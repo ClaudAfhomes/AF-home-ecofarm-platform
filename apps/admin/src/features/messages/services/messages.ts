@@ -2,7 +2,6 @@ import {
   adminConversationSchema,
   adminMessagesSummarySchema,
   messageSchema,
-  createMessageRequestSchema,
   markMessagesReadResponseSchema,
 } from '@jad/contracts';
 import type {
@@ -13,8 +12,8 @@ import type {
   Message,
 } from '@jad/contracts';
 
-import { request, requestList, requestPage } from '../../lib/api/client';
-import type { PageResult } from '../../lib/api/client';
+import { request, requestList, requestPage } from '../../../lib/api/client';
+import type { PageResult } from '../../../lib/api/client';
 
 /**
  * Admin messaging services (FEAT-072, ADR-013) — typed wrappers over the API

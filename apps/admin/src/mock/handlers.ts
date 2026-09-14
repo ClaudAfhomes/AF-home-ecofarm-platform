@@ -36,6 +36,7 @@ import {
 } from './staffMockStore';
 import { guardRolePermissions } from '../features/roles/guards';
 import { registrationStore } from './registrationMockStore';
+import { messagesMockStore, staffUnreadFor } from './messagesMockStore';
 
 function idFromPath(url: string, pattern: RegExp): string | undefined {
   return pattern.exec(new URL(url, 'http://mock.local').pathname)?.[1];
@@ -781,6 +782,130 @@ export const adminMockHandlers: MockRoute[] = [
           total: data.length,
         },
       };
+    },
+  },
+  {
+    path: '/admin/messages/summary',
+    response: () => {
+      const unreadCount = messagesMockStore.conversations.reduce(
+        (sum, c) => sum + staffUnreadFor(c.memberId),
+        0,
+      );
+      return {
+        unreadCount,
+        unreadConversations: messagesMockStore.conversations.filter(
+          (c) => staffUnreadFor(c.memberId) > 0,
+        ).length,
+      };
+    },
+  },
+  {
+    path: '/admin/conversations',
+    response: () => {
+      const data = messagesMockStore.conversations
+        .map((conversation) => {
+          const thread = messagesMockStore.messages
+            .filter((m) => m.memberId === conversation.memberId)
+            .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+          const latest = thread[0];
+          return {
+            memberId: conversation.memberId,
+            memberName: conversation.memberName,
+            memberEmail: conversation.memberEmail,
+            lastMessageAt: latest?.createdAt,
+            lastMessagePreview: latest ? latest.body.slice(0, 140) : undefined,
+            unreadCount: staffUnreadFor(conversation.memberId),
+          };
+        })
+        .sort(
+          (a, b) =>
+            (b.lastMessageAt ?? '').localeCompare(a.lastMessageAt ?? ''),
+        );
+      return {
+        data,
+        meta: {
+          page: 1,
+          pageSize: data.length,
+          total: data.length,
+        },
+      };
+    },
+  },
+  {
+    path: '/admin/conversations/',
+    match: 'prefix',
+    handler: (ctx: MockRequestContext) => {
+      const id = idFromPath(ctx.url, /\/admin\/conversations\/([^/]+)/);
+      if (!id) return notFound('Conversation');
+      const conversation = messagesMockStore.conversations.find((c) => c.memberId === id);
+      const memberExists =
+        conversation !== undefined ||
+        registrationStore.members.some((m) => m.id === id);
+      if (!memberExists) return notFound('Member');
+      if (ctx.method === 'GET') {
+        // Thread, newest first (cursor/limit handled client-side over the page).
+        const thread = messagesMockStore.messages
+          .filter((m) => m.memberId === id)
+          .sort(
+            (a, b) =>
+              b.createdAt.localeCompare(a.createdAt) || b.id.localeCompare(a.id),
+          );
+        return {
+          data: thread.map(({ memberId: _memberId, ...rest }) => rest),
+          meta: { pagination: {} },
+        };
+      }
+      if (ctx.method === 'POST' && ctx.url.includes('/messages')) {
+        const body = (ctx.body ?? {}) as { body?: unknown };
+        if (typeof body.body !== 'string' || body.body.trim().length === 0) {
+          return fail('Enter a message.');
+        }
+        const trimmed = body.body.trim();
+        if (trimmed.length > 4000) return fail('Message is too long.');
+        const message = {
+          id: `msg-${String(messagesMockStore.messages.length + 1).padStart(3, '0')}`,
+          memberId: id,
+          senderType: 'STAFF' as const,
+          senderName: 'Ada Admin',
+          body: trimmed,
+          createdAt: new Date().toISOString(),
+        };
+        if (!conversation) {
+          const member = registrationStore.members.find((m) => m.id === id);
+          messagesMockStore.conversations.push({
+            memberId: id,
+            memberName: member ? `${member.firstName} ${member.lastName}` : 'Member',
+            memberEmail: member?.email ?? '',
+          });
+        }
+        messagesMockStore.messages.push(message);
+        return {
+          body: {
+            id: message.id,
+            senderType: message.senderType,
+            senderName: message.senderName,
+            body: message.body,
+            createdAt: message.createdAt,
+          },
+          status: 201,
+        };
+      }
+      if (ctx.method === 'POST' && ctx.url.includes('/read')) {
+        const existing = messagesMockStore.conversations.find((c) => c.memberId === id);
+        if (existing) {
+          existing.staffLastReadAt = new Date().toISOString();
+        } else {
+          const member = registrationStore.members.find((m) => m.id === id);
+          messagesMockStore.conversations.push({
+            memberId: id,
+            memberName: member ? `${member.firstName} ${member.lastName}` : 'Member',
+            memberEmail: member?.email ?? '',
+            staffLastReadAt: new Date().toISOString(),
+          });
+        }
+        return { readAt: new Date().toISOString() };
+      }
+      return notFound('Conversation');
     },
   },
 ];
