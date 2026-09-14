@@ -66,6 +66,9 @@ export const MEMBER_NAV_ITEMS: MemberNavItem[] = [
 
   /* Single-page link */
   { to: '/member/profile', label: 'Profile', icon: 'user' },
+
+  /* Single-page link */
+  { to: '/member/messages', label: 'Messages', icon: 'message' },
 ];
 
 export function memberSidebarItems(): SidebarItem[] {

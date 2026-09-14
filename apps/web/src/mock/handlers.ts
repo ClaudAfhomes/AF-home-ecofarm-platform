@@ -929,6 +929,110 @@ export function memberMockHandlers(store: MockStore): MockRoute[] {
       },
     },
 
+    // ---- MEMBER: admin↔member messaging (FEAT-072, ADR-013) -------------
+    {
+      path: '/me/messages',
+      method: 'GET',
+      handler: (ctx) => {
+        const member = currentMember(store);
+        if (!member) return unauthorized();
+        const url = new URL(ctx.url, 'http://mock.local');
+        const cursor = url.searchParams.get('cursor') ?? undefined;
+        const requestedLimit = Number(url.searchParams.get('limit') ?? 50);
+        const limit =
+          Number.isFinite(requestedLimit) && requestedLimit > 0
+            ? Math.min(requestedLimit, 100)
+            : 50;
+        const ordered = store.messages
+          .filter((message) => message.memberId === member.id)
+          .sort(
+            (a, b) =>
+              b.createdAt.localeCompare(a.createdAt) ||
+              b.id.localeCompare(a.id),
+          );
+        const startIndex = cursor ? ordered.findIndex((message) => message.id === cursor) + 1 : 0;
+        const page = ordered.slice(startIndex, startIndex + limit);
+        const hasMore = startIndex + limit < ordered.length;
+        const nextCursor = hasMore ? page[page.length - 1]?.id : undefined;
+        return ok({
+          data: page.map((message) => ({
+            id: message.id,
+            senderType: message.senderType,
+            senderName: message.senderName,
+            body: message.body,
+            createdAt: message.createdAt,
+          })),
+          meta: { pagination: nextCursor ? { nextCursor } : {} },
+        });
+      },
+    },
+    {
+      path: '/me/messages',
+      method: 'POST',
+      handler: (ctx) => {
+        const member = currentMember(store);
+        if (!member) return unauthorized();
+        const body = (ctx.body ?? {}) as { body?: unknown };
+        if (typeof body.body !== 'string' || body.body.trim().length === 0) {
+          return validationError('Enter a message.');
+        }
+        const trimmed = body.body.trim();
+        if (trimmed.length > 4000) return validationError('Message is too long.');
+        const message = {
+          id: `msg-${String(store.nextMessageId++).padStart(3, '0')}`,
+          memberId: member.id,
+          senderType: 'MEMBER' as const,
+          senderName: `${member.firstName} ${member.lastName}`,
+          body: trimmed,
+          createdAt: new Date().toISOString(),
+        };
+        store.messages.push(message);
+        return created({
+          id: message.id,
+          senderType: message.senderType,
+          senderName: message.senderName,
+          body: message.body,
+          createdAt: message.createdAt,
+        });
+      },
+    },
+    {
+      path: '/me/messages/read',
+      method: 'POST',
+      handler: () => {
+        const member = currentMember(store);
+        if (!member) return unauthorized();
+        const readAt = new Date().toISOString();
+        store.messageReads[member.id] = readAt;
+        return ok({ readAt });
+      },
+    },
+    {
+      path: '/me/messages/summary',
+      method: 'GET',
+      handler: () => {
+        const member = currentMember(store);
+        if (!member) return unauthorized();
+        const readAt = store.messageReads[member.id];
+        const thread = store.messages
+          .filter((message) => message.memberId === member.id)
+          .sort(
+            (a, b) =>
+              b.createdAt.localeCompare(a.createdAt) ||
+              b.id.localeCompare(a.id),
+          );
+        const unreadCount = readAt
+          ? thread.filter(
+              (message) => message.senderType === 'STAFF' && message.createdAt > readAt,
+            ).length
+          : thread.filter((message) => message.senderType === 'STAFF').length;
+        return ok({
+          unreadCount,
+          lastMessageAt: thread[0]?.createdAt,
+        });
+      },
+    },
+
     // ---- MEMBER: referrals & reporting (FG-REF / FG-REPORTING) -----------
     {
       path: '/me/direct-referrals',

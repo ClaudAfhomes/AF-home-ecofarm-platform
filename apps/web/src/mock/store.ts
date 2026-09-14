@@ -185,6 +185,16 @@ export interface MockNotification {
   readAt?: string;
 }
 
+/** One chat message in a member's admin thread (ADR-013, FEAT-072). */
+export interface MockMessage {
+  id: string;
+  memberId: string;
+  senderType: 'MEMBER' | 'STAFF';
+  senderName: string;
+  body: string;
+  createdAt: string;
+}
+
 export interface MockVoucher {
   id: string;
   code: string;
@@ -236,13 +246,15 @@ export interface MockStore {
   payoutAccounts: MockPayoutAccount[];
   withdrawals: MockWithdrawal[];
   notifications: MockNotification[];
+  messages: MockMessage[];
+  /** Per-member thread read watermarks (mirrors Conversation.memberLastReadAt). */
+  messageReads: Record<string, string>;
   vouchers: MockVoucher[];
   contentItems: MockContentItem[];
   policies: MockPolicy[];
   /** Server-side Idempotency-Key store (API-SPECIFICATION §5.3) — key → cached response. */
   idempotency: Record<string, unknown>;
-  nextCustomerId: number;
-  nextSaleId: number;
+  nextCustomerId: number;  nextSaleId: number;
   nextCommissionId: number;
   nextPayoutAccountId: number;
   nextWithdrawalId: number;
@@ -250,6 +262,7 @@ export interface MockStore {
   nextVoucherId: number;
   nextContentId: number;
   nextPolicyId: number;
+  nextMessageId: number;
 }
 
 export function ageFromDateOfBirth(dateOfBirth: string, now = new Date()): number {
@@ -773,6 +786,25 @@ export function createMockStore(): MockStore {
       title: 'Payout account rejected',
       body: 'Your payout account (Traditional bank • •••• 7777) was rejected — Account name does not match bank record — please verify the account name and resubmit. You can add a new payout account with the correct details.',
       createdAt: iso(1),
+    },
+  ];
+
+  const messages: MockMessage[] = [
+    {
+      id: 'msg-001',
+      memberId: 'mem-001',
+      senderType: 'MEMBER',
+      senderName: 'Juan Member',
+      body: 'Hello, I have a question about my commission.',
+      createdAt: iso(3),
+    },
+    {
+      id: 'msg-002',
+      memberId: 'mem-001',
+      senderType: 'STAFF',
+      senderName: 'Ada Admin',
+      body: 'Hi Juan! Happy to help — what would you like to know?',
+      createdAt: iso(2),
     },
   ];
 
@@ -1419,6 +1451,8 @@ export function createMockStore(): MockStore {
     payoutAccounts,
     withdrawals,
     notifications,
+    messages,
+    messageReads: {},
     vouchers,
     contentItems,
     policies,
@@ -1432,5 +1466,6 @@ export function createMockStore(): MockStore {
     nextVoucherId: 4,
     nextContentId: 4,
     nextPolicyId: 4,
+    nextMessageId: 3,
   };
 }

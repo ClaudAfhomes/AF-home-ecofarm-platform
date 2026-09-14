@@ -17,6 +17,8 @@ import { CatalogDetailPage } from '../features/catalog/pages/CatalogDetailPage';
 import { ContentPage } from '../features/content/pages/ContentPage';
 import { MarketingToolDetailPage } from '../features/content/pages/MarketingToolDetailPage';
 import { BroadcastsPage } from '../features/broadcasts/pages/BroadcastsPage';
+import { InboxPage } from '../features/messages/pages/InboxPage';
+import { ConversationPage } from '../features/messages/pages/ConversationPage';
 import { PoliciesPage } from '../features/policies/pages/PoliciesPage';
 import { PolicyDetailPage } from '../features/policies/pages/PolicyDetailPage';
 import { MyAccountPage } from '../features/account/pages/MyAccountPage';
@@ -171,6 +173,22 @@ export default function App() {
             element={
               <RequireRole>
                 <BroadcastsPage />
+              </RequireRole>
+            }
+          />
+          <Route
+            path="/admin/messages"
+            element={
+              <RequireRole>
+                <InboxPage />
+              </RequireRole>
+            }
+          />
+          <Route
+            path="/admin/messages/:memberId"
+            element={
+              <RequireRole>
+                <ConversationPage />
               </RequireRole>
             }
           />

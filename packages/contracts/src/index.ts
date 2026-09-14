@@ -195,6 +195,24 @@ export type {
   ReadAllNotificationsResponse,
 } from './schemas/notification.js';
 export {
+  messageSenderTypeSchema,
+  messageSchema,
+  conversationSummarySchema,
+  adminConversationSchema,
+  adminMessagesSummarySchema,
+  createMessageRequestSchema,
+  markMessagesReadResponseSchema,
+} from './schemas/message.js';
+export type {
+  MessageSenderType,
+  Message,
+  ConversationSummary,
+  AdminConversation,
+  AdminMessagesSummary,
+  CreateMessageRequest,
+  MarkMessagesReadResponse,
+} from './schemas/message.js';
+export {
   directReferralSchema,
   groupNetworkSchema,
   genealogyNodeSchema,

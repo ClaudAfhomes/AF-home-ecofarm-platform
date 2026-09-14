@@ -8,6 +8,8 @@ import { findNavItem, findNavSubItem, navItemsForRole, ROLE_LABELS } from './nav
 import { resolveRoleModules, roleNameFor } from '@jad/contracts';
 import { useRegistrations } from '../features/registrations/hooks/useRegistrations';
 import { useRoles } from '../features/roles/hooks/useRoles';
+import { useMessagesRealtime } from '../features/messages/hooks/useMessagesRealtime';
+import { useAdminMessagesSummary } from '../features/messages/hooks/useConversations';
 import styles from './AdminLayout.module.css';
 
 /**
@@ -43,9 +45,23 @@ export function AdminLayout() {
     enabled: queriesEnabled && canSeeRegistrations,
   });
   const pendingCount = (registrations ?? []).filter((r) => r.status === 'PENDING').length;
-  const items = baseItems.map((item) =>
-    item.to === '/admin/members' ? { ...item, badge: pendingCount > 0 ? pendingCount : undefined } : item,
-  );
+  // Messages inbox badge (unread member messages), module-gated like the
+  // registrations queue; skip the doomed fetch for roles without the module.
+  const canSeeMessages = resolveRoleModules(roles, roleId, user?.roleModules).includes('messages');
+  useMessagesRealtime(queriesEnabled && canSeeMessages);
+  const { data: messagesSummary } = useAdminMessagesSummary({
+    enabled: queriesEnabled && canSeeMessages,
+  });
+  const messagesUnread = messagesSummary?.unreadCount ?? 0;
+  const items = baseItems.map((item) => {
+    if (item.to === '/admin/members') {
+      return { ...item, badge: pendingCount > 0 ? pendingCount : undefined };
+    }
+    if (item.to === '/admin/messages') {
+      return { ...item, badge: messagesUnread > 0 ? messagesUnread : undefined };
+    }
+    return item;
+  });
   const current = findNavItem(location.pathname);
 
   const crumbs = useMemo(() => {

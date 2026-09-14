@@ -30,7 +30,8 @@ export type IconName =
   | 'download'
   | 'plus'
   | 'pencil'
-  | 'trash';
+  | 'trash'
+  | 'message';
 
 const PATHS: Record<IconName, ReactNode> = {
   menu: (
@@ -204,6 +205,13 @@ const PATHS: Record<IconName, ReactNode> = {
       <path d="M19 6V20a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2" />
       <line x1="10" y1="11" x2="10" y2="17" />
       <line x1="14" y1="11" x2="14" y2="17" />
+    </>
+  ),
+  message: (
+    <>
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+      <line x1="8" y1="9" x2="16" y2="9" />
+      <line x1="8" y1="13" x2="13" y2="13" />
     </>
   ),
 };

@@ -156,6 +156,10 @@ describe('STAFF_PERMISSIONS matrix', () => {
     expect(canStaffAccess('admin', 'properties')).toBe(true);
     expect(canStaffAccess('admin', 'marketing_tools')).toBe(true);
     expect(canStaffAccess('admin', 'cms')).toBe(true);
+    expect(canStaffAccess('admin', 'messages')).toBe(true);
+    expect(canStaffAccess('super_admin', 'messages')).toBe(true);
+    expect(canStaffAccess('finance', 'messages')).toBe(false);
+    expect(canStaffAccess('merchant', 'messages')).toBe(false);
     expect(canStaffAccess('admin', 'config')).toBe(false);
     expect(canStaffAccess('admin', 'programs')).toBe(false);
     expect(canStaffAccess('admin', 'audit')).toBe(false);

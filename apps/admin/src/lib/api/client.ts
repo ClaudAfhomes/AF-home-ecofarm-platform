@@ -88,3 +88,31 @@ export async function requestList<T>(
   }
   return parsed.data.data;
 }
+
+/** Cursor-paginated page of `{ data, meta.pagination.nextCursor }` (API-SPECIFICATION §4). */
+export interface PageResult<T> {
+  items: T[];
+  nextCursor?: string;
+}
+
+/** GET a cursor-paginated collection (threads/ledger streams — API-SPECIFICATION §4). */
+export async function requestPage<T>(
+  path: string,
+  itemSchema: ZodType<T>,
+  init?: RequestInit,
+): Promise<PageResult<T>> {
+  const listSchema = listResponseSchema(itemSchema);
+  const res = await rawRequest(path, init);
+  const body = await parseBody(res);
+
+  if (!res.ok) {
+    throw toApiError(body, res.status);
+  }
+
+  const parsed = listSchema.safeParse(body);
+  if (!parsed.success) {
+    throw new ApiParseError(path, parsed.error.message);
+  }
+  const pagination = parsed.data.meta?.pagination as { nextCursor?: string } | undefined;
+  return { items: parsed.data.data, nextCursor: pagination?.nextCursor };
+}

@@ -1,0 +1,150 @@
+.threadShell {
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--space-5);
+}
+
+.thread {
+  height: clamp(320px, 52vh, 560px);
+  overflow-y: auto;
+  padding: var(--space-4);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+}
+
+.loading {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.loadOlder {
+  display: flex;
+  justify-content: center;
+  padding-bottom: var(--space-3);
+}
+
+.empty {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-10) var(--space-4);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.row {
+  display: flex;
+}
+
+.rowOwn {
+  justify-content: flex-end;
+}
+
+.rowStaff {
+  justify-content: flex-start;
+}
+
+.bubble {
+  max-width: 78%;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+}
+
+.bubbleOwn {
+  background: var(--color-brand-primary);
+  color: var(--color-text-on-brand);
+  border-bottom-right-radius: var(--radius-sm);
+}
+
+.bubbleStaff {
+  background: var(--color-bg-surface-raised);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-default);
+  border-bottom-left-radius: var(--radius-sm);
+}
+
+.sender {
+  margin: 0 0 var(--space-1);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.bubbleOwn .sender {
+  color: var(--color-on-dark-muted);
+}
+
+.bubbleStaff .sender {
+  color: var(--color-text-muted);
+}
+
+.body {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.meta {
+  display: block;
+  margin-top: var(--space-2);
+  font-size: 0.75rem;
+}
+
+.bubbleOwn .meta {
+  color: var(--color-on-dark-muted);
+}
+
+.bubbleStaff .meta {
+  color: var(--color-text-muted);
+}
+
+.composer {
+  margin-top: var(--space-4);
+  padding: var(--space-4);
+  background: var(--color-bg-surface-raised);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+}
+
+.composerLabel {
+  display: block;
+  margin-bottom: var(--space-2);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.composerInput {
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+  padding: var(--space-3);
+  font: inherit;
+  color: var(--color-text-primary);
+  background: var(--color-bg-canvas);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+}
+
+.composerInput:focus {
+  outline: 3px solid var(--color-state-focus);
+  outline-offset: 1px;
+}
+
+.composerFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+
+.counter {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}

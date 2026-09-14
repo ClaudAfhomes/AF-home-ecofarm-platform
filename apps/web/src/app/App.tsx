@@ -33,6 +33,7 @@ import { DirectReferralsPage } from '../features/member/pages/DirectReferralsPag
 import { EWalletPage } from '../features/member/pages/EWalletPage';
 import { GroupNetworkPage } from '../features/member/pages/GroupNetworkPage';
 import { LedgerPage } from '../features/member/pages/LedgerPage';
+import { MessagesPage } from '../features/member/pages/MessagesPage';
 import { MyGenealogyPage } from '../features/member/pages/MyGenealogyPage';
 import { NotificationsPage } from '../features/member/pages/NotificationsPage';
 import { PayoutAccountsPage } from '../features/member/pages/PayoutAccountsPage';
@@ -321,6 +322,14 @@ export default function App() {
             element={
               <RequireMember>
                 <NotificationsPage />
+              </RequireMember>
+            }
+          />
+          <Route
+            path="/member/messages"
+            element={
+              <RequireMember>
+                <MessagesPage />
               </RequireMember>
             }
           />

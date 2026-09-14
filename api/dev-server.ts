@@ -120,6 +120,14 @@ import handlerSaleById from './v1/sales/[id].js';
 import handlerSaleResubmit from './v1/sales/[id]/resubmit.js';
 import handlerSaleReopenRequest from './v1/me/sales/[id]/reopen-request.js';
 import handlerMemberById from './v1/members/[id].js';
+import handlerMeMessages from './v1/me/messages.js';
+import handlerMeMessagesRead from './v1/me/messages/read.js';
+import handlerMeMessagesSummary from './v1/me/messages/summary.js';
+import handlerAdminConversations from './v1/admin/conversations.js';
+import handlerAdminConversationThread from './v1/admin/conversations/[memberId].js';
+import handlerAdminConversationMessages from './v1/admin/conversations/[memberId]/messages.js';
+import handlerAdminConversationRead from './v1/admin/conversations/[memberId]/read.js';
+import handlerAdminMessagesSummary from './v1/admin/messages/summary.js';
 
 const port = Number(process.argv[2] ?? process.env.PORT ?? 3000);
 
@@ -265,6 +273,48 @@ const server = http.createServer(async (req, res) => {
       query.id = decodeURIComponent(m[1] ?? '');
       handler = handlerMeBroadcastRead as unknown as HandlerFn;
       routeKey = 'me/broadcasts/[id]/read';
+    }
+  } else if (pathname === '/api/v1/me/messages' || pathname === '/api/me/messages') {
+    handler = handlerMeMessages as unknown as HandlerFn;
+    routeKey = 'me/messages';
+  } else if (pathname === '/api/v1/me/messages/read' || pathname === '/api/me/messages/read') {
+    handler = handlerMeMessagesRead as unknown as HandlerFn;
+    routeKey = 'me/messages/read';
+  } else if (
+    pathname === '/api/v1/me/messages/summary' ||
+    pathname === '/api/me/messages/summary'
+  ) {
+    handler = handlerMeMessagesSummary as unknown as HandlerFn;
+    routeKey = 'me/messages/summary';
+  } else if (
+    pathname === '/api/v1/admin/conversations' ||
+    pathname === '/api/admin/conversations'
+  ) {
+    handler = handlerAdminConversations as unknown as HandlerFn;
+    routeKey = 'admin/conversations';
+  } else if (
+    pathname === '/api/v1/admin/messages/summary' ||
+    pathname === '/api/admin/messages/summary'
+  ) {
+    handler = handlerAdminMessagesSummary as unknown as HandlerFn;
+    routeKey = 'admin/messages/summary';
+  } else if (
+    pathname.startsWith('/api/v1/admin/conversations/') ||
+    pathname.startsWith('/api/admin/conversations/')
+  ) {
+    const m = pathname.match(/\/admin\/conversations\/([^/]+)(\/messages|\/read)?$/);
+    if (m) {
+      query.memberId = decodeURIComponent(m[1] ?? '');
+      if (m[2] === '/messages') {
+        handler = handlerAdminConversationMessages as unknown as HandlerFn;
+        routeKey = 'admin/conversations/[memberId]/messages';
+      } else if (m[2] === '/read') {
+        handler = handlerAdminConversationRead as unknown as HandlerFn;
+        routeKey = 'admin/conversations/[memberId]/read';
+      } else {
+        handler = handlerAdminConversationThread as unknown as HandlerFn;
+        routeKey = 'admin/conversations/[memberId]';
+      }
     }
   } else if (pathname === '/api/v1/me' || pathname === '/api/me') {
     handler = handlerMe as unknown as HandlerFn;

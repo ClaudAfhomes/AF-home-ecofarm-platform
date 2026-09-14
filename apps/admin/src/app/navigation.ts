@@ -104,6 +104,13 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
     module: 'marketing_tools',
   },
   {
+    to: '/admin/messages',
+    label: 'Messages',
+    icon: 'message',
+    roles: ADMINS_ONLY,
+    module: 'messages',
+  },
+  {
     to: '/admin/policies',
     label: 'Policies',
     icon: 'file-text',

@@ -1,14 +1,17 @@
 import { z } from 'zod';
 import {
   commissionSchema,
+  conversationSummarySchema,
   customerSchema,
   directReferralSchema,
   forwardableContentSchema,
   genealogySchema,
   groupNetworkSchema,
   ledgerEntrySchema,
+  markMessagesReadResponseSchema,
   markNotificationReadResponseSchema,
   memberProfileSchema,
+  messageSchema,
   notificationSchema,
   payoutAccountSchema,
   qualificationSummarySchema,
@@ -22,7 +25,9 @@ import {
 } from '@jad/contracts';
 import type {
   Commission,
+  ConversationSummary,
   CreateCustomerRequest,
+  CreateMessageRequest,
   CreatePayoutAccountRequest,
   CreateWithdrawalRequest,
   Customer,
@@ -31,8 +36,10 @@ import type {
   Genealogy,
   GroupNetwork,
   LedgerEntry,
+  MarkMessagesReadResponse,
   MarkNotificationReadResponse,
   MemberProfile,
+  Message,
   Notification,
   PayoutAccount,
   QualificationSummary,
@@ -98,11 +105,43 @@ export function markNotificationRead(
   });
 }
 
-/** `POST /me/broadcasts/read-all` — receipts for every visible unread item. */
+/** `GET /me/broadcasts/read-all` — receipts for every visible unread item. */
 export function markAllNotificationsRead(): Promise<ReadAllNotificationsResponse> {
   return request('/me/broadcasts/read-all', readAllNotificationsResponseSchema, {
     method: 'POST',
   });
+}
+
+/** `GET /me/messages?cursor=…` — own admin thread, cursor-paginated newest first (API-SPECIFICATION #90). */
+export function getMessagesPage(
+  cursor?: string,
+  limit?: number,
+): Promise<PageResult<Message>> {
+  const params = new URLSearchParams();
+  if (cursor) params.set('cursor', cursor);
+  if (limit) params.set('limit', String(limit));
+  const query = params.size > 0 ? `?${params.toString()}` : '';
+  return requestPage(`/me/messages${query}`, messageSchema);
+}
+
+/** `POST /me/messages` — send a message to the admin team (API-SPECIFICATION #91). */
+export function sendMessage(input: CreateMessageRequest): Promise<Message> {
+  return request('/me/messages', messageSchema, {
+    method: 'POST',
+    body: JSON.stringify(input),
+  });
+}
+
+/** `POST /me/messages/read` — mark the thread read (API-SPECIFICATION #92). */
+export function markMessagesRead(): Promise<MarkMessagesReadResponse> {
+  return request('/me/messages/read', markMessagesReadResponseSchema, {
+    method: 'POST',
+  });
+}
+
+/** `GET /me/messages/summary` — thread badge: unread staff replies (API-SPECIFICATION #93). */
+export function getMessagesSummary(): Promise<ConversationSummary> {
+  return request('/me/messages/summary', conversationSummarySchema);
 }
 
 /** `GET /customers` — the member's own customer records (API-SPECIFICATION #23). */

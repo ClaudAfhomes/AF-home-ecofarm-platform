@@ -42,6 +42,11 @@ where schemaname = 'storage'
 -- Money functions (withdraw_reserve, withdrawal_complete, withdrawal_reject,
 -- sale_qualify, …) must be service_role-only; any row naming one is a FAIL.
 -- Other rows are triage candidates, not automatic failures.
+-- Deliberate exception (owner, 2026-09-14, ADR-013): is_staff_user() is
+-- EXECUTE-to-authenticated by design — a read-only, parameterless standing
+-- check used only inside SELECT-only RLS policies on "Message" and
+-- "Conversation" (staff realtime). It writes nothing and reveals only the
+-- caller's own standing.
 select grantee, routine_schema, routine_name
 from information_schema.role_routine_grants
 where grantee in ('anon', 'authenticated', 'PUBLIC')

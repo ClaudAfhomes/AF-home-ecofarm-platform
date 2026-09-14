@@ -1,4 +1,4 @@
-import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 import { useSession } from '../../../lib/session';
 
@@ -11,6 +11,8 @@ import {
   getGenealogy,
   getGroupNetwork,
   getLedgerPage,
+  getMessagesPage,
+  getMessagesSummary,
   getPayoutAccounts,
   getProfile,
   getQualification,
@@ -22,6 +24,8 @@ import {
   getWallet,
   getWithdrawal,
   getWithdrawals,
+  markMessagesRead,
+  sendMessage,
 } from '../services/member';
 
 /** `GET /members/:id` — the signed-in member's profile (SCR-MEM-002). */
@@ -124,6 +128,56 @@ export function useBroadcasts() {
     queryKey: ['member', 'broadcasts', user?.id],
     queryFn: getBroadcasts,
     enabled: Boolean(user?.id),
+  });
+}
+
+/** `GET /me/messages` — own admin thread, cursor-paginated (FEAT-072). */
+export function useMessagesPage() {
+  const { user } = useSession();
+  return useInfiniteQuery({
+    queryKey: ['member', 'messages', user?.id],
+    queryFn: ({ pageParam }) => getMessagesPage(pageParam as string | undefined),
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (lastPage) => lastPage.nextCursor,
+    enabled: Boolean(user?.id),
+  });
+}
+
+/** `GET /me/messages/summary` — thread badge (unread staff replies). */
+export function useMessagesSummary() {
+  const { user } = useSession();
+  return useQuery({
+    queryKey: ['member', 'messages', 'summary', user?.id],
+    queryFn: getMessagesSummary,
+    enabled: Boolean(user?.id),
+  });
+}
+
+/** `POST /me/messages` + `POST /me/messages/read` — send and mark-read. */
+export function useSendMessage() {
+  const { user } = useSession();
+  const queryClient = useQueryClient();
+  const baseKey = ['member', 'messages', user?.id] as const;
+  return useMutation({
+    mutationFn: sendMessage,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['member', 'messages', 'summary', user?.id] });
+    },
+    onSettled: () => {
+      void queryClient.invalidateQueries({ queryKey: baseKey });
+    },
+  });
+}
+
+export function useMarkMessagesRead() {
+  const { user } = useSession();
+  const queryClient = useQueryClient();
+  const summaryKey = ['member', 'messages', 'summary', user?.id] as const;
+  return useMutation({
+    mutationFn: markMessagesRead,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: summaryKey });
+    },
   });
 }
 
