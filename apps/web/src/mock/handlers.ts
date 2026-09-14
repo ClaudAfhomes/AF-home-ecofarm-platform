@@ -544,15 +544,11 @@ export function memberMockHandlers(store: MockStore): MockRoute[] {
       method: 'POST',
       handler: (ctx) => {
         const body = (ctx.body ?? {}) as Record<string, unknown>;
-        const hasGps =
-          typeof body.latitude === 'number' && typeof body.longitude === 'number';
+        const hasGps = typeof body.latitude === 'number' && typeof body.longitude === 'number';
         // Isolated mapping: PH → DOMESTIC, non-PH → ABROAD
-        const mapCountryToProgram = (
-          cc: string,
-        ): { programId: string; programCode: string } => {
+        const mapCountryToProgram = (cc: string): { programId: string; programCode: string } => {
           const code = cc.toUpperCase();
-          if (code === 'PH')
-            return { programId: 'prg-domestic', programCode: 'DOMESTIC' };
+          if (code === 'PH') return { programId: 'prg-domestic', programCode: 'DOMESTIC' };
           return { programId: 'prg-abroad', programCode: 'ABROAD' };
         };
         const makeId = () => {
@@ -562,7 +558,10 @@ export function memberMockHandlers(store: MockStore): MockRoute[] {
             if (fn) return fn.call((globalThis as unknown as { crypto: unknown }).crypto);
           } catch {}
           // Fallback valid uuid (not PH-dependent) for jsdom without crypto
-          return '550e8400-e29b-41d4-a716-44665544' + String(Math.floor(Math.random() * 10000)).padStart(4, '0');
+          return (
+            '550e8400-e29b-41d4-a716-44665544' +
+            String(Math.floor(Math.random() * 10000)).padStart(4, '0')
+          );
         };
         // DEV ONLY: Mock emulates the API contract, not the geolocation algorithm.
         // Do NOT add fixture coordinate mappings or bounding boxes here.
@@ -582,12 +581,15 @@ export function memberMockHandlers(store: MockStore): MockRoute[] {
           try {
             const viteEnv = (import.meta as unknown as { env?: Record<string, string> }).env;
             const envVal = viteEnv?.VITE_DEV_LOCATION_COUNTRY ?? viteEnv?.DEV_LOCATION_COUNTRY;
-            if (typeof envVal === 'string' && /^[A-Za-z]{2}$/.test(envVal.trim())) return envVal.trim().toUpperCase();
+            if (typeof envVal === 'string' && /^[A-Za-z]{2}$/.test(envVal.trim()))
+              return envVal.trim().toUpperCase();
           } catch {}
           // 3) localStorage override for runtime switching in browser dev
           try {
-            const ls = typeof localStorage !== 'undefined' ? localStorage.getItem('jad:dev:country') : null;
-            if (typeof ls === 'string' && /^[A-Za-z]{2}$/.test(ls.trim())) return ls.trim().toUpperCase();
+            const ls =
+              typeof localStorage !== 'undefined' ? localStorage.getItem('jad:dev:country') : null;
+            if (typeof ls === 'string' && /^[A-Za-z]{2}$/.test(ls.trim()))
+              return ls.trim().toUpperCase();
           } catch {}
           return null;
         };
@@ -871,8 +873,13 @@ export function memberMockHandlers(store: MockStore): MockRoute[] {
       handler: () => {
         const member = currentMember(store);
         if (!member) return unauthorized();
+        // Own rows + broadcasts (memberId null), newest first — mirrors the
+        // real endpoint (member_id.is.null OR member_id.eq.<uid>).
         const items = store.notifications
-          .filter((notification) => notification.memberId === member.id)
+          .filter(
+            (notification) => notification.memberId === member.id || notification.memberId === null,
+          )
+          .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
           .map((notification) => ({
             id: notification.id,
             title: notification.title,
@@ -881,6 +888,44 @@ export function memberMockHandlers(store: MockStore): MockRoute[] {
             readAt: notification.readAt,
           }));
         return list(items);
+      },
+    },
+    {
+      path: '/me/broadcasts/read-all',
+      method: 'POST',
+      handler: () => {
+        const member = currentMember(store);
+        if (!member) return unauthorized();
+        let updated = 0;
+        for (const notification of store.notifications) {
+          if (
+            (notification.memberId === member.id || notification.memberId === null) &&
+            !notification.readAt
+          ) {
+            notification.readAt = new Date().toISOString();
+            updated += 1;
+          }
+        }
+        return ok({ updated });
+      },
+    },
+    {
+      path: '/me/broadcasts/',
+      method: 'POST',
+      match: 'prefix',
+      handler: (ctx) => {
+        const member = currentMember(store);
+        if (!member) return unauthorized();
+        const match = /\/me\/broadcasts\/([^/]+)\/read$/.exec(ctx.url);
+        if (!match) return error('NOT_FOUND', 'Not found', 404);
+        const notification = store.notifications.find(
+          (candidate) =>
+            candidate.id === match[1] &&
+            (candidate.memberId === member.id || candidate.memberId === null),
+        );
+        if (!notification) return error('NOT_FOUND', 'Notification not found', 404);
+        if (!notification.readAt) notification.readAt = new Date().toISOString();
+        return ok({ id: notification.id, readAt: notification.readAt });
       },
     },
 
@@ -1279,9 +1324,11 @@ export function memberMockHandlers(store: MockStore): MockRoute[] {
         if (!customer) return error('NOT_FOUND', 'Customer not found.', 404);
         const property = store.properties.find((candidate) => candidate.id === propertyId);
         if (!property) return validationError('This property is not available in the catalog.');
-        if (property.status !== 'ACTIVE') return validationError('This property is not available in the catalog.');
+        if (property.status !== 'ACTIVE')
+          return validationError('This property is not available in the catalog.');
         const price = (property as { price?: string }).price ?? property.value;
-        if (!price || price === '0.00') return validationError('This property is not available in the catalog.');
+        if (!price || price === '0.00')
+          return validationError('This property is not available in the catalog.');
         const sale: MockSale = {
           id: `sal-${String(store.nextSaleId).padStart(3, '0')}`,
           sellerId: member.id,
@@ -1344,9 +1391,11 @@ export function memberMockHandlers(store: MockStore): MockRoute[] {
           (candidate) => candidate.id === parsed.data.propertyId,
         );
         if (!property) return validationError('This property is not available in the catalog.');
-        if (property.status !== 'ACTIVE') return validationError('This property is not available in the catalog.');
+        if (property.status !== 'ACTIVE')
+          return validationError('This property is not available in the catalog.');
         const price = (property as { price?: string }).price ?? property.value;
-        if (!price || price === '0.00') return validationError('This property is not available in the catalog.');
+        if (!price || price === '0.00')
+          return validationError('This property is not available in the catalog.');
         sale.customerId = customer.id;
         sale.customerName = customer.fullName;
         sale.propertyId = property.id;

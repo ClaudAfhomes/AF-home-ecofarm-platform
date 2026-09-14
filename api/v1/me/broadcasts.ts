@@ -4,7 +4,34 @@ import { isValidNotificationRow, mapNotificationRow } from '../../_lib/mappers.j
 import { methodNotAllowed, okList, requireService } from '../../_lib/rest.js';
 import { toErrorEnvelope } from '../../_lib/envelope.js';
 
-/** GET /me/broadcasts — own + broadcast notifications, newest first (API-SPECIFICATION #73). */
+/** Merge per-member read receipts over notification rows. A broadcast row
+ * (member_id NULL) is shared, so its row read_at can never mark it read for
+ * one member — the receipt is the SSOT. Member-scoped rows fall back to the
+ * row read_at (legacy/seed state converged by the NotificationRead backfill).
+ */
+export function mergeReadReceipts(
+  notifications: Record<string, unknown>[],
+  receipts: { notificationId?: unknown; readAt?: unknown; read_at?: unknown }[],
+): Record<string, unknown>[] {
+  const byNotification = new Map<string, string>();
+  for (const receipt of receipts) {
+    if (typeof receipt.notificationId === 'string' && typeof receipt.readAt === 'string') {
+      byNotification.set(receipt.notificationId, receipt.readAt);
+    } else if (typeof receipt.notificationId === 'string' && typeof receipt.read_at === 'string') {
+      byNotification.set(receipt.notificationId, receipt.read_at);
+    }
+  }
+  return notifications.map((row) => {
+    const receipt = typeof row.id === 'string' ? byNotification.get(row.id) : undefined;
+    return { ...row, readAt: receipt ?? row.readAt ?? row.read_at ?? undefined };
+  });
+}
+
+/**
+ * GET /me/broadcasts — own + broadcast notifications, newest first
+ * (API-SPECIFICATION #73). Per-member `readAt` merges NotificationRead
+ * receipts over the row state.
+ */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
@@ -35,6 +62,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.status(status).json({ error: env });
     return;
   }
-  const rows = (((data as unknown[]) ?? []) as Record<string, unknown>[]).map(mapNotificationRow);
+  const notifications = (((data as unknown[]) ?? []) as Record<string, unknown>[]).map(
+    mapNotificationRow,
+  );
+  // Read receipts (missing table pre-migration degrades to row state).
+  let receipts: { notificationId?: unknown; readAt?: unknown; read_at?: unknown }[] = [];
+  try {
+    const { data: receiptRows, error: receiptError } = await supabase
+      .from('NotificationRead')
+      .select('notificationId,readAt')
+      .eq('memberId', auth.userId);
+    if (!receiptError && Array.isArray(receiptRows)) {
+      receipts = receiptRows as typeof receipts;
+    }
+  } catch {
+    // pre-migration: no receipts table — row state stands alone.
+  }
+  const rows = mergeReadReceipts(notifications, receipts);
   okList(res, rows.filter(isValidNotificationRow));
 }

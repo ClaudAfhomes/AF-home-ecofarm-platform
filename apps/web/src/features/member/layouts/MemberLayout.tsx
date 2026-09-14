@@ -6,6 +6,7 @@ import { AppShell, Breadcrumbs, ConfirmDialog, UserMenu } from '@jad/ui';
 
 import { NotificationBell } from '../components/NotificationBell';
 import { MemberBottomNav } from '../components/MemberBottomNav';
+import { useNotificationsRealtime } from '../hooks/useNotificationsRealtime';
 import { findMemberNavItem, memberSidebarItems } from '../navigation';
 import styles from './MemberLayout.module.css';
 
@@ -19,6 +20,8 @@ export function MemberLayout() {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const location = useLocation();
   const current = findMemberNavItem(location.pathname);
+  // Single live subscription for the notification feed (bell + page).
+  useNotificationsRealtime(user?.id);
 
   const crumbs = useMemo(() => {
     if (!current || current.to === '/member') return [];
@@ -54,7 +57,12 @@ export function MemberLayout() {
               items={[
                 { label: 'My Account', icon: 'user', to: '/member/profile' },
                 { label: '-', icon: '' },
-                { label: 'Logout', icon: 'logout', danger: true, onClick: () => setShowLogoutConfirm(true) },
+                {
+                  label: 'Logout',
+                  icon: 'logout',
+                  danger: true,
+                  onClick: () => setShowLogoutConfirm(true),
+                },
               ]}
             />
           </div>

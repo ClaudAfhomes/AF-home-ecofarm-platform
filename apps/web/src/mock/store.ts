@@ -177,7 +177,8 @@ export function maskIdentifier(identifier: string): string {
 
 export interface MockNotification {
   id: string;
-  memberId: string;
+  /** Member-scoped row owner; `null` = broadcast to every member. */
+  memberId: string | null;
   title: string;
   body?: string;
   createdAt: string;
@@ -572,7 +573,13 @@ export function createMockStore(): MockStore {
 
   const sale = (
     partial: Omit<MockSale, 'id' | 'sellerId' | 'sellerName' | 'submittedAt'> & { id: string },
-  ): MockSale => ({ ...partial, id: partial.id, sellerId: 'mem-001', sellerName: 'Juan Dela Cruz', submittedAt: iso(0) });
+  ): MockSale => ({
+    ...partial,
+    id: partial.id,
+    sellerId: 'mem-001',
+    sellerName: 'Juan Dela Cruz',
+    submittedAt: iso(0),
+  });
 
   const sales: MockSale[] = [
     sale({
@@ -717,6 +724,20 @@ export function createMockStore(): MockStore {
   });
 
   const notifications: MockNotification[] = [
+    {
+      id: 'ntf-broadcast-001',
+      memberId: null,
+      title: 'New properties in the catalog',
+      body: 'The Admin team has added new fixed-value units to the catalog — see the Properties page.',
+      createdAt: iso(2),
+    },
+    {
+      id: 'ntf-broadcast-002',
+      memberId: null,
+      title: 'Community announcement',
+      body: 'New marketing material and community update — find it in Marketing Tools or check the community links.',
+      createdAt: iso(6),
+    },
     {
       id: 'ntf-001',
       memberId: 'mem-001',
@@ -966,7 +987,8 @@ export function createMockStore(): MockStore {
       status: 'REJECTED',
       isPrimary: false,
       createdAt: iso(1),
-      rejectionReason: 'Account name does not match bank record — please verify the account name and resubmit.',
+      rejectionReason:
+        'Account name does not match bank record — please verify the account name and resubmit.',
     },
   ];
 

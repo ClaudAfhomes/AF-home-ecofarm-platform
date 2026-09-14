@@ -54,6 +54,10 @@ import handlerPolicyById from './v1/policies/[id].js';
 import handlerAdminConfig from './v1/admin/config.js';
 import handlerAdminConfigKey from './v1/admin/config/[key].js';
 import handlerBroadcasts from './v1/me/broadcasts.js';
+import handlerBroadcastCreate from './v1/broadcasts.js';
+import handlerAdminBroadcasts from './v1/admin/broadcasts.js';
+import handlerMeBroadcastRead from './v1/me/broadcasts/[id]/read.js';
+import handlerMeBroadcastsReadAll from './v1/me/broadcasts/read-all.js';
 import handlerForwardable from './v1/content/forwardable.js';
 import handlerAdminContent from './v1/admin/content.js';
 import handlerAdminContentById from './v1/admin/content/[id].js';
@@ -240,6 +244,28 @@ const server = http.createServer(async (req, res) => {
   } else if (pathname === '/api/v1/me/broadcasts' || pathname === '/api/me/broadcasts') {
     handler = handlerBroadcasts as unknown as HandlerFn;
     routeKey = 'me/broadcasts';
+  } else if (pathname === '/api/v1/broadcasts' || pathname === '/api/broadcasts') {
+    handler = handlerBroadcastCreate as unknown as HandlerFn;
+    routeKey = 'broadcasts';
+  } else if (pathname === '/api/v1/admin/broadcasts' || pathname === '/api/admin/broadcasts') {
+    handler = handlerAdminBroadcasts as unknown as HandlerFn;
+    routeKey = 'admin/broadcasts';
+  } else if (
+    pathname === '/api/v1/me/broadcasts/read-all' ||
+    pathname === '/api/me/broadcasts/read-all'
+  ) {
+    handler = handlerMeBroadcastsReadAll as unknown as HandlerFn;
+    routeKey = 'me/broadcasts/read-all';
+  } else if (
+    pathname.startsWith('/api/v1/me/broadcasts/') ||
+    pathname.startsWith('/api/me/broadcasts/')
+  ) {
+    const m = pathname.match(/\/me\/broadcasts\/([^/]+)\/read$/);
+    if (m) {
+      query.id = decodeURIComponent(m[1] ?? '');
+      handler = handlerMeBroadcastRead as unknown as HandlerFn;
+      routeKey = 'me/broadcasts/[id]/read';
+    }
   } else if (pathname === '/api/v1/me' || pathname === '/api/me') {
     handler = handlerMe as unknown as HandlerFn;
     routeKey = 'me';

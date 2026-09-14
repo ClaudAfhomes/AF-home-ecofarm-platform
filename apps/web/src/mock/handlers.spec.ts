@@ -12,6 +12,7 @@ import { getPolicies, getPrograms } from '../lib/api/endpoints';
 import {
   createPayoutAccount,
   createWithdrawal,
+  getBroadcasts,
   getCommissions,
   getContentLibrary,
   getDirectReferrals,
@@ -26,6 +27,8 @@ import {
   getWithdrawals,
   getSales,
   getSale,
+  markAllNotificationsRead,
+  markNotificationRead,
   requestReopenSale,
   resubmitSale,
   setPrimaryPayoutAccount,
@@ -564,6 +567,48 @@ describe('F1 member mock API', () => {
         title: 'Terms and Conditions',
         type: 'terms',
         content: expect.any(String),
+      });
+    });
+
+    it('serves own + broadcast notifications newest first (SCR-MEM-024)', async () => {
+      setMockSessionUser(MOCK_MEMBER);
+      const items = await getBroadcasts();
+      // 5 member rows + 2 broadcasts (memberId null), newest first.
+      expect(items).toHaveLength(7);
+      expect(items.map((item) => item.id)).toContain('ntf-broadcast-001');
+      expect(items.map((item) => item.id)).toContain('ntf-broadcast-002');
+      const created = items.map((item) => item.createdAt);
+      expect([...created].sort().reverse()).toEqual(created);
+    });
+
+    it('marks one notification read and then all remaining (SCR-MEM-024)', async () => {
+      setMockSessionUser(MOCK_MEMBER);
+      const receipt = await markNotificationRead('ntf-broadcast-001');
+      expect(receipt).toMatchObject({ id: 'ntf-broadcast-001' });
+      expect(typeof receipt.readAt).toBe('string');
+
+      const after = await getBroadcasts();
+      expect(after.find((item) => item.id === 'ntf-broadcast-001')?.readAt).toBeDefined();
+
+      // Idempotent re-mark of the same item.
+      const again = await markNotificationRead('ntf-broadcast-001');
+      expect(again.readAt).toBe(receipt.readAt);
+
+      const all = await markAllNotificationsRead();
+      expect(all.updated).toBe(5);
+      const done = await getBroadcasts();
+      expect(done.every((item) => Boolean(item.readAt))).toBe(true);
+
+      const noop = await markAllNotificationsRead();
+      expect(noop).toMatchObject({ updated: 0 });
+    });
+
+    it('404s a foreign member-scoped notification on mark-read', async () => {
+      setMockSessionUser(MOCK_MEMBER_NOT_QUALIFIED);
+      // ntf-002 belongs to mem-001 — not visible to another member.
+      await expect(markNotificationRead('ntf-002')).rejects.toMatchObject({
+        code: 'NOT_FOUND',
+        status: 404,
       });
     });
   });

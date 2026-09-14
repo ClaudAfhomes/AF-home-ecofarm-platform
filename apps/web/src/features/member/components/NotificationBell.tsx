@@ -1,13 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import { Icon, IconButton, Skeleton, useDialogShell } from '@jad/ui';
 
+import { useSession } from '../../../lib/session';
 import { useBroadcasts } from '../hooks/useMember';
+import { markAllNotificationsRead } from '../services/member';
 import { formatDate } from '../lib/presentation';
 import styles from './NotificationBell.module.css';
 
 const NOTIFICATION_LIMIT = 5;
+const UNREAD_DISPLAY_CAP = 99;
 
 /**
  * Bell icon button in the topbar that toggles a notification dropdown.
@@ -15,6 +19,8 @@ const NOTIFICATION_LIMIT = 5;
  * "View all" link to the full notifications page.
  */
 export function NotificationBell() {
+  const { user } = useSession();
+  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const panelRef = useRef<HTMLDivElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
@@ -50,22 +56,37 @@ export function NotificationBell() {
     };
   }, [open]);
 
-  const notifications = (query.data ?? []).slice(0, NOTIFICATION_LIMIT);
-  const unreadCount = notifications.filter((n) => !n.readAt).length;
+  const all = query.data ?? [];
+  const notifications = all.slice(0, NOTIFICATION_LIMIT);
+  // Unread count spans the FULL feed — the 5-item slice is display-only.
+  const unreadCount = all.filter((n) => !n.readAt).length;
+  const unreadLabel =
+    unreadCount > UNREAD_DISPLAY_CAP ? `${UNREAD_DISPLAY_CAP}+` : String(unreadCount);
+
+  const markAllMutation = useMutation({
+    mutationFn: markAllNotificationsRead,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['member', 'broadcasts', user?.id] });
+    },
+  });
 
   return (
     <div ref={wrapperRef} className={styles.wrapper}>
       <button
         type="button"
         className={styles.bellButton}
-        aria-label={`Notifications${unreadCount > 0 ? `, ${unreadCount} unread` : ''}`}
+        aria-label={`Notifications${unreadCount > 0 ? `, ${unreadLabel} unread` : ''}`}
         aria-expanded={open}
         aria-haspopup="dialog"
         onClick={toggle}
       >
         <Icon name="bell" size={20} />
       </button>
-      {unreadCount > 0 ? <span className={styles.badge} aria-hidden="true" /> : null}
+      {unreadCount > 0 ? (
+        <span className={styles.badge} aria-hidden="true">
+          <span className={styles.badgeCount}>{unreadLabel}</span>
+        </span>
+      ) : null}
       {open ? (
         <>
           <div className={styles.backdrop} onClick={() => setOpen(false)} aria-hidden="true" />
@@ -80,6 +101,16 @@ export function NotificationBell() {
             <div className={styles.panelHeader}>
               <span className={styles.panelTitle}>Notifications</span>
               <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-2)' }}>
+                {unreadCount > 0 ? (
+                  <button
+                    type="button"
+                    className={styles.markAllButton}
+                    disabled={markAllMutation.isPending}
+                    onClick={() => markAllMutation.mutate()}
+                  >
+                    {markAllMutation.isPending ? 'Marking…' : 'Mark all read'}
+                  </button>
+                ) : null}
                 <Link
                   className={styles.viewAll}
                   to="/member/notifications"
@@ -102,6 +133,17 @@ export function NotificationBell() {
                   <Skeleton />
                   <Skeleton />
                 </div>
+              ) : query.isError ? (
+                <div className={styles.errorWrap}>
+                  <p className={styles.errorText}>Could not load notifications.</p>
+                  <button
+                    type="button"
+                    className={styles.retryButton}
+                    onClick={() => void query.refetch()}
+                  >
+                    Retry
+                  </button>
+                </div>
               ) : notifications.length === 0 ? (
                 <p className={styles.empty}>No notifications yet.</p>
               ) : (
@@ -110,7 +152,12 @@ export function NotificationBell() {
                     const isUnread = !notification.readAt;
                     return (
                       <li key={notification.id} className={styles.listItem}>
-                        <div className={styles.listMain}>
+                        <Link
+                          className={styles.itemLink}
+                          to="/member/notifications"
+                          onClick={() => setOpen(false)}
+                          aria-label={`${notification.title}${isUnread ? ' (unread)' : ''}`}
+                        >
                           <span
                             className={`${styles.listTitle} ${isUnread ? styles.listTitleUnread : ''}`}
                           >
@@ -125,7 +172,7 @@ export function NotificationBell() {
                           <span className={styles.listDate}>
                             {formatDate(notification.createdAt)}
                           </span>
-                        </div>
+                        </Link>
                       </li>
                     );
                   })}

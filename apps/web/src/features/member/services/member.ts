@@ -7,10 +7,12 @@ import {
   genealogySchema,
   groupNetworkSchema,
   ledgerEntrySchema,
+  markNotificationReadResponseSchema,
   memberProfileSchema,
   notificationSchema,
   payoutAccountSchema,
   qualificationSummarySchema,
+  readAllNotificationsResponseSchema,
   referralCodeSchema,
   reopenSaleRequestResponseSchema,
   saleSchema,
@@ -29,10 +31,12 @@ import type {
   Genealogy,
   GroupNetwork,
   LedgerEntry,
+  MarkNotificationReadResponse,
   MemberProfile,
   Notification,
   PayoutAccount,
   QualificationSummary,
+  ReadAllNotificationsResponse,
   ReferralCode,
   ReopenSaleRequestResponse,
   Sale,
@@ -83,6 +87,22 @@ export function getReferralCode(): Promise<ReferralCode> {
 /** `GET /me/broadcasts` — member notification feed (API-SPECIFICATION #73). */
 export function getBroadcasts(): Promise<Notification[]> {
   return requestList('/me/broadcasts', notificationSchema);
+}
+
+/** `POST /me/broadcasts/:id/read` — per-member read receipt (idempotent). */
+export function markNotificationRead(
+  notificationId: string,
+): Promise<MarkNotificationReadResponse> {
+  return request(`/me/broadcasts/${notificationId}/read`, markNotificationReadResponseSchema, {
+    method: 'POST',
+  });
+}
+
+/** `POST /me/broadcasts/read-all` — receipts for every visible unread item. */
+export function markAllNotificationsRead(): Promise<ReadAllNotificationsResponse> {
+  return request('/me/broadcasts/read-all', readAllNotificationsResponseSchema, {
+    method: 'POST',
+  });
 }
 
 /** `GET /customers` — the member's own customer records (API-SPECIFICATION #23). */

@@ -15,3 +15,26 @@ export const notificationSchema = z.object({
 });
 
 export type Notification = z.infer<typeof notificationSchema>;
+
+/** POST /broadcasts — admin announcement to all members (API-SPECIFICATION #72, FEAT-063). */
+export const createBroadcastRequestSchema = z.object({
+  title: z.string().trim().min(1, 'Enter an announcement title.').max(200),
+  body: z.string().trim().max(5000).optional(),
+});
+
+export type CreateBroadcastRequest = z.infer<typeof createBroadcastRequestSchema>;
+
+/** POST /me/broadcasts/:id/read — per-member read receipt (idempotent). */
+export const markNotificationReadResponseSchema = z.object({
+  id: z.string().min(1),
+  readAt: z.string(),
+});
+
+export type MarkNotificationReadResponse = z.infer<typeof markNotificationReadResponseSchema>;
+
+/** POST /me/broadcasts/read-all — receipts for every visible unread item. */
+export const readAllNotificationsResponseSchema = z.object({
+  updated: z.number().int().min(0),
+});
+
+export type ReadAllNotificationsResponse = z.infer<typeof readAllNotificationsResponseSchema>;

@@ -2,6 +2,7 @@ import type { AdminQueues, ContentKind } from '@jad/contracts';
 import { CMS_PROPERTIES_SEED, STAFF_MODULE_LABEL, roleNameFor } from '@jad/contracts';
 import type { MockRequestContext, MockRoute } from '@jad/mock';
 import { contentStore, createStoreContent, deleteStoreContent } from './contentMockStore';
+import { broadcastStore, createStoreBroadcast } from './broadcastMockStore';
 import {
   createStorePolicy,
   deleteStorePolicy,
@@ -315,6 +316,36 @@ export const adminMockHandlers: MockRoute[] = [
         };
       }
       return { body: item, status: 200 };
+    },
+  },
+  {
+    path: '/broadcasts',
+    method: 'POST',
+    handler: (ctx: MockRequestContext) => {
+      const input = (ctx.body ?? {}) as Record<string, unknown>;
+      try {
+        const item = createStoreBroadcast({
+          title: String(input.title ?? ''),
+          body: typeof input.body === 'string' ? input.body : undefined,
+        });
+        return { body: item, status: 201 };
+      } catch (e) {
+        return fail((e as Error).message);
+      }
+    },
+  },
+  {
+    path: '/admin/broadcasts',
+    response: () => {
+      const data = broadcastStore.items;
+      return {
+        data,
+        meta: {
+          page: 1,
+          pageSize: data.length,
+          total: data.length,
+        },
+      };
     },
   },
   {

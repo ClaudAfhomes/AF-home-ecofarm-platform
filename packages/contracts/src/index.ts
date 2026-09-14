@@ -182,8 +182,18 @@ export type {
   ResubmitSaleRequest,
   ReopenSaleRequestResponse,
 } from './schemas/sales.js';
-export { notificationSchema } from './schemas/notification.js';
-export type { Notification } from './schemas/notification.js';
+export {
+  notificationSchema,
+  createBroadcastRequestSchema,
+  markNotificationReadResponseSchema,
+  readAllNotificationsResponseSchema,
+} from './schemas/notification.js';
+export type {
+  Notification,
+  CreateBroadcastRequest,
+  MarkNotificationReadResponse,
+  ReadAllNotificationsResponse,
+} from './schemas/notification.js';
 export {
   directReferralSchema,
   groupNetworkSchema,

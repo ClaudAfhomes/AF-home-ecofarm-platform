@@ -97,6 +97,13 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
     module: 'marketing_tools',
   },
   {
+    to: '/admin/broadcasts',
+    label: 'Broadcasts',
+    icon: 'bell',
+    roles: ADMINS_ONLY,
+    module: 'marketing_tools',
+  },
+  {
     to: '/admin/policies',
     label: 'Policies',
     icon: 'file-text',
@@ -151,7 +158,11 @@ export function findNavItem(pathname: string): AdminNavItem | undefined {
   if (exact) return exact;
   // Check dropdown children first for more specific match
   for (const item of ADMIN_NAV_ITEMS) {
-    if (item.dropdown?.some((sub) => !('divider' in sub) && (pathname === sub.to || pathname.startsWith(`${sub.to}/`)))) {
+    if (
+      item.dropdown?.some(
+        (sub) => !('divider' in sub) && (pathname === sub.to || pathname.startsWith(`${sub.to}/`)),
+      )
+    ) {
       return item;
     }
     if (pathname.startsWith(`${item.to}/`) && item.to !== '/admin') {
@@ -166,7 +177,9 @@ export function findNavSubItem(
   pathname: string,
 ): { parent: AdminNavItem; sub: AdminNavSubItem } | undefined {
   for (const item of ADMIN_NAV_ITEMS) {
-    const sub = item.dropdown?.find((s) => !('divider' in s) && (pathname === s.to || pathname.startsWith(`${s.to}/`)));
+    const sub = item.dropdown?.find(
+      (s) => !('divider' in s) && (pathname === s.to || pathname.startsWith(`${s.to}/`)),
+    );
     if (sub && !('divider' in sub)) return { parent: item, sub };
   }
   return undefined;

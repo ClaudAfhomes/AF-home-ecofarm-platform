@@ -27,13 +27,24 @@
 
 .badge {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
+  top: 4px;
+  right: 4px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
   background-color: var(--color-danger);
   pointer-events: none;
+}
+
+.badgeCount {
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  color: #ffffff;
 }
 
 .backdrop {
@@ -109,6 +120,26 @@
   text-decoration: underline;
 }
 
+.markAllButton {
+  font-size: var(--text-body-s);
+  font-weight: 600;
+  color: var(--color-brand-primary);
+  background: none;
+  border: none;
+  padding: var(--space-1) var(--space-2);
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.markAllButton:hover:not(:disabled) {
+  text-decoration: underline;
+}
+
+.markAllButton:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .panelBody {
   flex: 1 1 auto;
   overflow-y: auto;
@@ -136,7 +167,6 @@
 }
 
 .listItem {
-  padding: var(--space-3) var(--space-4);
   border-bottom: 1px solid var(--color-border-default);
 }
 
@@ -144,9 +174,51 @@
   border-bottom: none;
 }
 
-.listMain {
+.itemLink {
   display: grid;
   gap: 2px;
+  padding: var(--space-3) var(--space-4);
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+}
+
+.itemLink:hover {
+  background-color: var(--color-bg-subtle);
+}
+
+.itemLink:focus-visible {
+  outline: 2px solid var(--color-brand-primary);
+  outline-offset: -2px;
+}
+
+.errorWrap {
+  display: grid;
+  gap: var(--space-2);
+  justify-items: center;
+  padding: var(--space-8) var(--space-4);
+  text-align: center;
+}
+
+.errorText {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--text-body-s);
+}
+
+.retryButton {
+  font-size: var(--text-body-s);
+  font-weight: 600;
+  color: var(--color-brand-primary);
+  background: none;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+  padding: 0 var(--space-3);
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.retryButton:hover {
+  border-color: var(--color-brand-primary);
 }
 
 .listTitle {

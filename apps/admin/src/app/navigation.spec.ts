@@ -24,6 +24,7 @@ describe('admin navigation registry', () => {
     expect(labels).toContain('Operations');
     expect(labels).toContain('Properties');
     expect(labels).toContain('Marketing Tools');
+    expect(labels).toContain('Broadcasts');
     expect(labels).toContain('System');
     expect(labels).toContain('Website CMS');
     expect(labels).not.toContain('Authentication');
@@ -95,7 +96,9 @@ describe('staff role module access', () => {
     ];
     const byTo = new Map(ADMIN_NAV_ITEMS.map((item) => [item.to, item]));
     expect(canAccessModule('role-finance-reviewer', roles, byTo.get('/admin/sales')!)).toBe(true);
-    expect(canAccessModule('role-finance-reviewer', roles, byTo.get('/admin/members')!)).toBe(false);
+    expect(canAccessModule('role-finance-reviewer', roles, byTo.get('/admin/members')!)).toBe(
+      false,
+    );
     expect(canAccessModule('role-ghost', roles, byTo.get('/admin/sales')!)).toBe(false);
     const items = navItemsForRole('admin', 'role-finance-reviewer', roles);
     expect(items.map((item) => item.label)).toEqual(['Dashboard', 'Operations']);
@@ -118,6 +121,7 @@ describe('navItemsForRole with staff role', () => {
       'Operations',
       'Properties',
       'Marketing Tools',
+      'Broadcasts',
       'Policies',
       'System',
       'Website CMS',
@@ -143,7 +147,9 @@ describe('navItemsForRole with staff role', () => {
     expect(findNavSubItem('/admin/staff')?.sub.module).toBe('staff');
     expect(canAccessSubModule('admin', undefined, findNavSubItem('/admin/staff')!.sub)).toBe(false);
     expect(findNavSubItem('/admin/roles')?.sub.module).toBe('staff');
-    expect(canAccessSubModule('finance', undefined, findNavSubItem('/admin/roles')!.sub)).toBe(false);
+    expect(canAccessSubModule('finance', undefined, findNavSubItem('/admin/roles')!.sub)).toBe(
+      false,
+    );
   });
 
   it('limits finance to dashboard plus sales, payouts and withdrawals', () => {
