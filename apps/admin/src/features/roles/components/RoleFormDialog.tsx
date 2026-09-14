@@ -1,6 +1,7 @@
 import { useEffect, useState, type CSSProperties } from 'react';
 
 import { Button, Dialog, useToast } from '@jad/ui';
+import { CUSTOM_ROLE_FORBIDDEN_MODULES } from '@jad/contracts';
 import type { StaffModule } from '@jad/contracts';
 
 import { useSession } from '../../../lib/session';
@@ -132,7 +133,12 @@ export function RoleFormDialog({ open, onClose }: Props) {
             onChange={setPermissions}
             disabled={isPending}
             showGlobalActions
+            lockedModules={CUSTOM_ROLE_FORBIDDEN_MODULES}
           />
+          <span style={{ fontSize: 'var(--text-caption)', color: 'var(--color-text-muted)' }}>
+            New roles are custom: Staff, Audit Log, System Configuration and Programs stay
+            super-admin-only.
+          </span>
           {errors.permissions ? (
             <span style={errorStyle} role="alert">
               {errors.permissions}

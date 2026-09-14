@@ -1,6 +1,6 @@
 import { createContentItemRequestSchema, forwardableContentSchema } from '@jad/contracts';
 
-import { verifyStaff } from '../../_lib/auth.js';
+import { verifyStaffModule } from '../../_lib/auth.js';
 import type { VercelRequest, VercelResponse } from '../../_lib/http.js';
 import { isValidContentItemRow, mapContentItemRow } from '../../_lib/mappers.js';
 import { prefixedId } from '../../_lib/pipeline.js';
@@ -20,7 +20,7 @@ export function buildContentShare(title: string, downloadUrl: string) {
 
 /** GET /admin/content — full library incl. unpublished (super_admin + admin). */
 export async function listAdminContent(req: VercelRequest, res: VercelResponse) {
-  const auth = await verifyStaff(req, ['super_admin', 'admin']);
+  const auth = await verifyStaffModule(req, 'marketing_tools', ['super_admin', 'admin']);
   if ('error' in auth) {
     const { error, status } = auth.error;
     res.status(status).json({ error });
@@ -43,7 +43,7 @@ export async function listAdminContent(req: VercelRequest, res: VercelResponse) 
 
 /** POST /admin/content — publish marketing content (super_admin + admin, FR-ADM-003). */
 export async function createAdminContent(req: VercelRequest, res: VercelResponse) {
-  const auth = await verifyStaff(req, ['super_admin', 'admin']);
+  const auth = await verifyStaffModule(req, 'marketing_tools', ['super_admin', 'admin']);
   if ('error' in auth) {
     const { error, status } = auth.error;
     res.status(status).json({ error });

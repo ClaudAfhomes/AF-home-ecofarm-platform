@@ -1,7 +1,7 @@
 import { adminMemberSchema, purgeMemberRequestSchema } from '@jad/contracts';
 
 import { ADMIN_STAFF, SUPER_ADMIN_ONLY } from '../../../_lib/access.js';
-import { slugsAllowed, verifyStaff } from '../../../_lib/auth.js';
+import { slugsAllowed, verifyStaffModule } from '../../../_lib/auth.js';
 import { appendAudit } from '../../../_lib/audit.js';
 import type { VercelRequest, VercelResponse } from '../../../_lib/http.js';
 import { mapAdminMemberRow } from '../../../_lib/pipeline.js';
@@ -41,7 +41,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     methodNotAllowed(res, req.method);
     return;
   }
-  const auth = await verifyStaff(req, [...ADMIN_STAFF]);
+  const auth = await verifyStaffModule(req, 'members', ADMIN_STAFF);
   if ('error' in auth) {
     const { error, status } = auth.error;
     res.status(status).json({ error });

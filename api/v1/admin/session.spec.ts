@@ -18,6 +18,8 @@ const mocks = vi.hoisted(() => {
       status: 'ACTIVE',
       mustChangePassword: false,
     } as Record<string, unknown> | null,
+    slugs: ['super_admin'] as string[],
+    roleRows: [] as Record<string, unknown>[],
   };
   const calls: { table: string; op: string; arg?: unknown }[] = [];
   const builder = (table: string) => {
@@ -25,11 +27,13 @@ const mocks = vi.hoisted(() => {
     b.select = () => b;
     b.eq = () => b;
     b.in = async () => {
-      if (table === 'Role') return { data: [{ slug: 'super_admin' }], error: null };
+      if (table === 'Role')
+        return { data: script.slugs.map((slug) => ({ slug })), error: null };
       return { data: [], error: null };
     };
     b.then = (resolve: (v: unknown) => void) => {
       if (table === 'StaffAssignment') resolve({ data: [{ roleId: 'r-1' }], error: null });
+      else if (table === 'Role') resolve({ data: script.roleRows, error: null });
       else resolve({ data: null, error: null });
     };
     b.maybeSingle = async () => {
@@ -99,6 +103,8 @@ function resetStaffRow() {
     status: 'ACTIVE',
     mustChangePassword: false,
   };
+  mocks.script.slugs = ['super_admin'];
+  mocks.script.roleRows = [];
 }
 
 describe('GET /admin/session', () => {
@@ -119,6 +125,41 @@ describe('GET /admin/session', () => {
       email: 'admin@jad.local',
       status: 'ACTIVE',
       slugs: ['super_admin'],
+    });
+  });
+
+  it('resolves the system role identity (label + matrix modules)', async () => {
+    const { res, seen } = capture();
+    await handler(req(), res);
+    expect(seen.status).toBe(200);
+    expect(seen.body).toMatchObject({
+      roleId: 'super_admin',
+      roleName: 'Super Admin',
+    });
+    const modules = (seen.body as { modules?: string[] }).modules ?? [];
+    expect(modules).toEqual(expect.arrayContaining(['dashboard', 'members', 'staff', 'audit', 'config']));
+  });
+
+  it('resolves a custom role identity from its record (name + modules)', async () => {
+    mocks.script.slugs = ['role-admin-support'];
+    mocks.script.roleRows = [
+      {
+        id: 'x-1',
+        key: 'role-admin-support',
+        slug: 'role-admin-support',
+        name: 'Admin Support',
+        permissions: ['dashboard', 'members'],
+        is_system: false,
+      },
+    ];
+    const { res, seen } = capture();
+    await handler(req(), res);
+    expect(seen.status).toBe(200);
+    expect(seen.body).toMatchObject({
+      slugs: ['role-admin-support'],
+      roleId: 'role-admin-support',
+      roleName: 'Admin Support',
+      modules: ['dashboard', 'members'],
     });
   });
 

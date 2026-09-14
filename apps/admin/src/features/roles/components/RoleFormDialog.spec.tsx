@@ -51,6 +51,18 @@ describe('RoleFormDialog', () => {
     expect(await screen.findByText('A role with this name already exists.')).toBeInTheDocument();
   });
 
+  it('locks governance modules for new custom roles (server rejects them)', async () => {
+    renderDialog();
+    await screen.findByRole('heading', { name: 'Create Role' });
+    // staff/audit/config/programs stay super-admin-only on new roles.
+    expect(screen.getByLabelText('Staff')).toBeDisabled();
+    expect(screen.getByLabelText('Audit Log')).toBeDisabled();
+    expect(screen.getByLabelText('System Configuration')).toBeDisabled();
+    // Operational modules stay selectable.
+    expect(screen.getByLabelText('Sales')).toBeEnabled();
+    expect(screen.getByLabelText('Dashboard')).toBeEnabled();
+  });
+
   it('creates the role with actor attribution and closes', async () => {
     const user = userEvent.setup();
     const { onClose } = renderDialog();

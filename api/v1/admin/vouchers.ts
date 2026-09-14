@@ -1,5 +1,5 @@
 import { FINANCE_VIEW } from '../../_lib/access.js';
-import { verifyStaff } from '../../_lib/auth.js';
+import { verifyStaffModule } from '../../_lib/auth.js';
 import type { VercelRequest, VercelResponse } from '../../_lib/http.js';
 import { isValidVoucherAssignmentRow, mapVoucherAssignmentRow } from '../../_lib/pipeline.js';
 import { methodNotAllowed, okList, requireService } from '../../_lib/rest.js';
@@ -11,7 +11,7 @@ import { toErrorEnvelope } from '../../_lib/envelope.js';
  * template's assignments (used by the template detail page).
  */
 export async function listVouchers(req: VercelRequest, res: VercelResponse) {
-  const auth = await verifyStaff(req, [...FINANCE_VIEW]);
+  const auth = await verifyStaffModule(req, 'vouchers', FINANCE_VIEW);
   if ('error' in auth) {
     const { error, status } = auth.error;
     res.status(status).json({ error });

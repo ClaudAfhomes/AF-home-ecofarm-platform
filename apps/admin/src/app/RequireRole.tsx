@@ -62,7 +62,10 @@ function LoadingState() {
  * of stranding the user — a refresh is no longer required to recover.
  */
 export function RequireRole({ children }: { children: ReactNode }) {
-  const { status, role, roleId, sessionError, revalidate, mustChangePassword } = useSession();
+  const { status, user, role, roleId, sessionError, revalidate, mustChangePassword } = useSession();
+  // Server-resolved modules are authoritative for the signed-in staff member
+  // (the role catalog is super_admin-only); they win over fetched records.
+  const sessionModules = user?.roleModules;
   // During a forced password change the roles endpoint is blocked by design
   // (verifyStaff rejects mustChangePassword) and module RBAC is irrelevant —
   // the redirect below pins the user to My Account. Never wait on role
@@ -94,16 +97,20 @@ export function RequireRole({ children }: { children: ReactNode }) {
     <Forbidden />
   );
   if (mustChangePassword) return <>{children}</>;
-  // Sessions carrying a role id enforce per-module access resolved against
-  // role records (matrix seed as fallback). A matched sub-item (dropdown
-  // link) is authoritative for its destination; the item module check
-  // additionally covers flat pages (dashboard, properties) and category
-  // headers with no matching child. Sessions without a role id (real backend
-  // until it resolves roles server-side) keep the legacy top-level gate.
-  if (roleId !== undefined && roleId !== null && rolesPending) return <LoadingState />;
+  // Sessions carrying a role id enforce per-module access: session-resolved
+  // modules win, then role records, then the matrix seed as fallback. A
+  // matched sub-item (dropdown link) is authoritative for its destination;
+  // the item module check additionally covers flat pages (dashboard,
+  // properties) and category headers with no matching child. Sessions
+  // without a role id keep the legacy top-level gate.
+  // Only wait for role records when the session carries no resolved modules
+  // (mock/legacy): non-super-admin staff cannot read the role catalog, so
+  // waiting would strand them on the skeleton for a fetch that must 403.
+  if (roleId !== undefined && roleId !== null && !sessionModules && rolesPending)
+    return <LoadingState />;
   const enforcedId = roleId ?? null;
   const sub = roleId ? findNavSubItem(location.pathname) : undefined;
-  if (sub !== undefined && !canAccessSubModule(enforcedId, roles, sub.sub)) {
+  if (sub !== undefined && !canAccessSubModule(enforcedId, roles, sub.sub, sessionModules)) {
     return denied;
   }
   const item = findNavItem(location.pathname);
@@ -111,7 +118,7 @@ export function RequireRole({ children }: { children: ReactNode }) {
     if (!canAccess(role, item)) {
       return denied;
     }
-    if (roleId && sub === undefined && !canAccessModule(enforcedId, roles, item)) {
+    if (roleId && sub === undefined && !canAccessModule(enforcedId, roles, item, sessionModules)) {
       return denied;
     }
   }

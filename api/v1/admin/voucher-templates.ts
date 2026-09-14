@@ -1,5 +1,5 @@
 import { ADMIN_STAFF, FINANCE_VIEW } from '../../_lib/access.js';
-import { verifyStaff } from '../../_lib/auth.js';
+import { verifyStaffModule } from '../../_lib/auth.js';
 import { appendAudit } from '../../_lib/audit.js';
 import type { VercelRequest, VercelResponse } from '../../_lib/http.js';
 import {
@@ -13,7 +13,7 @@ import { toErrorEnvelope } from '../../_lib/envelope.js';
 
 /** GET /admin/voucher-templates — voucher types (super_admin, admin, finance). Read-only in B5. */
 export async function listVoucherTemplates(req: VercelRequest, res: VercelResponse) {
-  const auth = await verifyStaff(req, [...FINANCE_VIEW]);
+  const auth = await verifyStaffModule(req, 'vouchers', FINANCE_VIEW);
   if ('error' in auth) {
     const { error, status } = auth.error;
     res.status(status).json({ error });
@@ -38,7 +38,7 @@ export async function listVoucherTemplates(req: VercelRequest, res: VercelRespon
 
 /** POST /admin/voucher-templates — create a template (super_admin, admin). */
 export async function createVoucherTemplate(req: VercelRequest, res: VercelResponse) {
-  const auth = await verifyStaff(req, [...ADMIN_STAFF]);
+  const auth = await verifyStaffModule(req, 'vouchers', ADMIN_STAFF);
   if ('error' in auth) {
     const { error, status } = auth.error;
     res.status(status).json({ error });

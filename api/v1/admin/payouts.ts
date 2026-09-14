@@ -1,5 +1,5 @@
 import { FINANCE_VIEW } from '../../_lib/access.js';
-import { verifyStaff } from '../../_lib/auth.js';
+import { verifyStaffModule } from '../../_lib/auth.js';
 import type { VercelRequest, VercelResponse } from '../../_lib/http.js';
 import { isValidPayoutAccountRow, mapPayoutAccountRow } from '../../_lib/pipeline.js';
 import { methodNotAllowed, okList, requireService } from '../../_lib/rest.js';
@@ -7,7 +7,7 @@ import { toErrorEnvelope } from '../../_lib/envelope.js';
 
 /** GET /admin/payouts — payout accounts queue (super_admin, admin, finance). */
 export async function listPayouts(req: VercelRequest, res: VercelResponse) {
-  const auth = await verifyStaff(req, [...FINANCE_VIEW]);
+  const auth = await verifyStaffModule(req, 'payouts', FINANCE_VIEW);
   if ('error' in auth) {
     const { error, status } = auth.error;
     res.status(status).json({ error });

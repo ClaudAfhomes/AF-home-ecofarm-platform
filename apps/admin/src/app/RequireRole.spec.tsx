@@ -16,6 +16,9 @@ import { RequireRole } from './RequireRole';
 
 const rolesStub = vi.hoisted(() => ({
   pending: false,
+  // Simulates the production 403 for non-super-admin staff: the catalog is
+  // unreadable, so module checks must run on session-resolved modules.
+  denied: false,
 }));
 
 vi.mock('../features/roles/hooks/useRoles', async () => {
@@ -24,12 +27,14 @@ vi.mock('../features/roles/hooks/useRoles', async () => {
     useRoles: () =>
       rolesStub.pending
         ? { data: undefined, isPending: true, isError: false, error: null }
-        : {
-            data: systemRoleRecords(),
-            isPending: false,
-            isError: false,
-            error: null,
-          },
+        : rolesStub.denied
+          ? { data: undefined, isPending: false, isError: true, error: new Error('forbidden') }
+          : {
+              data: systemRoleRecords(),
+              isPending: false,
+              isError: false,
+              error: null,
+            },
   };
 });
 
@@ -56,6 +61,7 @@ function renderAt(path: string, user: SessionUser | null | undefined) {
 describe('RequireRole', () => {
   afterEach(() => {
     rolesStub.pending = false;
+    rolesStub.denied = false;
     vi.restoreAllMocks();
   });
 
@@ -142,6 +148,38 @@ describe('RequireRole', () => {
 
   it('renders Forbidden when the role cannot access the section', async () => {
     renderAt('/admin/registrations', MOCK_MEMBER);
+    expect(await screen.findByText('Access denied')).toBeInTheDocument();
+    expect(screen.queryByText('registrations page')).not.toBeInTheDocument();
+  });
+
+  it('lets a custom-role session through on session modules when the catalog is unreadable', async () => {
+    rolesStub.denied = true;
+    const custom: SessionUser = {
+      ...MOCK_SUPER_ADMIN,
+      id: 'cst-1',
+      name: 'Support Staffer',
+      email: 'support@jad.local',
+      roleId: 'role-admin-support',
+      roleName: 'Admin Support',
+      roleModules: ['dashboard', 'registrations'],
+    };
+    renderAt('/admin/registrations', custom);
+    expect(await screen.findByText('registrations page')).toBeInTheDocument();
+    expect(screen.queryByText('Access denied')).not.toBeInTheDocument();
+  });
+
+  it('denies a custom-role session a module its session modules do not grant', async () => {
+    rolesStub.denied = true;
+    const custom: SessionUser = {
+      ...MOCK_SUPER_ADMIN,
+      id: 'cst-1',
+      name: 'Support Staffer',
+      email: 'support@jad.local',
+      roleId: 'role-admin-support',
+      roleName: 'Admin Support',
+      roleModules: ['dashboard'],
+    };
+    renderAt('/admin/registrations', custom);
     expect(await screen.findByText('Access denied')).toBeInTheDocument();
     expect(screen.queryByText('registrations page')).not.toBeInTheDocument();
   });

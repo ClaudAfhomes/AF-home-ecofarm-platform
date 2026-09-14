@@ -2,7 +2,7 @@ import { payoutAccountSchema } from '@jad/contracts';
 
 import { FINANCE_VIEW } from '../../../_lib/access.js';
 import { appendAudit } from '../../../_lib/audit.js';
-import { verifyStaff } from '../../../_lib/auth.js';
+import { verifyStaffModule } from '../../../_lib/auth.js';
 import type { VercelRequest, VercelResponse } from '../../../_lib/http.js';
 import { mapPayoutAccountRow } from '../../../_lib/pipeline.js';
 import { methodNotAllowed, readJsonBody, requireService } from '../../../_lib/rest.js';
@@ -25,7 +25,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     methodNotAllowed(res, req.method);
     return;
   }
-  const auth = await verifyStaff(req, [...FINANCE_VIEW]);
+  const auth = await verifyStaffModule(req, 'payouts', FINANCE_VIEW);
   if ('error' in auth) {
     const { error, status } = auth.error;
     res.status(status).json({ error });

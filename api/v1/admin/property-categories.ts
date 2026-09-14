@@ -2,7 +2,7 @@ import { cmsPropertyCategorySchema } from '@jad/contracts';
 
 import { ADMIN_STAFF } from '../../_lib/access.js';
 import { appendAudit } from '../../_lib/audit.js';
-import { verifyStaff } from '../../_lib/auth.js';
+import { verifyStaffModule } from '../../_lib/auth.js';
 import type { VercelRequest, VercelResponse } from '../../_lib/http.js';
 import { isValidMergedCategory, mergeCategory } from '../../_lib/cutover.js';
 import { methodNotAllowed, readJsonBody, requireService } from '../../_lib/rest.js';
@@ -53,7 +53,7 @@ async function writeCmsCategories(
 
 /** GET /admin/property-categories — merged key + presentation + counts. */
 export async function listCategories(req: VercelRequest, res: VercelResponse) {
-  const auth = await verifyStaff(req, [...ADMIN_STAFF]);
+  const auth = await verifyStaffModule(req, 'properties', ADMIN_STAFF);
   if ('error' in auth) {
     const { error, status } = auth.error;
     res.status(status).json({ error });
@@ -86,7 +86,7 @@ export async function listCategories(req: VercelRequest, res: VercelResponse) {
 
 /** POST /admin/property-categories — create key + presentation. */
 export async function createCategory(req: VercelRequest, res: VercelResponse) {
-  const auth = await verifyStaff(req, [...ADMIN_STAFF]);
+  const auth = await verifyStaffModule(req, 'properties', ADMIN_STAFF);
   if ('error' in auth) {
     const { error, status } = auth.error;
     res.status(status).json({ error });

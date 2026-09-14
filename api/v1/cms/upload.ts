@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
 import { ADMIN_STAFF } from '../../_lib/access.js';
-import { verifyStaff } from '../../_lib/auth.js';
+import { verifyStaffModule } from '../../_lib/auth.js';
 import { getSupabaseEnv } from '../../_lib/env.js';
 import { toErrorEnvelope as toError } from '../../_lib/envelope.js';
 import type { VercelRequest, VercelResponse } from '../../_lib/http.js';
@@ -20,7 +20,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.status(status).json({ error });
     return;
   }
-  const auth = await verifyStaff(req, [...ADMIN_STAFF]);
+  const auth = await verifyStaffModule(req, 'cms', ADMIN_STAFF);
   if ('error' in auth) {
     const { error, status } = auth.error;
     res.status(status).json({ error });

@@ -1,7 +1,7 @@
 import { policyCreateSchema, policySchema } from '@jad/contracts';
 
 import { ADMIN_STAFF } from '../_lib/access.js';
-import { verifyStaff } from '../_lib/auth.js';
+import { verifyStaffModule } from '../_lib/auth.js';
 import { appendAudit } from '../_lib/audit.js';
 import { toErrorEnvelope } from '../_lib/envelope.js';
 import type { VercelRequest, VercelResponse } from '../_lib/http.js';
@@ -37,7 +37,7 @@ async function listPolicies(req: VercelRequest, res: VercelResponse) {
 
 /** POST /policies — admin policy create (FR-ADM-004). The PDF is required. */
 async function createPolicy(req: VercelRequest, res: VercelResponse) {
-  const auth = await verifyStaff(req, [...ADMIN_STAFF]);
+  const auth = await verifyStaffModule(req, 'policies', ADMIN_STAFF);
   if ('error' in auth) {
     const { error, status } = auth.error;
     res.status(status).json({ error });

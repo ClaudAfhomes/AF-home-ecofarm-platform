@@ -1,8 +1,11 @@
 import { createClient } from '@supabase/supabase-js';
 
+import type { StaffModule } from '@jad/contracts';
+
 import { getSupabaseEnv } from './env.js';
 import { toErrorEnvelope } from './envelope.js';
 import type { VercelRequest } from './http.js';
+import { pickStaffRoleId, staffRoleModules } from './rbac.js';
 
 export type StaffAuthError = { error: ReturnType<typeof toErrorEnvelope> };
 export type StaffAuthSuccess = { userId: string; slugs: string[] };
@@ -318,4 +321,70 @@ export async function verifyStaff(
     return { error: toErrorEnvelope('FORBIDDEN', 'Insufficient role', 403) };
   }
   return { error: toErrorEnvelope('FORBIDDEN', 'Admin access required', 403) };
+}
+
+/**
+ * Module-gated staff authorization (custom-role support). Keeps the
+ * endpoint's legacy slug allow-list AND additionally authorizes a
+ * custom-role holder when the caller's role holds the required module.
+ * Governance endpoints stay slug-only (verifyStaff) so custom roles can
+ * never escalate there.
+ *
+ * Behavior for system roles is identical to verifyStaff — the slug branch
+ * is checked first, so allow-lists the UI matrix doesn't mirror (e.g.
+ * finance on vouchers) keep working without matrix changes.
+ */
+export async function verifyStaffModule(
+  req: VercelRequest,
+  module: StaffModule,
+  fallbackSlugs: readonly string[] = [],
+  deps?: VerifyStaffDeps,
+): Promise<StaffAuthSuccess | StaffAuthError> {
+  const { url, anonKey, serviceKey } = getSupabaseEnv();
+  if (!url || !anonKey) {
+    return { error: toErrorEnvelope('INTERNAL', 'Supabase not configured', 500) };
+  }
+  const token = extractBearerToken(req);
+  if (!token) {
+    return { error: toErrorEnvelope('UNAUTHORIZED', 'Missing authentication', 401) };
+  }
+  const anon =
+    deps?.anonClient ?? createClient(url, anonKey, { auth: { autoRefreshToken: false } });
+  const { data, error } = await anon.auth.getUser(token);
+  const authedUser = data?.user as { id?: string } | null;
+  if (error || !authedUser?.id) {
+    return { error: toErrorEnvelope('UNAUTHORIZED', 'Invalid session', 401) };
+  }
+  if (!serviceKey) {
+    return { error: toErrorEnvelope('INTERNAL', 'Service role not configured', 500) };
+  }
+  const svc =
+    deps?.serviceClient ?? createClient(url, serviceKey, { auth: { autoRefreshToken: false } });
+  const standing = await staffStanding(svc, authedUser.id);
+  if (standing.status === 'DISABLED') {
+    return { error: toErrorEnvelope('FORBIDDEN', 'Account disabled.', 403) };
+  }
+  if (standing.mustChangePassword) {
+    return {
+      error: toErrorEnvelope('FORBIDDEN', 'Password change required before continuing.', 403),
+    };
+  }
+  const slugs = await queryStaffSlugs(svc, authedUser.id);
+  if (slugs.length === 0) {
+    return { error: toErrorEnvelope('FORBIDDEN', 'Admin access required', 403) };
+  }
+  // Legacy slug branch first: system roles keep exactly today's access.
+  if (fallbackSlugs.length > 0 && slugsAllowed(slugs, [...fallbackSlugs])) {
+    return { userId: authedUser.id, slugs };
+  }
+  // Custom-role branch: the caller's role must hold the required module.
+  const roleId = pickStaffRoleId(slugs);
+  if (!roleId) {
+    return { error: toErrorEnvelope('FORBIDDEN', 'Insufficient role', 403) };
+  }
+  const modules = await staffRoleModules(svc, roleId);
+  if (!modules.includes(module)) {
+    return { error: toErrorEnvelope('FORBIDDEN', 'Insufficient role', 403) };
+  }
+  return { userId: authedUser.id, slugs };
 }

@@ -54,6 +54,28 @@ describe('AdminLayout', () => {
     ).toBeInTheDocument();
   });
 
+  it('shows the session-resolved custom role name and nav without the role catalog', async () => {
+    // Production shape for custom-role staff: the catalog fetch fails
+    // (super_admin-only), so the shell renders the topbar label and
+    // navigation from the session-resolved roleName/roleModules alone —
+    // never the raw role id.
+    renderWithProviders(<AdminLayout />, {
+      user: {
+        ...MOCK_SUPER_ADMIN,
+        roleId: 'role-admin-support',
+        roleName: 'Admin Support',
+        roleModules: ['dashboard', 'members', 'registrations'],
+      },
+    });
+    expect(await screen.findByText('Admin Support')).toBeInTheDocument();
+    expect(screen.queryByText('role-admin-support')).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Dashboard' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Members' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Operations' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'System' })).not.toBeInTheDocument();
+    expect(screen.queryByText('Navigation unavailable')).not.toBeInTheDocument();
+  });
+
   it('shows no notice when navigation resolves or the user is not staff', async () => {
     const healthy = renderWithProviders(<AdminLayout />, { user: MOCK_SUPER_ADMIN });
     expect(await screen.findByRole('link', { name: 'Dashboard' })).toBeInTheDocument();

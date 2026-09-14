@@ -7,6 +7,7 @@ import {
   isAuthConflict,
   slugsAllowed,
   verifyStaff,
+  verifyStaffModule,
   verifyUser,
 } from './auth.js';
 import type { VercelRequest } from './http.js';
@@ -480,5 +481,134 @@ describe('findAuthUserId', () => {
       email: 'missing@example.com',
     });
     expect(id).toBeNull();
+  });
+});
+
+describe('verifyStaffModule', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  const authed = {
+    auth: {
+      getUser: async () => ({ data: { user: { id: 'u-9', user_metadata: {} } }, error: null }),
+    },
+  };
+
+  /** Service fake for a custom-role staffer (role rows + assignment links). */
+  const customService = (permissions: string[]) => {
+    const roleRows = [
+      {
+        id: 'x-1',
+        key: 'role-admin-support',
+        slug: 'role-admin-support',
+        name: 'Admin Support',
+        permissions,
+        is_system: false,
+      },
+    ];
+    const roleBuilder = () => {
+      const b: Record<string, unknown> = {};
+      b.select = () => b;
+      b.eq = async () => ({ data: roleRows, error: null });
+      b.in = async () => ({ data: [{ slug: 'role-admin-support' }], error: null });
+      b.then = (resolve: (v: unknown) => void) => resolve({ data: roleRows, error: null });
+      return b;
+    };
+    return {
+      from: (table: string) => {
+        if (table === 'Role') return roleBuilder();
+        return {
+          select: () => ({
+            eq: async () => {
+              if (table === 'StaffAssignment') return { data: [{ roleId: 'x-1' }], error: null };
+              if (table === 'StaffUser')
+                return {
+                  data: { status: 'ACTIVE', mustChangePassword: false },
+                  error: null,
+                };
+              return { data: [], error: null };
+            },
+            in: async () => ({ data: [], error: null }),
+          }),
+        };
+      },
+    };
+  };
+
+  const systemService = (slug: string) => ({
+    from: (table: string) => ({
+      select: () => ({
+        eq: async () => {
+          if (table === 'StaffAssignment') return { data: [{ roleId: 'r-1' }], error: null };
+          if (table === 'StaffUser')
+            return { data: { status: 'ACTIVE', mustChangePassword: false }, error: null };
+          return { data: [], error: null };
+        },
+        in: async () =>
+          table === 'Role' ? { data: [{ slug }], error: null } : { data: [], error: null },
+      }),
+    }),
+  });
+
+  it('keeps system-slug access identical to verifyStaff (finance on vouchers)', async () => {
+    setEnv({
+      SUPABASE_URL: 'https://x.supabase.co',
+      VITE_SUPABASE_ANON_KEY: 'anon',
+      SUPABASE_SERVICE_ROLE_KEY: 'service',
+    });
+    const result = await verifyStaffModule(
+      req({ authorization: 'Bearer good' }),
+      'vouchers',
+      ['super_admin', 'admin', 'finance'],
+      { anonClient: authed, serviceClient: systemService('finance') },
+    );
+    expect(result).toEqual({ userId: 'u-9', slugs: ['finance'] });
+  });
+
+  it('authorizes a custom role holding the required module', async () => {
+    setEnv({
+      SUPABASE_URL: 'https://x.supabase.co',
+      VITE_SUPABASE_ANON_KEY: 'anon',
+      SUPABASE_SERVICE_ROLE_KEY: 'service',
+    });
+    const result = await verifyStaffModule(
+      req({ authorization: 'Bearer good' }),
+      'members',
+      ['super_admin', 'admin'],
+      { anonClient: authed, serviceClient: customService(['dashboard', 'members']) },
+    );
+    expect(result).toEqual({ userId: 'u-9', slugs: ['role-admin-support'] });
+  });
+
+  it('denies a custom role missing the required module', async () => {
+    setEnv({
+      SUPABASE_URL: 'https://x.supabase.co',
+      VITE_SUPABASE_ANON_KEY: 'anon',
+      SUPABASE_SERVICE_ROLE_KEY: 'service',
+    });
+    const result = await verifyStaffModule(
+      req({ authorization: 'Bearer good' }),
+      'sales',
+      ['super_admin', 'admin'],
+      { anonClient: authed, serviceClient: customService(['dashboard', 'members']) },
+    );
+    expect('error' in result && result.error.status).toBe(403);
+    expect('error' in result && result.error.error.message).toBe('Insufficient role');
+  });
+
+  it('denies member-tier slugs through the custom path as well', async () => {
+    setEnv({
+      SUPABASE_URL: 'https://x.supabase.co',
+      VITE_SUPABASE_ANON_KEY: 'anon',
+      SUPABASE_SERVICE_ROLE_KEY: 'service',
+    });
+    const result = await verifyStaffModule(
+      req({ authorization: 'Bearer good' }),
+      'members',
+      ['super_admin', 'admin'],
+      { anonClient: authed, serviceClient: systemService('user') },
+    );
+    expect('error' in result && result.error.status).toBe(403);
   });
 });

@@ -5,7 +5,7 @@ import { useSession } from '../lib/session';
 import { AppShell, Breadcrumbs, ConfirmDialog, UserMenu } from '@jad/ui';
 
 import { findNavItem, findNavSubItem, navItemsForRole, ROLE_LABELS } from './navigation';
-import { roleNameFor } from '@jad/contracts';
+import { resolveRoleModules, roleNameFor } from '@jad/contracts';
 import { useRegistrations } from '../features/registrations/hooks/useRegistrations';
 import { useRoles } from '../features/roles/hooks/useRoles';
 import styles from './AdminLayout.module.css';
@@ -27,8 +27,21 @@ export function AdminLayout() {
   // the queries refetches them fresh.
   const queriesEnabled = status === 'authenticated' && !mustChangePassword;
   const { data: roles } = useRoles({ enabled: queriesEnabled });
-  const baseItems = mustChangePassword ? [] : navItemsForRole(role, roleId, roles);
-  const { data: registrations } = useRegistrations({ enabled: queriesEnabled });
+  // Session-resolved modules are authoritative for the signed-in staff
+  // member (the roles catalog is super_admin-only, so custom-role staff
+  // could otherwise never resolve their own navigation).
+  const baseItems = mustChangePassword
+    ? []
+    : navItemsForRole(role, roleId, roles, user?.roleModules);
+  // The pending-count badge needs the registrations queue; skip that fetch
+  // for roles without the module (a doomed 403 for e.g. custom roles that
+  // were never granted it).
+  const canSeeRegistrations = resolveRoleModules(roles, roleId, user?.roleModules).includes(
+    'registrations',
+  );
+  const { data: registrations } = useRegistrations({
+    enabled: queriesEnabled && canSeeRegistrations,
+  });
   const pendingCount = (registrations ?? []).filter((r) => r.status === 'PENDING').length;
   const items = baseItems.map((item) =>
     item.to === '/admin/members' ? { ...item, badge: pendingCount > 0 ? pendingCount : undefined } : item,
@@ -93,7 +106,10 @@ export function AdminLayout() {
         topbarActions={
           <UserMenu
             name={user?.name}
-            role={roleId ? roleNameFor(roles, roleId) : role ? ROLE_LABELS[role] : undefined}
+            role={
+              user?.roleName ??
+              (roleId ? roleNameFor(roles, roleId) : role ? ROLE_LABELS[role] : undefined)
+            }
             items={[
               { label: 'My Account', icon: 'user', to: '/admin/profile' },
               { label: '-', icon: '', onClick: undefined },

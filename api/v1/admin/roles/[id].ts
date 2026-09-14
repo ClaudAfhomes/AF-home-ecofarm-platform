@@ -1,4 +1,9 @@
-import { roleRecordSchema, staffModuleSchema, STAFF_MODULE_LABEL } from '@jad/contracts';
+import {
+  CUSTOM_ROLE_FORBIDDEN_MODULES,
+  roleRecordSchema,
+  staffModuleSchema,
+  STAFF_MODULE_LABEL,
+} from '@jad/contracts';
 
 import { SUPER_ADMIN_ONLY } from '../../../_lib/access.js';
 import { verifyStaff } from '../../../_lib/auth.js';
@@ -158,6 +163,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const { error, status } = toErrorEnvelope('VALIDATION_ERROR', 'At least one valid module permission is required.', 400);
       res.status(status).json({ error });
       return;
+    }
+    if (!role.is_system) {
+      const forbidden = (input.permissions as string[]).filter((p) =>
+        (CUSTOM_ROLE_FORBIDDEN_MODULES as readonly string[]).includes(p),
+      );
+      if (forbidden.length > 0) {
+        const { error, status } = toErrorEnvelope(
+          'VALIDATION_ERROR',
+          `Custom roles cannot hold: ${forbidden.join(', ')}.`,
+          400,
+        );
+        res.status(status).json({ error });
+        return;
+      }
     }
     const { data: allRoles } = await supabase.from('Role').select('id,key,slug,permissions');
     const records = (((allRoles as unknown[]) ?? []) as {

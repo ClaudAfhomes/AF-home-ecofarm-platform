@@ -177,14 +177,19 @@ export function canAccess(role: Role | null, item: AdminNavItem): boolean {
   return role !== null && item.roles.includes(role);
 }
 
-/** Check whether a role id can access a nav item's module (records + matrix fallback). */
+/**
+ * Check whether a role id can access a nav item's module (records + matrix
+ * fallback). `sessionModules` — when provided by the server-resolved
+ * session — is authoritative and wins over records (see resolveRoleModules).
+ */
 export function canAccessModule(
   roleId: string | null,
   roles: readonly RoleRecord[] | undefined,
   item: AdminNavItem,
+  sessionModules?: readonly StaffModule[],
 ): boolean {
   if (roleId === null) return false;
-  return resolveRoleModules(roles, roleId).includes(item.module);
+  return resolveRoleModules(roles, roleId, sessionModules).includes(item.module);
 }
 
 /** Check whether a role id can access a dropdown sub-item's module. */
@@ -192,9 +197,10 @@ export function canAccessSubModule(
   roleId: string | null,
   roles: readonly RoleRecord[] | undefined,
   sub: AdminNavSubItem,
+  sessionModules?: readonly StaffModule[],
 ): boolean {
   if (roleId === null) return false;
-  return resolveRoleModules(roles, roleId).includes(sub.module);
+  return resolveRoleModules(roles, roleId, sessionModules).includes(sub.module);
 }
 
 /**
@@ -205,11 +211,12 @@ export function filterDropdownForStaffRole(
   dropdown: AdminNavDropdownItem[] | undefined,
   roleId: string | null,
   roles?: readonly RoleRecord[],
+  sessionModules?: readonly StaffModule[],
 ): AdminNavDropdownItem[] | undefined {
   if (!dropdown) return undefined;
   if (roleId === null) return dropdown;
   const visible = dropdown.filter(
-    (sub) => 'divider' in sub || canAccessSubModule(roleId, roles, sub),
+    (sub) => 'divider' in sub || canAccessSubModule(roleId, roles, sub, sessionModules),
   );
   const cleaned: AdminNavDropdownItem[] = [];
   for (const sub of visible) {
@@ -226,6 +233,7 @@ export function navItemsForRole(
   role: Role | null,
   roleId?: string | null,
   roles?: readonly RoleRecord[],
+  sessionModules?: readonly StaffModule[],
 ): SidebarItem[] {
   if (role === null) return [];
   const items = ADMIN_NAV_ITEMS.filter((item) => canAccess(role, item));
@@ -242,12 +250,12 @@ export function navItemsForRole(
   }
   if (roleId === null) return [];
   return items.flatMap((item) => {
-    const dropdown = filterDropdownForStaffRole(item.dropdown, roleId, roles);
+    const dropdown = filterDropdownForStaffRole(item.dropdown, roleId, roles, sessionModules);
     // A category stays visible when its own module is allowed or when at
     // least one sub-item link remains (e.g. merchant sees Operations for
     // Vouchers even though the Operations/Sales module itself is denied).
     const hasVisibleLink = dropdown?.some((sub) => !('divider' in sub)) ?? false;
-    if (!canAccessModule(roleId, roles, item) && !hasVisibleLink) return [];
+    if (!canAccessModule(roleId, roles, item, sessionModules) && !hasVisibleLink) return [];
     return [
       {
         to: item.to,

@@ -2,7 +2,7 @@ import { cmsPropertyCategorySchema } from '@jad/contracts';
 
 import { ADMIN_STAFF } from '../../../_lib/access.js';
 import { appendAudit } from '../../../_lib/audit.js';
-import { verifyStaff } from '../../../_lib/auth.js';
+import { verifyStaffModule } from '../../../_lib/auth.js';
 import type { VercelRequest, VercelResponse } from '../../../_lib/http.js';
 import { mergeCategory } from '../../../_lib/cutover.js';
 import { methodNotAllowed, readJsonBody, requireService } from '../../../_lib/rest.js';
@@ -39,7 +39,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     methodNotAllowed(res, req.method);
     return;
   }
-  const auth = await verifyStaff(req, [...ADMIN_STAFF]);
+  const auth = await verifyStaffModule(req, 'properties', ADMIN_STAFF);
   if ('error' in auth) {
     const { error, status } = auth.error;
     res.status(status).json({ error });

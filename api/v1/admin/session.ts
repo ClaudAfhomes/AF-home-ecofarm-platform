@@ -3,7 +3,12 @@ import type { VercelRequest, VercelResponse } from '../../_lib/http.js';
 import { methodNotAllowed, readJsonBody, requireService } from '../../_lib/rest.js';
 import { toErrorEnvelope } from '../../_lib/envelope.js';
 import { appendAudit } from '../../_lib/audit.js';
-import { staffSessionSchema, updateStaffProfileRequestSchema } from '@jad/contracts';
+import { listRoleRecords, pickStaffRoleId, staffRoleModules } from '../../_lib/rbac.js';
+import {
+  STAFF_ROLE_LABEL,
+  staffSessionSchema,
+  updateStaffProfileRequestSchema,
+} from '@jad/contracts';
 
 /**
  * GET /admin/session — own staff session (Phase 6 staff separation).
@@ -107,6 +112,37 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const slugs = await queryStaffSlugs(supabase, user.userId);
+  // Resolve the caller's own role identity server-side so the admin shell
+  // can render the topbar label and navigation from the session alone.
+  // Non-super-admin staff cannot read the role catalog (`GET /admin/roles`
+  // is super_admin-only), so without this the shell falls back to the raw
+  // role id (custom roles) or the matrix seed (system roles). Record names
+  // win; system ids fall back to the shared labels; effective modules come
+  // from the stored set with the matrix fallback for seed-empty system
+  // rows (via effectivePermissions / listRoleRecords).
+  const sessionRoleId = pickStaffRoleId(slugs);
+  let sessionRoleName: string | undefined;
+  let sessionModules: string[] | undefined;
+  if (sessionRoleId) {
+    // Single source of role identity shared with verifyStaffModule:
+    // record name wins and effective modules come from the stored set
+    // (matrix fallback for seed-empty system rows). Never throws — a
+    // failed lookup degrades to the shared labels/empty set and the
+    // client's catalog fallback.
+    const systemLabels = STAFF_ROLE_LABEL as Record<string, string>;
+    try {
+      const records = await listRoleRecords(supabase);
+      const record = records.find((r) => r.id === sessionRoleId);
+      sessionRoleName = record?.name ?? systemLabels[sessionRoleId] ?? sessionRoleId;
+    } catch {
+      sessionRoleName = systemLabels[sessionRoleId] ?? sessionRoleId;
+    }
+    try {
+      sessionModules = await staffRoleModules(supabase, sessionRoleId);
+    } catch {
+      sessionModules = undefined;
+    }
+  }
   const parsed = staffSessionSchema.safeParse({
     id: row.id,
     email: row.email,
@@ -114,6 +150,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     status: row.status,
     slugs,
     mustChangePassword: row.mustChangePassword === true,
+    ...(sessionRoleId
+      ? { roleId: sessionRoleId, roleName: sessionRoleName, modules: sessionModules }
+      : {}),
   });
   if (!parsed.success) {
     const { error: env, status } = toErrorEnvelope(

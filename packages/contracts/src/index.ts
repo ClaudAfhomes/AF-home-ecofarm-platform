@@ -39,6 +39,7 @@ export {
   STAFF_ROLE_LABEL,
   STAFF_MODULE_LABEL,
   STAFF_PERMISSIONS,
+  CUSTOM_ROLE_FORBIDDEN_MODULES,
   canStaffAccess,
   roleRecordSchema,
   systemRoleRecords,

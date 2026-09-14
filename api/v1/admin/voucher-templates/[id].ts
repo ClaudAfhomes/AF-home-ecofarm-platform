@@ -2,7 +2,7 @@ import { voucherTemplateSchema } from '@jad/contracts';
 
 import { ADMIN_STAFF, FINANCE_VIEW } from '../../../_lib/access.js';
 import { appendAudit } from '../../../_lib/audit.js';
-import { verifyStaff } from '../../../_lib/auth.js';
+import { verifyStaffModule } from '../../../_lib/auth.js';
 import type { VercelRequest, VercelResponse } from '../../../_lib/http.js';
 import { mapVoucherTemplateRow } from '../../../_lib/pipeline.js';
 import { validateUpdateTemplate } from '../../../_lib/cutover.js';
@@ -27,7 +27,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
   const allowed = req.method === 'GET' ? FINANCE_VIEW : ADMIN_STAFF;
-  const auth = await verifyStaff(req, [...allowed]);
+  const auth = await verifyStaffModule(req, 'vouchers', allowed);
   if ('error' in auth) {
     const { error, status } = auth.error;
     res.status(status).json({ error });

@@ -38,7 +38,7 @@ export function MyAccountPage() {
   const [savingPassword, setSavingPassword] = useState(false);
 
   if (!user) return null;
-  const roleLabel = roleId ? roleNameFor(roles, roleId) : 'Staff';
+  const roleLabel = user.roleName ?? (roleId ? roleNameFor(roles, roleId) : 'Staff');
 
   const handleSaveName = async () => {
     const trimmed = name.trim();

@@ -1,7 +1,7 @@
 import { saleSchema } from '@jad/contracts';
 
 import { ADMIN_STAFF, FINANCE_VIEW } from '../../_lib/access.js';
-import { verifyStaff } from '../../_lib/auth.js';
+import { verifyStaffModule } from '../../_lib/auth.js';
 import { appendAudit } from '../../_lib/audit.js';
 import type { VercelRequest, VercelResponse } from '../../_lib/http.js';
 import { isValidSaleRow, mapSaleRow, prefixedId, validateSaleTransition } from '../../_lib/pipeline.js';
@@ -10,7 +10,7 @@ import { toErrorEnvelope } from '../../_lib/envelope.js';
 
 /** GET /admin/sales — queue (super_admin, admin, finance). */
 export async function listSales(req: VercelRequest, res: VercelResponse) {
-  const auth = await verifyStaff(req, [...FINANCE_VIEW]);
+  const auth = await verifyStaffModule(req, 'sales', FINANCE_VIEW);
   if ('error' in auth) {
     const { error, status } = auth.error;
     res.status(status).json({ error });
@@ -30,7 +30,7 @@ export async function listSales(req: VercelRequest, res: VercelResponse) {
 
 /** POST /admin/sales — staff-created sale (super_admin, admin). */
 export async function createSale(req: VercelRequest, res: VercelResponse) {
-  const auth = await verifyStaff(req, [...ADMIN_STAFF]);
+  const auth = await verifyStaffModule(req, 'sales', ADMIN_STAFF);
   if ('error' in auth) {
     const { error, status } = auth.error;
     res.status(status).json({ error });

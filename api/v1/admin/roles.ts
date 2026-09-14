@@ -1,4 +1,8 @@
-import { roleRecordSchema, staffModuleSchema } from '@jad/contracts';
+import {
+  CUSTOM_ROLE_FORBIDDEN_MODULES,
+  roleRecordSchema,
+  staffModuleSchema,
+} from '@jad/contracts';
 
 import { SUPER_ADMIN_ONLY } from '../../_lib/access.js';
 import { verifyStaff } from '../../_lib/auth.js';
@@ -76,6 +80,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const validModules = staffModuleSchema.options as readonly string[];
   if (permissions.length === 0 || !permissions.every((p) => typeof p === 'string' && validModules.includes(p))) {
     const { error, status } = toErrorEnvelope('VALIDATION_ERROR', 'At least one valid module permission is required.', 400);
+    res.status(status).json({ error });
+    return;
+  }
+  // New roles are always custom: governance modules stay super_admin-only
+  // on the server, so granting them would only produce navigation that
+  // 403s. Reject them here (the role editor disables them too).
+  const forbidden = (permissions as string[]).filter((p) =>
+    (CUSTOM_ROLE_FORBIDDEN_MODULES as readonly string[]).includes(p),
+  );
+  if (forbidden.length > 0) {
+    const { error, status } = toErrorEnvelope(
+      'VALIDATION_ERROR',
+      `Custom roles cannot hold: ${forbidden.join(', ')}.`,
+      400,
+    );
     res.status(status).json({ error });
     return;
   }

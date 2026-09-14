@@ -16,6 +16,7 @@ import {
   systemRoleRecords,
   staffUserSchema,
   staffAssignmentSchema,
+  staffSessionSchema,
   slugifyRoleName,
   isRoleNameUnique,
   resolveRoleModules,
@@ -440,6 +441,74 @@ describe('resolveRoleModules', () => {
   it('prefers the record over the matrix seed when both exist', () => {
     const edited: RoleRecord = { ...custom, id: 'finance', permissions: ['sales'] };
     expect(resolveRoleModules([edited], 'finance')).toEqual(['sales']);
+  });
+
+  it('treats session modules as authoritative over records and fallbacks', () => {
+    expect(resolveRoleModules([custom], 'role-finance-reviewer', ['dashboard'])).toEqual([
+      'dashboard',
+    ]);
+    expect(resolveRoleModules(undefined, 'role-ghost', ['vouchers'])).toEqual(['vouchers']);
+    expect(resolveRoleModules(undefined, 'finance', ['sales'])).toEqual(['sales']);
+  });
+
+  it('ignores an empty session-module override (falls through to records)', () => {
+    expect(resolveRoleModules([custom], 'role-finance-reviewer', [])).toEqual([
+      'dashboard',
+      'sales',
+      'payouts',
+      'withdrawals',
+    ]);
+    expect(resolveRoleModules(undefined, 'finance', [])).toEqual([
+      'dashboard',
+      'sales',
+      'payouts',
+      'withdrawals',
+    ]);
+  });
+});
+
+describe('staffSessionSchema', () => {
+  const base = {
+    id: 'u-1',
+    email: 'staffer@jad.local',
+    name: 'Staffer',
+    status: 'ACTIVE',
+    slugs: ['role-admin-support'],
+  };
+
+  it('accepts the slugs-only shape (mock/legacy responses)', () => {
+    const result = staffSessionSchema.safeParse(base);
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.roleId).toBeUndefined();
+      expect(result.data.roleName).toBeUndefined();
+      expect(result.data.modules).toBeUndefined();
+    }
+  });
+
+  it('accepts the server-resolved role identity shape', () => {
+    const result = staffSessionSchema.safeParse({
+      ...base,
+      roleId: 'role-admin-support',
+      roleName: 'Admin Support',
+      modules: ['dashboard', 'members'],
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.roleId).toBe('role-admin-support');
+      expect(result.data.roleName).toBe('Admin Support');
+      expect(result.data.modules).toEqual(['dashboard', 'members']);
+    }
+  });
+
+  it('rejects unknown modules in the resolved set', () => {
+    const result = staffSessionSchema.safeParse({
+      ...base,
+      roleId: 'admin',
+      roleName: 'Admin',
+      modules: ['nope'],
+    });
+    expect(result.success).toBe(false);
   });
 });
 

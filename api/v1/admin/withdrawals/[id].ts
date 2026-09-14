@@ -1,5 +1,5 @@
 import { FINANCE_VIEW } from '../../../_lib/access.js';
-import { verifyStaff } from '../../../_lib/auth.js';
+import { verifyStaffModule } from '../../../_lib/auth.js';
 import type { VercelRequest, VercelResponse } from '../../../_lib/http.js';
 import {
   fetchWithdrawalIdentifierMap,
@@ -23,7 +23,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     methodNotAllowed(res, req.method);
     return;
   }
-  const auth = await verifyStaff(req, [...FINANCE_VIEW]);
+  const auth = await verifyStaffModule(req, 'withdrawals', FINANCE_VIEW);
   if ('error' in auth) {
     const { error, status } = auth.error;
     res.status(status).json({ error });

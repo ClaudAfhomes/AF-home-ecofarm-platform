@@ -73,6 +73,8 @@ function Probe() {
       <div data-testid="status">{status}</div>
       <div data-testid="role">{role ?? 'null'}</div>
       <div data-testid="roleId">{roleId ?? 'null'}</div>
+      <div data-testid="roleName">{user?.roleName ?? 'none'}</div>
+      <div data-testid="roleModules">{(user?.roleModules ?? []).join(',')}</div>
       <div data-testid="user">{user?.id ?? 'none'}</div>
       <div data-testid="sessionError">{sessionError ? 'yes' : 'no'}</div>
       <div data-testid="mustChange">{mustChangePassword ? 'yes' : 'no'}</div>
@@ -116,6 +118,54 @@ describe('Admin SupabaseSessionProvider – server-side staff session (regressio
     await waitFor(() => expect(screen.getByTestId('status')).toHaveTextContent('authenticated'));
     expect(screen.getByTestId('role')).toHaveTextContent('admin');
     expect(screen.getByTestId('roleId')).toHaveTextContent('super_admin');
+  });
+
+  it('custom-role session carries the server-resolved display name and modules', async () => {
+    stubStaffSession(() =>
+      Response.json({
+        id: 'cst-1',
+        email: 'support@jad.local',
+        name: 'Support Staffer',
+        status: 'ACTIVE',
+        slugs: ['role-admin-support'],
+        roleId: 'role-admin-support',
+        roleName: 'Admin Support',
+        modules: ['dashboard', 'members'],
+      }),
+    );
+    mockGetSession.mockResolvedValue({
+      data: { session: sessionWithUser('cst-1', 'support@jad.local') },
+    });
+    mockMembersSingle.mockResolvedValue({ data: null });
+
+    render(
+      <SupabaseSessionProvider>
+        <Probe />
+      </SupabaseSessionProvider>,
+    );
+    await waitFor(() => expect(screen.getByTestId('status')).toHaveTextContent('authenticated'));
+    // Any staff role id (system or custom) is staff at the top-level gate.
+    expect(screen.getByTestId('role')).toHaveTextContent('admin');
+    expect(screen.getByTestId('roleId')).toHaveTextContent('role-admin-support');
+    expect(screen.getByTestId('roleName')).toHaveTextContent('Admin Support');
+    expect(screen.getByTestId('roleModules')).toHaveTextContent('dashboard,members');
+  });
+
+  it('slugs-only session falls back to the derived role id with no display name', async () => {
+    // beforeEach stub returns the slugs-only shape — the mock/legacy path.
+    mockGetSession.mockResolvedValue({
+      data: { session: sessionWithUser('sup-001', 'superadmin@gmail.com') },
+    });
+
+    render(
+      <SupabaseSessionProvider>
+        <Probe />
+      </SupabaseSessionProvider>,
+    );
+    await waitFor(() => expect(screen.getByTestId('status')).toHaveTextContent('authenticated'));
+    expect(screen.getByTestId('roleId')).toHaveTextContent('super_admin');
+    expect(screen.getByTestId('roleName')).toHaveTextContent('none');
+    expect(screen.getByTestId('roleModules')).toHaveTextContent('');
   });
 
   it('surfaces mustChangePassword from the staff session', async () => {

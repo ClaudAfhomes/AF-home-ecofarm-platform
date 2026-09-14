@@ -34,6 +34,20 @@ describe('MyAccountPage', () => {
     expect(screen.getByText('Super Admin')).toBeInTheDocument();
   });
 
+  it('prefers the session-resolved custom role name over the raw role id', async () => {
+    renderWithProviders(<MyAccountPage />, {
+      user: {
+        ...MOCK_SUPER_ADMIN,
+        roleId: 'role-admin-support',
+        roleName: 'Admin Support',
+        roleModules: ['dashboard', 'members'],
+      },
+    });
+
+    expect(await screen.findByText('Admin Support')).toBeInTheDocument();
+    expect(screen.queryByText('role-admin-support')).not.toBeInTheDocument();
+  });
+
   it('saves a new display name and refreshes the session', async () => {
     const onRevalidate = vi.fn();
     const user = userEvent.setup();

@@ -11,7 +11,7 @@ import {
   StatusChip,
   useToast,
 } from '@jad/ui';
-import { STAFF_MODULE_LABEL } from '@jad/contracts';
+import { CUSTOM_ROLE_FORBIDDEN_MODULES, STAFF_MODULE_LABEL } from '@jad/contracts';
 import type { StaffModule } from '@jad/contracts';
 
 import { useSession } from '../../../lib/session';
@@ -224,6 +224,9 @@ export function RoleDetailPage() {
                 onChange={setPermDraft}
                 disabled={updateRole.isPending}
                 showGlobalActions
+                lockedModules={
+                  data && !data.isSystem ? CUSTOM_ROLE_FORBIDDEN_MODULES : undefined
+                }
               />
               {effectivePermissions.length === 0 ? (
                 <p className={styles.guardNote} role="status">

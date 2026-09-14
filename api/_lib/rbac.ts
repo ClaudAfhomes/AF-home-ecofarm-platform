@@ -78,6 +78,26 @@ export async function listRoleRecords(svc: Db) {
   }));
 }
 
+/**
+ * Effective permission modules for a single role id (single source for
+ * server-side custom-role authorization AND `GET /admin/session` identity).
+ * Stored modules win; canonical system roles fall back to the
+ * `STAFF_PERMISSIONS` matrix when the stored array is empty. Unknown ids
+ * resolve to no modules (deny by default).
+ */
+export async function staffRoleModules(
+  svc: { from: (table: string) => unknown },
+  roleId: string,
+): Promise<string[]> {
+  const rows = await roleRows(svc as Db);
+  const row = rows.find(
+    (r) =>
+      (typeof r.key === 'string' && r.key ? r.key : r.slug) === roleId || r.slug === roleId,
+  );
+  if (!row) return effectivePermissions(roleId, undefined);
+  return effectivePermissions(row.slug ?? row.key ?? '', row.permissions);
+}
+
 /** Staff slugs held by a staff user (via StaffAssignment links — Phase 1 staff domain). */
 export async function staffAssignmentSlugs(svc: Db, staffUserId: string): Promise<string[]> {
   const { data: links, error } = await svc.from('StaffAssignment').select('roleId').eq('staffUserId', staffUserId);

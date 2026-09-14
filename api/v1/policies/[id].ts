@@ -1,7 +1,7 @@
 import { policySchema, policyUpdateSchema } from '@jad/contracts';
 
 import { ADMIN_STAFF } from '../../_lib/access.js';
-import { verifyStaff } from '../../_lib/auth.js';
+import { verifyStaffModule } from '../../_lib/auth.js';
 import { appendAudit } from '../../_lib/audit.js';
 import { toErrorEnvelope } from '../../_lib/envelope.js';
 import type { VercelRequest, VercelResponse } from '../../_lib/http.js';
@@ -22,7 +22,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     methodNotAllowed(res, req.method);
     return;
   }
-  const auth = await verifyStaff(req, [...ADMIN_STAFF]);
+  const auth = await verifyStaffModule(req, 'policies', ADMIN_STAFF);
   if ('error' in auth) {
     const { error, status } = auth.error;
     res.status(status).json({ error });

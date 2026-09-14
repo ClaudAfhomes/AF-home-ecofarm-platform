@@ -216,6 +216,17 @@ export const staffSessionSchema = z.object({
   slugs: z.array(z.string().min(1)),
   /** Mirrors StaffUser.mustChangePassword; drives the forced-change gate. */
   mustChangePassword: z.boolean().optional(),
+  /**
+   * Server-resolved role identity (record key/slug, display name, effective
+   * permission modules). Optional so pre-resolution fixtures and mock
+   * sessions — which lack a resolving server — still validate; writers
+   * (the real `GET /admin/session`) always set them. Lets the admin shell
+   * render the signed-in staff member's role name and navigation without
+   * fetching the super_admin-only role catalog for self-resolution.
+   */
+  roleId: z.string().min(1).optional(),
+  roleName: z.string().min(1).optional(),
+  modules: z.array(staffModuleSchema).optional(),
 });
 
 export type StaffSession = z.infer<typeof staffSessionSchema>;
@@ -291,11 +302,18 @@ export function isRoleNameUnique(
  * Falls back to the matrix seed for system ids when records are absent, so
  * the shell can render synchronously before the mock records load.
  * Unknown ids resolve to no modules (deny by default).
+ *
+ * A non-empty `sessionModules` set (carried on the server-resolved staff
+ * session) is authoritative and wins over records — it is how non-
+ * super-admin staff (who cannot read the role catalog) resolve their own
+ * modules for navigation and route guards.
  */
 export function resolveRoleModules(
   roles: readonly RoleRecord[] | undefined,
   roleId: string | null | undefined,
+  sessionModules?: readonly StaffModule[],
 ): StaffModule[] {
+  if (sessionModules && sessionModules.length > 0) return [...sessionModules];
   if (!roleId) return [];
   const record = roles?.find((r) => r.id === roleId);
   if (record) return [...record.permissions];
@@ -324,6 +342,21 @@ export const STAFF_MODULE_LABEL: Record<StaffModule, string> = {
   staff: 'Staff',
   cms: 'Website CMS',
 };
+
+/**
+ * Modules a custom (non-system) role may never hold. The API keeps the
+ * corresponding endpoints super_admin-slug-gated (`staff`, `audit`) or
+ * super_admin-only for writes (`config`), so granting them would only
+ * produce navigation that 403s — block them at creation/editing so the
+ * shell and the API stay consistent. `programs` redirects into System
+ * Configuration, which custom roles cannot read anyway.
+ */
+export const CUSTOM_ROLE_FORBIDDEN_MODULES: readonly StaffModule[] = [
+  'staff',
+  'audit',
+  'config',
+  'programs',
+];
 
 /** Display name for a role id (record name, else system label, else the raw id). */
 export function roleNameFor(

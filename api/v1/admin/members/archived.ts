@@ -1,7 +1,7 @@
 import { archivedMemberSchema } from '@jad/contracts';
 
 import { ADMIN_STAFF } from '../../../_lib/access.js';
-import { verifyStaff } from '../../../_lib/auth.js';
+import { verifyStaffModule } from '../../../_lib/auth.js';
 import type { VercelRequest, VercelResponse } from '../../../_lib/http.js';
 import { methodNotAllowed, okList, requireService } from '../../../_lib/rest.js';
 import { toErrorEnvelope } from '../../../_lib/envelope.js';
@@ -19,7 +19,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     methodNotAllowed(res, req.method);
     return;
   }
-  const auth = await verifyStaff(req, [...ADMIN_STAFF]);
+  const auth = await verifyStaffModule(req, 'members', ADMIN_STAFF);
   if ('error' in auth) {
     const { error, status } = auth.error;
     res.status(status).json({ error });

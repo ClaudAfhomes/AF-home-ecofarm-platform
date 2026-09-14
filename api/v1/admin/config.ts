@@ -1,6 +1,6 @@
 import { systemConfigEntrySchema } from '@jad/contracts';
 
-import { verifyStaff } from '../../_lib/auth.js';
+import { verifyStaffModule } from '../../_lib/auth.js';
 import type { VercelRequest, VercelResponse } from '../../_lib/http.js';
 import { methodNotAllowed, okList, requireService } from '../../_lib/rest.js';
 import { toErrorEnvelope } from '../../_lib/envelope.js';
@@ -18,7 +18,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     methodNotAllowed(res, req.method);
     return;
   }
-  const auth = await verifyStaff(req, ['super_admin', 'admin']);
+  const auth = await verifyStaffModule(req, 'config', ['super_admin', 'admin']);
   if ('error' in auth) {
     const { error, status } = auth.error;
     res.status(status).json({ error });

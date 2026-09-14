@@ -9,8 +9,7 @@ import {
   type ReactNode,
 } from 'react';
 
-import type { MemberStatus, Role } from '@jad/contracts';
-import { normalizeRole } from '@jad/contracts';
+import type { MemberStatus, Role, StaffModule } from '@jad/contracts';
 import { MockSessionProvider, setMockSessionUser, useMockSession } from '@jad/mock';
 
 import { staffSessionSchema } from '@jad/contracts';
@@ -32,6 +31,15 @@ export interface SessionUser {
    * enforces module checks only when set.
    */
   roleId?: string | null;
+  /**
+   * Server-resolved role display name and effective permission modules
+   * (from `GET /admin/session`). Preferred over re-deriving from the
+   * role catalog, which non-super-admin staff cannot read. Absent for
+   * mock/dev-test sessions — renderers fall back to role records, then
+   * system labels / the raw role id.
+   */
+  roleName?: string;
+  roleModules?: StaffModule[];
   isQualified?: boolean;
   status?: MemberStatus;
   /** True while the account runs on a temporary password (forced change). */
@@ -156,7 +164,14 @@ export function SupabaseSessionProvider({ children }: { children: ReactNode }) {
      */
     const fetchSlugs = async (
       accessToken: string | undefined,
-    ): Promise<{ status: number; slugs: string[]; mustChangePassword: boolean } | null> => {
+    ): Promise<{
+      status: number;
+      slugs: string[];
+      mustChangePassword: boolean;
+      roleId?: string;
+      roleName?: string;
+      modules?: StaffModule[];
+    } | null> => {
       if (!accessToken) return null;
       try {
         const res = await fetch(`${env.VITE_API_BASE_URL}/admin/session`, {
@@ -172,10 +187,20 @@ export function SupabaseSessionProvider({ children }: { children: ReactNode }) {
         }
         const parsed = staffSessionSchema.safeParse(await res.json().catch(() => null));
         if (!parsed.success) return null;
+        // Verbose-level only: lets an operator confirm the server resolved
+        // the staff role (roleId/roleName/modules) vs a slugs-only answer.
+        console.debug('[SupabaseSessionProvider] staff session resolved', {
+          roleId: parsed.data.roleId ?? null,
+          roleName: parsed.data.roleName ?? null,
+          modules: parsed.data.modules ?? null,
+        });
         return {
           status: 200,
           slugs: [...parsed.data.slugs],
           mustChangePassword: parsed.data.mustChangePassword === true,
+          roleId: parsed.data.roleId,
+          roleName: parsed.data.roleName,
+          modules: parsed.data.modules ? [...parsed.data.modules] : undefined,
         };
       } catch {
         return null;
@@ -184,7 +209,14 @@ export function SupabaseSessionProvider({ children }: { children: ReactNode }) {
 
     const resolveRoleSlugs = async (
       accessToken?: string,
-    ): Promise<{ slugs: string[]; verified: boolean; mustChangePassword: boolean }> => {
+    ): Promise<{
+      slugs: string[];
+      verified: boolean;
+      mustChangePassword: boolean;
+      roleId?: string;
+      roleName?: string;
+      modules?: StaffModule[];
+    }> => {
       // Prefer the caller-supplied token (the auth event's own session);
       // fall back to a fresh getSession read when absent.
       let token = accessToken;
@@ -198,6 +230,9 @@ export function SupabaseSessionProvider({ children }: { children: ReactNode }) {
           slugs: first.slugs,
           verified: true,
           mustChangePassword: first.mustChangePassword,
+          roleId: first.roleId,
+          roleName: first.roleName,
+          modules: first.modules,
         };
       // Transient failure: one token rotation, then a single retry with the
       // fresh token before giving up.
@@ -211,6 +246,9 @@ export function SupabaseSessionProvider({ children }: { children: ReactNode }) {
               slugs: second.slugs,
               verified: true,
               mustChangePassword: second.mustChangePassword,
+              roleId: second.roleId,
+              roleName: second.roleName,
+              modules: second.modules,
             };
         }
       } catch {
@@ -292,13 +330,24 @@ export function SupabaseSessionProvider({ children }: { children: ReactNode }) {
       } catch {
         member = null;
       }
-      const { slugs, verified, mustChangePassword } = await resolveRoleSlugs(accessToken);
+      const {
+        slugs,
+        verified,
+        mustChangePassword,
+        roleId: serverRoleId,
+        roleName: serverRoleName,
+        modules: serverModules,
+      } = await resolveRoleSlugs(accessToken);
+      // A holder of any staff role id (system or custom) is staff at the
+      // top-level gate (`admin`); per-module checks via roleId refine from
+      // there, and the server enforces every request. Without this, staff
+      // whose slugs don't normalize to admin (finance, merchant, custom
+      // roles) would resolve `user` and hit an empty nav + Forbidden
+      // everywhere, since every admin destination requires `admin`.
+      // Member-only slugs or a missing assignment stay member-tier.
+      const staffRoleId = serverRoleId ?? slugToRoleId(slugs);
       let role: Role | null =
-        slugs.length === 0
-          ? null
-          : slugs.some((s) => normalizeRole(s) === 'admin')
-            ? 'admin'
-            : 'user';
+        staffRoleId !== null ? 'admin' : slugs.length === 0 ? null : 'user';
       if (role === null) {
         // No staff assignment: member-tier session. user_metadata is
         // client-writable and must never confer privilege.
@@ -313,7 +362,12 @@ export function SupabaseSessionProvider({ children }: { children: ReactNode }) {
               : ((supaUser.user_metadata['full_name'] as string) ?? supaUser.email ?? ''),
           email: supaUser.email ?? '',
           role,
-          roleId: slugToRoleId(slugs),
+          // Server-resolved role identity wins (the caller may not read
+          // the role catalog); the slug derivation stays as the mock/
+          // legacy fallback when the endpoint lacks the new fields.
+          roleId: serverRoleId ?? slugToRoleId(slugs),
+          roleName: serverRoleName,
+          roleModules: serverModules,
           isQualified: (member?.isQualified as boolean) ?? false,
           status: (member?.status as MemberStatus) ?? 'PENDING',
           mustChangePassword,
