@@ -851,7 +851,13 @@ export const adminMockHandlers: MockRoute[] = [
               b.createdAt.localeCompare(a.createdAt) || b.id.localeCompare(a.id),
           );
         return {
-          data: thread.map(({ memberId: _memberId, ...rest }) => rest),
+          data: thread.map((m) => ({
+            id: m.id,
+            senderType: m.senderType,
+            senderName: m.senderName,
+            body: m.body,
+            createdAt: m.createdAt,
+          })),
           meta: { pagination: {} },
         };
       }

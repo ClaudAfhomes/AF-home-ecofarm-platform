@@ -499,6 +499,7 @@ Legend: App `A`=AUTH, `M`=Member, `D`=Admin/Back-Office, `C`=Merchant. States li
 | SCR-MEM-023 | Policies | M | Public/MEM | View policies, guidelines, T&C | — | FEAT-062, FR-ADM-004 |
 | SCR-MEM-024 | Notifications | M | MEM | View broadcasts/announcements | — | FEAT-063, FR-ADM-005 |
 | SCR-MEM-025 | Location exception request | M | MEM | Request exception (Abroad) | — | FEAT-016, FR-GEO-004, BR-GEO-003 |
+| SCR-MEM-026 | Messages | M | MEM | View own admin-team thread; send/receive text (Realtime) | — | FEAT-072, FR-MEM-002, BR-MSG-001..004 |
 | SCR-ADM-001 | Admin dashboard | D | ADM, FIN, SUP | Route to queues; view workload | — | FEAT-003/004, NFR-AUD-001 |
 | SCR-ADM-002 | Registration queue | D | ADM | List `Pending` registrations | `Pending` | FEAT-011, FR-REG-004, BR-AUTH-003 |
 | SCR-ADM-003 \* | Registration detail | D | ADM | Verify ID; approve/reject (reason) | `Pending`, `Approved-Active`, `Rejected` | FEAT-010/011, FR-REG-002/004, BR-REG-002/004 |
@@ -515,6 +516,8 @@ Legend: App `A`=AUTH, `M`=Member, `D`=Admin/Back-Office, `C`=Merchant. States li
 | SCR-ADM-014 | Media management | D | ADM | Upload/manage media | — | FEAT-060, FR-ADM-002, BR-MKT-001 |
 | SCR-ADM-015 | Policies management | D | ADM | Create/update policies, guidelines, T&C | — | FEAT-062, FR-ADM-004, BR-NOT-001 |
 | SCR-ADM-016 | Broadcasts | D | ADM | Create broadcasts/push | — | FEAT-063, FR-ADM-005, BR-NOT-002 |
+| SCR-ADM-016a | Messages inbox | D | ADM | One row per member; open thread; reply | — | FEAT-072, FR-ADM-006, BR-MSG-001..004 |
+| SCR-ADM-016b | Conversation detail | D | ADM | Member thread; staff composer; live updates | — | FEAT-072, FR-ADM-006, BR-MSG-001..004 |
 | SCR-ADM-017 | Voucher management | D | ADM, SUP | Issue voucher (via signing); view redemption history | — | FEAT-052/054, FR-SEC-001..003, FR-VCH-003 |
 | SCR-ADM-018 | Commissions (staff) | D | ADM, FIN, SUP | List/filter commissions | `Pending`, `Available`, `Cancelled`, `Reversed` | FEAT-033..040, FR-COM-001..012 |
 | SCR-ADM-019 \* | Platform config | D | SUP | Edit business parameters (BR-CFG-001) | — | FEAT-005, FR-ADM-001, BR-CFG-001 |

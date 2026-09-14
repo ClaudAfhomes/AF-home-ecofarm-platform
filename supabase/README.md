@@ -20,14 +20,18 @@ Copy `apps/web/.env.example` → `.env.local` for overrides. Never commit `.env*
 
 ## Migrations
 
-`supabase/migrations/20260829000001_auth_foundation.sql` — Phase 1 auth only (no Prisma):
+Apply with `pnpm db:migrate` (runs `supabase/apply-migrations.ts`): it connects via `DATABASE_URL`, records applied versions in `supabase_migrations.schema_migrations` (the Supabase CLI convention), applies pending `.sql` files in filename order, then probes `to_regclass` for the messaging tables.
+
+- `DATABASE_URL` must be the **transaction-pooler** connection string from Dashboard → Settings → Database → Connect (`postgresql://postgres.<ref>:<pw>@aws-0-<region>.pooler.supabase.com:6543/postgres`). The legacy direct host `db.<ref>.supabase.co` no longer resolves.
+- **Upgrading a database whose migrations were applied out-of-band** (manual SQL editor, never recorded): run `pnpm db:migrate --mark-existing` once to record existing versions, then it applies only genuinely new files. (Without this, an unrecorded database re-runs every historical file — they are idempotent, but avoid it.)
+- Idempotent: re-running is a no-op (`No pending migrations`). The `api/dev-server.ts` startup self-check warns loudly when `Conversation`/`Message` are missing from the schema cache.
+- After each batch, run `supabase/security/rls_invariants.sql` in the SQL editor; expect only the documented `is_staff_user` exception row.
+
+Legacy: `psql $DATABASE_URL -f supabase/migrations/<file>.sql` (requires a working pooler URL). `20260829000001_auth_foundation.sql` — Phase 1 auth only (no Prisma):
 - Creates `Member`, `Role`, `MemberRole` if not exists (id = `auth.users.id` for `auth.uid()`).
 - Seeds roles `admin` / `user`.
 - Enables `RLS` `Member auth.uid()=id`, `MemberRole` own row, `Role` read for authenticated.
 - **CRM tables (`Customer`, `Sale`, `Property`, `Commission`, `Wallet`, etc.) are intentionally left untouched** until CRM phase (Q3).
-
-Apply: `psql $DATABASE_URL -f supabase/migrations/20260829000001_auth_foundation.sql` (idempotent).
-Legacy `supabase/migrations/20260828000001_enable_rls.sql` is deprecated — removed during Prisma cleanup.
 
 Later migrations (apply in filename order, all idempotent):
 - `20260830000001_cms_contents.sql`, `20260831000002_cms_realtime.sql`,
@@ -38,6 +42,10 @@ Later migrations (apply in filename order, all idempotent):
   (service_role-only), `Policy` (public read)
 - `20260907000001_notifications_content.sql` — `Notification` (own + broadcast reads),
   `ContentItem` (published public read), Realtime publication for notifications
+- `20261008000001_messaging.sql`, `20261008000002_member_purge_messaging.sql`,
+  `20261008000003_messaging_role_backfill.sql` — admin↔member messaging (ADR-013, FEAT-072):
+  `Conversation`/`Message`, `is_staff_user()` RLS helper, `message_after_insert` trigger,
+  Realtime for `Message`, purge extension, `messages` staff module
 
 ## Seed
 

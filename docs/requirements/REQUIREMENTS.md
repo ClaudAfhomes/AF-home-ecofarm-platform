@@ -172,6 +172,7 @@ All other open questions (see OD-001..025) remain **REQUIRES OWNER APPROVAL** an
 | ID | Requirement | Status |
 |---|---|---|
 | FR-MEM-001 | Member profiles shall capture structured fields: First Name, Last Name, Middle Initial, Extension/Suffix, Date of Birth, Gender, Address, Country, Phone, Email, optional Profile Photo. | **CONFIRMED** |
+| FR-MEM-002 | Members shall view their own admin-team thread, send text messages, and receive replies in the same thread with live (Realtime) updates. | **CONFIRMED** (owner-approved scope, 2026-09-14 — ADR-013) |
 
 ### 6.4 Abroad Geolocation — FR-GEO
 
@@ -312,6 +313,7 @@ All other open questions (see OD-001..025) remain **REQUIRES OWNER APPROVAL** an
 | FR-ADM-003 | Members shall be able to forward permitted content via Facebook Messenger and Viber, and download permitted materials. | **CONFIRMED** |
 | FR-ADM-004 | Admins shall manage policies, program guidelines, Terms and Conditions, and company rules. | **CONFIRMED** |
 | FR-ADM-005 | Admins shall broadcast promotions, training invitations, Zoom/Google Meet invitations, company announcements, and push notifications. | **CONFIRMED** |
+| FR-ADM-006 | Admins (super_admin/admin) shall view a per-member conversation inbox and reply within each member's thread; every staff reply is audited. | **CONFIRMED** (owner-approved scope, 2026-09-14 — ADR-013) |
 
 ### 6.17 Reporting & Genealogy — FR-RPT
 

@@ -17,6 +17,8 @@ import path from 'node:path';
 import { fileURLToPath, URL } from 'node:url';
 
 import { findRouteCoverageGaps } from './_lib/route-coverage.js';
+import { getSupabaseEnv } from './_lib/env.js';
+import { findMissingSchemaRelations } from './_lib/schema-check.js';
 
 // ---------------------------------------------------------------------------
 // Load root .env (Node-compatible, no Vite). Mirrors supabase/seed.ts.
@@ -769,6 +771,29 @@ for (const gap of findRouteCoverageGaps(
     `[dev-server] WARNING: ${gap.file} is ${gap.reason === 'not-imported' ? 'not imported' : 'imported but never routed'} — requests to it will 404. Add it to the route table.`,
   );
 }
+
+// Schema self-check: probe the messaging tables via PostgREST so a missing
+// migration is caught at startup (loud) instead of every endpoint returning
+// "Could not find the table 'public.Conversation' in the schema cache".
+// Skipped when Supabase is not configured (mock/dev-server-only mode).
+void (async () => {
+  const { url, serviceKey } = getSupabaseEnv();
+  if (!url || !serviceKey) return;
+  const { createClient } = await import('@supabase/supabase-js');
+  const svc = createClient(url, serviceKey, { auth: { autoRefreshToken: false } });
+  try {
+    const missing = await findMissingSchemaRelations(svc as never);
+    if (missing.length > 0) {
+      // eslint-disable-next-line no-console
+      console.error(
+        `[dev-server] FATAL: messaging schema missing (${missing.join(', ')}) — run \`pnpm db:migrate\` or apply supabase/migrations/20261008000001_messaging.sql.`,
+      );
+    }
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error('[dev-server] schema self-check failed:', (e as Error).message);
+  }
+})();
 
 server.listen(port, () => {
   // eslint-disable-next-line no-console

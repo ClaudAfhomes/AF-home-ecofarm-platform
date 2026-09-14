@@ -282,6 +282,20 @@ Legend: **M** method · **Auth** role shorthand · **Feature** FEAT ID · **Req*
 | 72 | POST | `/broadcasts` | ADM | FEAT-063 | FR-ADM-005 | Promotions/training/invites/announcements |
 | 73 | GET | `/me/broadcasts` | MEM | FEAT-063 | FR-ADM-005 | My notifications (incl. push dispatch) |
 
+### 6.12a Admin ↔ Member Messaging (FG-MESSAGING — FEAT-072, ADR-013)
+
+| # | M | Path | Auth | Feature | Req | Notes |
+|---|---|---|---|---|---|---|
+| 90 | GET | `/me/messages` | MEM | FEAT-072 | FR-MEM (messaging) | Own thread, cursor-paginated (newest first) |
+| 90a | POST | `/me/messages` | MEM | FEAT-072 | FR-MEM (messaging) | Send a message to the admin team |
+| 91 | POST | `/me/messages/read` | MEM | FEAT-072 | FR-MEM (messaging) | Mark own thread read (member watermark) |
+| 91a | GET | `/me/messages/summary` | MEM | FEAT-072 | FR-MEM (messaging) | Thread badge (unread staff replies) |
+| 92 | GET | `/admin/conversations` | ADM | FEAT-072 | FR-ADM (messaging) | Inbox: one row per member with a thread; module `messages` |
+| 92a | GET | `/admin/conversations/:memberId` | ADM | FEAT-072 | FR-ADM (messaging) | One member's thread, cursor-paginated |
+| 93 | POST | `/admin/conversations/:memberId/messages` | ADM | FEAT-072 | FR-ADM (messaging) | Staff reply (audited `MESSAGE_SENT`) |
+| 93a | POST | `/admin/conversations/:memberId/read` | ADM | FEAT-072 | FR-ADM (messaging) | Mark thread read for staff |
+| 94 | GET | `/admin/messages/summary` | ADM | FEAT-072 | FR-ADM (messaging) | Inbox badge (unread member messages) |
+
 ### 6.13 Reporting & Genealogy (FG-REPORTING)
 
 | # | M | Path | Auth | Feature | Req | Notes |

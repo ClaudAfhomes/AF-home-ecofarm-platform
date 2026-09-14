@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
 import {
@@ -6,12 +6,14 @@ import {
   Button,
   EmptyState,
   ErrorState,
+  Icon,
   PageHeader,
   Skeleton,
 } from '@jad/ui';
 import type { Message } from '@jad/contracts';
 
 import { Alert } from '@/components/Alert';
+import { ButtonLink } from '@/components/ButtonLink';
 import { apiErrorMessage } from '../../../lib/api/errorMessage';
 import { useSession } from '../../../lib/session';
 import {
@@ -20,8 +22,21 @@ import {
   useMessagesSummary,
   useSendMessage,
 } from '../hooks/useMember';
-import { formatDate } from '../lib/presentation';
+import { formatDate, formatTime } from '../lib/presentation';
 import styles from './MessagesPage.module.css';
+
+const dayOf = (iso: string): string => new Date(iso).toDateString();
+
+/** Day divider label for the thread — Today / Yesterday / full date. */
+function dayLabel(iso: string, now: Date): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return formatDate(iso);
+  const dayStart = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  const diffDays = Math.round((dayStart(now) - dayStart(date)) / 86_400_000);
+  if (diffDays <= 0) return 'Today';
+  if (diffDays === 1) return 'Yesterday';
+  return formatDate(iso);
+}
 
 /**
  * Messages (SCR-MEM Messages, FEAT-072, ADR-013). One thread with the JA&D
@@ -42,8 +57,6 @@ export function MessagesPage() {
   const threadRef = useRef<HTMLDivElement | null>(null);
   const markedRef = useRef(false);
 
-  const summaryKey = ['member', 'messages', 'summary', user?.id];
-
   // Mark the thread read on first successful load when there are unread
   // staff replies (idempotent server-side; ref-guard prevents repeats).
   useEffect(() => {
@@ -53,7 +66,9 @@ export function MessagesPage() {
       markedRef.current = true;
       markReadMutation.mutate(undefined, {
         onSuccess: () => {
-          void queryClient.invalidateQueries({ queryKey: summaryKey });
+          void queryClient.invalidateQueries({
+            queryKey: ['member', 'messages', 'summary', user?.id],
+          });
         },
       });
     }
@@ -63,7 +78,7 @@ export function MessagesPage() {
     summaryQuery.data,
     markReadMutation,
     queryClient,
-    summaryKey,
+    user?.id,
   ]);
 
   // Scroll to the newest message after a send or a live refresh.
@@ -73,6 +88,7 @@ export function MessagesPage() {
   };
 
   const messages: Message[] = (threadQuery.data?.pages.flatMap((page) => page.items) ?? []).slice().reverse();
+  const now = new Date();
 
   const canSend = draft.trim().length > 0 && draft.length <= 4000;
 
@@ -99,15 +115,9 @@ export function MessagesPage() {
         title="Messages"
         description="One-to-one chat with the JA&D admin team."
         actions={
-          <Button
-            variant="secondary"
-            onClick={() => {
-              void threadQuery.refetch();
-              void summaryQuery.refetch();
-            }}
-          >
-            Refresh
-          </Button>
+          <ButtonLink to="/member" variant="ghost">
+            ← Back to Dashboard
+          </ButtonLink>
         }
       />
       <Breadcrumbs
@@ -120,88 +130,130 @@ export function MessagesPage() {
         </Alert>
       ) : null}
 
-      <div className={styles.threadShell}>
-        {threadQuery.isLoading ? (
-          <div className={styles.loading} role="status" aria-live="polite" aria-busy="true">
-            <Skeleton />
-            <Skeleton />
-            <Skeleton />
+      <div className={styles.conversation}>
+        <header className={styles.conversationHeader}>
+          <span className={styles.teamAvatar} aria-hidden="true">
+            <Icon name="message" size={18} />
+          </span>
+          <div className={styles.identity}>
+            <h2 className={styles.identityName}>JA&D Admin Team</h2>
+            <p className={styles.identityNote}>
+              Support from the JA&D admin team — replies arrive right here.
+            </p>
           </div>
-        ) : threadQuery.isError ? (
-          <ErrorState
-            error={threadQuery.error}
-            title="Could not load messages"
-            onRetry={() => void threadQuery.refetch()}
-          />
-        ) : (
-          <div className={styles.thread} ref={threadRef} aria-live="polite">
-            {threadQuery.hasNextPage ? (
-              <div className={styles.loadOlder}>
-                <Button
-                  variant="ghost"
-                  onClick={() => void threadQuery.fetchNextPage()}
-                  disabled={threadQuery.isFetchingNextPage}
-                >
-                  {threadQuery.isFetchingNextPage ? 'Loading…' : 'Load earlier messages'}
-                </Button>
-              </div>
-            ) : null}
-            {messages.length === 0 ? (
-              <div className={styles.empty}>
-                <EmptyState
-                  title="No messages yet"
-                  description="Ask the JA&D admin team anything — they will reply right here."
-                />
-              </div>
-            ) : (
-              <ul className={styles.list}>
-                {messages.map((message) => {
-                  const own = message.senderType === 'MEMBER';
-                  return (
-                    <li
-                      key={message.id}
-                      className={`${styles.row} ${own ? styles.rowOwn : styles.rowStaff}`}
-                    >
-                      <div
-                        className={`${styles.bubble} ${own ? styles.bubbleOwn : styles.bubbleStaff}`}
-                      >
-                        <p className={styles.sender}>{own ? 'You' : message.senderName}</p>
-                        <p className={styles.body}>{message.body}</p>
-                        <span className={styles.meta}>{formatDate(message.createdAt)}</span>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-          </div>
-        )}
-      </div>
+        </header>
 
-      <div className={styles.composer}>
-        <label className={styles.composerLabel} htmlFor="message-draft">
-          New message
-        </label>
-        <textarea
-          id="message-draft"
-          className={styles.composerInput}
-          value={draft}
-          maxLength={4000}
-          rows={3}
-          placeholder="Write a message to the JA&D admin team…"
-          onChange={(event) => setDraft(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key === 'Enter' && !event.shiftKey) {
-              event.preventDefault();
-              submit();
-            }
-          }}
-        />
-        <div className={styles.composerFooter}>
-          <span className={styles.counter}>{draft.length}/4000</span>
-          <Button onClick={submit} disabled={!canSend || sendMutation.isPending}>
-            {sendMutation.isPending ? 'Sending…' : 'Send'}
-          </Button>
+        <div className={styles.thread} ref={threadRef} aria-live="polite">
+          {threadQuery.isLoading ? (
+            <div className={styles.loading} role="status" aria-live="polite" aria-busy="true">
+              <div className={styles.skeletonRow}>
+                <Skeleton className={styles.skeletonBubble} style={{ width: '55%' }} />
+              </div>
+              <div className={styles.skeletonRowOwn}>
+                <Skeleton className={styles.skeletonBubble} style={{ width: '40%' }} />
+              </div>
+              <div className={styles.skeletonRow}>
+                <Skeleton className={styles.skeletonBubble} style={{ width: '68%' }} />
+              </div>
+            </div>
+          ) : threadQuery.isError ? (
+            <ErrorState
+              error={threadQuery.error}
+              title="Could not load messages"
+              onRetry={() => void threadQuery.refetch()}
+            />
+          ) : (
+            <>
+              {threadQuery.hasNextPage ? (
+                <div className={styles.loadOlder}>
+                  <Button
+                    variant="ghost"
+                    onClick={() => void threadQuery.fetchNextPage()}
+                    disabled={threadQuery.isFetchingNextPage}
+                  >
+                    {threadQuery.isFetchingNextPage ? 'Loading…' : 'Load earlier messages'}
+                  </Button>
+                </div>
+              ) : null}
+              {messages.length === 0 ? (
+                <div className={styles.empty}>
+                  <EmptyState
+                    title="No messages yet"
+                    description="Ask the JA&D admin team anything — they will reply right here."
+                  />
+                </div>
+              ) : (
+                <ul className={styles.list}>
+                  {messages.map((message, index) => {
+                    const own = message.senderType === 'MEMBER';
+                    const previous = messages[index - 1];
+                    const showDay =
+                      !previous || dayOf(previous.createdAt) !== dayOf(message.createdAt);
+                    return (
+                      <Fragment key={message.id}>
+                        {showDay ? (
+                          <li className={styles.dayDivider}>
+                            <span>{dayLabel(message.createdAt, now)}</span>
+                          </li>
+                        ) : null}
+                        <li
+                          className={`${styles.row} ${own ? styles.rowOwn : styles.rowStaff}`}
+                        >
+                          {!own ? (
+                            <span className={styles.threadAvatar} aria-hidden="true">
+                              {(message.senderName.trim()[0] ?? 'A').toUpperCase()}
+                            </span>
+                          ) : null}
+                          <div
+                            className={`${styles.bubble} ${own ? styles.bubbleOwn : styles.bubbleStaff}`}
+                          >
+                            <p className={styles.sender}>{own ? 'You' : message.senderName}</p>
+                            <p className={styles.body}>{message.body}</p>
+                            <time className={styles.meta} dateTime={message.createdAt}>
+                              {formatTime(message.createdAt)}
+                            </time>
+                          </div>
+                        </li>
+                      </Fragment>
+                    );
+                  })}
+                </ul>
+              )}
+            </>
+          )}
+        </div>
+
+        <div className={styles.composer}>
+          <label className={styles.composerLabel} htmlFor="message-draft">
+            New message
+          </label>
+          <div className={styles.composerRow}>
+            <textarea
+              id="message-draft"
+              className={styles.composerInput}
+              value={draft}
+              maxLength={4000}
+              rows={2}
+              placeholder="Write a message to the JA&D admin team…"
+              onChange={(event) => setDraft(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                  event.preventDefault();
+                  submit();
+                }
+              }}
+            />
+            <Button
+              onClick={submit}
+              disabled={!canSend || sendMutation.isPending}
+            >
+              {sendMutation.isPending ? 'Sending…' : 'Send'}
+            </Button>
+          </div>
+          <div className={styles.composerFooter}>
+            <span className={styles.hint}>Enter to send · Shift+Enter for a new line</span>
+            <span className={styles.counter}>{draft.length}/4000</span>
+          </div>
         </div>
       </div>
     </section>

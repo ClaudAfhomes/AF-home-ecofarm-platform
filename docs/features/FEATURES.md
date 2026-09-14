@@ -49,6 +49,7 @@ Where the source documents do not establish a priority, it is marked `TBD — Ow
 | FG-SALES | Sales & Qualifying Sale | SAL | FEAT-027..032 | P4 |
 | FG-COMMISSION | Commission Engine | COM, CLC, CAN, LED | FEAT-033..FEAT-040 (FEAT-041 → P12) | P5 / P12 |
 | FG-EWALLET | eWallet & Financial Ledger | WAL, ADJ | FEAT-042, FEAT-043, FEAT-071 | P6 |
+| FG-MESSAGING | Admin ↔ Member Messaging | MEM, ADM | FEAT-072 | P9 |
 | FG-PAYOUT | Payout Accounts | PAY | FEAT-044..047 | P7 |
 | FG-WDR | Withdrawals | WDR | FEAT-048..051 | P7 |
 | FG-BND | External Payment Boundary | BND | FEAT-070 | P7 |
@@ -662,6 +663,24 @@ User story: As a member, I want my available balance accurate, so that I only wi
 | Acceptance criteria | Only Super Admin can adjust; every adjustment records Member, Amount, Credit/Debit, Reason, Performing Super Admin, Date/time (AC-ADJ-001). |
 
 User story: As a Super Admin, I want to apply financial adjustments, so that verified corrections can be made.
+
+---
+
+### FG-MESSAGING — Admin ↔ Member Messaging (P9)
+
+#### FEAT-072 — Admin ↔ Member Messaging (one thread per member)
+| Field | Value |
+|---|---|
+| Module / Group | FG-MESSAGING |
+| Phase | P9 |
+| Priority | P0 |
+| Status | CONFIRMED |
+| Requirements | FR-MEM-0xx, FR-ADM-0xx (messaging) |
+| Business rules | BR-MSG-001, BR-MSG-002, BR-MSG-003, BR-MSG-004 |
+| Dependencies | FEAT-003 (auth), FEAT-063 (content/notification foundation) |
+| Acceptance criteria | Members can send messages to the admin team and receive replies in the same thread; staff can reply from the inbox; unread counts and read watermarks are maintained per side; live updates arrive via Realtime (ADR-013). |
+
+User story: As a member, I want to message the admin team and read their replies, so that I can get questions answered without leaving the platform.
 
 ---
 

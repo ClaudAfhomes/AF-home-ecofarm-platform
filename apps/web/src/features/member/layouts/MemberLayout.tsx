@@ -6,8 +6,8 @@ import { AppShell, Breadcrumbs, ConfirmDialog, UserMenu } from '@jad/ui';
 
 import { NotificationBell } from '../components/NotificationBell';
 import { MemberBottomNav } from '../components/MemberBottomNav';
+import { MessageFab } from '../components/MessageFab';
 import { useMessagesRealtime } from '../hooks/useMessagesRealtime';
-import { useMessagesSummary } from '../hooks/useMember';
 import { useNotificationsRealtime } from '../hooks/useNotificationsRealtime';
 import { findMemberNavItem, memberSidebarItems } from '../navigation';
 import styles from './MemberLayout.module.css';
@@ -24,19 +24,8 @@ export function MemberLayout() {
   const current = findMemberNavItem(location.pathname);
   // Single live subscription for the notification feed (bell + page).
   useNotificationsRealtime(user?.id);
-  // Single live subscription for the admin thread (page + nav badge).
+  // Single live subscription for the admin thread (page + floating button).
   useMessagesRealtime(user?.id);
-  const messagesSummary = useMessagesSummary();
-
-  // Sidebar badge on Messages (unread staff replies); registry stays static.
-  const navItems = useMemo(() => {
-    const items = memberSidebarItems();
-    const unread = messagesSummary.data?.unreadCount ?? 0;
-    if (unread <= 0) return items;
-    return items.map((item) =>
-      item.to === '/member/messages' ? { ...item, badge: unread } : item,
-    );
-  }, [messagesSummary.data?.unreadCount]);
 
   const crumbs = useMemo(() => {
     if (!current || current.to === '/member') return [];
@@ -61,7 +50,7 @@ export function MemberLayout() {
             </div>
           </div>
         }
-        navItems={navItems}
+        navItems={memberSidebarItems()}
         navLabel="Member navigation"
         topbarActions={
           <div className={styles.topbarActions}>
@@ -92,6 +81,7 @@ export function MemberLayout() {
           <Outlet />
         </div>
       </AppShell>
+      <MessageFab />
       <ConfirmDialog
         open={showLogoutConfirm}
         onCancel={() => setShowLogoutConfirm(false)}

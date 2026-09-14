@@ -69,6 +69,13 @@ export function formatDate(iso: string): string {
   return date.toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
+/** Clock time for chat meta — e.g. `10:15 AM`. */
+export function formatTime(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return iso;
+  return date.toLocaleTimeString('en-PH', { hour: 'numeric', minute: '2-digit' });
+}
+
 export function commissionStatusLabel(status: CommissionStatus): string {
   switch (status) {
     case 'PENDING':

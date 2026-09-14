@@ -27,6 +27,7 @@
 | [ADR-010-TypeScript-Only-Full-Stack.md](./ADR-010-TypeScript-Only-Full-Stack.md) | TypeScript-only full stack | Accepted | TECH-STACK §2/§3; ARCH-DEC-005 |
 | [ADR-011-pnpm-Workspaces-Monorepo.md](./ADR-011-pnpm-Workspaces-Monorepo.md) | pnpm workspaces + Turborepo monorepo | Proposed | TECH-STACK §11 |
 | [ADR-012-Deployment-Infrastructure-Provider.md](./ADR-012-Deployment-Infrastructure-Provider.md) | Containerized deployment; provider/region OPEN | Proposed | ARCH-DEC-008 |
+| [ADR-013-Admin-Member-Messaging.md](./ADR-013-Admin-Member-Messaging.md) | Admin ↔ member messaging (one thread per member, text-only, realtime) | **Accepted** | Owner-approved scope (2026-09-14); FEAT-072 |
 
 ## Adding or changing an ADR
 

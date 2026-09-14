@@ -198,8 +198,10 @@ The confirmed entities are drawn from the confirmed business model (ROADMAP §5.
 | E-31 | Country | Structured country value (ISO 3166) | `config` | Read-only reference | BR-REG-010, FR-REG-012 |
 | E-32 | Idempotency Key | Server-side idempotency record (24h TTL **PROPOSED**) | Platform shared | Create → Expire | API-SPECIFICATION §5.3, BACKEND-ARCHITECTURE §16 |
 | E-33 | Audit Log Entry | Immutable audit trail (staff actions, exceptions) | `audit` | Insert-only; never modified/deleted | NFR-SEC-002, NFR-AUD-001, FEAT-004 |
+| E-34 | Conversation | One admin↔member thread (per member) | `messaging` | Created on first message; per-side read watermarks + unread counters | BR-MSG-001..004, FR-MEM/ADM (messaging), FEAT-072, ADR-013 |
+| E-35 | Message | Chat message in a member's thread | `messaging` | Insert-only; display snapshot; trigger-maintained counters | BR-MSG-001..004, FR-MEM/ADM (messaging), FEAT-072, ADR-013 |
 
-> Entities E-01..E-33 above are the complete confirmed/proposed entity set. No entity exists for unapproved functionality (e.g., no Group Incentive parameters, no MLM tables, no payment-gateway tables).
+> Entities E-01..E-35 above are the complete confirmed/proposed entity set. No entity exists for unapproved functionality (e.g., no Group Incentive parameters, no MLM tables, no payment-gateway tables).
 
 ---
 
@@ -765,6 +767,47 @@ Record lifecycle: **insert-only; never edited or deleted** (FEAT-004 acceptance 
 | `after` | `jsonb` | YES | NULL | — | — | Post state (proposal) |
 | `ip_address` | `inet` | YES | NULL | — | — | — |
 | `created_at` | `timestamptz` | NO | `now()` | — | — | Date/time required by audit rules |
+
+### 7.34 `conversations` — Entity E-34 (module: `messaging`) — Status: CONFIRMED (implemented, ADR-013)
+
+Purpose: one admin↔member thread per member (FEAT-072). Created on first message; per-side read
+watermarks and unread counters for badges. No delete path except the sanctioned member purge.
+Record lifecycle: created → (messages append) → retained.
+
+| Column | Type | Null | Default | Generated/Derived | Sensitive | Notes |
+|---|---|---|---|---|---|---|
+| `memberId` | `uuid` | NO | — | — | — | PK; FK → `Member(id)` ON DELETE CASCADE |
+| `lastMessageAt` | `timestamptz` | YES | NULL | — | — | Set by trigger on each message |
+| `memberLastReadAt` | `timestamptz` | YES | NULL | — | — | Member read watermark (`POST /me/messages/read`) |
+| `staffLastReadAt` | `timestamptz` | YES | NULL | — | — | Staff read watermark (`POST /admin/conversations/:memberId/read`) |
+| `memberUnread` | `integer` | NO | `0` | trigger | — | Unread staff replies; CHECK >= 0 |
+| `staffUnread` | `integer` | NO | `0` | trigger | — | Unread member messages; CHECK >= 0 |
+| `createdAt` | `timestamptz` | NO | `now()` | — | — | Audit field |
+| `updatedAt` | `timestamptz` | NO | `now()` | — | — | Set by trigger |
+
+RLS: `conversation_member_select_own` (own row), `conversation_staff_select` (staff standing via
+`is_staff_user()`), `conversation_service_role_all`. All writes service-role-only.
+
+### 7.35 `messages` — Entity E-35 (module: `messaging`) — Status: CONFIRMED (implemented, ADR-013)
+
+Purpose: chat message in a member's thread (FEAT-072). Insert-only; `senderName` is a display
+snapshot (no join across the two identity domains); body is plain text (1–4000, never rendered
+as HTML). An AFTER INSERT trigger maintains the conversation row atomically.
+Record lifecycle: insert → retained; deleted only via member purge.
+
+| Column | Type | Null | Default | Generated/Derived | Sensitive | Notes |
+|---|---|---|---|---|---|---|
+| `id` | `text` | NO | — | server `msg-…` | — | PK |
+| `memberId` | `uuid` | NO | — | — | — | FK → `Member(id)` ON DELETE CASCADE; denormalized for RLS + realtime filter |
+| `senderType` | `text` | NO | — | — | — | CHECK IN `MEMBER, STAFF` |
+| `senderId` | `uuid` | NO | — | — | — | `Member.id` or `StaffUser.id`; deliberately no FK across identity domains |
+| `senderName` | `text` | NO | — | — | — | Display snapshot at send time |
+| `body` | `text` | NO | — | — | PII | CHECK `char_length(btrim(body)) >= 1 AND char_length(body) <= 4000` |
+| `createdAt` | `timestamptz` | NO | `now()` | — | — | Audit field |
+
+RLS: `message_member_select_own` (own row), `message_staff_select` (staff standing via
+`is_staff_user()`), `message_service_role_all`. All writes service-role-only. Realtime:
+`Message` added to the `supabase_realtime` publication (member + staff live updates).
 
 ---
 

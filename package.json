@@ -15,6 +15,7 @@
     "test": "turbo run test",
     "format": "prettier --write .",
     "seed": "tsx supabase/seed.ts",
+    "db:migrate": "tsx supabase/apply-migrations.ts",
     "reset:dev": "tsx supabase/reset-dev.ts",
     "purge:core": "tsx supabase/purge-seed-keep-core.ts",
     "provision:superadmin": "tsx supabase/provision-superadmin.ts",

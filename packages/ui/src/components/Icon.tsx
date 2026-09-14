@@ -31,7 +31,8 @@ export type IconName =
   | 'plus'
   | 'pencil'
   | 'trash'
-  | 'message';
+  | 'message'
+  | 'search';
 
 const PATHS: Record<IconName, ReactNode> = {
   menu: (
@@ -212,6 +213,12 @@ const PATHS: Record<IconName, ReactNode> = {
       <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
       <line x1="8" y1="9" x2="16" y2="9" />
       <line x1="8" y1="13" x2="13" y2="13" />
+    </>
+  ),
+  search: (
+    <>
+      <circle cx="11" cy="11" r="8" />
+      <line x1="21" y1="21" x2="16.65" y2="16.65" />
     </>
   ),
 };

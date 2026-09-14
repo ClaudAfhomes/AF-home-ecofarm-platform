@@ -19,3 +19,43 @@ export function formatDateTime(iso: string): string {
     minute: '2-digit',
   });
 }
+
+const MINUTE_MS = 60_000;
+const HOUR_MS = 3_600_000;
+const DAY_MS = 86_400_000;
+
+function isSameDay(a: Date, b: Date): boolean {
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth() &&
+    a.getDate() === b.getDate()
+  );
+}
+
+function startOfDay(d: Date): Date {
+  const out = new Date(d);
+  out.setHours(0, 0, 0, 0);
+  return out;
+}
+
+/** Relative time for chat timestamps ("just now", "5m ago", "Yesterday", …). */
+export function formatRelativeTime(iso: string, now: Date = new Date()): string {
+  const date = new Date(iso);
+  const diff = Math.max(0, now.getTime() - date.getTime());
+  if (diff < MINUTE_MS) return 'just now';
+  if (diff < HOUR_MS) return `${Math.floor(diff / MINUTE_MS)}m ago`;
+  if (diff < DAY_MS && isSameDay(date, now)) return `${Math.floor(diff / HOUR_MS)}h ago`;
+  const dayDiff = Math.round((startOfDay(now).getTime() - startOfDay(date).getTime()) / DAY_MS);
+  if (dayDiff === 1) return 'Yesterday';
+  if (dayDiff < 7) return `${dayDiff}d ago`;
+  return formatDate(iso);
+}
+
+/** Day separator label for a thread ("Today", "Yesterday", "Sep 12, 2026"). */
+export function formatDayLabel(iso: string, now: Date = new Date()): string {
+  const date = new Date(iso);
+  if (isSameDay(date, now)) return 'Today';
+  const dayDiff = Math.round((startOfDay(now).getTime() - startOfDay(date).getTime()) / DAY_MS);
+  if (dayDiff === 1) return 'Yesterday';
+  return formatDate(iso);
+}

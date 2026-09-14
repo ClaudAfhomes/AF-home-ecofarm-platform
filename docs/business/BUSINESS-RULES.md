@@ -235,6 +235,15 @@ Each rule has a stable ID (`BR-<MODULE>-<NNN>`). Statuses reflect the latest app
 | BR-NOT-001 | Admin-managed: policies, program guidelines, Terms and Conditions, company rules. | **CONFIRMED** |
 | BR-NOT-002 | Admin broadcast capabilities: promotions, training invitations, Zoom/Google Meet invitations, company announcements, push notifications. | **CONFIRMED** |
 
+## 1.20a Admin ↔ Member Messaging (MSG)
+
+| ID | Rule | Status |
+|---|---|---|
+| BR-MSG-001 | Each member has exactly **one conversation thread** with the admin team; messages are text-only (1–4000 chars, plain text, never rendered as HTML). | **CONFIRMED** |
+| BR-MSG-002 | Threads are retained (no hard delete except the sanctioned member purge); message content is member-generated PII subject to the open general retention decision (DATABASE-DESIGN DA-13). | **CONFIRMED** |
+| BR-MSG-003 | Staff replies are visible to authorized staff only (staff module `messages`; SELECT-only RLS gated by `is_staff_user()`); every staff reply is audited (`MESSAGE_SENT`, NFR-SEC-002). | **CONFIRMED** |
+| BR-MSG-004 | All message writes go through service-role API handlers; authenticated users hold SELECT-only RLS, and per-side read watermarks drive unread counts. | **CONFIRMED** |
+
 ## 1.21 Reporting / Genealogy (RPT)
 
 | ID | Rule | Status |

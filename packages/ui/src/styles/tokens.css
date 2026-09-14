@@ -128,6 +128,7 @@
   /* Z-index scale */
   --z-topbar: 20;
   --z-sidebar: 10;
+  --z-fab: 45;
   --z-bottom-nav: 50;
   --z-drawer: 60;
   --z-skip-link: 100;
