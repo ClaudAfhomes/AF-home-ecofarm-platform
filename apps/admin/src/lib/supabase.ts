@@ -8,7 +8,7 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
 export function isSupabaseConfigured(): boolean {
   const env = import.meta.env as Record<string, string | undefined>;
-  return Boolean(env.VITE_SUPABASE_URL && env.VITE_SUPABASE_ANON_KEY);
+  return Boolean(env.VITE_SUPABASE_URL?.trim() && env.VITE_SUPABASE_ANON_KEY?.trim());
 }
 
 let cached: SupabaseClient | null = null;
@@ -34,8 +34,10 @@ export function getSupabaseClient(): SupabaseClient | null {
   if (!isSupabaseConfigured()) return null;
   if (cached) return cached;
   const env = import.meta.env as Record<string, string | undefined>;
-  if (!env.VITE_SUPABASE_URL || !env.VITE_SUPABASE_ANON_KEY) return null;
-  cached = createClient(env.VITE_SUPABASE_URL, env.VITE_SUPABASE_ANON_KEY, {
+  const url = env.VITE_SUPABASE_URL?.trim();
+  const anonKey = env.VITE_SUPABASE_ANON_KEY?.trim();
+  if (!url || !anonKey) return null;
+  cached = createClient(url, anonKey, {
     auth: {
       persistSession: true,
       autoRefreshToken: true,

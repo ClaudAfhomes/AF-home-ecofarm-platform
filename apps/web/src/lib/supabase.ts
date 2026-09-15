@@ -17,10 +17,35 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
 export function isSupabaseConfigured(): boolean {
   const env = import.meta.env as Record<string, string | undefined>;
-  return Boolean(env.VITE_SUPABASE_URL && env.VITE_SUPABASE_ANON_KEY);
+  return Boolean(env.VITE_SUPABASE_URL?.trim() && env.VITE_SUPABASE_ANON_KEY?.trim());
 }
 
 let cached: SupabaseClient | null = null;
+
+/**
+ * Build the client from trimmed env values. A stray trailing newline/space in
+ * `VITE_SUPABASE_ANON_KEY` (e.g. pasted into a Vercel env var) would otherwise
+ * produce an invalid `apikey` in every request and in the Realtime WebSocket
+ * URL (`...QmtOg%0A`), silently breaking auth/realtime.
+ */
+export function getSupabaseClient(): SupabaseClient | null {
+  if (!isSupabaseConfigured()) return null;
+  if (cached) return cached;
+  const env = import.meta.env as Record<string, string | undefined>;
+  const url = env.VITE_SUPABASE_URL?.trim();
+  const anonKey = env.VITE_SUPABASE_ANON_KEY?.trim();
+  if (!url || !anonKey) return null;
+  cached = createClient(url, anonKey, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+      flowType: 'pkce',
+      storage: import.meta.env.DEV ? (cookieStorage as never) : undefined,
+    },
+  });
+  return cached;
+}
 
 /**
  * Cookie storage adapter for DEV cross-port sharing.
@@ -46,23 +71,6 @@ const cookieStorage = {
     document.cookie = `${key}=; path=/; max-age=0`;
   },
 };
-
-export function getSupabaseClient(): SupabaseClient | null {
-  if (!isSupabaseConfigured()) return null;
-  if (cached) return cached;
-  const env = import.meta.env as Record<string, string | undefined>;
-  if (!env.VITE_SUPABASE_URL || !env.VITE_SUPABASE_ANON_KEY) return null;
-  cached = createClient(env.VITE_SUPABASE_URL, env.VITE_SUPABASE_ANON_KEY, {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: true,
-      flowType: 'pkce',
-      storage: import.meta.env.DEV ? (cookieStorage as never) : undefined,
-    },
-  });
-  return cached;
-}
 
 /** Test helper — reset singleton between vitest cases */
 export function resetSupabaseClientForTest(): void {

@@ -22,5 +22,11 @@ export function getSupabaseEnv() {
   if (url?.includes('your-project')) url = 'https://vudwoqduebdgtzvybywb.supabase.co';
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const anonKey = process.env.SUPABASE_ANON_KEY ?? process.env.VITE_SUPABASE_ANON_KEY;
-  return { url, serviceKey, anonKey };
+  // Trim: a trailing newline/space pasted into a host env var would otherwise
+  // produce an invalid `apikey`/token and silently fail auth or DB access.
+  return {
+    url: url?.trim() || undefined,
+    serviceKey: serviceKey?.trim() || undefined,
+    anonKey: anonKey?.trim() || undefined,
+  };
 }
