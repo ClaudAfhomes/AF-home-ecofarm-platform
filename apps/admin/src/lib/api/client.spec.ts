@@ -101,11 +101,14 @@ describe('rawRequest 401 recovery', () => {
   it('clears the session when rotation fails so guards redirect to login', async () => {
     supabaseStubs.configured = true;
     supabaseStubs.refreshResult = false;
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const fetchMock = vi.fn(async () => unauthorized());
     vi.stubGlobal('fetch', fetchMock);
     await expect(request('/admin/members', z.object({}))).rejects.toMatchObject({ status: 401 });
     expect(supabaseStubs.refreshCalls).toBe(1);
     expect(supabaseStubs.signOutCalls).toBe(1);
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('session rotation failed'));
+    warn.mockRestore();
   });
 
   it('never retries more than once', async () => {

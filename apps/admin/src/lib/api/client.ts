@@ -32,11 +32,9 @@ async function rawRequest(path: string, init?: RequestInit, retried = false): Pr
     const client = getSupabaseClient();
     const { data } = (await client?.auth.getSession()) ?? { data: { session: null } };
     const token = data.session?.access_token;
+    // No warning when the token is absent: public endpoints (CMS, config,
+    // programs, policies) legitimately run without a session.
     if (token) headers.Authorization = `Bearer ${token}`;
-    else
-      console.warn(
-        `[api] Supabase configured but no session token — request will be unauthenticated: ${path}`,
-      );
   }
   let res: Response;
   try {
@@ -50,11 +48,13 @@ async function rawRequest(path: string, init?: RequestInit, retried = false): Pr
   }
   // Expired/rotated sessions surface as 401 (the API never returns 401 for a
   // merely under-privileged caller — that's 403). Heal once via rotation and
-  // retry; if rotation fails the session is dead, so clear it and let the
-  // route guards redirect to login instead of stranding an error page.
+  // retry; if rotation fails the session is dead, so warn (the only reliable
+  // signal that auth was actually required and lost) then clear it and let
+  // the route guards redirect to login instead of stranding an error page.
   if (res.status === 401 && !retried && isSupabaseConfigured()) {
     const healed = await tryRefreshSession();
     if (healed) return rawRequest(path, init, true);
+    console.warn(`[api] ${path} returned 401 and session rotation failed — clearing session`);
     await clearSession();
   }
   return res;
