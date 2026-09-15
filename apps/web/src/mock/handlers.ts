@@ -311,6 +311,8 @@ function toVoucher(voucher: MockVoucher): Voucher {
     status: voucher.status,
     createdAt: voucher.createdAt,
     expiresAt: voucher.expiresAt,
+    redeemedAt: voucher.redeemedAt,
+    redeemedBy: voucher.redeemedBy,
   };
 }
 
@@ -945,11 +947,7 @@ export function memberMockHandlers(store: MockStore): MockRoute[] {
             : 50;
         const ordered = store.messages
           .filter((message) => message.memberId === member.id)
-          .sort(
-            (a, b) =>
-              b.createdAt.localeCompare(a.createdAt) ||
-              b.id.localeCompare(a.id),
-          );
+          .sort((a, b) => b.createdAt.localeCompare(a.createdAt) || b.id.localeCompare(a.id));
         const startIndex = cursor ? ordered.findIndex((message) => message.id === cursor) + 1 : 0;
         const page = ordered.slice(startIndex, startIndex + limit);
         const hasMore = startIndex + limit < ordered.length;
@@ -1016,15 +1014,10 @@ export function memberMockHandlers(store: MockStore): MockRoute[] {
         const readAt = store.messageReads[member.id];
         const thread = store.messages
           .filter((message) => message.memberId === member.id)
-          .sort(
-            (a, b) =>
-              b.createdAt.localeCompare(a.createdAt) ||
-              b.id.localeCompare(a.id),
-          );
+          .sort((a, b) => b.createdAt.localeCompare(a.createdAt) || b.id.localeCompare(a.id));
         const unreadCount = readAt
-          ? thread.filter(
-              (message) => message.senderType === 'STAFF' && message.createdAt > readAt,
-            ).length
+          ? thread.filter((message) => message.senderType === 'STAFF' && message.createdAt > readAt)
+              .length
           : thread.filter((message) => message.senderType === 'STAFF').length;
         return ok({
           unreadCount,

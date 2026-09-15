@@ -2,7 +2,7 @@ import { ADMIN_STAFF, FINANCE_VIEW } from '../../../_lib/access.js';
 import { appendAudit } from '../../../_lib/audit.js';
 import { verifyStaffModule } from '../../../_lib/auth.js';
 import type { VercelRequest, VercelResponse } from '../../../_lib/http.js';
-import { isValidVoucherRow, mapVoucherRow } from '../../../_lib/pipeline.js';
+import { isValidVoucherAssignmentRow, mapVoucherAssignmentRow } from '../../../_lib/pipeline.js';
 import { methodNotAllowed, requireService } from '../../../_lib/rest.js';
 import { toErrorEnvelope } from '../../../_lib/envelope.js';
 
@@ -50,7 +50,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
   const current = found as Record<string, unknown>;
   if (req.method === 'GET') {
-    if (!isValidVoucherRow(current)) {
+    // Admin detail view carries the member linkage (assignment shape).
+    if (!isValidVoucherAssignmentRow(current)) {
       const { error, status } = toErrorEnvelope(
         'INTERNAL',
         'Stored voucher failed validation',
@@ -59,7 +60,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       res.status(status).json({ error });
       return;
     }
-    res.status(200).json(mapVoucherRow(current));
+    res.status(200).json(mapVoucherAssignmentRow(current));
     return;
   }
   const { error } = await supabase.from('Voucher').delete().eq('id', id);

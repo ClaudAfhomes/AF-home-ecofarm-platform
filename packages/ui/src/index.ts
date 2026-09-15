@@ -55,6 +55,8 @@ export { NotFound } from './components/NotFound.js';
 export type { NotFoundProps } from './components/NotFound.js';
 export { PageHeader } from './components/PageHeader.js';
 export type { PageHeaderProps } from './components/PageHeader.js';
+export { QrCode, downloadQrImage } from './components/QrCode.js';
+export type { QrCodeProps } from './components/QrCode.js';
 export { Select } from './components/Select.js';
 export type { SelectOption, SelectProps } from './components/Select.js';
 export {

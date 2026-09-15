@@ -20,6 +20,8 @@ const mocks = vi.hoisted(() => {
     single: {} as Record<string, unknown>,
     list: {} as Record<string, unknown[]>,
     propertyCount: 0,
+    /** Injected error for the next Voucher insert (duplicate-assignment test). */
+    voucherInsertError: null as { code?: string; message: string } | null,
   };
   const builder = (table: string) => {
     const b: Record<string, (...a: never[]) => unknown> = {};
@@ -37,8 +39,7 @@ const mocks = vi.hoisted(() => {
     b.then = (resolve: (v: unknown) => void) => {
       if (table === 'MemberRole' || table === 'StaffAssignment') {
         resolve({ data: [{ roleId: 'r-1' }], error: null });
-      }
-      else if (table === 'Property')
+      } else if (table === 'Property')
         resolve({ data: [], error: null, count: script.propertyCount });
       else resolve({ data: script.list[table] ?? null, error: null });
     };
@@ -46,6 +47,9 @@ const mocks = vi.hoisted(() => {
       ...b,
       insert: async (row: unknown) => {
         calls.push({ table, op: 'insert', arg: row });
+        if (table === 'Voucher' && script.voucherInsertError) {
+          return { error: script.voucherInsertError };
+        }
         return { error: null };
       },
       upsert: async (row: unknown) => {
@@ -200,6 +204,7 @@ describe('POST /admin/vouchers/assign', () => {
       Member: { id: 'mem-uuid-1', firstName: 'Juan', lastName: 'Dela Cruz', name: null },
     };
     mocks.script.list = { Voucher: [{ code: 'JAD-VCH-2026-101' }] };
+    mocks.script.voucherInsertError = null;
   });
 
   it('404s unknown templates or members', async () => {
@@ -233,6 +238,35 @@ describe('POST /admin/vouchers/assign', () => {
       remainingValue: '500.00',
       status: 'ACTIVE',
     });
+  });
+
+  it('honors the per-assignment expiry rule (fixed date wins over template)', async () => {
+    const { res, seen } = capture();
+    await assignHandler(
+      req(
+        'POST',
+        {},
+        { templateId: 'vtpl-001', memberId: 'mem-uuid-1', expiresAt: '2027-01-01T00:00:00.000Z' },
+      ),
+      res,
+    );
+    expect(seen.status).toBe(201);
+    const body = seen.body as Record<string, unknown>;
+    expect(body.expiresAt).toBe('2027-01-01T00:00:00.000Z');
+  });
+
+  it('409s a duplicate assignment for the same member and voucher', async () => {
+    mocks.script.list = { Voucher: [{ code: 'JAD-VCH-2026-101' }] };
+    mocks.script.voucherInsertError = {
+      code: '23505',
+      message: 'duplicate key value violates unique constraint "Voucher_member_template_uidx"',
+    };
+    const { res, seen } = capture();
+    await assignHandler(req('POST', {}, { templateId: 'vtpl-001', memberId: 'mem-uuid-1' }), res);
+    expect(seen.status).toBe(409);
+    expect((seen.body as { error: { message: string } }).error.message).toContain(
+      'already has this voucher',
+    );
   });
 });
 

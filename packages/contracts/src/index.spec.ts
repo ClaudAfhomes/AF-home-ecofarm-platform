@@ -34,6 +34,10 @@ import {
   PROGRAM_QUESTION_SEEDS,
   POLICY_SEEDS,
   qualificationQuestionSchema,
+  voucherSchema,
+  assignVoucherRequestSchema,
+  scanVoucherRequestSchema,
+  redeemVoucherRequestSchema,
 } from '../src/index';
 import type { RoleRecord, StaffModule, StaffRole } from '../src/index';
 
@@ -633,5 +637,73 @@ describe('changeStaffPasswordRequestSchema', () => {
         newPassword: 'NewPass12',
       }).success,
     ).toBe(true);
+  });
+});
+
+describe('voucherSchema redemption fields', () => {
+  it('accepts a voucher without redemption stamps', () => {
+    expect(
+      voucherSchema.safeParse({
+        id: 'vch-001',
+        code: 'JAD-VCH-2026-101',
+        title: 'Welcome Gift',
+        originalValue: '500.00',
+        remainingValue: '500.00',
+        status: 'ACTIVE',
+        createdAt: '2026-09-01T00:00:00.000Z',
+      }).success,
+    ).toBe(true);
+  });
+
+  it('accepts a redeemed voucher with stamps', () => {
+    expect(
+      voucherSchema.safeParse({
+        id: 'vch-001',
+        code: 'JAD-VCH-2026-101',
+        title: 'Welcome Gift',
+        originalValue: '500.00',
+        remainingValue: '0.00',
+        status: 'FULLY_REDEEMED',
+        createdAt: '2026-09-01T00:00:00.000Z',
+        redeemedAt: '2026-09-10T00:00:00.000Z',
+        redeemedBy: 'staff-uuid-1',
+      }).success,
+    ).toBe(true);
+  });
+});
+
+describe('assignVoucherRequestSchema', () => {
+  it('requires a template and a member', () => {
+    expect(
+      assignVoucherRequestSchema.safeParse({
+        templateId: 'vtpl-001',
+        memberId: 'mem-001',
+      }).success,
+    ).toBe(true);
+    expect(assignVoucherRequestSchema.safeParse({ memberId: 'mem-001' }).success).toBe(false);
+    expect(assignVoucherRequestSchema.safeParse({ templateId: 'vtpl-001' }).success).toBe(false);
+  });
+
+  it('accepts optional per-assignment expiry rules', () => {
+    expect(
+      assignVoucherRequestSchema.safeParse({
+        templateId: 'vtpl-001',
+        memberId: 'mem-001',
+        expiresAt: '2026-12-31T00:00:00.000Z',
+        validityDays: 90,
+      }).success,
+    ).toBe(true);
+  });
+});
+
+describe('scanVoucherRequestSchema / redeemVoucherRequestSchema', () => {
+  it('requires a code for scan', () => {
+    expect(scanVoucherRequestSchema.safeParse({ code: 'JAD-VCH-2026-101' }).success).toBe(true);
+    expect(scanVoucherRequestSchema.safeParse({ code: '' }).success).toBe(false);
+    expect(scanVoucherRequestSchema.safeParse({}).success).toBe(false);
+  });
+
+  it('accepts an empty redeem body', () => {
+    expect(redeemVoucherRequestSchema.safeParse({}).success).toBe(true);
   });
 });

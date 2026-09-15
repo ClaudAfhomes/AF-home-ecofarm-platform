@@ -1,20 +1,21 @@
 import { useQuery } from '@tanstack/react-query';
 
 import { emptyOnForbidden } from '../../../lib/api/errors';
-import { getAllAssignments, getAssignments } from '../services/vouchers';
+import { getAllVoucherAssignments, getVoucherAssignments } from '../services/vouchers';
 
+/** Member-scoped vouchers assigned to one voucher definition. */
 export function useVoucherAssignments(templateId: string) {
   return useQuery({
     queryKey: ['admin', 'vouchers', templateId, 'assignments'],
-    queryFn: () => emptyOnForbidden(() => getAssignments(templateId)),
+    queryFn: () => emptyOnForbidden(() => getVoucherAssignments(templateId)),
     enabled: templateId.length > 0,
   });
 }
 
-/** All assignments across templates — backs the per-template counts on the list page. */
+/** All member-scoped vouchers across definitions — backs per-definition counts. */
 export function useAllVoucherAssignments() {
   return useQuery({
     queryKey: ['admin', 'vouchers', 'assignments'],
-    queryFn: () => emptyOnForbidden(() => getAllAssignments()),
+    queryFn: () => emptyOnForbidden(() => getAllVoucherAssignments()),
   });
 }

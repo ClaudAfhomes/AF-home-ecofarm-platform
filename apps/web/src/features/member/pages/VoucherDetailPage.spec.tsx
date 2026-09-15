@@ -49,10 +49,7 @@ describe('member VoucherDetailPage', () => {
     expect(screen.getAllByText('JAD-VCH-2026-002').length).toBeGreaterThanOrEqual(2);
     expect(screen.getByAltText('QR code for JAD-VCH-2026-002')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Copy code' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Download QR' })).toHaveAttribute(
-      'href',
-      expect.stringContaining('api.qrserver.com'),
-    );
+    expect(screen.getByRole('button', { name: 'Download QR' })).toBeInTheDocument();
     expect(screen.getByText(/Vouchers are for your use only/)).toBeInTheDocument();
     expect(screen.queryByText(/pending approval/)).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'All vouchers' })).toHaveAttribute(

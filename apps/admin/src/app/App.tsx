@@ -12,6 +12,7 @@ import { PayoutsPage } from '../features/payouts/pages/PayoutsPage';
 import { WithdrawalsPage } from '../features/withdrawals/pages/WithdrawalsPage';
 import { VouchersPage } from '../features/vouchers/pages/VouchersPage';
 import { VoucherDetailPage } from '../features/vouchers/pages/VoucherDetailPage';
+import { ScanVoucherPage } from '../features/vouchers/pages/ScanVoucherPage';
 import { CatalogPage } from '../features/catalog/pages/CatalogPage';
 import { CatalogDetailPage } from '../features/catalog/pages/CatalogDetailPage';
 import { ContentPage } from '../features/content/pages/ContentPage';
@@ -123,6 +124,14 @@ export default function App() {
             element={
               <RequireRole>
                 <VouchersPage />
+              </RequireRole>
+            }
+          />
+          <Route
+            path="/admin/vouchers/scan"
+            element={
+              <RequireRole>
+                <ScanVoucherPage />
               </RequireRole>
             }
           />

@@ -8,8 +8,10 @@ import {
   ErrorState,
   NotFound,
   PageHeader,
+  QrCode,
   Skeleton,
   StatusChip,
+  downloadQrImage,
 } from '@jad/ui';
 import type { VoucherStatus } from '@jad/contracts';
 
@@ -96,11 +98,11 @@ export function VoucherDetailPage() {
               onClick={() => setQrOpen(true)}
               aria-label={`View QR code for ${voucherQuery.data.code} enlarged`}
             >
-              <img
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(voucherQuery.data.code)}`}
+              <QrCode
+                value={voucherQuery.data.code}
+                size={240}
                 alt={`QR code for ${voucherQuery.data.code}`}
                 className={styles.qrImage}
-                loading="lazy"
               />
             </button>
             <div className={styles.qrMeta}>
@@ -122,15 +124,15 @@ export function VoucherDetailPage() {
                 >
                   {copied ? 'Copied' : 'Copy code'}
                 </button>
-                <a
+                <button
+                  type="button"
                   className={styles.copyButton}
-                  href={`https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(voucherQuery.data.code)}`}
-                  download={`${voucherQuery.data.code}.png`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  onClick={() =>
+                    downloadQrImage(voucherQuery.data.code, `${voucherQuery.data.code}.png`)
+                  }
                 >
                   Download QR
-                </a>
+                </button>
               </div>
             </div>
           </div>
@@ -168,8 +170,18 @@ export function VoucherDetailPage() {
             </div>
             <div className={styles.detailItem}>
               <dt>Expires</dt>
-              <dd>{voucherQuery.data.expiresAt ? formatDate(voucherQuery.data.expiresAt) : 'No expiry'}</dd>
+              <dd>
+                {voucherQuery.data.expiresAt
+                  ? formatDate(voucherQuery.data.expiresAt)
+                  : 'No expiry'}
+              </dd>
             </div>
+            {voucherQuery.data.redeemedAt ? (
+              <div className={styles.detailItem}>
+                <dt>Redeemed</dt>
+                <dd>{formatDate(voucherQuery.data.redeemedAt)}</dd>
+              </div>
+            ) : null}
           </dl>
         </>
       )}
@@ -184,22 +196,23 @@ export function VoucherDetailPage() {
         title={`QR code — ${voucherQuery.data?.code ?? 'Voucher'}`}
         footer={
           voucherQuery.data ? (
-            <a
+            <button
+              type="button"
               className={styles.copyButton}
-              href={`https://api.qrserver.com/v1/create-qr-code/?size=360x360&data=${encodeURIComponent(voucherQuery.data.code)}`}
-              download={`${voucherQuery.data.code}.png`}
-              target="_blank"
-              rel="noopener noreferrer"
+              onClick={() =>
+                downloadQrImage(voucherQuery.data.code, `${voucherQuery.data.code}.png`)
+              }
             >
               Download QR
-            </a>
+            </button>
           ) : undefined
         }
       >
         {voucherQuery.data ? (
           <div className={styles.qrDialogBody}>
-            <img
-              src={`https://api.qrserver.com/v1/create-qr-code/?size=360x360&data=${encodeURIComponent(voucherQuery.data.code)}`}
+            <QrCode
+              value={voucherQuery.data.code}
+              size={360}
               alt={`QR code for ${voucherQuery.data.code} large`}
               className={styles.qrLarge}
             />

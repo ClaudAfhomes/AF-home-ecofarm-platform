@@ -28,6 +28,7 @@
 | [ADR-011-pnpm-Workspaces-Monorepo.md](./ADR-011-pnpm-Workspaces-Monorepo.md) | pnpm workspaces + Turborepo monorepo | Proposed | TECH-STACK §11 |
 | [ADR-012-Deployment-Infrastructure-Provider.md](./ADR-012-Deployment-Infrastructure-Provider.md) | Containerized deployment; provider/region OPEN | Proposed | ARCH-DEC-008 |
 | [ADR-013-Admin-Member-Messaging.md](./ADR-013-Admin-Member-Messaging.md) | Admin ↔ member messaging (one thread per member, text-only, realtime) | **Accepted** | Owner-approved scope (2026-09-14); FEAT-072 |
+| [ADR-014-One-Step-Voucher-Creation-and-Admin-QR-Scan.md](./ADR-014-One-Step-Voucher-Creation-and-Admin-QR-Scan.md) | Voucher creation (definition) + assign to members + admin QR scan/redeem (local QR; unique member-scoped vouchers) | **Accepted** | Owner-approved scope (2026-09-15) |
 
 ## Adding or changing an ADR
 

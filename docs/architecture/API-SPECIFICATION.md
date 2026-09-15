@@ -260,6 +260,19 @@ Legend: **M** method · **Auth** role shorthand · **Feature** FEAT ID · **Req*
 
 ### 6.11 Vouchers & QR (FG-VOUCHER)
 
+> **Implemented model (ADR-014, 2026-09-15):** the P8 CTO-signing/merchant-redemption
+> endpoints below are **PROPOSED / future**. The implemented flow is admin-created voucher
+> definitions assigned to members (each a unique voucher with a locally-generated QR) and an
+> **admin** scan/verify/redeem storefront (no merchant app, no signing service, no partial
+> redemption):
+>
+> | # | M | Path | Auth | Req | Notes |
+> |---|---|---|---|---|---|
+> | 60a | POST | `/admin/voucher-templates` | ADM/SUP | FR-VCH-001..003 | "Create Voucher" — definition (title + value); no member |
+> | 60b | POST | `/admin/vouchers/assign` | ADM/SUP | FR-VCH-001..003 | Assign to a member with per-assignment `expiresAt`/`validityDays`; unique code; duplicate `(memberId, templateId)` → 409; audit `VOUCHER_ASSIGNED` |
+> | 60c | POST | `/admin/vouchers/scan` | ADM/SUP | FR-VCH-001..003 | Verify-only; 404 unknown code, 409 already-redeemed/expired |
+> | 60d | POST | `/admin/vouchers/:id/redeem` | ADM/SUP | FR-VCH-001..003 | Conditional UPDATE (ACTIVE only); remaining → `0.00`; `redeemedAt`/`redeemedBy`; audit `VOUCHER_REDEEMED` |
+
 | # | M | Path | Auth | Feature | Req | Notes |
 |---|---|---|---|---|---|---|
 | 60 | POST | `/vouchers` | ADM/SUP | FEAT-052 | FR-SEC-001..003 | Issue via CTO signing service |

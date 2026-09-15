@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router';
 
 import {
   Button,
-  ConfirmDialog,
   EmptyState,
   ErrorState,
   PageHeader,
@@ -22,8 +21,7 @@ import type { VoucherTemplate } from '@jad/contracts';
 import { formatDate } from '../../../lib/format';
 import { useVouchers } from '../hooks/useVouchers';
 import { useAllVoucherAssignments } from '../hooks/useVoucherAssignments';
-import { useDeleteVoucher } from '../hooks/useDeleteVoucher';
-import { VoucherFormDialog } from '../components/VoucherFormDialog';
+import { VoucherCreateDialog } from '../components/VoucherCreateDialog';
 import styles from './VouchersPage.module.css';
 
 const PAGE_SIZE = 10;
@@ -36,20 +34,12 @@ function TableSkeleton() {
           <TableHeaderCell>Title</TableHeaderCell>
           <TableHeaderCell align="right">Value</TableHeaderCell>
           <TableHeaderCell align="right">Assigned</TableHeaderCell>
-          <TableHeaderCell>Expires</TableHeaderCell>
           <TableHeaderCell>Created</TableHeaderCell>
-          <TableHeaderCell>Actions</TableHeaderCell>
         </TableRow>
       </TableHead>
       <TableBody>
         {Array.from({ length: 4 }, (_, i) => (
           <TableRow key={i}>
-            <TableCell>
-              <Skeleton />
-            </TableCell>
-            <TableCell>
-              <Skeleton />
-            </TableCell>
             <TableCell>
               <Skeleton />
             </TableCell>
@@ -69,56 +59,41 @@ function TableSkeleton() {
   );
 }
 
+/** Vouchers — voucher definitions (title + value) that admins assign to members. */
 export function VouchersPage() {
   const navigate = useNavigate();
   const { data, isPending, isError, error, refetch } = useVouchers();
   const { data: allAssignments } = useAllVoucherAssignments();
+  const [page, setPage] = useState(1);
+  const [createOpen, setCreateOpen] = useState(false);
+
   const assignmentCounts = useMemo(() => {
     const counts = new Map<string, number>();
     for (const a of allAssignments ?? [])
       counts.set(a.templateId, (counts.get(a.templateId) ?? 0) + 1);
     return counts;
   }, [allAssignments]);
-  const deleteMutation = useDeleteVoucher();
-  const [page, setPage] = useState(1);
-  const [localData, setLocalData] = useState<VoucherTemplate[] | null>(null);
-  const [formOpen, setFormOpen] = useState(false);
-  const [editTarget, setEditTarget] = useState<VoucherTemplate | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<VoucherTemplate | null>(null);
 
-  const displayData = useMemo(() => {
-    return localData ?? (data as VoucherTemplate[] | undefined) ?? [];
-  }, [localData, data]);
-
-  const total = displayData.length;
+  const total = data?.length ?? 0;
   const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
-  const rows = displayData.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const rows = (data ?? []).slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  const handleDelete = () => {
-    if (!deleteTarget) return;
-    const id = deleteTarget.id;
-    setLocalData((prev) => {
-      const base = prev ?? (data as VoucherTemplate[] | undefined) ?? [];
-      return base.filter((t) => t.id !== id);
-    });
-    deleteMutation.mutate(id);
-    setDeleteTarget(null);
-  };
-
-  const handleFormClose = () => {
-    setFormOpen(false);
-    setEditTarget(null);
-  };
+  const openCreate = () => setCreateOpen(true);
 
   return (
     <section>
       <PageHeader
         title="Vouchers"
-        description="Create voucher templates and assign them to members"
+        description="Voucher definitions you create and assign to members"
         actions={
-          <Button variant="primary" onClick={() => setFormOpen(true)}>
-            Create Template
-          </Button>
+          <>
+            <Button variant="secondary" onClick={() => navigate('/admin/vouchers/scan')}>
+              Scan QR
+            </Button>
+            <Button variant="primary" onClick={openCreate}>
+              Create Voucher
+            </Button>
+          </>
         }
       />
       {isPending ? (
@@ -127,11 +102,11 @@ export function VouchersPage() {
         <ErrorState error={error} onRetry={refetch} />
       ) : total === 0 ? (
         <EmptyState
-          title="No voucher templates"
-          description="Create a voucher template to start issuing vouchers to members."
+          title="No vouchers yet"
+          description="Create a voucher, then assign it to members to generate unique codes and QR codes."
           action={
-            <Button variant="primary" onClick={() => setFormOpen(true)}>
-              Create First Template
+            <Button variant="primary" onClick={openCreate}>
+              Create First Voucher
             </Button>
           }
         />
@@ -144,13 +119,11 @@ export function VouchersPage() {
                   <TableHeaderCell>Title</TableHeaderCell>
                   <TableHeaderCell align="right">Value</TableHeaderCell>
                   <TableHeaderCell align="right">Assigned</TableHeaderCell>
-                  <TableHeaderCell>Expires</TableHeaderCell>
                   <TableHeaderCell>Created</TableHeaderCell>
-                  <TableHeaderCell>Actions</TableHeaderCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {rows.map((row) => {
+                {rows.map((row: VoucherTemplate) => {
                   const count = assignmentCounts.get(row.id) ?? 0;
                   return (
                     <TableRow
@@ -177,28 +150,7 @@ export function VouchersPage() {
                       <TableCell label="Assigned" align="right">
                         <span style={{ fontVariantNumeric: 'tabular-nums' }}>{count}</span>
                       </TableCell>
-                      <TableCell label="Expires">
-                        {row.expiresAt
-                          ? formatDate(row.expiresAt)
-                          : row.validityDays
-                            ? `${row.validityDays}d`
-                            : '—'}
-                      </TableCell>
                       <TableCell label="Created">{formatDate(row.createdAt)}</TableCell>
-                      <TableCell label="Actions">
-                        <div
-                          style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}
-                          onClick={(e) => e.stopPropagation()}
-                          onKeyDown={(e) => e.stopPropagation()}
-                        >
-                          <Button variant="secondary" onClick={() => setEditTarget(row)}>
-                            Edit
-                          </Button>
-                          <Button variant="danger" onClick={() => setDeleteTarget(row)}>
-                            Delete
-                          </Button>
-                        </div>
-                      </TableCell>
                     </TableRow>
                   );
                 })}
@@ -207,28 +159,14 @@ export function VouchersPage() {
           </div>
           <div className={styles.tableFooter}>
             <span className={styles.captionText} role="status" aria-live="polite">
-              {total} template{total === 1 ? '' : 's'} page {page} of {pageCount}
+              {total} voucher{total === 1 ? '' : 's'} page {page} of {pageCount}
             </span>
             <Pagination page={page} pageCount={pageCount} onChange={setPage} />
           </div>
-
-          <VoucherFormDialog
-            open={formOpen || editTarget !== null}
-            onClose={handleFormClose}
-            template={editTarget ?? undefined}
-          />
-
-          <ConfirmDialog
-            open={deleteTarget !== null}
-            onCancel={() => setDeleteTarget(null)}
-            onConfirm={handleDelete}
-            title="Delete voucher template?"
-            message={`This will permanently remove "${deleteTarget?.title ?? ''}" and all its assignments. This action cannot be undone.`}
-            confirmLabel="Delete"
-            cancelLabel="Cancel"
-          />
         </>
       )}
+
+      <VoucherCreateDialog open={createOpen} onClose={() => setCreateOpen(false)} />
     </section>
   );
 }

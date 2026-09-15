@@ -29,6 +29,10 @@ export const voucherSchema = z.object({
   status: voucherStatusSchema,
   createdAt: z.string(),
   expiresAt: z.string().optional(),
+  // Present once the voucher is redeemed (FULLY_REDEEMED). `redeemedBy` is the
+  // StaffUser uuid of the actor who confirmed the scan.
+  redeemedAt: z.string().optional(),
+  redeemedBy: z.string().optional(),
 });
 
 export type Voucher = z.infer<typeof voucherSchema>;
@@ -69,13 +73,31 @@ export const updateVoucherTemplateRequestSchema = z.object({
 
 export type UpdateVoucherTemplateRequest = z.infer<typeof updateVoucherTemplateRequestSchema>;
 
-/** `POST /admin/vouchers/assign` — issue a template to a member. */
+/**
+ * `POST /admin/vouchers/assign` — assign a voucher (definition) to a member.
+ * The expiry rule is set per assignment (`expiresAt` fixed date wins over
+ * `validityDays`; neither set → the template rule applies, else open-ended).
+ */
 export const assignVoucherRequestSchema = z.object({
   templateId: z.string().min(1),
   memberId: z.string().min(1),
+  expiresAt: z.string().optional(),
+  validityDays: z.number().int().positive().optional(),
 });
 
 export type AssignVoucherRequest = z.infer<typeof assignVoucherRequestSchema>;
+
+/** `POST /admin/vouchers/scan` — resolve a voucher from its QR payload (the unique code). */
+export const scanVoucherRequestSchema = z.object({
+  code: z.string().min(1),
+});
+
+export type ScanVoucherRequest = z.infer<typeof scanVoucherRequestSchema>;
+
+/** `POST /admin/vouchers/:id/redeem` — confirm a scan, redeem the voucher in full. */
+export const redeemVoucherRequestSchema = z.object({});
+
+export type RedeemVoucherRequest = z.infer<typeof redeemVoucherRequestSchema>;
 
 /**
  * Admin assignment view — `GET /admin/vouchers` (Phase B7). The member-facing

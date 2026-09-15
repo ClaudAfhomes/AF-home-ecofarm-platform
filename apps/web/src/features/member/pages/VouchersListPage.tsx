@@ -2,7 +2,15 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router';
 
 import { formatMoney, isExpired } from '@jad/shared';
-import { Breadcrumbs, EmptyState, ErrorState, PageHeader, Skeleton, StatusChip } from '@jad/ui';
+import {
+  Breadcrumbs,
+  EmptyState,
+  ErrorState,
+  PageHeader,
+  QrCode,
+  Skeleton,
+  StatusChip,
+} from '@jad/ui';
 import type { VoucherStatus } from '@jad/contracts';
 
 import { useVouchers } from '../hooks/useMember';
@@ -101,15 +109,14 @@ export function VouchersListPage() {
       ) : (
         <ul className={styles.list}>
           {filtered.map((voucher) => {
-            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(voucher.code)}`;
             return (
               <li key={voucher.id}>
                 <Link className={styles.card} to={`/member/vouchers/${voucher.id}`}>
-                  <img
-                    src={qrUrl}
+                  <QrCode
+                    value={voucher.code}
+                    size={120}
                     alt={`QR code for ${voucher.code}`}
                     className={styles.qrThumb}
-                    loading="lazy"
                   />
                   <span className={styles.cardMain}>
                     <span className={styles.title}>{voucher.title}</span>
@@ -122,7 +129,14 @@ export function VouchersListPage() {
                       Remaining <strong>{formatMoney(voucher.remainingValue)}</strong>
                     </span>
                   </span>
-                  <span style={{ display: 'flex', gap: 'var(--space-2)', alignItems: 'center', flexShrink: 0 }}>
+                  <span
+                    style={{
+                      display: 'flex',
+                      gap: 'var(--space-2)',
+                      alignItems: 'center',
+                      flexShrink: 0,
+                    }}
+                  >
                     <StatusChip
                       label={voucherStatusLabel(voucher.status)}
                       tone={VOUCHER_STATUS_TONE[voucher.status as VoucherStatus]}

@@ -435,6 +435,10 @@ export function mapVoucherRow(row: Record<string, unknown>) {
     status: row.status,
     createdAt: row.createdAt,
     expiresAt: row.expiresAt ?? undefined,
+    // Nullable redemption columns (set by the redeem handler) coalesce like
+    // every other optional field so a row is never dropped over a null.
+    redeemedAt: asIsoString(row.redeemedAt),
+    redeemedBy: asOptionalString(row.redeemedBy),
   };
 }
 

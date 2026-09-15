@@ -9,6 +9,7 @@ import {
   ErrorState,
   PageHeader,
   Pagination,
+  QrCode,
   Skeleton,
   StatusChip,
   Table,
@@ -17,14 +18,15 @@ import {
   TableHead,
   TableHeaderCell,
   TableRow,
+  downloadQrImage,
 } from '@jad/ui';
 import { formatMoney, isExpired } from '@jad/shared';
 import type { VoucherAssignment } from '@jad/contracts';
 
 import { formatDate } from '../../../lib/format';
-import { useVoucherAssignments } from '../hooks/useVoucherAssignments';
 import { useVoucherTemplate } from '../hooks/useVoucherTemplate';
-import { useDeleteAssignment } from '../hooks/useDeleteAssignment';
+import { useVoucherAssignments } from '../hooks/useVoucherAssignments';
+import { useDeleteVoucher } from '../hooks/useDeleteVoucher';
 import { VoucherAssignFormDialog } from '../components/VoucherAssignFormDialog';
 import { VOUCHER_STATUS_LABEL, VOUCHER_STATUS_TONE } from '../status';
 import styles from './VoucherDetailPage.module.css';
@@ -36,7 +38,7 @@ export function VoucherDetailPage() {
   const navigate = useNavigate();
   const { data: template, isPending: templatePending } = useVoucherTemplate(id);
   const { data: assignments, isPending, isError, error, refetch } = useVoucherAssignments(id);
-  const deleteAssignmentMutation = useDeleteAssignment(id);
+  const deleteAssignmentMutation = useDeleteVoucher();
 
   const [page, setPage] = useState(1);
   const [assignOpen, setAssignOpen] = useState(false);
@@ -53,7 +55,7 @@ export function VoucherDetailPage() {
   if (templatePending) {
     return (
       <section>
-        <PageHeader title="Voucher template" description="Loading template details…" />
+        <PageHeader title="Voucher" description="Loading voucher details…" />
         <Skeleton />
       </section>
     );
@@ -64,8 +66,8 @@ export function VoucherDetailPage() {
       <section>
         <PageHeader title="Voucher not found" />
         <ErrorState
-          error={new Error('Template not found')}
-          title="Voucher template not found"
+          error={new Error('Voucher not found')}
+          title="Voucher not found"
           onRetry={() => navigate('/admin/vouchers')}
         />
       </section>
@@ -83,11 +85,11 @@ export function VoucherDetailPage() {
     <section>
       <PageHeader
         title={template.title}
-        description="Voucher template details and member assignments"
+        description={`Voucher definition worth ${formatMoney(template.originalValue)} — assign to members to issue unique codes and QR codes`}
         actions={
           <>
             <Button variant="secondary" onClick={() => navigate('/admin/vouchers')}>
-              All Templates
+              All Vouchers
             </Button>
             <Button variant="primary" onClick={() => setAssignOpen(true)}>
               Assign to Member
@@ -104,16 +106,6 @@ export function VoucherDetailPage() {
             <span style={{ fontVariantNumeric: 'tabular-nums', fontWeight: 600 }}>
               {formatMoney(template.originalValue)}
             </span>
-          }
-        />
-        <DetailRow
-          label="Expiry Rule"
-          value={
-            template.expiresAt
-              ? `Fixed date: ${formatDate(template.expiresAt)}`
-              : template.validityDays
-                ? `Valid ${template.validityDays} days from issuance`
-                : 'No expiry'
           }
         />
         <DetailRow label="Created" value={formatDate(template.createdAt)} />
@@ -167,7 +159,7 @@ export function VoucherDetailPage() {
       ) : total === 0 ? (
         <EmptyState
           title="No assignments yet"
-          description="Assign this voucher template to members to generate unique codes and QR codes."
+          description="Assign this voucher to members to generate unique codes and QR codes with their own expiry."
           action={
             <Button variant="primary" onClick={() => setAssignOpen(true)}>
               Assign to Member
@@ -326,16 +318,10 @@ export function VoucherDetailPage() {
                 }}
                 aria-label={`View QR code for ${detailTarget.code} enlarged`}
               >
-                <img
-                  src={`https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(detailTarget.code)}`}
+                <QrCode
+                  value={detailTarget.code}
+                  size={120}
                   alt={`QR code for ${detailTarget.code}`}
-                  style={{
-                    display: 'block',
-                    width: 120,
-                    height: 120,
-                    borderRadius: 'var(--radius-sm)',
-                  }}
-                  loading="lazy"
                 />
               </button>
               <div style={{ display: 'grid', gap: 4 }}>
@@ -373,11 +359,9 @@ export function VoucherDetailPage() {
                   >
                     {copied ? 'Copied' : 'Copy code'}
                   </button>
-                  <a
-                    href={`https://api.qrserver.com/v1/create-qr-code/?size=360x360&data=${encodeURIComponent(detailTarget.code)}`}
-                    download={`${detailTarget.code}.png`}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    type="button"
+                    onClick={() => downloadQrImage(detailTarget.code, `${detailTarget.code}.png`)}
                     style={{
                       padding: '4px 10px',
                       border: '1px solid var(--color-border-default)',
@@ -385,12 +369,11 @@ export function VoucherDetailPage() {
                       background: 'transparent',
                       fontSize: 'var(--text-caption)',
                       fontWeight: 600,
-                      textDecoration: 'none',
-                      color: 'var(--color-text-primary)',
+                      cursor: 'pointer',
                     }}
                   >
                     Download QR
-                  </a>
+                  </button>
                 </div>
               </div>
             </div>
@@ -454,6 +437,9 @@ export function VoucherDetailPage() {
               label="Expires"
               value={detailTarget.expiresAt ? formatDate(detailTarget.expiresAt) : 'No expiry'}
             />
+            {detailTarget.redeemedAt ? (
+              <DetailRow label="Redeemed" value={formatDate(detailTarget.redeemedAt)} />
+            ) : null}
           </div>
         ) : null}
       </Dialog>
@@ -464,11 +450,9 @@ export function VoucherDetailPage() {
         title={`QR code — ${detailTarget?.code ?? 'Voucher'}`}
         footer={
           detailTarget ? (
-            <a
-              href={`https://api.qrserver.com/v1/create-qr-code/?size=360x360&data=${encodeURIComponent(detailTarget.code)}`}
-              download={`${detailTarget.code}.png`}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              type="button"
+              onClick={() => downloadQrImage(detailTarget.code, `${detailTarget.code}.png`)}
               style={{
                 padding: '8px 16px',
                 border: '1px solid var(--color-border-default)',
@@ -476,13 +460,11 @@ export function VoucherDetailPage() {
                 background: 'transparent',
                 fontSize: 'var(--text-body-s)',
                 fontWeight: 600,
-                textDecoration: 'none',
-                color: 'var(--color-text-primary)',
-                display: 'inline-block',
+                cursor: 'pointer',
               }}
             >
               Download QR
-            </a>
+            </button>
           ) : undefined
         }
       >
@@ -495,10 +477,10 @@ export function VoucherDetailPage() {
               gap: 'var(--space-3)',
             }}
           >
-            <img
-              src={`https://api.qrserver.com/v1/create-qr-code/?size=360x360&data=${encodeURIComponent(detailTarget.code)}`}
+            <QrCode
+              value={detailTarget.code}
+              size={360}
               alt={`QR code for ${detailTarget.code} large`}
-              style={{ width: 360, height: 360, borderRadius: 'var(--radius-md)' }}
             />
             <span
               style={{

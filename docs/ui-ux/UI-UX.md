@@ -519,6 +519,14 @@ Legend: App `A`=AUTH, `M`=Member, `D`=Admin/Back-Office, `C`=Merchant. States li
 | SCR-ADM-016a | Messages inbox | D | ADM | One row per member; open thread; reply | — | FEAT-072, FR-ADM-006, BR-MSG-001..004 |
 | SCR-ADM-016b | Conversation detail | D | ADM | Member thread; staff composer; live updates | — | FEAT-072, FR-ADM-006, BR-MSG-001..004 |
 | SCR-ADM-017 | Voucher management | D | ADM, SUP | Issue voucher (via signing); view redemption history | — | FEAT-052/054, FR-SEC-001..003, FR-VCH-003 |
+
+> **SCR-ADM-017 implemented (ADR-014, 2026-09-15):** admin **Vouchers** list (voucher
+> definitions: title, value, assigned count), **Create Voucher** dialog (title + value only —
+> no member select), voucher **detail** (definition + assignments table, **Assign to Member**
+> dialog with member + expiry/validity, per-assignment local QR, copy/download, Revoke), and
+> the **Scan Voucher QR** camera page (`/admin/vouchers/scan`) that verifies a code then
+> confirms full redemption. Scanning supports the camera, manual code entry, and **uploading
+> a QR image** (decoded client-side via jsQR). The P8 signing/merchant flow is future.
 | SCR-ADM-018 | Commissions (staff) | D | ADM, FIN, SUP | List/filter commissions | `Pending`, `Available`, `Cancelled`, `Reversed` | FEAT-033..040, FR-COM-001..012 |
 | SCR-ADM-019 \* | Platform config | D | SUP | Edit business parameters (BR-CFG-001) | — | FEAT-005, FR-ADM-001, BR-CFG-001 |
 | SCR-ADM-020 \* | Financial adjustments | D | SUP | Apply credit/debit with reason | — | FEAT-071, FR-ADJ-001/002, BR-ADJ-001/002 |

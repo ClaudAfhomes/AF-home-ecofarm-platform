@@ -14,8 +14,6 @@ import {
   MOCK_SALES,
   MOCK_PAYOUT_ACCOUNTS,
   MOCK_WITHDRAWALS,
-  MOCK_VOUCHERS,
-  MOCK_VOUCHER_ASSIGNMENTS,
   MOCK_PROPERTIES,
   MOCK_ADJUSTMENTS,
   MOCK_CONFIG,
@@ -37,6 +35,15 @@ import {
 import { guardRolePermissions } from '../features/roles/guards';
 import { registrationStore } from './registrationMockStore';
 import { messagesMockStore, staffUnreadFor } from './messagesMockStore';
+import {
+  assignMockVoucher,
+  createMockVoucher,
+  mockVoucherById,
+  mockVoucherTemplateById,
+  redeemMockVoucher,
+  scanMockVoucher,
+  voucherStore,
+} from './voucherMockStore';
 
 function idFromPath(url: string, pattern: RegExp): string | undefined {
   return pattern.exec(new URL(url, 'http://mock.local').pathname)?.[1];
@@ -223,30 +230,107 @@ export const adminMockHandlers: MockRoute[] = [
     },
   },
   {
-    // Test double mirroring GET /admin/voucher-templates (list envelope).
+    // Voucher definitions — "Create Voucher" list + create (title + value).
     path: '/admin/voucher-templates',
-    response: {
-      data: MOCK_VOUCHERS,
-      meta: {
-        page: 1,
-        pageSize: 10,
-        total: MOCK_VOUCHERS.length,
-      },
-    },
-  },
-  {
-    // Without templateId: all assignments (backs the list-page counts).
-    // With ?templateId=: that template's assignments (detail page).
-    path: '/admin/vouchers',
     handler: (ctx: MockRequestContext) => {
-      const templateId = new URL(ctx.url, 'http://mock.local').searchParams.get('templateId');
-      const items = templateId
-        ? MOCK_VOUCHER_ASSIGNMENTS.filter((a) => a.templateId === templateId)
-        : MOCK_VOUCHER_ASSIGNMENTS;
+      if (ctx.method === 'POST') {
+        try {
+          const input = (ctx.body ?? {}) as Record<string, unknown>;
+          const definition = createMockVoucher({
+            title: String(input.title ?? ''),
+            originalValue: String(input.originalValue ?? ''),
+          });
+          return { body: definition, status: 201 };
+        } catch (e) {
+          return fail((e as Error).message);
+        }
+      }
+      const items = voucherStore.definitions;
       return {
         data: items,
         meta: { page: 1, pageSize: items.length, total: items.length },
       };
+    },
+  },
+  {
+    path: '/admin/voucher-templates/',
+    match: 'prefix',
+    handler: (ctx: MockRequestContext) => {
+      const id = idFromPath(ctx.url, /\/admin\/voucher-templates\/([^/?#]+)/);
+      if (!id) return notFound('Voucher');
+      const definition = mockVoucherTemplateById(id);
+      if (!definition) return notFound('Voucher');
+      return { body: definition, status: 200 };
+    },
+  },
+  {
+    path: '/admin/vouchers/assign',
+    method: 'POST',
+    handler: (ctx: MockRequestContext) => {
+      try {
+        const input = (ctx.body ?? {}) as Record<string, unknown>;
+        const voucher = assignMockVoucher({
+          templateId: String(input.templateId ?? ''),
+          memberId: String(input.memberId ?? ''),
+          expiresAt: typeof input.expiresAt === 'string' ? input.expiresAt : undefined,
+          validityDays: typeof input.validityDays === 'number' ? input.validityDays : undefined,
+        });
+        return { body: voucher, status: 201 };
+      } catch (e) {
+        return fail((e as Error).message);
+      }
+    },
+  },
+  {
+    // All issued member vouchers with member linkage (assignments list).
+    path: '/admin/vouchers',
+    handler: (ctx: MockRequestContext) => {
+      const templateId = new URL(ctx.url, 'http://mock.local').searchParams.get('templateId');
+      const items = templateId
+        ? voucherStore.vouchers.filter((a) => a.templateId === templateId)
+        : voucherStore.vouchers;
+      return {
+        data: items,
+        meta: { page: 1, pageSize: items.length, total: items.length },
+      };
+    },
+  },
+  {
+    path: '/admin/vouchers/scan',
+    method: 'POST',
+    handler: (ctx: MockRequestContext) => {
+      const input = (ctx.body ?? {}) as { code?: unknown };
+      if (typeof input.code !== 'string' || !input.code.trim())
+        return fail('A voucher code is required.');
+      try {
+        return { body: scanMockVoucher(input.code.trim()), status: 200 };
+      } catch (e) {
+        return fail((e as Error).message);
+      }
+    },
+  },
+  {
+    path: '/admin/vouchers/',
+    match: 'prefix',
+    handler: (ctx: MockRequestContext) => {
+      const id = idFromPath(ctx.url, /\/admin\/vouchers\/([^/]+)(?:\/redeem)?$/);
+      if (!id) return notFound('Voucher');
+      if (ctx.method === 'POST' && ctx.url.includes('/redeem')) {
+        try {
+          return { body: redeemMockVoucher(id), status: 200 };
+        } catch (e) {
+          return fail((e as Error).message);
+        }
+      }
+      const voucher = mockVoucherById(id);
+      if (!voucher) return notFound('Voucher');
+      if (ctx.method === 'DELETE') {
+        const index = voucherStore.vouchers.findIndex((v) => v.id === id);
+        if (index >= 0) voucherStore.vouchers.splice(index, 1);
+        return { body: { id, deleted: true }, status: 200 };
+      }
+      if (ctx.method === 'GET') return { body: voucher, status: 200 };
+      return notFound('Voucher');
     },
   },
   {

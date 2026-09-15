@@ -97,6 +97,8 @@ import handlerAdminWithdrawalReject from './v1/admin/withdrawals/[id]/reject.js'
 import handlerAdminPayoutById from './v1/admin/payouts/[id].js';
 import handlerAdminVoucherTemplateById from './v1/admin/voucher-templates/[id].js';
 import handlerAdminVoucherAssign from './v1/admin/vouchers/assign.js';
+import handlerAdminVoucherScan from './v1/admin/vouchers/scan.js';
+import handlerAdminVoucherRedeem from './v1/admin/vouchers/[id]/redeem.js';
 import handlerAdminVoucherById from './v1/admin/vouchers/[id].js';
 import handlerAdminPropertyCategories from './v1/admin/property-categories.js';
 import handlerAdminPropertyCategoryBySlug from './v1/admin/property-categories/[slug].js';
@@ -377,6 +379,18 @@ const server = http.createServer(async (req, res) => {
     handler = handlerAdminVouchers as unknown as HandlerFn;
     routeKey = 'admin/vouchers';
   } else if (
+    pathname === '/api/v1/admin/vouchers/assign' ||
+    pathname === '/api/admin/vouchers/assign'
+  ) {
+    handler = handlerAdminVoucherAssign as unknown as HandlerFn;
+    routeKey = 'admin/vouchers/assign';
+  } else if (
+    pathname === '/api/v1/admin/vouchers/scan' ||
+    pathname === '/api/admin/vouchers/scan'
+  ) {
+    handler = handlerAdminVoucherScan as unknown as HandlerFn;
+    routeKey = 'admin/vouchers/scan';
+  } else if (
     pathname === '/api/v1/admin/voucher-templates' ||
     pathname === '/api/admin/voucher-templates'
   ) {
@@ -542,9 +556,14 @@ const server = http.createServer(async (req, res) => {
     pathname.startsWith('/api/v1/admin/vouchers/') ||
     pathname.startsWith('/api/admin/vouchers/')
   ) {
-    const m = pathname.match(/\/vouchers\/([^/]+)$/);
-    if (m) {
-      query.id = decodeURIComponent(m[1] ?? '');
+    const redeem = pathname.match(/\/vouchers\/([^/]+)\/redeem$/);
+    const one = pathname.match(/\/vouchers\/([^/]+)$/);
+    if (redeem) {
+      query.id = decodeURIComponent(redeem[1] ?? '');
+      handler = handlerAdminVoucherRedeem as unknown as HandlerFn;
+      routeKey = 'admin/vouchers/[id]/redeem';
+    } else if (one) {
+      query.id = decodeURIComponent(one[1] ?? '');
       handler = handlerAdminVoucherById as unknown as HandlerFn;
       routeKey = 'admin/vouchers/[id]';
     }

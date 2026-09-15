@@ -227,6 +227,8 @@ export {
   createVoucherTemplateRequestSchema,
   updateVoucherTemplateRequestSchema,
   assignVoucherRequestSchema,
+  scanVoucherRequestSchema,
+  redeemVoucherRequestSchema,
 } from './schemas/voucher.js';
 export type {
   VoucherStatus,
@@ -236,6 +238,8 @@ export type {
   CreateVoucherTemplateRequest,
   UpdateVoucherTemplateRequest,
   AssignVoucherRequest,
+  ScanVoucherRequest,
+  RedeemVoucherRequest,
 } from './schemas/voucher.js';
 export { adjustmentEntryTypeSchema, adjustmentSchema } from './schemas/adjustment.js';
 export type { AdjustmentEntryType, Adjustment } from './schemas/adjustment.js';

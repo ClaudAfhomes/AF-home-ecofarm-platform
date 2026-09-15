@@ -187,6 +187,16 @@ The confirmed entities are drawn from the confirmed business model (ROADMAP §5.
 | E-20 | Payout Account | Member payout destination; Admin verification; one primary | `payout` | Pending → Admin Review → Confirmed | BR-PAY-001..006, FR-PAY-001..006, FEAT-044..046 |
 | E-21 | Withdrawal | Withdrawal request/reservation/completion/rejection | `withdrawal` | Requested → Reserved → Completed / Rejected (final model **TBD** OD-017/018) | BR-WDR-001..005, FR-WDR-001..005, FEAT-048..050 |
 | E-22 | Voucher | QR credit voucher; CTO-signed payload; remaining value | `voucher` | Issued → Redeemed (full/partial); expiry/revoke **TBD** OD-020/021 | BR-VCH-001..006, FR-VCH-001..006, FEAT-052..057 |
+
+> **Implemented (ADR-014, 2026-09-15):** `VoucherTemplate` is the admin-created **definition**
+> (title + value); `Voucher` is the issued instrument with a unique `code` (`JAD-VCH-…`),
+> `memberId`/`memberName`, `templateId` → `VoucherTemplate`, snapshot
+> `originalValue`/`remainingValue` (exact-decimal text), `status` `ACTIVE`/`FULLY_REDEEMED`,
+> and a **per-assignment** `expiresAt` (set at assign from `expiresAt`/`validityDays`; the
+> template rule is the fallback). Unique index `Voucher_member_template_uidx` on `(memberId,
+> templateId)` blocks duplicate issuance. Redemption stamps `redeemedAt` + `redeemedBy` →
+> `StaffUser` and sets `remainingValue` = `0.00`. No signing payload / redemption-ledger
+> table in this scope (P8 PROPOSED, ADR-007).
 | E-23 | Voucher Redemption | Atomic redemption record; history retained | `voucher` | Insert-only; atomic (BI-007) | BR-VCH-002/003/006, FR-VCH-003/006, FEAT-053/054/057 |
 | E-24 | Media Asset | Photos/videos/ad images/landing pages/promo materials metadata | `content` | Upload → (referenced) → (deactivate) | BR-MKT-001, FR-ADM-002, FEAT-060 |
 | E-25 | Policy Document | Policies, guidelines, T&C, company rules | `content` | Create → Publish → Version | BR-NOT-001, FR-ADM-004, FEAT-062 |

@@ -205,6 +205,8 @@ export interface MockVoucher {
   status: 'ACTIVE' | 'FULLY_REDEEMED';
   createdAt: string;
   expiresAt?: string;
+  redeemedAt?: string;
+  redeemedBy?: string;
 }
 
 export interface MockContentItem {
@@ -254,7 +256,8 @@ export interface MockStore {
   policies: MockPolicy[];
   /** Server-side Idempotency-Key store (API-SPECIFICATION §5.3) — key → cached response. */
   idempotency: Record<string, unknown>;
-  nextCustomerId: number;  nextSaleId: number;
+  nextCustomerId: number;
+  nextSaleId: number;
   nextCommissionId: number;
   nextPayoutAccountId: number;
   nextWithdrawalId: number;

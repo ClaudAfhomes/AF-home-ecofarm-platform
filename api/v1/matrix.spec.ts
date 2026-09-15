@@ -60,6 +60,8 @@ import voucherTemplatesHandler from './admin/voucher-templates.js';
 import voucherTemplateById from './admin/voucher-templates/[id].js';
 import registrationGovId from './admin/registrations/[id]/government-id.js';
 import assignVoucher from './admin/vouchers/assign.js';
+import scanVoucher from './admin/vouchers/scan.js';
+import redeemVoucher from './admin/vouchers/[id]/redeem.js';
 import voucherById from './admin/vouchers/[id].js';
 import createProperty from './admin/properties.js';
 import listCategories from './admin/property-categories.js';
@@ -395,6 +397,16 @@ const CASES: { name: string; handler: Handler; req: VercelRequest }[] = [
     name: 'POST /admin/vouchers/assign',
     handler: assignVoucher,
     req: { method: 'POST', query: {}, headers: {}, body: {} },
+  },
+  {
+    name: 'POST /admin/vouchers/scan',
+    handler: scanVoucher,
+    req: { method: 'POST', query: {}, headers: {}, body: {} },
+  },
+  {
+    name: 'POST /admin/vouchers/:id/redeem',
+    handler: redeemVoucher,
+    req: { method: 'POST', query: { id: 'vch-001' }, headers: {}, body: {} },
   },
   {
     name: 'DELETE /admin/vouchers/:id',

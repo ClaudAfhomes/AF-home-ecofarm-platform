@@ -824,6 +824,15 @@ User story: As a system, I want to record payments and payouts, so that external
 
 ### FG-VOUCHER — Vouchers & QR Redemption (P8)
 
+> **Implemented model (ADR-014, 2026-09-15):** the FEAT-052..059 P8 entries below describe
+> the CTO-signing / merchant-redemption architecture and are **PROPOSED / future**. The
+> implemented vouchers flow (Phase B7, in the admin + member apps) is: **admin "Create
+> Voucher"** (a definition — title + value, no member), **"Assign to Member"** on the voucher
+> detail page (member + per-assignment expiry/validity → unique member voucher +
+> locally-generated QR), **admin QR scan** (`/admin/vouchers/scan` verify-only) and **admin
+> redeem in full** (`/admin/vouchers/:id/redeem`). Partial redemption, merchant portal, and
+> signing service remain gated (OD-019..023, ADR-007).
+
 #### FEAT-052 — Voucher Issuance & Signing Flow
 | Field | Value |
 |---|---|
