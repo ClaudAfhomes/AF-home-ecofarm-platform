@@ -2,24 +2,24 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 /**
- * Dev-server route coverage — prevents silent 404s for new handler files.
+ * Route coverage — prevents silent 404s for new handler files.
  *
- * `api/dev-server.ts` routes by a hand-maintained if/else chain, so a newly
- * added `api/v1/**` handler 404s (`No handler for ...`) until both an import
- * and a branch are added — exactly how `DELETE/PATCH /admin/content/:id`
+ * `api/_lib/router.ts` routes by a hand-maintained if/else chain, so a newly
+ * added `api/_handlers/**` handler 404s (`No handler for ...`) until both an
+ * import and a branch are added — exactly how `DELETE/PATCH /admin/content/:id`
  * broke after `content/[id].ts` landed without a route. This module scans
  * the handler tree and reports files that are not imported or whose import
- * binding is never used in a branch; dev-server logs them loudly at startup
- * and the spec below fails CI the moment a route is forgotten. Pure
+ * binding is never used in a branch; the dev server logs them loudly at
+ * startup and the spec below fails CI the moment a route is forgotten. Pure
  * functions — no server boot, no network.
  */
 
-const HANDLER_IMPORT_RE = /^import\s+([A-Za-z_$][\w$]*)\s+from\s+'(\.\/v1\/[^']+)'/gm;
+const HANDLER_IMPORT_RE = /^import\s+([A-Za-z_$][\w$]*)\s+from\s+'(\.\.\/_handlers\/[^']+)'/gm;
 
 export type RouteCoverageGapReason = 'not-imported' | 'imported-but-unused';
 
 export interface RouteCoverageGap {
-  /** Handler path relative to `api/`, e.g. `v1/admin/content/[id].ts`. */
+  /** Handler path relative to `api/`, e.g. `_handlers/admin/content/[id].ts`. */
   file: string;
   reason: RouteCoverageGapReason;
 }
@@ -50,27 +50,32 @@ function escapeRegExp(raw: string): string {
 }
 
 /**
- * Files in `v1Dir` missing from `devServerSource`: not imported at all, or
+ * Files in `handlersDir` missing from `routerSource`: not imported at all, or
  * imported but never referenced in a routing branch (declaration alone does
  * not serve traffic). Empty = fully covered.
  */
-export function findRouteCoverageGaps(v1Dir: string, devServerSource: string): RouteCoverageGap[] {
+export function findRouteCoverageGaps(
+  handlersDir: string,
+  routerSource: string,
+): RouteCoverageGap[] {
   const imports = new Map<string, string>();
-  for (const match of devServerSource.matchAll(HANDLER_IMPORT_RE)) {
+  for (const match of routerSource.matchAll(HANDLER_IMPORT_RE)) {
     imports.set(match[2]!, match[1]!);
   }
   const gaps: RouteCoverageGap[] = [];
-  for (const file of listHandlerFiles(v1Dir)) {
+  for (const file of listHandlerFiles(handlersDir)) {
     const noExt = file.replace(/\.ts$/, '');
-    const hit = [`./v1/${noExt}.js`, `./v1/${noExt}`].find((spec) => imports.has(spec));
+    const hit = [`../_handlers/${noExt}.js`, `../_handlers/${noExt}`].find((spec) =>
+      imports.has(spec),
+    );
     if (!hit) {
-      gaps.push({ file: `v1/${file}`, reason: 'not-imported' });
+      gaps.push({ file: `_handlers/${file}`, reason: 'not-imported' });
       continue;
     }
     const binding = imports.get(hit)!;
-    const uses = devServerSource.match(new RegExp(`\\b${escapeRegExp(binding)}\\b`, 'g')) ?? [];
+    const uses = routerSource.match(new RegExp(`\\b${escapeRegExp(binding)}\\b`, 'g')) ?? [];
     if (uses.length < 2) {
-      gaps.push({ file: `v1/${file}`, reason: 'imported-but-unused' });
+      gaps.push({ file: `_handlers/${file}`, reason: 'imported-but-unused' });
     }
   }
   return gaps;

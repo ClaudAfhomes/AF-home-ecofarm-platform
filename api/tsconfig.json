@@ -9,5 +9,5 @@
     "noEmit": true,
     "allowImportingTsExtensions": true
   },
-  "include": ["_lib/**/*.ts", "v1/**/*.ts", "dev-server.ts"]
+  "include": ["_lib/**/*.ts", "_handlers/**/*.ts", "router.ts", "dev-server.ts"]
 }

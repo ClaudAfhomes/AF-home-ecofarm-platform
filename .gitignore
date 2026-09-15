@@ -36,3 +36,5 @@ vercel.local.json
 # Local-only backfill rollback maps/snapshots (dev data, regenerated per run)
 supabase/backfill-staff-domain.map.json
 supabase/backfill-staff-domain.retire.json
+
+.env*

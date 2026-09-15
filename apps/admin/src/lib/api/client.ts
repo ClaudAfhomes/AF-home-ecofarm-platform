@@ -3,28 +3,42 @@ import type { ZodType } from 'zod';
 
 import { env } from '../env';
 import { ApiNetworkError, ApiParseError, toApiError } from './errors';
-import { clearSession, isSupabaseConfigured, tryRefreshSession } from '../supabase';
+import {
+  clearSession,
+  getSupabaseClient,
+  isSupabaseConfigured,
+  tryRefreshSession,
+} from '../supabase';
 
 /**
  * Single typed fetch-based API client (FRONTEND-ARCHITECTURE §5). All requests
  * go through here — no ad-hoc `fetch` in features.
  *
- * The admin panel consumes authenticated endpoints protected by the
- * HttpOnly-session architecture (ARCH-DEC-007): cookies are sent for
- * same-origin requests via the safe default `credentials: 'same-origin'`
- * (the default `/api/v1` deployment). No tokens are stored in the browser.
+ * Auth: the session is a Supabase JWT. When Supabase is configured, the access
+ * token is attached as `Authorization: Bearer` on every request (the API
+ * accepts Bearer or the PKCE cookie). Production stores the session in
+ * localStorage, so the Bearer header is what the API actually reads; public
+ * endpoints ignore the header and expired tokens are healed via the 401 path
+ * below. Credentials stay `same-origin` (the default `/api/v1` deployment).
  */
 async function rawRequest(path: string, init?: RequestInit, retried = false): Promise<Response> {
   const url = `${env.VITE_API_BASE_URL}${path}`;
+  const headers: Record<string, string> = {
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+    ...(init?.headers as Record<string, string> | undefined),
+  };
+  if (isSupabaseConfigured()) {
+    const client = getSupabaseClient();
+    const { data } = (await client?.auth.getSession()) ?? { data: { session: null } };
+    const token = data.session?.access_token;
+    if (token) headers.Authorization = `Bearer ${token}`;
+  }
   let res: Response;
   try {
     res = await fetch(url, {
       ...init,
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        ...init?.headers,
-      },
+      headers,
       credentials: init?.credentials ?? 'same-origin',
     });
   } catch (cause) {

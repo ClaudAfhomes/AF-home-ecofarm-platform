@@ -6,9 +6,9 @@ import { describe, expect, it } from 'vitest';
 
 import { findRouteCoverageGaps, listHandlerFiles } from './route-coverage.js';
 
-const SOURCE = `import handlerA from './v1/a.js';
-import handlerB from './v1/admin/b/[id].js';
-import handlerUnused from './v1/unused.js';
+const SOURCE = `import handlerA from '../_handlers/a.js';
+import handlerB from '../_handlers/admin/b/[id].js';
+import handlerUnused from '../_handlers/unused.js';
 
 if (x) {
   handler = handlerA;
@@ -26,8 +26,8 @@ describe('findRouteCoverageGaps (fixture source)', () => {
     fs.writeFileSync(path.join(dir, 'orphan.ts'), 'x');
     fs.writeFileSync(path.join(dir, 'unused.ts'), 'x');
     expect(findRouteCoverageGaps(dir, SOURCE)).toEqual([
-      { file: 'v1/orphan.ts', reason: 'not-imported' },
-      { file: 'v1/unused.ts', reason: 'imported-but-unused' },
+      { file: '_handlers/orphan.ts', reason: 'not-imported' },
+      { file: '_handlers/unused.ts', reason: 'imported-but-unused' },
     ]);
   });
 });
@@ -44,13 +44,13 @@ describe('listHandlerFiles', () => {
   });
 });
 
-describe('live api/v1 tree vs dev-server route table (regression guard)', () => {
+describe('live handler tree vs router route table (regression guard)', () => {
   it('every handler file is imported and routed', () => {
     const here = path.dirname(fileURLToPath(import.meta.url));
     const apiDir = path.resolve(here, '..');
     const gaps = findRouteCoverageGaps(
-      path.join(apiDir, 'v1'),
-      fs.readFileSync(path.join(apiDir, 'dev-server.ts'), 'utf8'),
+      path.join(apiDir, '_handlers'),
+      fs.readFileSync(path.join(apiDir, '_lib', 'router.ts'), 'utf8'),
     );
     expect(gaps).toEqual([]);
   });

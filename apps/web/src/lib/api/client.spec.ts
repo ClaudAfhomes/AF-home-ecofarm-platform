@@ -8,10 +8,20 @@ const supabaseStubs = vi.hoisted(() => ({
   refreshResult: false,
   signOutCalls: 0,
   refreshCalls: 0,
+  token: null as string | null,
 }));
 
 vi.mock('../supabase', () => ({
   isSupabaseConfigured: () => supabaseStubs.configured,
+  getSupabaseClient: () => ({
+    auth: {
+      getSession: async () => ({
+        data: {
+          session: supabaseStubs.token ? { access_token: supabaseStubs.token } : null,
+        },
+      }),
+    },
+  }),
   tryRefreshSession: async () => {
     supabaseStubs.refreshCalls += 1;
     return supabaseStubs.refreshResult;
@@ -37,7 +47,21 @@ describe('rawRequest 401 recovery', () => {
     supabaseStubs.refreshResult = false;
     supabaseStubs.signOutCalls = 0;
     supabaseStubs.refreshCalls = 0;
+    supabaseStubs.token = null;
     vi.unstubAllGlobals();
+  });
+
+  it('attaches the Bearer token when Supabase is configured', async () => {
+    supabaseStubs.configured = true;
+    supabaseStubs.token = 'tok-abc';
+    const fetchMock = vi.fn(async () => jsonResponse({ ok: true }, 200));
+    vi.stubGlobal('fetch', fetchMock);
+    await expect(request('/me/wallet', z.object({ ok: z.literal(true) }))).resolves.toEqual({
+      ok: true,
+    });
+    const [url, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
+    expect(url).toContain('/me/wallet');
+    expect(init.headers).toMatchObject({ Authorization: 'Bearer tok-abc' });
   });
 
   it('passes non-401 responses through without touching auth', async () => {
