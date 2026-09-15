@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { registrationSchema, rejectionNoteSchema } from '@jad/contracts';
 import type { Registration, RejectionNote } from '@jad/contracts';
 
-import { request, requestList } from '../../../lib/api/client';
+import { request, requestList, requestListEnvelope } from '../../../lib/api/client';
 
 /**
  * Registration repository — REST over api/v1 (Phase B3 cutover).
@@ -18,45 +18,18 @@ export async function getRegistrations(): Promise<Registration[]> {
  * Queue page fetch — same endpoint, but preserves `meta.invalid` (rows the
  * server dropped during validation) so the page can banner hidden work
  * instead of claiming "Queue is clear" while the dashboard card shows a
- * pending count. `meta` is passthrough in the contract; mocks and old
- * servers omit `invalid`, which defaults to 0.
+ * pending count. Goes through the shared client so the request carries the
+ * Supabase Bearer token (raw fetch here 401'd in production, where the session
+ * lives in localStorage rather than the PKCE cookie).
  */
 export async function getRegistrationsPage(): Promise<{
   registrations: Registration[];
   invalid: number;
 }> {
-  const { listResponseSchema } = await import('@jad/contracts');
-  const { env } = await import('../../../lib/env');
-  const { toApiError, ApiNetworkError, ApiParseError } = await import('../../../lib/api/errors');
-  let res: Response;
-  try {
-    res = await fetch(`${env.VITE_API_BASE_URL}/admin/registrations`, {
-      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-      credentials: 'same-origin',
-    });
-  } catch (cause) {
-    throw new ApiNetworkError(cause);
-  }
-  const body: unknown = await res.text().then((text) => {
-    if (!text) return null;
-    try {
-      return JSON.parse(text);
-    } catch {
-      return null;
-    }
-  });
-  if (!res.ok) {
-    throw toApiError(body, res.status);
-  }
-  const parsed = listResponseSchema(registrationSchema).safeParse(body);
-  if (!parsed.success) {
-    throw new ApiParseError('/admin/registrations', parsed.error.message);
-  }
+  const { data, meta } = await requestListEnvelope('/admin/registrations', registrationSchema);
   const invalid =
-    typeof parsed.data.meta?.invalid === 'number' && parsed.data.meta.invalid > 0
-      ? Math.floor(parsed.data.meta.invalid)
-      : 0;
-  return { registrations: parsed.data.data, invalid };
+    typeof meta.invalid === 'number' && meta.invalid > 0 ? Math.floor(meta.invalid) : 0;
+  return { registrations: data, invalid };
 }
 
 export async function getRegistrationById(id: string): Promise<Registration | undefined> {

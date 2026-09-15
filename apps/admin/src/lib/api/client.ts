@@ -103,6 +103,32 @@ export async function requestList<T>(
   return parsed.data.data;
 }
 
+/**
+ * GET a collection and return the full `{ data, meta }` envelope — for callers
+ * that need `meta` beyond the list (e.g. the registrations queue's
+ * `meta.invalid` dropped-row count). Auth + 401 healing are identical to the
+ * other helpers.
+ */
+export async function requestListEnvelope<T>(
+  path: string,
+  itemSchema: ZodType<T>,
+  init?: RequestInit,
+): Promise<{ data: T[]; meta: Record<string, unknown> }> {
+  const listSchema = listResponseSchema(itemSchema);
+  const res = await rawRequest(path, init);
+  const body = await parseBody(res);
+
+  if (!res.ok) {
+    throw toApiError(body, res.status);
+  }
+
+  const parsed = listSchema.safeParse(body);
+  if (!parsed.success) {
+    throw new ApiParseError(path, parsed.error.message);
+  }
+  return { data: parsed.data.data, meta: (parsed.data.meta ?? {}) as Record<string, unknown> };
+}
+
 /** Cursor-paginated page of `{ data, meta.pagination.nextCursor }` (API-SPECIFICATION §4). */
 export interface PageResult<T> {
   items: T[];

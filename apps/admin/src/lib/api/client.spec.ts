@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
 
-import { request } from './client';
+import { request, requestListEnvelope } from './client';
 
 const supabaseStubs = vi.hoisted(() => ({
   configured: false,
@@ -116,5 +116,53 @@ describe('rawRequest 401 recovery', () => {
     await expect(request('/admin/members', z.object({}))).rejects.toMatchObject({ status: 401 });
     expect(fetchMock).toHaveBeenCalledTimes(2);
     expect(supabaseStubs.refreshCalls).toBe(1);
+  });
+});
+
+describe('requestListEnvelope', () => {
+  beforeEach(() => {
+    supabaseStubs.configured = false;
+    supabaseStubs.refreshResult = false;
+    supabaseStubs.signOutCalls = 0;
+    supabaseStubs.refreshCalls = 0;
+    supabaseStubs.token = null;
+    vi.unstubAllGlobals();
+  });
+
+  it('returns the full { data, meta } envelope including passthrough meta', async () => {
+    const item = z.object({ id: z.string() });
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () =>
+        jsonResponse(
+          { data: [{ id: 'reg-1' }], meta: { page: 1, pageSize: 1, total: 1, invalid: 2 } },
+          200,
+        ),
+      ),
+    );
+    await expect(requestListEnvelope('/admin/registrations', item)).resolves.toEqual({
+      data: [{ id: 'reg-1' }],
+      meta: { page: 1, pageSize: 1, total: 1, invalid: 2 },
+    });
+  });
+
+  it('attaches the Bearer token so the request authenticates in production', async () => {
+    supabaseStubs.configured = true;
+    supabaseStubs.token = 'tok-list';
+    const fetchMock = vi.fn(async () => jsonResponse({ data: [], meta: {} }, 200));
+    vi.stubGlobal('fetch', fetchMock);
+    await requestListEnvelope('/admin/registrations', z.object({ id: z.string() }));
+    const [, init] = fetchMock.mock.calls[0] as unknown as [string, RequestInit];
+    expect(init.headers).toMatchObject({ Authorization: 'Bearer tok-list' });
+  });
+
+  it('throws ApiError on non-ok responses', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => unauthorized()),
+    );
+    await expect(requestListEnvelope('/admin/registrations', z.object({}))).rejects.toMatchObject({
+      status: 401,
+    });
   });
 });
