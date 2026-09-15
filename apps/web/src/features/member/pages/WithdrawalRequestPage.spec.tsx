@@ -163,4 +163,46 @@ describe('member WithdrawalRequestPage', () => {
       ),
     ).toBeInTheDocument();
   });
+
+  it('rejects amounts below the configured minimum (SCR-MEM-012)', async () => {
+    mockFetchRoutes({
+      '/me/wallet': WALLET,
+      '/me/payout-accounts': CONFIRMED_ACCOUNTS,
+      '/config/public': {
+        minimumAge: 18,
+        genders: ['Male', 'Female', 'Others'],
+        withdrawalLimits: { min: '100.00', max: '50000.00' },
+      },
+    });
+    const user = userEvent.setup();
+    renderMember(<WithdrawalRequestPage />, { user: MOCK_MEMBER });
+
+    await screen.findByText(/Withdraw between ₱100\.00 and ₱50,000\.00/);
+    await user.type(await screen.findByLabelText('Amount (PHP)'), '50.00');
+    await user.selectOptions(screen.getByLabelText('Payout account'), 'pa-001');
+    await user.click(screen.getByRole('button', { name: 'Review withdrawal' }));
+
+    expect(await screen.findByText('Enter at least ₱100.00.')).toBeInTheDocument();
+  });
+
+  it('rejects amounts above the configured maximum (SCR-MEM-012)', async () => {
+    mockFetchRoutes({
+      '/me/wallet': WALLET,
+      '/me/payout-accounts': CONFIRMED_ACCOUNTS,
+      '/config/public': {
+        minimumAge: 18,
+        genders: ['Male', 'Female', 'Others'],
+        withdrawalLimits: { min: '100.00', max: '50000.00' },
+      },
+    });
+    const user = userEvent.setup();
+    renderMember(<WithdrawalRequestPage />, { user: MOCK_MEMBER });
+
+    await screen.findByText(/Withdraw between ₱100\.00 and ₱50,000\.00/);
+    await user.type(await screen.findByLabelText('Amount (PHP)'), '60000.00');
+    await user.selectOptions(screen.getByLabelText('Payout account'), 'pa-001');
+    await user.click(screen.getByRole('button', { name: 'Review withdrawal' }));
+
+    expect(await screen.findByText('Enter no more than ₱50,000.00.')).toBeInTheDocument();
+  });
 });

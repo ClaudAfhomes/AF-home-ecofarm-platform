@@ -2,6 +2,7 @@ import type { VoucherAssignment, VoucherTemplate } from '@jad/contracts';
 import { computeMemberExpiry } from '@jad/shared';
 
 import { MOCK_VOUCHER_ASSIGNMENTS, MOCK_VOUCHERS } from './data';
+import { configStore } from './configMockStore';
 import { registrationStore } from './registrationMockStore';
 
 /**
@@ -64,6 +65,19 @@ export function assignMockVoucher(input: {
     (v) => v.templateId === input.templateId && v.memberId === input.memberId,
   );
   if (duplicate) throw new Error('This member already has this voucher.');
+  // Per-assignment rule wins; template rule next; platform default
+  // (VOUCHER_DEFAULT_EXPIRY_DAYS) last — mirrors POST /admin/vouchers/assign.
+  let defaultValidityDays: number | undefined;
+  if (
+    input.expiresAt === undefined &&
+    input.validityDays === undefined &&
+    definition.expiresAt === undefined &&
+    definition.validityDays === undefined
+  ) {
+    const raw = configStore.entries.find((e) => e.key === 'VOUCHER_DEFAULT_EXPIRY_DAYS')?.value;
+    const days = raw !== undefined && raw.trim() ? Number(raw) : NaN;
+    if (Number.isInteger(days) && days > 0) defaultValidityDays = days;
+  }
   const voucher: VoucherAssignment = {
     id: `vch-${seq}`,
     templateId: definition.id,
@@ -77,7 +91,10 @@ export function assignMockVoucher(input: {
     createdAt: new Date().toISOString(),
     expiresAt:
       computeMemberExpiry(
-        { expiresAt: input.expiresAt, validityDays: input.validityDays },
+        {
+          expiresAt: input.expiresAt ?? definition.expiresAt,
+          validityDays: input.validityDays ?? definition.validityDays ?? defaultValidityDays,
+        },
         new Date(),
       ) ?? undefined,
   };

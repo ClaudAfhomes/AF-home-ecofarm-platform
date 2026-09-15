@@ -2,6 +2,7 @@ import type { AdminQueues, ContentKind } from '@jad/contracts';
 import { CMS_PROPERTIES_SEED, STAFF_MODULE_LABEL, roleNameFor } from '@jad/contracts';
 import type { MockRequestContext, MockRoute } from '@jad/mock';
 import { contentStore, createStoreContent, deleteStoreContent } from './contentMockStore';
+import { configStore, updateStoreConfig } from './configMockStore';
 import { broadcastStore, createStoreBroadcast } from './broadcastMockStore';
 import {
   createStorePolicy,
@@ -16,7 +17,6 @@ import {
   MOCK_WITHDRAWALS,
   MOCK_PROPERTIES,
   MOCK_ADJUSTMENTS,
-  MOCK_CONFIG,
   MOCK_AUDIT,
   MOCK_PROGRAMS,
 } from './data';
@@ -167,6 +167,13 @@ export const adminMockHandlers: MockRoute[] = [
       if (!id) return notFound('Sale');
       const sale = MOCK_SALES.find((s) => s.id === id);
       if (!sale) return notFound('Sale');
+      // Configured rates for the estimate preview (mirrors GET /admin/sales/:id).
+      const rateOf = (key: string) => configStore.entries.find((e) => e.key === key)?.value;
+      const direct = rateOf('COMMISSION_DIRECT_RATE');
+      const referral = rateOf('COMMISSION_REFERRAL_RATE');
+      if (ctx.method === 'GET' && direct && referral) {
+        return { ...sale, commissionRates: { direct, referral } };
+      }
       return sale;
     },
   },
@@ -508,13 +515,32 @@ export const adminMockHandlers: MockRoute[] = [
   },
   {
     path: '/admin/config',
-    response: {
-      data: MOCK_CONFIG,
-      meta: {
-        page: 1,
-        pageSize: 50,
-        total: MOCK_CONFIG.length,
-      },
+    response: () => {
+      const data = configStore.entries;
+      return {
+        data,
+        meta: {
+          page: 1,
+          pageSize: 50,
+          total: data.length,
+        },
+      };
+    },
+  },
+  {
+    path: '/admin/config/',
+    match: 'prefix',
+    method: 'PATCH',
+    handler: (ctx: MockRequestContext) => {
+      const key = idFromPath(ctx.url, /\/admin\/config\/([^/?#]+)/);
+      if (!key) return notFound('Config entry');
+      const patch = (ctx.body ?? {}) as Record<string, unknown>;
+      if (typeof patch.value !== 'string' || patch.value.length === 0) {
+        return fail('A non-empty string value is required');
+      }
+      const updated = updateStoreConfig(decodeURIComponent(key), patch.value);
+      if (!updated) return notFound('Config entry');
+      return { body: updated, status: 200 };
     },
   },
   {

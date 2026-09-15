@@ -539,7 +539,12 @@ export function memberMockHandlers(store: MockStore): MockRoute[] {
       path: '/config/public',
       method: 'GET',
       handler: () =>
-        ok({ minimumAge: store.minAge, genders: store.genders, countries: store.countries }),
+        ok({
+          minimumAge: store.minAge,
+          genders: store.genders,
+          countries: store.countries,
+          withdrawalLimits: store.withdrawalLimits,
+        }),
     },
     {
       path: '/registration/location-verify',
@@ -1256,6 +1261,12 @@ export function memberMockHandlers(store: MockStore): MockRoute[] {
         if (compareMoney(amount, '0.00') <= 0) {
           return validationError('Enter a withdrawal amount greater than zero.');
         }
+        // Configured minimum (mirrors withdraw_reserve's MIN guard).
+        if (compareMoney(amount, store.withdrawalLimits.min) < 0) {
+          return validationError(
+            `The withdrawal amount is below the minimum of ${store.withdrawalLimits.min}.`,
+          );
+        }
         const wallet = store.wallets[member.id] ?? {
           availableBalance: '0.00',
           pendingAmount: '0.00',
@@ -1265,6 +1276,13 @@ export function memberMockHandlers(store: MockStore): MockRoute[] {
             'INSUFFICIENT_BALANCE',
             'The withdrawal amount exceeds your Available Balance.',
             409,
+          );
+        }
+        // Configured maximum, after the balance so over-balance requests keep
+        // the INSUFFICIENT_BALANCE contract (mirrors withdraw_reserve).
+        if (compareMoney(amount, store.withdrawalLimits.max) > 0) {
+          return validationError(
+            `The withdrawal amount exceeds the maximum of ${store.withdrawalLimits.max}.`,
           );
         }
 
@@ -1389,7 +1407,11 @@ export function memberMockHandlers(store: MockStore): MockRoute[] {
           (candidate) => candidate.id === id && candidate.sellerId === member.id,
         );
         if (!sale) return error('NOT_FOUND', 'Not found', 404);
-        return ok(toSale(sale));
+        // Configured rates for the estimate preview (mirrors GET /sales/:id).
+        return ok({
+          ...toSale(sale),
+          commissionRates: { direct: '0.0800', referral: '0.0400' },
+        });
       },
     },
     {

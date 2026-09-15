@@ -19,6 +19,12 @@ export const publicConfigSchema = z.object({
    * config service supplies the option list (UI-UX §8.8).
    */
   countries: z.array(z.object({ code: z.string().min(1), name: z.string().min(1) })).optional(),
+  /**
+   * Withdrawal bounds (MIN/MAX_WITHDRAWAL_AMOUNT, exact-decimal strings).
+   * Served so the member form can validate inline; the DB function
+   * `withdraw_reserve` remains authoritative server-side.
+   */
+  withdrawalLimits: z.object({ min: z.string().min(1), max: z.string().min(1) }).optional(),
 });
 
 export type PublicConfig = z.infer<typeof publicConfigSchema>;

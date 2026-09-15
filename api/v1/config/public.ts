@@ -24,8 +24,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.status(status).json({ error: env });
     return;
   }
-  const byKey = new Map(((rows as { key: string; value: string }[] | null) ?? []).map((r) => [r.key, r.value]));
+  const byKey = new Map(
+    ((rows as { key: string; value: string }[] | null) ?? []).map((r) => [r.key, r.value]),
+  );
   const minimumAge = Number.parseInt(byKey.get('QUALIFICATION_MIN_AGE') ?? '18', 10);
+  const moneyOk = (v: string | undefined): v is string =>
+    typeof v === 'string' && /^[0-9]+(\.[0-9]{1,2})?$/.test(v);
+  const minWithdrawal = byKey.get('MIN_WITHDRAWAL_AMOUNT');
+  const maxWithdrawal = byKey.get('MAX_WITHDRAWAL_AMOUNT');
   let genders: string[] = DEFAULT_GENDERS;
   try {
     const parsed: unknown = JSON.parse(byKey.get('GENDERS') ?? '[]');
@@ -49,5 +55,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     minimumAge: Number.isFinite(minimumAge) ? minimumAge : 18,
     genders,
     countries: countries ?? [],
+    withdrawalLimits: {
+      min: moneyOk(minWithdrawal) ? minWithdrawal : '100.00',
+      max: moneyOk(maxWithdrawal) ? maxWithdrawal : '50000.00',
+    },
   });
 }

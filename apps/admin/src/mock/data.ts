@@ -12,7 +12,12 @@ import type {
 } from '@jad/contracts';
 
 /** Extended sale type with optional referrer and customer contact fields for mock-only admin forms. */
-export type MockSale = Sale & { referrerName?: string; referrerId?: string; customerPhone?: string; customerEmail?: string };
+export type MockSale = Sale & {
+  referrerName?: string;
+  referrerId?: string;
+  customerPhone?: string;
+  customerEmail?: string;
+};
 
 /** Extended withdrawal type with balance for mock-only admin detail view. */
 export type MockWithdrawal = Withdrawal & { balance?: string };
@@ -206,7 +211,8 @@ export const MOCK_SALES: MockSale[] = [
     sellerName: 'Juan Dela Cruz',
     submittedAt: '2026-08-14T10:00:00.000Z',
     resubmissionCount: 1,
-    rejectionReason: 'Customer phone number could not be verified — please update the customer contact.',
+    rejectionReason:
+      'Customer phone number could not be verified — please update the customer contact.',
   },
   {
     id: 'sal-006',
@@ -589,14 +595,16 @@ export const MOCK_VOUCHER_ASSIGNMENTS: VoucherAssignment[] = [
  * share a single source of truth for mock property/category data.
  * Future DB: `properties(id PK, category_id FK, price numeric, status)`.
  */
-export const MOCK_PROPERTIES: CatalogProperty[] = CMS_PROPERTIES_SEED.properties.map((p, index) => ({
-  id: p.id,
-  name: p.name,
-  categoryId: p.categoryId,
-  price: p.price,
-  // One inactive sample for filtering/edge-case testing; rest ACTIVE
-  status: index === 7 ? 'INACTIVE' : 'ACTIVE',
-}));
+export const MOCK_PROPERTIES: CatalogProperty[] = CMS_PROPERTIES_SEED.properties.map(
+  (p, index) => ({
+    id: p.id,
+    name: p.name,
+    categoryId: p.categoryId,
+    price: p.price,
+    // One inactive sample for filtering/edge-case testing; rest ACTIVE
+    status: index === 7 ? 'INACTIVE' : 'ACTIVE',
+  }),
+);
 
 /**
  * Mock member profiles for admin member list/detail (API-SPECIFICATION #8/#9).
@@ -904,6 +912,12 @@ export const MOCK_CONFIG: MockConfigEntry[] = [
     label: 'Voucher Expiry (days)',
     value: '90',
     category: 'Vouchers',
+  },
+  {
+    key: 'GENDERS',
+    label: 'Gender Options',
+    value: '["Male","Female","Others"]',
+    category: 'Registration',
   },
 ];
 

@@ -14,7 +14,8 @@ import { toErrorEnvelope } from '../../../_lib/envelope.js';
 /**
  * POST /admin/vouchers/assign — assign a voucher (definition) to a member
  * (super_admin, admin). The expiry rule is set per assignment (fixed date wins
- * over validityDays; falls back to the template rule when neither is given).
+ * over validityDays; falls back to the template rule, then to the platform
+ * default `VOUCHER_DEFAULT_EXPIRY_DAYS` from SystemConfig).
  * The voucher starts ACTIVE with full remaining value and a unique code. The
  * `(memberId, templateId)` unique index rejects duplicate assignments (409).
  */
@@ -81,11 +82,31 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     (typeof m.name === 'string' && m.name ? m.name : String(m.id));
   const now = new Date();
   const issuedAt = now.toISOString();
-  // Per-assignment expiry rule wins; the template rule is the fallback.
+  // Per-assignment expiry rule wins; the template rule is the fallback; the
+  // platform default (SystemConfig VOUCHER_DEFAULT_EXPIRY_DAYS) is the last
+  // resort so definitions without any rule still expire (BR-VCH).
+  let defaultValidityDays: number | undefined;
+  if (
+    parsed.data.expiresAt === undefined &&
+    parsed.data.validityDays === undefined &&
+    typeof t.expiresAt !== 'string' &&
+    typeof t.validityDays !== 'number'
+  ) {
+    const { data: defaultRow } = await supabase
+      .from('SystemConfig')
+      .select('value')
+      .eq('key', 'VOUCHER_DEFAULT_EXPIRY_DAYS')
+      .maybeSingle();
+    const raw = (defaultRow as { value?: unknown } | null)?.value;
+    const days = typeof raw === 'string' && raw.trim() ? Number(raw) : NaN;
+    if (Number.isInteger(days) && days > 0) defaultValidityDays = days;
+  }
   const expiryRule = {
     expiresAt: parsed.data.expiresAt ?? (typeof t.expiresAt === 'string' ? t.expiresAt : undefined),
     validityDays:
-      parsed.data.validityDays ?? (typeof t.validityDays === 'number' ? t.validityDays : undefined),
+      parsed.data.validityDays ??
+      (typeof t.validityDays === 'number' ? t.validityDays : undefined) ??
+      defaultValidityDays,
   };
   const voucherBase = {
     id: prefixedId('vch'),

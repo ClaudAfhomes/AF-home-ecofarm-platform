@@ -288,8 +288,8 @@ describe('reference-data seed parity', () => {
     expect(MOCK_PROGRAMS).toEqual(PROGRAM_SEEDS);
   });
 
-  it('matches config rows to the contracts seed (minus GENDERS)', () => {
-    expect(MOCK_CONFIG).toEqual(CONFIG_SEEDS.filter((c) => c.key !== 'GENDERS'));
+  it('matches config rows to the contracts seed (including GENDERS)', () => {
+    expect(MOCK_CONFIG).toEqual(CONFIG_SEEDS);
   });
 });
 

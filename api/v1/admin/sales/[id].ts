@@ -62,7 +62,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const current = found as Record<string, unknown>;
 
   if (req.method === 'GET') {
-    const parsed = saleSchema.safeParse(mapSaleRow(current));
+    // Configured rates for the estimate preview (never hard-code 8%/4%).
+    const { data: rateRows } = await supabase
+      .from('SystemConfig')
+      .select('key,value')
+      .in('key', ['COMMISSION_DIRECT_RATE', 'COMMISSION_REFERRAL_RATE']);
+    const rateByKey: Record<string, string> = {};
+    for (const r of (rateRows as { key: string; value: string }[] | null) ?? []) {
+      rateByKey[r.key] = r.value;
+    }
+    const withRates = {
+      ...mapSaleRow(current),
+      ...(rateByKey.COMMISSION_DIRECT_RATE && rateByKey.COMMISSION_REFERRAL_RATE
+        ? {
+            commissionRates: {
+              direct: rateByKey.COMMISSION_DIRECT_RATE,
+              referral: rateByKey.COMMISSION_REFERRAL_RATE,
+            },
+          }
+        : {}),
+    };
+    const parsed = saleSchema.safeParse(withRates);
     if (!parsed.success) {
       const { error, status } = toErrorEnvelope('INTERNAL', 'Stored sale failed validation', 500);
       res.status(status).json({ error });

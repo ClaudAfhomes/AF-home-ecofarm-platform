@@ -34,17 +34,26 @@ function submittableProperties() {
   return PROPERTY_RECORDS.filter((property) => property.price !== undefined);
 }
 
-function estimateCommission(value: string, percent: number): string {
+function estimateCommission(value: string, rate: string): string {
   try {
-    const [whole = '0', frac = ''] = value.split('.');
-    const cents = BigInt(whole) * 100n + BigInt((frac + '00').slice(0, 2));
-    const estCents = (cents * BigInt(percent)) / 100n;
+    const [valueWhole = '0', valueFrac = ''] = value.split('.');
+    const cents = BigInt(valueWhole) * 100n + BigInt((valueFrac + '00').slice(0, 2));
+    const [rateWhole = '0', rateFrac = ''] = rate.split('.');
+    const rateBp = BigInt(rateWhole) * 10000n + BigInt((rateFrac + '0000').slice(0, 4));
+    const estCents = (cents * rateBp + 5000n) / 10000n;
     const wholeEst = estCents / 100n;
     const fracEst = estCents % 100n;
     return `${wholeEst.toString()}.${fracEst.toString().padStart(2, '0')}`;
   } catch {
     return '0.00';
   }
+}
+
+/** Configured rate string → percent label (e.g. '0.0800' → '8.00%'). */
+function rateLabel(rate: string): string {
+  const num = Number(rate);
+  if (Number.isNaN(num)) return rate;
+  return `${(num * 100).toFixed(2)}%`;
 }
 
 /**
@@ -291,9 +300,28 @@ export function SaleDetailPage() {
               <div className={styles.item}>
                 <dt>Est. commission</dt>
                 <dd className={styles.commissionPreview} aria-label="Estimated commission preview">
-                  {formatMoney(estimateCommission(sale.propertyValue, 8))} Direct ·{' '}
-                  {formatMoney(estimateCommission(sale.propertyValue, 4))} Referral{' '}
-                  <span className={styles.commissionNote}>(estimated, 8%/4% configurable)</span>
+                  {sale.commissionRates ? (
+                    <>
+                      <span>
+                        {formatMoney(
+                          estimateCommission(sale.propertyValue, sale.commissionRates.direct),
+                        )}
+                      </span>{' '}
+                      Direct ·{' '}
+                      <span>
+                        {formatMoney(
+                          estimateCommission(sale.propertyValue, sale.commissionRates.referral),
+                        )}
+                      </span>{' '}
+                      Referral{' '}
+                      <span className={styles.commissionNote}>
+                        (estimated, {rateLabel(sale.commissionRates.direct)}/
+                        {rateLabel(sale.commissionRates.referral)})
+                      </span>
+                    </>
+                  ) : (
+                    <span className={styles.commissionNote}>Rates not configured</span>
+                  )}
                 </dd>
               </div>
               <div className={styles.item}>

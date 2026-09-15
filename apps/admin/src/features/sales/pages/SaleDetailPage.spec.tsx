@@ -18,6 +18,7 @@ const SUBMITTED_SALE = {
   sellerName: 'Juan Dela Cruz',
   submittedAt: '2026-08-18T09:00:00.000Z',
   resubmissionCount: 0,
+  commissionRates: { direct: '0.0800', referral: '0.0400' },
 };
 
 vi.mock('../hooks/useSale', () => ({
@@ -55,6 +56,20 @@ function renderDetail() {
 describe('SaleDetailPage transitions', () => {
   afterEach(() => {
     vi.unstubAllGlobals();
+  });
+
+  it('renders the commission estimate from the configured rates (BR-CFG-001)', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => jsonResponse({ ...SUBMITTED_SALE }, 200)),
+    );
+    renderDetail();
+
+    // 1,200,000.00 × 0.0800 = 96,000.00 · × 0.0400 = 48,000.00.
+    expect(await screen.findByText('Est. commission')).toBeInTheDocument();
+    expect(screen.getByText('₱96,000.00')).toBeInTheDocument();
+    expect(screen.getByText('₱48,000.00')).toBeInTheDocument();
+    expect(screen.getByText(/\(estimated, 8\.00%\/4\.00%\)/)).toBeInTheDocument();
   });
 
   it('persists approval through the API instead of local state', async () => {

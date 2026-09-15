@@ -671,6 +671,10 @@ Legend: App `A`=AUTH, `M`=Member, `D`=Admin/Back-Office, `C`=Merchant. States li
 | **Required states** | Loading (config fetch); save success/failure. |
 | **Related** | FEAT-005, FR-ADM-001, BR-CFG-001, BR-COM-007, NFR-MAINT-001. |
 
+> **SCR-ADM-019 implemented (2026-09-15):** edits persist via `PATCH /admin/config/:key`
+> (super_admin-only, server-audited); other staff roles get a read-only view with no Edit
+> affordance.
+
 #### SCR-ADM-020 — Financial adjustments
 | Field | Value |
 |---|---|

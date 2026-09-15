@@ -235,6 +235,7 @@ export interface MockPolicy {
 export interface MockStore {
   minAge: number;
   genders: string[];
+  withdrawalLimits: { min: string; max: string };
   countries: { code: string; name: string }[];
   programs: Program[];
   qualificationQuestions: { id: string; questionText: string }[];
@@ -1157,6 +1158,7 @@ export function createMockStore(): MockStore {
   return {
     minAge: 18,
     genders: ['Male', 'Female', 'Others'],
+    withdrawalLimits: { min: '100.00', max: '50000.00' },
     // ISO 3166-1 alpha-2 master — mirrors supabase/migrations/20260831000004_countries.sql
     // Do NOT use for coordinate detection; provider resolves country, this is identity/reference only.
     countries: [

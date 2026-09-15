@@ -138,6 +138,20 @@ describe('POST /me/withdrawals (DB function boundary)', () => {
     expect(seen.body).toMatchObject({ error: { code: 'INSUFFICIENT_BALANCE' } });
   });
 
+  it('maps configured-limit errors from the DB function', async () => {
+    mocks.script.rpcResult = {
+      error: {
+        code: 'VALIDATION_ERROR',
+        message: 'The withdrawal amount is below the minimum of 100.00.',
+        status: 400,
+      },
+    };
+    const { res, seen } = capture();
+    await handler(postReq({ amount: '50.00', payoutAccountId: 'pa-001' }, 'k6'), res);
+    expect(seen.status).toBe(400);
+    expect(seen.body).toMatchObject({ error: { code: 'VALIDATION_ERROR' } });
+  });
+
   it('500s transport-level rpc failures', async () => {
     mocks.script.rpcError = 'connection refused';
     const { res, seen } = capture();

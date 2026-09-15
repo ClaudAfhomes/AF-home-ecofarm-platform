@@ -381,16 +381,35 @@ describe('F1 member mock API', () => {
       ).rejects.toMatchObject({ code: 'INSUFFICIENT_BALANCE', status: 409 });
     });
 
-    it('allows withdrawing exactly the Available Balance down to 0.00 (BI-001 boundary)', async () => {
+    it('allows draining the Available Balance exactly across capped requests (BI-001)', async () => {
+      // The per-request maximum (50000.00) is below the 140000.00 balance, so
+      // a full drain takes three requests and must land on exactly 0.00.
       setMockSessionUser(MOCK_MEMBER);
-      const withdrawal = await createWithdrawal(
-        { amount: '140000.00', payoutAccountId: 'pa-001' },
-        'idem-wdr-boundary',
-      );
-      expect(withdrawal.status).toBe('RESERVED');
+      for (const [amount, key] of [
+        ['50000.00', 'idem-wdr-drain-1'],
+        ['50000.00', 'idem-wdr-drain-2'],
+        ['40000.00', 'idem-wdr-drain-3'],
+      ] as const) {
+        const withdrawal = await createWithdrawal({ amount, payoutAccountId: 'pa-001' }, key);
+        expect(withdrawal.status).toBe('RESERVED');
+      }
       const after = await getWallet();
       expect(after.availableBalance).toBe('0.00');
       expect(after.pendingAmount).toBe('636000.00');
+    });
+
+    it('rejects withdrawals below the configured minimum (400 VALIDATION_ERROR)', async () => {
+      setMockSessionUser(MOCK_MEMBER);
+      await expect(
+        createWithdrawal({ amount: '50.00', payoutAccountId: 'pa-001' }, 'idem-wdr-min'),
+      ).rejects.toMatchObject({ code: 'VALIDATION_ERROR', status: 400 });
+    });
+
+    it('rejects affordable withdrawals above the configured maximum (400 VALIDATION_ERROR)', async () => {
+      setMockSessionUser(MOCK_MEMBER);
+      await expect(
+        createWithdrawal({ amount: '50000.01', payoutAccountId: 'pa-001' }, 'idem-wdr-max'),
+      ).rejects.toMatchObject({ code: 'VALIDATION_ERROR', status: 400 });
     });
 
     it('creates a RESERVED withdrawal, deducts the wallet, and appends a ledger entry', async () => {

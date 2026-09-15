@@ -1,15 +1,17 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { MOCK_ADMIN } from '@jad/mock';
+import { MOCK_ADMIN, MOCK_STAFF_ADMIN } from '@jad/mock';
 
 import { installMockApi, renderWithProviders } from '../../../test/utils';
+import { resetConfigStore } from '../../../mock/configMockStore';
 import { ConfigPage } from './ConfigPage';
 
 describe('ConfigPage', () => {
   let server: ReturnType<typeof installMockApi>;
 
   beforeEach(() => {
+    resetConfigStore();
     server = installMockApi();
     server.install();
   });
@@ -60,9 +62,9 @@ describe('ConfigPage', () => {
     expect(screen.getByText(/Overseas Filipino Workers/)).toBeInTheDocument();
   });
 
-  it('opens edit dialog and saves updated value locally', async () => {
+  it('saves via PATCH and persists after refetch', async () => {
     const user = userEvent.setup();
-    renderWithProviders(<ConfigPage />, { user: MOCK_ADMIN });
+    const first = renderWithProviders(<ConfigPage />, { user: MOCK_ADMIN });
     await screen.findByText('Direct Commission Rate');
 
     const editButtons = screen.getAllByRole('button', { name: /Edit/ });
@@ -75,10 +77,107 @@ describe('ConfigPage', () => {
     fireEvent.change(input, { target: { value: '10' } });
     await user.click(screen.getByRole('button', { name: 'Save' }));
 
+    expect(await screen.findByText('10.00%')).toBeInTheDocument();
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+    // A fresh mount refetches from the server — the edit must survive
+    // navigation instead of living in local component state.
+    first.unmount();
+    renderWithProviders(<ConfigPage />, { user: MOCK_ADMIN });
+    expect(await screen.findByText('10.00%')).toBeInTheDocument();
+  });
+
+  it('is read-only for non-super-admin staff (no Edit affordance)', async () => {
+    renderWithProviders(<ConfigPage />, { user: MOCK_STAFF_ADMIN });
+    await screen.findByText('Direct Commission Rate');
+
+    expect(screen.queryByRole('button', { name: /Edit/ })).not.toBeInTheDocument();
+    expect(screen.getByText('8.00%')).toBeInTheDocument();
+  });
+
+  it('shows an inline error when the save request fails', async () => {
+    const user = userEvent.setup();
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
+      if (
+        String(input).includes('/admin/config/') &&
+        (init?.method ?? 'GET').toUpperCase() === 'PATCH'
+      ) {
+        return new Response(
+          JSON.stringify({
+            error: {
+              code: 'INTERNAL',
+              message: 'Database unavailable.',
+              timestamp: new Date().toISOString(),
+            },
+          }),
+          { status: 500, headers: { 'Content-Type': 'application/json' } },
+        );
+      }
+      return (originalFetch as typeof fetch)(input, init);
+    }) as typeof fetch;
+
+    try {
+      renderWithProviders(<ConfigPage />, { user: MOCK_ADMIN });
+      await screen.findByText('Direct Commission Rate');
+
+      const editButtons = screen.getAllByRole('button', { name: /Edit/ });
+      await user.click(editButtons[0]!);
+
+      const input = await screen.findByRole('textbox', { name: /value/i });
+      fireEvent.change(input, { target: { value: '10' } });
+      await user.click(screen.getByRole('button', { name: 'Save' }));
+
+      expect(await screen.findByRole('alert')).toHaveTextContent(/Database unavailable/);
+      // The dialog stays open so the operator can retry.
+      expect(screen.getByText('Edit Direct Commission Rate')).toBeInTheDocument();
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+
+  it('renders Gender Options under the Registration category', async () => {
+    renderWithProviders(<ConfigPage />, { user: MOCK_ADMIN });
+    expect(await screen.findByText('Registration')).toBeInTheDocument();
+    expect(screen.getByText('Gender Options')).toBeInTheDocument();
+    expect(screen.getByText('Male, Female, Others')).toBeInTheDocument();
+  });
+
+  it('edits Gender Options with Save enabled while typing', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<ConfigPage />, { user: MOCK_ADMIN });
+    await screen.findByText('Gender Options');
+
+    await user.click(screen.getByRole('button', { name: 'Edit Gender Options' }));
+
+    expect(await screen.findByText('Edit Gender Options')).toBeInTheDocument();
+    const input = screen.getByRole('textbox', { name: /value/i });
+    expect(input).toHaveValue('Male, Female, Others');
+
+    fireEvent.change(input, { target: { value: 'Male, Female, Others, X' } });
+    // Non-numeric list values must not trigger the numeric validator.
+    expect(screen.queryByText('Must be a number')).not.toBeInTheDocument();
+    const save = screen.getByRole('button', { name: 'Save' });
+    expect(save).not.toBeDisabled();
+    await user.click(save);
+
+    expect(await screen.findByText('Male, Female, Others, X')).toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('rejects an empty Gender Options value', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<ConfigPage />, { user: MOCK_ADMIN });
+    await screen.findByText('Gender Options');
+
+    await user.click(screen.getByRole('button', { name: 'Edit Gender Options' }));
+    const input = await screen.findByRole('textbox', { name: /value/i });
+    fireEvent.change(input, { target: { value: '   ' } });
+
     await waitFor(() => {
-      expect(screen.getByText('10.00%')).toBeInTheDocument();
+      expect(screen.getByText('Value is required')).toBeInTheDocument();
     });
+    expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled();
   });
 
   it('cancels edit without persisting changes', async () => {

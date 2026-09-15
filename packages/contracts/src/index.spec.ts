@@ -86,6 +86,15 @@ describe('publicConfigSchema', () => {
     ).toBe(true);
   });
 
+  it('accepts optional withdrawal limits', () => {
+    expect(
+      publicConfigSchema.safeParse({
+        minimumAge: 18,
+        withdrawalLimits: { min: '100.00', max: '50000.00' },
+      }).success,
+    ).toBe(true);
+  });
+
   it('rejects a negative minimum age', () => {
     expect(publicConfigSchema.safeParse({ minimumAge: -1 }).success).toBe(false);
   });

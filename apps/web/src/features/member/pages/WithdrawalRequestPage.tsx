@@ -11,6 +11,7 @@ import { Button } from '../../../components/Button';
 import { ApiError } from '../../../lib/api/errors';
 import { apiErrorMessage } from '../../../lib/api/errorMessage';
 import { usePayoutAccounts, useWallet } from '../hooks/useMember';
+import { usePublicConfig } from '../../public/hooks/usePublicConfig';
 import { createWithdrawal, getWallet } from '../services/member';
 import { SelectField } from '../../auth/components/SelectField';
 import { TextField } from '../../auth/components/TextField';
@@ -32,6 +33,11 @@ export function WithdrawalRequestPage() {
   const queryClient = useQueryClient();
   const walletQuery = useWallet();
   const accountsQuery = usePayoutAccounts();
+  // Configured withdrawal bounds (MIN/MAX_WITHDRAWAL_AMOUNT via GET
+  // /config/public). The DB function remains authoritative; these only
+  // validate inline. Unknown until loaded — then the checks are skipped.
+  const configQuery = usePublicConfig();
+  const limits = configQuery.data?.withdrawalLimits;
   const [amount, setAmount] = useState('');
   const [payoutAccountId, setPayoutAccountId] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -106,8 +112,12 @@ export function WithdrawalRequestPage() {
       nextErrors.amount = 'Enter a valid amount with up to two decimal places.';
     else if (compareMoney(amount.trim(), '0.00') <= 0)
       nextErrors.amount = 'Enter an amount greater than zero.';
+    else if (limits && compareMoney(amount.trim(), limits.min) < 0)
+      nextErrors.amount = `Enter at least ${formatMoney(limits.min)}.`;
     else if (compareMoney(amount.trim(), balance) > 0)
       nextErrors.amount = 'The amount exceeds your Available Balance.';
+    else if (limits && compareMoney(amount.trim(), limits.max) > 0)
+      nextErrors.amount = `Enter no more than ${formatMoney(limits.max)}.`;
     if (!payoutAccountId) nextErrors.payoutAccountId = 'Choose a verified payout account.';
     setErrors(nextErrors);
     if (nextErrors.amount) document.getElementById('withdrawal-amount')?.focus();
@@ -333,7 +343,11 @@ export function WithdrawalRequestPage() {
           value={amount}
           onChange={setAmount}
           error={errors.amount}
-          hint="The full amount is reserved immediately and cannot be edited after submission."
+          hint={
+            limits
+              ? `Withdraw between ${formatMoney(limits.min)} and ${formatMoney(limits.max)}. The full amount is reserved immediately and cannot be edited after submission.`
+              : 'The full amount is reserved immediately and cannot be edited after submission.'
+          }
           inputMode="decimal"
         />
         {(() => {
@@ -342,6 +356,11 @@ export function WithdrawalRequestPage() {
           let availableAfter: string;
           try {
             if (compareMoney(trimmed, '0.00') <= 0 || compareMoney(trimmed, balance) > 0)
+              return null;
+            if (
+              limits &&
+              (compareMoney(trimmed, limits.min) < 0 || compareMoney(trimmed, limits.max) > 0)
+            )
               return null;
             availableAfter = formatMoney(subtractMoney(balance, trimmed));
           } catch {

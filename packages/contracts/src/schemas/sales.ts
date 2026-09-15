@@ -55,6 +55,13 @@ export const saleSchema = z.object({
   approvedAt: z.string().optional(),
   paymentVerifiedAt: z.string().optional(),
   lockedAt: z.string().optional(),
+  /**
+   * Configured commission rates for the estimate preview
+   * (COMMISSION_DIRECT_RATE / COMMISSION_REFERRAL_RATE, exact-decimal rate
+   * strings up to 4 places). Server-populated on detail reads so the UI
+   * never hard-codes 8%/4% (BR-CFG-001). Optional: list reads omit it.
+   */
+  commissionRates: z.object({ direct: z.string().min(1), referral: z.string().min(1) }).optional(),
 });
 
 export type Sale = z.infer<typeof saleSchema>;

@@ -69,6 +69,23 @@ describe('member SaleDetailPage (SCR-MEM-007)', () => {
     );
   });
 
+  it('renders the commission estimate from the configured rates (BR-CFG-001)', async () => {
+    mockFetchRoutes({
+      '/sales/sal-001': {
+        ...SALE,
+        commissionRates: { direct: '0.0800', referral: '0.0400' },
+      },
+      '/customers': CUSTOMERS,
+    });
+    renderSale('sal-001');
+
+    // 3,200,000.00 × 0.0800 = 256,000.00 · × 0.0400 = 128,000.00.
+    expect(await screen.findByLabelText('Estimated commission preview')).toBeInTheDocument();
+    expect(screen.getByText('₱256,000.00')).toBeInTheDocument();
+    expect(screen.getByText('₱128,000.00')).toBeInTheDocument();
+    expect(screen.getByText(/\(estimated, 8\.00%\/4\.00%\)/)).toBeInTheDocument();
+  });
+
   it('requests staff review for a LOCKED sale (FR-SAL-007)', async () => {
     mockFetchRoutes({
       '/sales/sal-006': LOCKED_SALE,

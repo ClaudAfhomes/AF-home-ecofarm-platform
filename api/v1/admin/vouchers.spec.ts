@@ -255,6 +255,51 @@ describe('POST /admin/vouchers/assign', () => {
     expect(body.expiresAt).toBe('2027-01-01T00:00:00.000Z');
   });
 
+  it('falls back to the platform default expiry when no rule is set', async () => {
+    mocks.script.one = {
+      VoucherTemplate: TEMPLATE,
+      Member: { id: 'mem-uuid-1', firstName: 'Juan', lastName: 'Dela Cruz', name: null },
+      SystemConfig: { value: '45' },
+    };
+    const { res, seen } = capture();
+    await assignHandler(req('POST', {}, { templateId: 'vtpl-001', memberId: 'mem-uuid-1' }), res);
+    expect(seen.status).toBe(201);
+    const body = seen.body as Record<string, unknown>;
+    const diffDays =
+      (new Date(body.expiresAt as string).getTime() - Date.now()) / (24 * 60 * 60 * 1000);
+    expect(diffDays).toBeGreaterThan(44);
+    expect(diffDays).toBeLessThan(46);
+  });
+
+  it('prefers the template rule over the platform default expiry', async () => {
+    mocks.script.one = {
+      VoucherTemplate: { ...TEMPLATE, validityDays: 90 },
+      Member: { id: 'mem-uuid-1', firstName: 'Juan', lastName: 'Dela Cruz', name: null },
+      SystemConfig: { value: '45' },
+    };
+    const { res, seen } = capture();
+    await assignHandler(req('POST', {}, { templateId: 'vtpl-001', memberId: 'mem-uuid-1' }), res);
+    expect(seen.status).toBe(201);
+    const body = seen.body as Record<string, unknown>;
+    const diffDays =
+      (new Date(body.expiresAt as string).getTime() - Date.now()) / (24 * 60 * 60 * 1000);
+    expect(diffDays).toBeGreaterThan(89);
+    expect(diffDays).toBeLessThan(91);
+  });
+
+  it('leaves the voucher open-ended when no rule or default is configured', async () => {
+    mocks.script.one = {
+      VoucherTemplate: TEMPLATE,
+      Member: { id: 'mem-uuid-1', firstName: 'Juan', lastName: 'Dela Cruz', name: null },
+      SystemConfig: { value: 'not-a-number' },
+    };
+    const { res, seen } = capture();
+    await assignHandler(req('POST', {}, { templateId: 'vtpl-001', memberId: 'mem-uuid-1' }), res);
+    expect(seen.status).toBe(201);
+    const body = seen.body as Record<string, unknown>;
+    expect(body.expiresAt).toBeUndefined();
+  });
+
   it('409s a duplicate assignment for the same member and voucher', async () => {
     mocks.script.list = { Voucher: [{ code: 'JAD-VCH-2026-101' }] };
     mocks.script.voucherInsertError = {
