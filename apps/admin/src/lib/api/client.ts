@@ -33,6 +33,10 @@ async function rawRequest(path: string, init?: RequestInit, retried = false): Pr
     const { data } = (await client?.auth.getSession()) ?? { data: { session: null } };
     const token = data.session?.access_token;
     if (token) headers.Authorization = `Bearer ${token}`;
+    else
+      console.warn(
+        `[api] Supabase configured but no session token — request will be unauthenticated: ${path}`,
+      );
   }
   let res: Response;
   try {
