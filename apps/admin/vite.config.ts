@@ -4,7 +4,10 @@ import { fileURLToPath, URL } from 'node:url';
 import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
+  // Served under /admin on the same origin as the web app + API in production
+  // (see scripts/assemble-vercel-output.mjs); local dev keeps the root base.
+  base: mode === 'production' ? '/admin/' : '/',
   plugins: [react()],
   resolve: {
     alias: {
@@ -31,4 +34,4 @@ export default defineConfig({
     // parallel load and flake without headroom.
     testTimeout: 30000,
   },
-});
+}));

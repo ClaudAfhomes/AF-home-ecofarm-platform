@@ -1,0 +1,14 @@
+# Vercel upload exclusions.
+# Critical: anything under api/ that is not `_`-prefixed becomes a function, so
+# test files and the local dev server must be excluded from the upload.
+**/*.spec.ts
+**/*.spec.tsx
+api/dev-server.ts
+
+# Not needed on the server
+supabase/
+docs/
+node_modules/
+.turbo/
+vercel-static/
+C：UsersSSD-OR~1AppDataLocalTemplint.txt

@@ -1,8 +1,8 @@
 {
-  "buildCommand": "pnpm run build",
-  "outputDirectory": "apps/web/dist",
+  "framework": null,
   "installCommand": "pnpm install",
-  "framework": "vite",
+  "buildCommand": "node scripts/prepare-vercel-env.mjs && pnpm exec turbo run build && node scripts/assemble-vercel-output.mjs",
+  "outputDirectory": "vercel-static",
   "functions": {
     "api/v1/cms/[key].ts": {
       "includeFiles": "packages/**"
@@ -16,5 +16,10 @@
     "api/v1/registration/location-verify.ts": {
       "includeFiles": "packages/**"
     }
-  }
+  },
+  "rewrites": [
+    { "source": "/admin", "destination": "/admin/index.html" },
+    { "source": "/admin/:path*", "destination": "/admin/index.html" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }

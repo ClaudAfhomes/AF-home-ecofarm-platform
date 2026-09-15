@@ -4,6 +4,7 @@ node_modules/
 # Build output
 dist/
 coverage/
+vercel-static/
 
 # Environment — secrets are never committed (FOLDER-STRUCTURE §7, §9.4)
 .env
