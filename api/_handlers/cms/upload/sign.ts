@@ -1,12 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
 
-import {
-  contentUploadSignRequestSchema,
-  type ContentKind,
-} from '@jad/contracts';
+import { contentUploadSignRequestSchema, type ContentKind } from '@jad/contracts';
 
 import { ADMIN_STAFF } from '../../../_lib/access.js';
 import { verifyStaffModule } from '../../../_lib/auth.js';
+import { setCors } from '../../../_lib/cors.js';
 import { getSupabaseEnv } from '../../../_lib/env.js';
 import { toErrorEnvelope as toError } from '../../../_lib/envelope.js';
 import type { VercelRequest, VercelResponse } from '../../../_lib/http.js';
@@ -67,17 +65,29 @@ const KIND_UPLOAD_RULES: Record<
       'video/webm',
       'video/quicktime',
     ],
-    exts: ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'jpg', 'jpeg', 'png', 'webp', 'mp4', 'webm', 'mov'],
+    exts: [
+      'pdf',
+      'doc',
+      'docx',
+      'ppt',
+      'pptx',
+      'xls',
+      'xlsx',
+      'jpg',
+      'jpeg',
+      'png',
+      'webp',
+      'mp4',
+      'webm',
+      'mov',
+    ],
     maxBytes: 50 * 1024 * 1024,
     typeMessage: 'Promos must be a document, image, or video file',
   },
 };
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  res.setHeader('Access-Control-Allow-Origin', (req.headers.origin as string) ?? '*');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  setCors(res, req, 'POST,OPTIONS');
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return;
@@ -155,7 +165,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const { data, error } = await supabase.storage.from('marketing-tools').createSignedUploadUrl(key);
 
   if (error || !data) {
-    const { error: err, status } = toError('INTERNAL', error?.message ?? 'Failed to create signed upload URL', 500);
+    const { error: err, status } = toError(
+      'INTERNAL',
+      error?.message ?? 'Failed to create signed upload URL',
+      500,
+    );
     res.status(status).json({ error: err });
     return;
   }

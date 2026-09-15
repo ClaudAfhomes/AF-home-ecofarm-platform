@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 
 import { ADMIN_STAFF } from '../../_lib/access.js';
 import { verifyStaffModule } from '../../_lib/auth.js';
+import { setCors } from '../../_lib/cors.js';
 import { getSupabaseEnv } from '../../_lib/env.js';
 import { toErrorEnvelope } from '../../_lib/envelope.js';
 import type { VercelRequest, VercelResponse } from '../../_lib/http.js';
@@ -49,7 +50,12 @@ function extractCmsPhotoIds(content: unknown, out = new Set<string>()): Set<stri
     return out;
   }
   const obj = content as Record<string, unknown>;
-  if (typeof obj.id === 'string' && typeof obj.alt === 'string' && obj.id.length >= 1 && obj.alt.length >= 1) {
+  if (
+    typeof obj.id === 'string' &&
+    typeof obj.alt === 'string' &&
+    obj.id.length >= 1 &&
+    obj.alt.length >= 1
+  ) {
     // Heuristic: CmsPhoto is {id, alt} — Property/Category have id but no alt, CtaLink has label/to, so id+alt is distinctive
     // Ensure we don't collect non-photo objects that happen to have id+alt (none in CMS schemas)
     out.add(obj.id);
@@ -91,12 +97,8 @@ function getMarketingToolsCmsPath(id: string): string | null {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // CORS — allow same-origin + Vercel preview, credentials for Supabase cookie
-  const origin = req.headers.origin;
-  res.setHeader('Access-Control-Allow-Origin', Array.isArray(origin) ? (origin[0] ?? '*') : (origin ?? '*'));
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,PUT,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  // CORS — same-origin + configured app origins only (no wildcard)
+  setCors(res, req, 'GET,PUT,OPTIONS', 'Content-Type, Authorization, X-Requested-With');
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return;
@@ -118,14 +120,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const supabase = createClient(url, serviceKey, { auth: { autoRefreshToken: false } });
 
   if (req.method === 'GET') {
-    const { data, error } = await supabase.from('cms_contents').select('content, version, updated_at, updated_by').eq('key', key).maybeSingle();
+    const { data, error } = await supabase
+      .from('cms_contents')
+      .select('content, version, updated_at, updated_by')
+      .eq('key', key)
+      .maybeSingle();
     if (error) {
       const { error: env, status } = toErrorEnvelope('INTERNAL', error.message, 500);
       res.status(status).json({ error: env });
       return;
     }
     if (!data) {
-      const { error: env, status } = toErrorEnvelope('NOT_FOUND', `CMS content not found: ${key}`, 404);
+      const { error: env, status } = toErrorEnvelope(
+        'NOT_FOUND',
+        `CMS content not found: ${key}`,
+        404,
+      );
       res.status(status).json({ error: env });
       return;
     }
@@ -157,7 +167,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
     const parsed = schema.safeParse(body);
     if (!parsed.success) {
-      const { error, status } = toErrorEnvelope('VALIDATION_ERROR', parsed.error.issues[0]?.message ?? 'Validation failed', 400, parsed.error.issues);
+      const { error, status } = toErrorEnvelope(
+        'VALIDATION_ERROR',
+        parsed.error.issues[0]?.message ?? 'Validation failed',
+        400,
+        parsed.error.issues,
+      );
       res.status(status).json({ error });
       return;
     }
@@ -191,11 +206,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Feature 2: Broadcast CMS update via Supabase Realtime (public clients invalidate ['cms', key])
     // Uses service_role channel; public clients subscribe via anon broadcast. Do not block response on failure.
     try {
-      const rtChannel = supabase.channel('cms:public', { config: { broadcast: { ack: false } } } as never);
+      const rtChannel = supabase.channel('cms:public', {
+        config: { broadcast: { ack: false } },
+      } as never);
       rtChannel.subscribe((status: string) => {
         if (status === 'SUBSCRIBED') {
           void rtChannel
-            .send({ type: 'broadcast', event: 'cms_update', payload: { key, version: nextVersion } } as never)
+            .send({
+              type: 'broadcast',
+              event: 'cms_update',
+              payload: { key, version: nextVersion },
+            } as never)
             .then(() => {
               setTimeout(() => {
                 void supabase.removeChannel(rtChannel);
@@ -224,9 +245,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           const unique = [...new Set(toDelete)];
           const { error: delErr } = await supabase.storage.from('marketing-tools').remove(unique);
           if (delErr) {
-            console.error(`[cms:${key}] cleanup failed for ${unique.length} objects:`, delErr.message);
+            console.error(
+              `[cms:${key}] cleanup failed for ${unique.length} objects:`,
+              delErr.message,
+            );
           } else {
-            console.log(`[cms:${key}] cleaned up ${unique.length} orphaned images:`, unique.join(', '));
+            console.log(
+              `[cms:${key}] cleaned up ${unique.length} orphaned images:`,
+              unique.join(', '),
+            );
           }
         }
       } catch (e) {

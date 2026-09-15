@@ -101,6 +101,7 @@ import handlerAdminConversationThread from '../_handlers/admin/conversations/[me
 import handlerAdminConversationMessages from '../_handlers/admin/conversations/[memberId]/messages.js';
 import handlerAdminConversationRead from '../_handlers/admin/conversations/[memberId]/read.js';
 import handlerAdminMessagesSummary from '../_handlers/admin/messages/summary.js';
+import handlerHealth from '../_handlers/health.js';
 
 type HandlerFn = (req: VercelRequest, res: VercelResponse) => Promise<void> | void;
 
@@ -115,6 +116,9 @@ export function selectHandler(
   pathname: string,
   query: Record<string, string | string[] | undefined>,
 ): RouteMatch | null {
+  if (pathname === '/api/v1/health' || pathname === '/health') {
+    return { handler: handlerHealth as HandlerFn, routeKey: 'health' };
+  }
   if (
     pathname === '/api/v1/registration/location-verify' ||
     pathname === '/api/registration/location-verify'

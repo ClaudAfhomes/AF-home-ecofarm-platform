@@ -5,9 +5,13 @@ import { locationVerificationRequestSchema } from '@jad/contracts';
 
 import { getSupabaseEnv } from '../../_lib/env.js';
 import { toErrorEnvelope } from '../../_lib/envelope.js';
+import { setCors } from '../../_lib/cors.js';
 import type { VercelRequest, VercelResponse } from '../../_lib/http.js';
 
-function headerValue(headers: Record<string, string | string[] | undefined>, name: string): string | undefined {
+function headerValue(
+  headers: Record<string, string | string[] | undefined>,
+  name: string,
+): string | undefined {
   const raw = headers[name.toLowerCase()] ?? headers[name];
   if (Array.isArray(raw)) return raw[0];
   if (typeof raw === 'string') return raw;
@@ -16,7 +20,10 @@ function headerValue(headers: Record<string, string | string[] | undefined>, nam
 
 // --- SINGLE isolated mapping function ---
 // PH → DOMESTIC, non-PH → ABROAD. No PH default on unknown.
-function mapCountryToProgram(countryCode: string): { programId: string; programCode: 'DOMESTIC' | 'ABROAD' } {
+function mapCountryToProgram(countryCode: string): {
+  programId: string;
+  programCode: 'DOMESTIC' | 'ABROAD';
+} {
   const cc = countryCode.toUpperCase();
   if (cc === 'PH') return { programId: 'prg-domestic', programCode: 'DOMESTIC' };
   return { programId: 'prg-abroad', programCode: 'ABROAD' };
@@ -29,9 +36,15 @@ function getNominatimConfig() {
   const url = process.env.REVERSE_GEO_PROVIDER_URL ?? 'https://nominatim.openstreetmap.org/reverse';
   const timeoutMs = Number(process.env.REVERSE_GEO_TIMEOUT_MS ?? 4000);
   // Nominatim usage policy requires a valid User-Agent identifying the application
-  const userAgent = process.env.REVERSE_GEO_USER_AGENT ?? 'jad-realty/1.0 (contact: support@jad.local)';
+  const userAgent =
+    process.env.REVERSE_GEO_USER_AGENT ?? 'jad-realty/1.0 (contact: support@jad.local)';
   const referer = process.env.REVERSE_GEO_REFERER ?? 'https://jad-realty.vercel.app';
-  return { url, timeoutMs: Number.isFinite(timeoutMs) && timeoutMs > 0 ? timeoutMs : 4000, userAgent, referer };
+  return {
+    url,
+    timeoutMs: Number.isFinite(timeoutMs) && timeoutMs > 0 ? timeoutMs : 4000,
+    userAgent,
+    referer,
+  };
 }
 
 async function reverseGeocodeCountry(latitude: number, longitude: number): Promise<string> {
@@ -56,11 +69,15 @@ async function reverseGeocodeCountry(latitude: number, longitude: number): Promi
       signal: AbortSignal.timeout(timeoutMs),
     });
   } catch (e) {
-    const msg = (e as Error).name === 'TimeoutError' ? 'Reverse-geolocation timeout' : (e as Error).message;
+    const msg =
+      (e as Error).name === 'TimeoutError' ? 'Reverse-geolocation timeout' : (e as Error).message;
     throw Object.assign(new Error(msg), { code: 'GEO_REVERSE_FAILED', cause: e });
   }
   if (!res.ok) {
-    throw Object.assign(new Error(`Nominatim error ${res.status}`), { code: 'GEO_REVERSE_FAILED', status: res.status });
+    throw Object.assign(new Error(`Nominatim error ${res.status}`), {
+      code: 'GEO_REVERSE_FAILED',
+      status: res.status,
+    });
   }
   let data: unknown;
   try {
@@ -70,20 +87,23 @@ async function reverseGeocodeCountry(latitude: number, longitude: number): Promi
   }
   const countryCode = (data as { address?: { country_code?: string } })?.address?.country_code;
   if (typeof countryCode !== 'string' || !/^[a-z]{2}$/i.test(countryCode)) {
-    throw Object.assign(new Error('Nominatim missing country_code'), { code: 'GEO_REVERSE_FAILED', data });
+    throw Object.assign(new Error('Nominatim missing country_code'), {
+      code: 'GEO_REVERSE_FAILED',
+      data,
+    });
   }
   const cc = countryCode.toUpperCase();
   if (!/^[A-Z]{2}$/.test(cc)) {
-    throw Object.assign(new Error('Invalid country code from provider'), { code: 'GEO_REVERSE_FAILED', cc });
+    throw Object.assign(new Error('Invalid country code from provider'), {
+      code: 'GEO_REVERSE_FAILED',
+      cc,
+    });
   }
   return cc;
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  res.setHeader('Access-Control-Allow-Origin', req.headers.origin ? String(req.headers.origin) : '*');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  setCors(res, req, 'POST,OPTIONS', 'Content-Type, Authorization, X-Requested-With');
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return;
@@ -114,7 +134,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const first = parsed.error.issues[0];
     const isCoordBound = first?.path.includes('latitude') || first?.path.includes('longitude');
     const code = isCoordBound ? 'VALIDATION_ERROR' : 'VALIDATION_ERROR';
-    const { error, status } = toErrorEnvelope(code, first?.message ?? 'Invalid location verification payload', 400, parsed.error.issues);
+    const { error, status } = toErrorEnvelope(
+      code,
+      first?.message ?? 'Invalid location verification payload',
+      400,
+      parsed.error.issues,
+    );
     res.status(status).json({ error });
     return;
   }
@@ -133,7 +158,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   let longitude: number | undefined;
   let ipCountryHeader: string | undefined;
 
-  const hasGps = typeof (payload as Record<string, unknown>).latitude === 'number' && typeof (payload as Record<string, unknown>).longitude === 'number';
+  const hasGps =
+    typeof (payload as Record<string, unknown>).latitude === 'number' &&
+    typeof (payload as Record<string, unknown>).longitude === 'number';
   if (hasGps) {
     const g = payload as { latitude: number; longitude: number; accuracy?: number };
     if (g.latitude < -90 || g.latitude > 90 || g.longitude < -180 || g.longitude > 180) {
@@ -160,7 +187,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         finalCode === 'GEO_PROVIDER_NOT_CONFIGURED'
           ? 'Reverse-geolocation provider not configured. Set REVERSE_GEO_PROVIDER_URL / REVERSE_GEO_USER_AGENT in server env.'
           : 'Location could not be resolved to a country. Please retry. (provider error)';
-      console.error('[location-verify] reverseGeocode failed:', err?.message ?? e, 'lat', latitude, 'lon', longitude);
+      console.error(
+        '[location-verify] reverseGeocode failed:',
+        err?.message ?? e,
+        'lat',
+        latitude,
+        'lon',
+        longitude,
+      );
       const { error, status } = toErrorEnvelope(finalCode, message, 422, {
         reason: 'REVERSE_GEOCODE_FAILED',
       });
@@ -186,7 +220,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         'GEO_UNAVAILABLE',
         'Location could not be determined. Please enable location access or ensure your network provides a country header (x-vercel-ip-country) and retry. No external IP provider is configured.',
         422,
-        { reason: 'NO_LOCATION', hint: 'Retry with GPS allowed, or deploy behind Vercel to expose x-vercel-ip-country.' },
+        {
+          reason: 'NO_LOCATION',
+          hint: 'Retry with GPS allowed, or deploy behind Vercel to expose x-vercel-ip-country.',
+        },
       );
       res.status(status).json({ error });
       return;
@@ -202,7 +239,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   let supabaseForValidation: ReturnType<typeof createClient> | null = null;
   if (supaUrl && supaServiceKey) {
     try {
-      supabaseForValidation = createClient(supaUrl, supaServiceKey, { auth: { autoRefreshToken: false } });
+      supabaseForValidation = createClient(supaUrl, supaServiceKey, {
+        auth: { autoRefreshToken: false },
+      });
     } catch {}
   }
   if (supabaseForValidation) {
@@ -214,13 +253,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         .maybeSingle();
       if (countryErr) {
         // If table missing (migration not applied), log and allow — dev fallback. Production must have migration.
-        console.warn('[location-verify] countries lookup failed (migration may not be applied):', countryErr.message);
+        console.warn(
+          '[location-verify] countries lookup failed (migration may not be applied):',
+          countryErr.message,
+        );
       } else if (!countryRow || (countryRow as { is_active: boolean }).is_active === false) {
         console.error('[location-verify] unknown/inactive country code from provider:', cc);
-        const { error, status } = toErrorEnvelope('GEO_REVERSE_FAILED', 'Location could not be resolved to a supported country.', 422, {
-          reason: 'UNKNOWN_COUNTRY',
-          code: cc,
-        });
+        const { error, status } = toErrorEnvelope(
+          'GEO_REVERSE_FAILED',
+          'Location could not be resolved to a supported country.',
+          422,
+          {
+            reason: 'UNKNOWN_COUNTRY',
+            code: cc,
+          },
+        );
         res.status(status).json({ error });
         return;
       }
@@ -228,7 +275,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       console.warn('[location-verify] countries validation error:', (e as Error).message);
     }
   } else {
-    console.warn('[location-verify] SUPABASE not configured; skipping countries master validation (dev mock fallback).');
+    console.warn(
+      '[location-verify] SUPABASE not configured; skipping countries master validation (dev mock fallback).',
+    );
   }
 
   const { programId, programCode } = mapCountryToProgram(cc);
@@ -263,7 +312,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       console.error('[location-verify] insert error:', (e as Error).message);
     }
   } else {
-    console.warn('[location-verify] SUPABASE not configured; verification not persisted (ok for local mock).');
+    console.warn(
+      '[location-verify] SUPABASE not configured; verification not persisted (ok for local mock).',
+    );
   }
 
   res.status(200).json({

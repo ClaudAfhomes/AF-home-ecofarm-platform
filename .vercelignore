@@ -5,6 +5,14 @@
 **/*.spec.tsx
 api/dev-server.ts
 
+# Secrets / local env — NEVER upload. The CLI uploads by .vercelignore (gitignore
+# is not consulted), so without these the root .env (service-role key, DATABASE_URL,
+# admin/seed passwords) ships into every deployment snapshot.
+.env
+.env.*
+!.env.example
+.vercel/
+
 # Not needed on the server
 supabase/
 docs/
@@ -12,3 +20,7 @@ node_modules/
 .turbo/
 vercel-static/
 C：UsersSSD-OR~1AppDataLocalTemplint.txt
+
+# Local dev scripts (read secrets from .env at runtime) — not deployment code
+test-cleanup.ts
+test-realtime.ts

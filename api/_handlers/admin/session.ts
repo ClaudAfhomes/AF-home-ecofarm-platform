@@ -1,4 +1,5 @@
 import { queryStaffSlugs, verifyUser } from '../../_lib/auth.js';
+import { setCors } from '../../_lib/cors.js';
 import type { VercelRequest, VercelResponse } from '../../_lib/http.js';
 import { methodNotAllowed, readJsonBody, requireService } from '../../_lib/rest.js';
 import { toErrorEnvelope } from '../../_lib/envelope.js';
@@ -18,9 +19,7 @@ import {
  * 404 when the caller holds no staff identity (client treats as non-staff).
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,PATCH,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  setCors(res, req, 'GET,PATCH,OPTIONS');
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return;

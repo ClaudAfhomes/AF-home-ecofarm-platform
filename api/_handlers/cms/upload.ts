@@ -2,15 +2,13 @@ import { createClient } from '@supabase/supabase-js';
 
 import { ADMIN_STAFF } from '../../_lib/access.js';
 import { verifyStaffModule } from '../../_lib/auth.js';
+import { setCors } from '../../_lib/cors.js';
 import { getSupabaseEnv } from '../../_lib/env.js';
 import { toErrorEnvelope as toError } from '../../_lib/envelope.js';
 import type { VercelRequest, VercelResponse } from '../../_lib/http.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  res.setHeader('Access-Control-Allow-Origin', (req.headers.origin as string) ?? '*');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  setCors(res, req, 'POST,OPTIONS');
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return;
@@ -53,7 +51,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
   } else {
-    const { error, status } = toError('VALIDATION_ERROR', 'Missing file data (expected {name,type,data} base64 JSON)', 400);
+    const { error, status } = toError(
+      'VALIDATION_ERROR',
+      'Missing file data (expected {name,type,data} base64 JSON)',
+      400,
+    );
     res.status(status).json({ error });
     return;
   }
@@ -63,7 +65,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const validExts = ['jpg', 'jpeg', 'png', 'webp'];
   const typeOk = mimeType ? validTypes.includes(mimeType) : validExts.includes(ext);
   if (!typeOk) {
-    const { error, status } = toError('VALIDATION_ERROR', 'Only JPG, PNG and WebP are allowed', 400);
+    const { error, status } = toError(
+      'VALIDATION_ERROR',
+      'Only JPG, PNG and WebP are allowed',
+      400,
+    );
     res.status(status).json({ error });
     return;
   }

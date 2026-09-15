@@ -5,11 +5,12 @@
   "outputDirectory": "vercel-static",
   "functions": {
     "api/router.ts": {
-      "includeFiles": "packages/**"
+      "includeFiles": "packages/contracts/src/**,packages/shared/src/**"
     }
   },
   "rewrites": [
     { "source": "/api/v1/:path*", "destination": "/api/router" },
+    { "source": "/health", "destination": "/api/router?path=health" },
     { "source": "/admin", "destination": "/admin/index.html" },
     { "source": "/admin/:path*", "destination": "/admin/index.html" },
     { "source": "/(.*)", "destination": "/index.html" }

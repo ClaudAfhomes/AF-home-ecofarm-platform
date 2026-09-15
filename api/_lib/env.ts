@@ -19,7 +19,10 @@ export function getSupabaseEnv() {
       if (ref) url = `https://${ref}.supabase.co`;
     } catch {}
   }
-  if (url?.includes('your-project')) url = 'https://vudwoqduebdgtzvybywb.supabase.co';
+  // A placeholder/unset URL must fail loudly, never silently route to a real
+  // project (a hardcoded project ref here would combine whatever service key
+  // is configured with the wrong tenant).
+  if (url?.includes('your-project')) url = undefined;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const anonKey = process.env.SUPABASE_ANON_KEY ?? process.env.VITE_SUPABASE_ANON_KEY;
   // Trim: a trailing newline/space pasted into a host env var would otherwise
