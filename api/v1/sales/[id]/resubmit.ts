@@ -146,6 +146,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     rejectionReason: null,
     submittedAt: now,
     updatedAt: now,
+    ...(parsed.data.referrerName !== undefined ? { referrerName: parsed.data.referrerName } : {}),
   };
   if (outcome.status === 'LOCKED') patch.lockedAt = now;
   const { data: updated, error: writeError } = await supabase

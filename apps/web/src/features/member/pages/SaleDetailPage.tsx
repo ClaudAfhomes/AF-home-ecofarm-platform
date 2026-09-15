@@ -328,6 +328,12 @@ export function SaleDetailPage() {
                 <dt>Customer</dt>
                 <dd>{sale.customerName}</dd>
               </div>
+              {sale.referrerName ? (
+                <div className={styles.item}>
+                  <dt>Referrer</dt>
+                  <dd>{sale.referrerName}</dd>
+                </div>
+              ) : null}
               {sale.rejectionReason ? (
                 <div className={styles.item}>
                   <dt>Rejection reason</dt>

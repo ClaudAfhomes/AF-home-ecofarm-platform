@@ -154,6 +154,7 @@ function toSale(sale: MockSale): Sale {
     approvedAt: sale.approvedAt,
     paymentVerifiedAt: sale.paymentVerifiedAt,
     lockedAt: sale.lockedAt,
+    referrerName: sale.referrerName,
   };
 }
 
@@ -1460,6 +1461,9 @@ export function memberMockHandlers(store: MockStore): MockRoute[] {
           customerName: customer.fullName,
           resubmissionCount: 0,
           submittedAt: new Date().toISOString(),
+          ...(parsed.data.referrerName !== undefined
+            ? { referrerName: parsed.data.referrerName }
+            : {}),
         };
         store.nextSaleId += 1;
         store.sales.push(sale);

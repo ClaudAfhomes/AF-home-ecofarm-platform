@@ -19,6 +19,7 @@ const SUBMITTED_SALE = {
   submittedAt: '2026-08-18T09:00:00.000Z',
   resubmissionCount: 0,
   commissionRates: { direct: '0.0800', referral: '0.0400' },
+  referrerName: 'Maria Santos',
 };
 
 vi.mock('../hooks/useSale', () => ({
@@ -70,6 +71,13 @@ describe('SaleDetailPage transitions', () => {
     expect(screen.getByText('₱96,000.00')).toBeInTheDocument();
     expect(screen.getByText('₱48,000.00')).toBeInTheDocument();
     expect(screen.getByText(/\(estimated, 8\.00%\/4\.00%\)/)).toBeInTheDocument();
+  });
+
+  it('renders the referrer snapshot when present', async () => {
+    renderDetail();
+
+    expect(await screen.findByText('Referrer')).toBeInTheDocument();
+    expect(screen.getByText('Maria Santos')).toBeInTheDocument();
   });
 
   it('persists approval through the API instead of local state', async () => {

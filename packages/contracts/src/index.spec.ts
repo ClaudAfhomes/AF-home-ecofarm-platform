@@ -38,6 +38,8 @@ import {
   assignVoucherRequestSchema,
   scanVoucherRequestSchema,
   redeemVoucherRequestSchema,
+  saleSchema,
+  submitSaleRequestSchema,
 } from '../src/index';
 import type { RoleRecord, StaffModule, StaffRole } from '../src/index';
 
@@ -111,6 +113,48 @@ describe('programSchema', () => {
 
   it('rejects a program without a name', () => {
     expect(programSchema.safeParse({ id: 'p1', code: 'D' }).success).toBe(false);
+  });
+});
+
+describe('saleSchema', () => {
+  const base = {
+    id: 'sal-1',
+    status: 'SUBMITTED',
+    propertyId: 'prop-1',
+    propertyName: 'Lot',
+    propertyValue: '1200000.00',
+    customerId: 'cus-1',
+    customerName: 'Ramon',
+    sellerId: 'mem-1',
+    sellerName: 'Juan',
+    resubmissionCount: 0,
+    submittedAt: '2026-08-18T10:00:00.000Z',
+  };
+
+  it('accepts a sale without a referrer', () => {
+    expect(saleSchema.safeParse(base).success).toBe(true);
+  });
+
+  it('accepts an optional referrer name snapshot', () => {
+    expect(saleSchema.safeParse({ ...base, referrerName: 'Maria Santos' }).success).toBe(true);
+  });
+});
+
+describe('submitSaleRequestSchema', () => {
+  const base = { customerId: 'cus-1', propertyId: 'prop-1' };
+
+  it('accepts customer + property only', () => {
+    expect(submitSaleRequestSchema.safeParse(base).success).toBe(true);
+  });
+
+  it('accepts an optional referrer name', () => {
+    expect(
+      submitSaleRequestSchema.safeParse({ ...base, referrerName: 'Maria Santos' }).success,
+    ).toBe(true);
+  });
+
+  it('rejects a blank referrer name', () => {
+    expect(submitSaleRequestSchema.safeParse({ ...base, referrerName: '   ' }).success).toBe(false);
   });
 });
 

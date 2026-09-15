@@ -2,10 +2,31 @@
 
 Date: 2026-09-15 (UTC). Earlier sessions covered the registrations count/list
 mismatch fix, the full vouchers feature build (definition + assign + admin QR scan/redeem +
-QR upload), the admin/config edit-persistence fix (Part A), and the scan UI/UX polish
-(Part B). This session implemented the **config-connectivity verification + fixes**:
-Gender Options editing, VOUCHER_DEFAULT_EXPIRY_DAYS, MIN/MAX_WITHDRAWAL_AMOUNT,
-QUALIFICATION_MIN_SALES auto-qualification, and config-driven commission estimates.
+QR upload), the admin/config edit-persistence fix (Part A), the scan UI/UX polish
+(Part B), and the config-connectivity fixes (Gender Options, voucher/withdrawal/
+qualification defaults, config-driven commission estimates). This session built the
+**sale referrer dropdown** (see "Referrer dropdown" below).
+
+## Sale referrer dropdown (2026-09-15, implemented + verified)
+
+The `referrerName` field on the member `SaleSubmitPage` was a dead free-text input
+(captured, never sent). Now: a **dropdown of the seller's 1st-level genealogy**
+(`GET /me/direct-referrals`, i.e. members who joined with the seller's code) plus an
+**"Add a new name…"** free-text path, persisted as an optional name snapshot on the
+sale (no commission effect — BR-REF-001/002; members are never created from it).
+
+- Contracts: optional `referrerName` on `submitSaleRequestSchema` (trim, 1..120) and
+  `saleSchema`.
+- Migration `20261015000003_sale_referrer_name.sql`: nullable `Sale.referrerName` text.
+- API: `mapSaleRow` conditionally emits `referrerName` (omits when null/undefined);
+  `POST /sales` and `POST /sales/:id/resubmit` persist it when supplied.
+  New `api/v1/sales.spec.ts` (submit/replay/GET round-trip + referrer cases).
+- Member UI: `SaleSubmitPage` uses `useDirectReferrals()`; select = direct referrals +
+  "Add a new name…"; typed name required when in add mode; value sent via `submitSale`.
+  `SaleDetailPage` shows a "Referrer" row when present.
+- Admin UI: `SaleDetailPage` shows a "Referrer" row when present.
+- Web mock: `MockSale.referrerName` + POST handler stores/returns it; `handlers.spec`
+  covers store + fetch round-trip.
 
 ## Config-connectivity work (2026-09-15, implemented + verified)
 

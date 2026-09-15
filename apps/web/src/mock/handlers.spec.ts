@@ -130,6 +130,17 @@ describe('F1 member mock API', () => {
     expect(sale.resubmissionCount).toBe(0);
   });
 
+  it('stores and returns an optional referrer name snapshot (SCR-MEM-006)', async () => {
+    setMockSessionUser(MOCK_MEMBER);
+    const sale = await submitSale(
+      { customerId: 'cus-001', propertyId: 'igp-250-sqm-farm-lot', referrerName: 'Maria Santos' },
+      'idem-wdr-referrer',
+    );
+    expect(sale.referrerName).toBe('Maria Santos');
+    const fetched = await getSale(sale.id);
+    expect(fetched.referrerName).toBe('Maria Santos');
+  });
+
   it('replays an idempotent sale submission without creating a duplicate (API-SPECIFICATION §5.3)', async () => {
     setMockSessionUser(MOCK_MEMBER);
     const key = 'idem-sale-replay';

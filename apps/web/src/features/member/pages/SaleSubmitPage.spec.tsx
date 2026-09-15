@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Route, Routes } from 'react-router';
@@ -8,8 +8,35 @@ import { SaleSubmitPage } from './SaleSubmitPage';
 import { renderMember } from '../test/utils';
 import { mockFetchNetworkError, mockFetchRoutes } from '../../../test/utils';
 
+function json(body: unknown, status = 200): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
+
 const CUSTOMERS = {
   data: [{ id: 'cus-001', fullName: 'Ramon Reyes', phone: '+63 917 555 0111' }],
+  meta: {},
+};
+
+const DIRECT_REFERRALS = {
+  data: [
+    {
+      id: 'mem-002',
+      name: 'Maria Santos',
+      status: 'APPROVED_ACTIVE',
+      isQualified: true,
+      joinedAt: '2026-07-01T00:00:00.000Z',
+    },
+    {
+      id: 'mem-003',
+      name: 'Pedro Pendiente',
+      status: 'PENDING',
+      isQualified: false,
+      joinedAt: '2026-07-05T00:00:00.000Z',
+    },
+  ],
   meta: {},
 };
 
@@ -111,5 +138,81 @@ describe('member SaleSubmitPage (SCR-MEM-006, FR-SAL-002)', () => {
     renderSubmit();
 
     expect(await screen.findByText('Could not load your customers')).toBeInTheDocument();
+  });
+
+  it('lists the member\u2019s direct referrals in the referrer dropdown', async () => {
+    mockFetchRoutes({ '/customers': CUSTOMERS, '/me/direct-referrals': DIRECT_REFERRALS });
+    renderSubmit();
+
+    await screen.findByLabelText('Customer');
+    const referrer = screen.getByRole('combobox', { name: /Referrer name/ });
+    expect(referrer.querySelector('option[value="Maria Santos"]')).not.toBeNull();
+    expect(referrer.querySelector('option[value="Pedro Pendiente"]')).not.toBeNull();
+  });
+
+  it('submits a selected direct referral as the referrer', async () => {
+    const fetchMock = vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input);
+      const method = (init?.method ?? 'GET').toUpperCase();
+      if (url.endsWith('/customers')) return Promise.resolve(json(CUSTOMERS));
+      if (url.endsWith('/me/direct-referrals')) return Promise.resolve(json(DIRECT_REFERRALS));
+      if (url.endsWith('/sales') && method === 'POST') return Promise.resolve(json(SALE_RESPONSE));
+      return Promise.resolve(json({ data: [], meta: {} }));
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const user = userEvent.setup();
+    renderSubmit();
+
+    await screen.findByLabelText('Customer');
+    await user.selectOptions(screen.getByLabelText('Customer'), 'cus-001');
+    await user.selectOptions(screen.getByLabelText('Catalog property'), 'igp-250-sqm-farm-lot');
+    await user.selectOptions(
+      screen.getByRole('combobox', { name: /Referrer name/ }),
+      'Maria Santos',
+    );
+    await user.click(screen.getByRole('button', { name: 'Submit sale' }));
+
+    await screen.findByText('sale detail page');
+    const createCall = fetchMock.mock.calls.find(
+      (call) =>
+        String(call[0]).endsWith('/sales') &&
+        (call[1] as RequestInit | undefined)?.method === 'POST',
+    );
+    expect(createCall).toBeTruthy();
+    const body = JSON.parse(String((createCall?.[1] as RequestInit | undefined)?.body));
+    expect(body.referrerName).toBe('Maria Santos');
+  });
+
+  it('adds a new referrer name via free text and submits it', async () => {
+    const fetchMock = vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
+      const url = String(input);
+      const method = (init?.method ?? 'GET').toUpperCase();
+      if (url.endsWith('/customers')) return Promise.resolve(json(CUSTOMERS));
+      if (url.endsWith('/me/direct-referrals')) return Promise.resolve(json(DIRECT_REFERRALS));
+      if (url.endsWith('/sales') && method === 'POST') return Promise.resolve(json(SALE_RESPONSE));
+      return Promise.resolve(json({ data: [], meta: {} }));
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const user = userEvent.setup();
+    renderSubmit();
+
+    await screen.findByLabelText('Customer');
+    await user.selectOptions(screen.getByLabelText('Customer'), 'cus-001');
+    await user.selectOptions(screen.getByLabelText('Catalog property'), 'igp-250-sqm-farm-lot');
+    await user.selectOptions(screen.getByRole('combobox', { name: /Referrer name/ }), '__new__');
+    await user.type(screen.getByLabelText('New referrer name'), 'Ana Anay');
+    await user.click(screen.getByRole('button', { name: 'Submit sale' }));
+
+    await screen.findByText('sale detail page');
+    const createCall = fetchMock.mock.calls.find(
+      (call) =>
+        String(call[0]).endsWith('/sales') &&
+        (call[1] as RequestInit | undefined)?.method === 'POST',
+    );
+    expect(createCall).toBeTruthy();
+    const body = JSON.parse(String((createCall?.[1] as RequestInit | undefined)?.body));
+    expect(body.referrerName).toBe('Ana Anay');
   });
 });

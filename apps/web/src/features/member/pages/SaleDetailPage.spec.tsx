@@ -86,6 +86,17 @@ describe('member SaleDetailPage (SCR-MEM-007)', () => {
     expect(screen.getByText(/\(estimated, 8\.00%\/4\.00%\)/)).toBeInTheDocument();
   });
 
+  it('renders the referrer snapshot when present', async () => {
+    mockFetchRoutes({
+      '/sales/sal-001': { ...SALE, referrerName: 'Maria Santos' },
+      '/customers': CUSTOMERS,
+    });
+    renderSale('sal-001');
+
+    expect(await screen.findByText('Referrer')).toBeInTheDocument();
+    expect(screen.getByText('Maria Santos')).toBeInTheDocument();
+  });
+
   it('requests staff review for a LOCKED sale (FR-SAL-007)', async () => {
     mockFetchRoutes({
       '/sales/sal-006': LOCKED_SALE,

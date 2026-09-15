@@ -177,6 +177,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     sellerName,
     submittedAt: now,
     resubmissionCount: 0,
+    ...(parsed.data.referrerName !== undefined ? { referrerName: parsed.data.referrerName } : {}),
   };
   const { error: insertError } = await supabase.from('Sale').insert(sale);
   if (insertError) {

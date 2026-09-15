@@ -10,7 +10,7 @@ import { Alert } from '../../../components/Alert';
 import { Button } from '../../../components/Button';
 import { apiErrorMessage } from '../../../lib/api/errorMessage';
 import { PROPERTY_RECORDS } from '../../public/content/properties';
-import { useCustomers } from '../hooks/useMember';
+import { useCustomers, useDirectReferrals } from '../hooks/useMember';
 import { createCustomer, submitSale } from '../services/member';
 import { SelectField } from '../../auth/components/SelectField';
 import { TextField } from '../../auth/components/TextField';
@@ -34,11 +34,14 @@ export function SaleSubmitPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const customersQuery = useCustomers();
+  const referralsQuery = useDirectReferrals();
   const [customerId, setCustomerId] = useState('');
   const [addingCustomer, setAddingCustomer] = useState(false);
   const [newCustomer, setNewCustomer] = useState({ fullName: '', phone: '', email: '' });
   const [propertyId, setPropertyId] = useState('');
+  // Referrer: a choice from the seller's direct referrals or a free-text name.
   const [referrerName, setReferrerName] = useState('');
+  const [referrerMode, setReferrerMode] = useState<'none' | 'pick' | 'new'>('none');
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [serverError, setServerError] = useState<string | undefined>();
   const [idempotencyKey] = useState(() =>
@@ -56,10 +59,12 @@ export function SaleSubmitPage() {
     mutationFn: ({
       customerId: cid,
       propertyId: pid,
+      referrerName: referrer,
     }: {
       customerId: string;
       propertyId: string;
-    }) => submitSale({ customerId: cid, propertyId: pid }, idempotencyKey),
+      referrerName?: string;
+    }) => submitSale({ customerId: cid, propertyId: pid, referrerName: referrer }, idempotencyKey),
     onSuccess: (sale) => {
       void queryClient.invalidateQueries({ queryKey: ['member', 'sales'] });
       void queryClient.invalidateQueries({ queryKey: ['member', 'customers'] });
@@ -89,6 +94,33 @@ export function SaleSubmitPage() {
     setServerError(undefined);
   };
 
+  const onReferrerChange = (value: string) => {
+    if (value === '__new__') {
+      setReferrerMode('new');
+      setReferrerName('');
+    } else {
+      setReferrerMode('pick');
+      setReferrerName(value);
+    }
+    setErrors((current) => {
+      const next = { ...current };
+      delete next.referrerName;
+      return next;
+    });
+    setServerError(undefined);
+  };
+
+  const onNewReferrerName = (value: string) => {
+    setReferrerName(value);
+    setErrors((current) => {
+      if (current.referrerName === undefined) return current;
+      const next = { ...current };
+      delete next.referrerName;
+      return next;
+    });
+    setServerError(undefined);
+  };
+
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const nextErrors: Record<string, string> = {};
@@ -110,6 +142,8 @@ export function SaleSubmitPage() {
       nextErrors.customerId = 'Select a customer or add a new one.';
     }
     if (!propertyId) nextErrors.propertyId = 'Select a property from the catalog.';
+    if (referrerMode === 'new' && !referrerName.trim())
+      nextErrors.referrerName = 'Enter the referrer\u2019s name.';
     setErrors(nextErrors);
     if (nextErrors.customerId) document.getElementById('sale-customerId')?.focus();
     else if (nextErrors.propertyId) document.getElementById('sale-propertyId')?.focus();
@@ -128,6 +162,7 @@ export function SaleSubmitPage() {
       await submitSaleMutation.mutateAsync({
         customerId: resolvedCustomerId,
         propertyId,
+        referrerName: referrerMode === 'none' ? undefined : referrerName.trim(),
       });
     } catch (error) {
       setServerError(
@@ -257,16 +292,41 @@ export function SaleSubmitPage() {
 
         <fieldset className={styles.fieldset}>
           <legend className={styles.legend}>Referral</legend>
-          <TextField
+          <SelectField
             id="sale-referrerName"
             name="referrerName"
             label="Referrer name"
             optional
-            value={referrerName}
-            onChange={(value) => setReferrerName(value)}
+            value={referrerMode === 'pick' ? referrerName : referrerMode === 'new' ? '__new__' : ''}
+            onChange={onReferrerChange}
+            options={[
+              ...(referralsQuery.data ?? []).map((referral) => ({
+                value: referral.name,
+                label: referral.name,
+              })),
+              { value: '__new__', label: 'Add a new name\u2026' },
+            ]}
             error={errors.referrerName}
-            hint="The member who referred this customer (optional)."
+            hint={
+              'The member who referred this customer — pick from your direct referrals or add a name (optional).'
+            }
           />
+          {referrerMode === 'new' ? (
+            <TextField
+              id="sale-newReferrer"
+              name="newReferrer"
+              label="New referrer name"
+              value={referrerName}
+              onChange={onNewReferrerName}
+              error={errors.referrerName}
+              autoComplete="name"
+            />
+          ) : null}
+          {referralsQuery.isError ? (
+            <p className={styles.referrerHint} role="status">
+              Could not load your direct referrals — you can still add a name manually.
+            </p>
+          ) : null}
         </fieldset>
 
         <div className={styles.actions}>

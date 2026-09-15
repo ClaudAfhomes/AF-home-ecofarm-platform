@@ -108,6 +108,8 @@ export interface MockSale {
   approvedAt?: string;
   paymentVerifiedAt?: string;
   lockedAt?: string;
+  /** Optional referrer name snapshot (direct referral pick or free text). */
+  referrerName?: string;
 }
 
 export interface MockLedgerEntry {

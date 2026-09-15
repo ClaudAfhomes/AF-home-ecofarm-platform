@@ -275,6 +275,12 @@ export function SaleDetailPage() {
                   <dt>Customer</dt>
                   <dd>{data.customerName}</dd>
                 </div>
+                {data.referrerName ? (
+                  <div className={styles.field}>
+                    <dt>Referrer</dt>
+                    <dd>{data.referrerName}</dd>
+                  </div>
+                ) : null}
                 <div className={styles.field}>
                   <dt>Submitted by</dt>
                   <dd>

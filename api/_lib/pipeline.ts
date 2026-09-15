@@ -354,6 +354,9 @@ export function mapSaleRow(row: Record<string, unknown>) {
     paymentVerifiedAt: row.paymentVerifiedAt ?? undefined,
     lockedAt: row.lockedAt ?? undefined,
     rejectionReason: row.rejectionReason ?? undefined,
+    ...(row.referrerName !== undefined && row.referrerName !== null
+      ? { referrerName: row.referrerName }
+      : {}),
   };
 }
 
