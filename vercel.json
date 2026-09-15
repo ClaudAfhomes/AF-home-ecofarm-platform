@@ -5,7 +5,7 @@
   "outputDirectory": "vercel-static",
   "functions": {
     "api/router.ts": {
-      "includeFiles": "packages/contracts/src/**,packages/shared/src/**"
+      "includeFiles": "packages/**"
     }
   },
   "rewrites": [
