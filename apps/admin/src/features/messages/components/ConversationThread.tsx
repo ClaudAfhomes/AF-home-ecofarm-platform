@@ -12,7 +12,7 @@ import {
   useMarkConversationRead,
   useSendStaffMessage,
 } from '../hooks/useConversations';
-import { buildThreadItems } from '../threadItems';
+import { buildThreadItems, capComposerHeight } from '../threadItems';
 import styles from './ConversationThread.module.css';
 
 const MAX_LENGTH = 4000;
@@ -36,6 +36,7 @@ export function ConversationThread({ memberId, memberName, memberEmail }: Conver
   const markReadMutation = useMarkConversationRead(memberId);
   const [draft, setDraft] = useState('');
   const threadRef = useRef<HTMLDivElement | null>(null);
+  const composerRef = useRef<HTMLTextAreaElement | null>(null);
   const markedRef = useRef(false);
 
   const messages: Message[] = useMemo(
@@ -66,6 +67,16 @@ export function ConversationThread({ memberId, memberName, memberEmail }: Conver
   useEffect(() => {
     if (threadQuery.isSuccess) requestAnimationFrame(scrollToBottom);
   }, [threadQuery.isSuccess, memberId]);
+
+  // Composer auto-grow: follow content up to the cap so the box never
+  // scrolls internally (direct DOM write only — no state, no extra render).
+  useEffect(() => {
+    const el = composerRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    const next = capComposerHeight(el.scrollHeight);
+    if (next !== null) el.style.height = `${next}px`;
+  }, [draft]);
 
   const canSend = draft.trim().length > 0 && draft.length <= MAX_LENGTH;
 
@@ -200,6 +211,7 @@ export function ConversationThread({ memberId, memberName, memberEmail }: Conver
         </label>
         <textarea
           id="staff-message-draft"
+          ref={composerRef}
           className={styles.composerInput}
           value={draft}
           maxLength={MAX_LENGTH}

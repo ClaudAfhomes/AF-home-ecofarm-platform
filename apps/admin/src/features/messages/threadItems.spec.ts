@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { Message } from '@jad/contracts';
 
-import { buildThreadItems } from './threadItems';
+import { COMPOSER_MAX_HEIGHT_PX, buildThreadItems, capComposerHeight } from './threadItems';
 
 const msg = (id: string, senderType: 'MEMBER' | 'STAFF', createdAt: string): Message => ({
   id,
@@ -75,5 +75,19 @@ describe('buildThreadItems', () => {
     >[];
     expect(messages.every((m) => m.firstOfGroup)).toBe(true);
     expect(messages.every((m) => m.lastOfGroup)).toBe(true);
+  });
+});
+
+describe('capComposerHeight', () => {
+  it('passes through short content and caps tall content at the max', () => {
+    expect(capComposerHeight(90)).toBe(90);
+    expect(capComposerHeight(500)).toBe(COMPOSER_MAX_HEIGHT_PX);
+    expect(capComposerHeight(COMPOSER_MAX_HEIGHT_PX)).toBe(COMPOSER_MAX_HEIGHT_PX);
+  });
+
+  it('returns null for non-positive or non-finite heights (hidden/measuring)', () => {
+    expect(capComposerHeight(0)).toBeNull();
+    expect(capComposerHeight(-4)).toBeNull();
+    expect(capComposerHeight(Number.NaN)).toBeNull();
   });
 });

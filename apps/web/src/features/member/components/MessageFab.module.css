@@ -26,6 +26,13 @@
   box-shadow: 0 22px 48px -20px rgba(28, 43, 58, 0.5);
 }
 
+/* Visited links must keep the white icon: the global `a:visited` rule
+   (0,1,1) beats plain `.fab` (0,1,0); `:visited` on the class (0,2,0) wins.
+   Without this the message icon renders brand-on-brand after first click. */
+.fab:visited {
+  color: var(--color-text-on-brand);
+}
+
 .fab:active {
   transform: translateY(0) scale(0.97);
 }

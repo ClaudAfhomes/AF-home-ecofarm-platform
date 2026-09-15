@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { screen } from '@testing-library/react';
 import { MOCK_ADMIN } from '@jad/mock';
+import { createMockServer } from '@jad/mock';
 
 import { installMockApi, renderWithProviders } from '../../../test/utils';
 import { RegistrationsPage } from './RegistrationsPage';
@@ -58,7 +59,32 @@ describe('RegistrationsPage', () => {
 
     // Repository goes through fetch (Phase B3 cutover); with the mock
     // server restored the request fails and the error state renders.
-    expect(await screen.findByText(/something went wrong|failed to load|error/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/something went wrong|failed to load|error/i),
+    ).toBeInTheDocument();
     expect(screen.queryByText(/Juan/)).not.toBeInTheDocument();
+  });
+
+  it('banners hidden applications when the server reports meta.invalid', async () => {
+    // Dashboard counts raw PENDING rows while the list drops invalid ones:
+    // the page must explain the gap instead of claiming "Queue is clear".
+    server.restore();
+    const hidden = createMockServer(
+      [
+        {
+          path: '/admin/registrations',
+          response: { data: [], meta: { page: 1, pageSize: 0, total: 0, invalid: 2 } },
+        },
+      ],
+      0,
+    );
+    hidden.install();
+    try {
+      renderWithProviders(<RegistrationsPage />, { user: MOCK_ADMIN });
+      expect(await screen.findByText(/could not be displayed/)).toBeInTheDocument();
+      expect(screen.getByText('Queue is clear')).toBeInTheDocument();
+    } finally {
+      hidden.restore();
+    }
   });
 });

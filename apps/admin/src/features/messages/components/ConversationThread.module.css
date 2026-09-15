@@ -299,7 +299,8 @@
 .composerInput {
   width: 100%;
   box-sizing: border-box;
-  resize: vertical;
+  resize: none;
+  max-height: 132px;
   padding: var(--space-3);
   font: inherit;
   font-size: var(--text-body-s);
@@ -343,12 +344,18 @@
     display: inline-flex;
   }
 
+  /* Bounded pane: the thread scrolls internally while the composer stays
+     pinned at the bottom of the viewport. Offset ≈ sticky topbar (73px) +
+     main padding (32px) + breadcrumbs (~30px) + gaps. `dvh` tracks the
+     mobile keyboard; `vh` is the fallback. */
   .pane {
-    height: auto;
+    height: calc(100vh - 190px);
+    height: calc(100dvh - 190px);
+    min-height: 430px;
   }
 
   .thread {
-    height: clamp(320px, 52vh, 560px);
-    flex: 0 0 auto;
+    flex: 1 1 auto;
+    min-height: 0;
   }
 }

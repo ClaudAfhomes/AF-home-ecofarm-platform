@@ -100,6 +100,7 @@ export const adminMockHandlers: MockRoute[] = [
           page: 1,
           pageSize: 10,
           total: data.length,
+          invalid: 0,
         },
       };
     },
@@ -817,10 +818,7 @@ export const adminMockHandlers: MockRoute[] = [
             unreadCount: staffUnreadFor(conversation.memberId),
           };
         })
-        .sort(
-          (a, b) =>
-            (b.lastMessageAt ?? '').localeCompare(a.lastMessageAt ?? ''),
-        );
+        .sort((a, b) => (b.lastMessageAt ?? '').localeCompare(a.lastMessageAt ?? ''));
       return {
         data,
         meta: {
@@ -839,17 +837,13 @@ export const adminMockHandlers: MockRoute[] = [
       if (!id) return notFound('Conversation');
       const conversation = messagesMockStore.conversations.find((c) => c.memberId === id);
       const memberExists =
-        conversation !== undefined ||
-        registrationStore.members.some((m) => m.id === id);
+        conversation !== undefined || registrationStore.members.some((m) => m.id === id);
       if (!memberExists) return notFound('Member');
       if (ctx.method === 'GET') {
         // Thread, newest first (cursor/limit handled client-side over the page).
         const thread = messagesMockStore.messages
           .filter((m) => m.memberId === id)
-          .sort(
-            (a, b) =>
-              b.createdAt.localeCompare(a.createdAt) || b.id.localeCompare(a.id),
-          );
+          .sort((a, b) => b.createdAt.localeCompare(a.createdAt) || b.id.localeCompare(a.id));
         return {
           data: thread.map((m) => ({
             id: m.id,

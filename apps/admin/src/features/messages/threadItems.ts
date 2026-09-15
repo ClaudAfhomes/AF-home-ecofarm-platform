@@ -4,6 +4,22 @@ import { formatDayLabel } from '../../lib/format';
 
 const GROUP_GAP_MS = 5 * 60 * 1000;
 
+/** Composer auto-grow ceiling (~5 rows) — the box never scrolls internally below it. */
+export const COMPOSER_MAX_HEIGHT_PX = 132;
+
+/**
+ * Auto-grow height for the composer textarea: follow content up to the cap;
+ * null when there is nothing measurable (hidden element), so callers leave
+ * the natural `rows` height alone instead of collapsing the box.
+ */
+export function capComposerHeight(
+  scrollHeightPx: number,
+  maxPx: number = COMPOSER_MAX_HEIGHT_PX,
+): number | null {
+  if (!Number.isFinite(scrollHeightPx) || scrollHeightPx <= 0) return null;
+  return Math.min(scrollHeightPx, maxPx);
+}
+
 export type ThreadDayItem = { kind: 'day'; key: string; label: string };
 export type ThreadMessageItem = {
   kind: 'message';

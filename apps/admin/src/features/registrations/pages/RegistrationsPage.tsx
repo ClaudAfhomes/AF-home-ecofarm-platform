@@ -18,7 +18,7 @@ import {
 } from '@jad/ui';
 
 import { formatDate } from '../../../lib/format';
-import { useRegistrations } from '../hooks/useRegistrations';
+import { useRegistrationsPage } from '../hooks/useRegistrations';
 import { MEMBER_STATUS_LABEL, MEMBER_STATUS_TONE } from '../status';
 import styles from './RegistrationsPage.module.css';
 
@@ -31,7 +31,9 @@ export function RegistrationsPage() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'PENDING' | 'REJECTED'>('PENDING');
   const [programFilter, setProgramFilter] = useState<'ALL' | 'DOMESTIC' | 'ABROAD'>('ALL');
-  const { data, isPending, isError, error, refetch } = useRegistrations();
+  const { data: queuePage, isPending, isError, error, refetch } = useRegistrationsPage();
+  const data = queuePage?.registrations;
+  const hiddenInvalid = queuePage?.invalid ?? 0;
 
   const filtered = useMemo(() => {
     const all = data ?? [];
@@ -41,7 +43,12 @@ export function RegistrationsPage() {
       if (search.trim()) {
         const q = search.toLowerCase();
         const name = `${r.firstName} ${r.lastName}`.toLowerCase();
-        if (!name.includes(q) && !r.countryName.toLowerCase().includes(q) && !(r.referralCode ?? '').toLowerCase().includes(q)) return false;
+        if (
+          !name.includes(q) &&
+          !r.countryName.toLowerCase().includes(q) &&
+          !(r.referralCode ?? '').toLowerCase().includes(q)
+        )
+          return false;
       }
       return true;
     });
@@ -77,7 +84,18 @@ export function RegistrationsPage() {
     return (
       <section>
         <PageHeader title="Registrations" description="Member registrations requiring review" />
-        <EmptyState title="Queue is clear" description="There are no registrations to review right now." />
+        {hiddenInvalid > 0 ? (
+          <p role="status" className={styles.noticeBanner}>
+            {hiddenInvalid} application{hiddenInvalid === 1 ? '' : 's'} could not be displayed
+            because some stored details are incomplete. The dashboard count includes{' '}
+            {hiddenInvalid === 1 ? 'it' : 'them'} — check the server logs for
+            {` "[registrations] dropping invalid row"`} and re-save the application.
+          </p>
+        ) : null}
+        <EmptyState
+          title="Queue is clear"
+          description="There are no registrations to review right now."
+        />
       </section>
     );
   }
@@ -85,6 +103,14 @@ export function RegistrationsPage() {
   return (
     <section>
       <PageHeader title="Registrations" description="Member registrations requiring review" />
+      {hiddenInvalid > 0 ? (
+        <p role="status" className={styles.noticeBanner}>
+          {hiddenInvalid} more application{hiddenInvalid === 1 ? '' : 's'}{' '}
+          {hiddenInvalid === 1 ? 'is' : 'are'} hidden because some stored details are incomplete.
+          Check the server logs for
+          {` "[registrations] dropping invalid row"`}.
+        </p>
+      ) : null}
       <div className={styles.filterBar}>
         <div className={styles.searchWrap}>
           <input
@@ -142,7 +168,6 @@ export function RegistrationsPage() {
             Clear
           </button>
         ) : null}
-
       </div>
       {total === 0 ? (
         <EmptyState title="No registrations found" description="Try adjusting filters or search." />
@@ -183,7 +208,9 @@ export function RegistrationsPage() {
                       </span>
                     </TableCell>
                     <TableCell label="Country">
-                      <span title={row.countryCode}>{row.countryName} ({row.countryCode})</span>
+                      <span title={row.countryCode}>
+                        {row.countryName} ({row.countryCode})
+                      </span>
                     </TableCell>
                     <TableCell label="Program">
                       <span
@@ -201,13 +228,21 @@ export function RegistrationsPage() {
                       </span>
                     </TableCell>
                     <TableCell label="Referral">
-                      <span style={{ fontSize: 'var(--text-body-s)', color: 'var(--color-text-secondary)' }}>
+                      <span
+                        style={{
+                          fontSize: 'var(--text-body-s)',
+                          color: 'var(--color-text-secondary)',
+                        }}
+                      >
                         {row.referralCode ?? '—'}
                       </span>
                     </TableCell>
                     <TableCell label="Submitted">{formatDate(row.submittedAt)}</TableCell>
                     <TableCell label="Status">
-                      <StatusChip label={MEMBER_STATUS_LABEL[row.status]} tone={MEMBER_STATUS_TONE[row.status]} />
+                      <StatusChip
+                        label={MEMBER_STATUS_LABEL[row.status]}
+                        tone={MEMBER_STATUS_TONE[row.status]}
+                      />
                     </TableCell>
                   </TableRow>
                 ))}

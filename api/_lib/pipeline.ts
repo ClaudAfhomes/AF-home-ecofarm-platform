@@ -172,32 +172,146 @@ export function isValidAdminMemberRow(row: Record<string, unknown>): boolean {
   return adminMemberSchema.safeParse(mapAdminMemberRow(row)).success;
 }
 
+function asOptionalString(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined;
+  const trimmed = value.trim();
+  return trimmed ? trimmed : undefined;
+}
+
+function asNonEmptyString(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined;
+  return value ? value : undefined;
+}
+
+function asCountryCode(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined;
+  const trimmed = value.trim();
+  return trimmed ? trimmed : undefined;
+}
+
+function asOptionalEmail(value: unknown): string | undefined {
+  if (typeof value !== 'string') return undefined;
+  const trimmed = value.trim();
+  return trimmed ? trimmed : undefined;
+}
+
+/** DATE columns arrive as "YYYY-MM-DD"; tolerate Date instances defensively. */
+function asDateString(value: unknown): string | undefined {
+  if (typeof value === 'string' && value) return value;
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    return value.toISOString().slice(0, 10);
+  }
+  return undefined;
+}
+
+/** Timestamptz columns arrive as ISO strings; tolerate Date instances. */
+function asIsoString(value: unknown): string | undefined {
+  if (typeof value === 'string' && value) return value;
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    return value.toISOString();
+  }
+  return undefined;
+}
+
+/**
+ * Government-ID payloads are best-effort: a missing or malformed file object
+ * degrades to undefined (the detail page shows its "no file" state) instead
+ * of hiding the whole application from the review queue.
+ */
+function asGovernmentId(value: unknown): Record<string, unknown> | undefined {
+  if (value == null) return undefined;
+  if (typeof value !== 'object' || Array.isArray(value)) return undefined;
+  const record = value as Record<string, unknown>;
+  if (typeof record.fileName !== 'string' || !record.fileName) return undefined;
+  if (typeof record.mimeType !== 'string' || !record.mimeType) return undefined;
+  if (
+    typeof record.sizeBytes !== 'number' ||
+    !Number.isInteger(record.sizeBytes) ||
+    record.sizeBytes <= 0
+  ) {
+    return undefined;
+  }
+  const cleaned: Record<string, unknown> = {
+    fileName: record.fileName,
+    mimeType: record.mimeType,
+    sizeBytes: record.sizeBytes,
+  };
+  if (typeof record.storagePath === 'string' && record.storagePath) {
+    cleaned.storagePath = record.storagePath;
+  }
+  if (typeof record.data === 'string' && record.data) {
+    cleaned.data = record.data;
+  }
+  return cleaned;
+}
+
+/**
+ * Qualification answers are best-effort: invalid items are filtered so one
+ * bad answer never hides the application. Non-arrays degrade to [].
+ */
+function asQualificationAnswers(value: unknown): { questionId: string; answer: string }[] {
+  if (!Array.isArray(value)) return [];
+  const items: { questionId: string; answer: string }[] = [];
+  for (const entry of value) {
+    if (typeof entry !== 'object' || entry === null) continue;
+    const record = entry as Record<string, unknown>;
+    if (typeof record.questionId !== 'string' || !record.questionId) continue;
+    if (typeof record.answer !== 'string' || !record.answer) continue;
+    items.push({ questionId: record.questionId, answer: record.answer });
+  }
+  return items;
+}
+
+/** Rejection notes pass through when shaped, otherwise degrade to undefined. */
+function asRejectionNote(value: unknown): { reason: string; requiredChanges: string } | undefined {
+  if (value == null) return undefined;
+  if (typeof value !== 'object' || Array.isArray(value)) return undefined;
+  const record = value as Record<string, unknown>;
+  if (typeof record.reason !== 'string' || !record.reason) return undefined;
+  if (typeof record.requiredChanges !== 'string' || !record.requiredChanges) return undefined;
+  return { reason: record.reason, requiredChanges: record.requiredChanges };
+}
+
 export function mapRegistrationRow(row: Record<string, unknown>) {
+  // PostgREST serializes nullable columns as JSON null and DATE/timestamptz
+  // columns as strings (a DATE arrives as "YYYY-MM-DD"). `z.string()` rejects
+  // `null`, so every nullable/optional field must coalesce to `undefined` or
+  // the row fails validation and is silently dropped from the queue while the
+  // dashboard count (`head` count, no validation) still includes it.
+  // Required-but-nullable-in-DB fields (phone, dateOfBirth, gender,
+  // countryCode/Name, programId/Code) map null/"" to undefined so the failure
+  // surfaces as an explicit missing-field path in the server warn log instead
+  // of a null-type error. governmentId/qualificationAnswers are lenient by
+  // design: a malformed file payload or answer item degrades to "no file" /
+  // filtered answers so a PENDING application is never hidden from review.
+  const submittedAt = asIsoString(row.submittedAt) ?? asIsoString(row.createdAt);
+  const createdAt = asIsoString(row.createdAt) ?? submittedAt;
+  const updatedAt = asIsoString(row.updatedAt) ?? submittedAt;
   return {
     id: row.id,
     status: row.status,
-    firstName: row.firstName,
-    middleInitial: row.middleInitial ?? undefined,
-    lastName: row.lastName,
-    nameSuffix: row.nameSuffix ?? undefined,
-    email: typeof row.email === 'string' && row.email ? row.email : undefined,
-    phone: row.phone,
-    dateOfBirth: row.dateOfBirth,
-    gender: row.gender,
-    countryCode: row.countryCode,
-    countryName: row.countryName,
-    address: row.address,
-    programId: row.programId,
-    programCode: row.programCode,
-    referralCode: row.referralCode ?? undefined,
-    qualificationAnswers: row.qualificationAnswers ?? [],
-    governmentId: row.governmentId ?? undefined,
-    submittedAt: row.submittedAt,
-    createdAt: row.createdAt ?? row.submittedAt,
-    updatedAt: row.updatedAt ?? row.submittedAt,
-    reviewedAt: row.reviewedAt ?? undefined,
-    reviewedBy: row.reviewedBy ?? undefined,
-    rejectionNote: row.rejectionNote ?? undefined,
+    firstName: asNonEmptyString(row.firstName),
+    middleInitial: asOptionalString(row.middleInitial),
+    lastName: asNonEmptyString(row.lastName),
+    nameSuffix: asOptionalString(row.nameSuffix),
+    email: asOptionalEmail(row.email),
+    phone: asNonEmptyString(row.phone),
+    dateOfBirth: asDateString(row.dateOfBirth),
+    gender: asNonEmptyString(row.gender),
+    countryCode: asCountryCode(row.countryCode),
+    countryName: asNonEmptyString(row.countryName),
+    address: asOptionalString(row.address),
+    programId: asNonEmptyString(row.programId),
+    programCode: asNonEmptyString(row.programCode),
+    referralCode: asOptionalString(row.referralCode),
+    qualificationAnswers: asQualificationAnswers(row.qualificationAnswers),
+    governmentId: asGovernmentId(row.governmentId),
+    submittedAt,
+    createdAt,
+    updatedAt,
+    reviewedAt: asIsoString(row.reviewedAt),
+    reviewedBy: asOptionalString(row.reviewedBy),
+    rejectionNote: asRejectionNote(row.rejectionNote),
   };
 }
 
