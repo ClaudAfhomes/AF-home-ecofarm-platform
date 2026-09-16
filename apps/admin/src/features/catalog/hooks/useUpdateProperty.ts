@@ -9,6 +9,7 @@ export function useUpdateProperty() {
       updateProperty(id, input),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['admin', 'properties'] });
+      qc.invalidateQueries({ queryKey: ['cms', 'properties'] });
       qc.invalidateQueries({ queryKey: ['admin', 'property-categories'] });
     },
   });

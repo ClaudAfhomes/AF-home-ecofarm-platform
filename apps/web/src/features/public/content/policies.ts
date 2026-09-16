@@ -53,11 +53,18 @@ export const POLICY_FALLBACK: Policy[] = [
 ];
 
 /**
- * Resolve a route param to a policy: slugs first (canonical), legacy ids
- * accepted so old `/policies/pol-001` links keep working.
+ * Resolve a route param to a policy: slugs first (canonical), legacy ids and
+ * `type` (e.g. /policies/terms finding a row typed `terms`) accepted so old
+ * or mis-typed links keep working and canonical deep links survive slug edits.
  */
 export function findPolicy(items: Policy[], slugOrId: string): Policy | undefined {
-  return items.find((item) => item.slug === slugOrId || item.id === slugOrId);
+  const normalized = slugOrId.trim().toLowerCase();
+  return items.find(
+    (item) =>
+      item.slug.toLowerCase() === normalized ||
+      item.id.toLowerCase() === normalized ||
+      item.type.toLowerCase() === normalized,
+  );
 }
 
 /** Token an admin can place in policy content to embed the live programs list. */

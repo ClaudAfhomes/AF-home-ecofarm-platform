@@ -117,6 +117,14 @@ describe('RegistrationDetailPage government ID preview', () => {
     );
   });
 
+  it('shows friendly placeholders for blank applicant details', () => {
+    renderDetail();
+    expect(screen.getByText('No address provided')).toBeInTheDocument();
+    expect(screen.getByText('No email provided')).toBeInTheDocument();
+    expect(screen.getByText('No sponsor code provided')).toBeInTheDocument();
+    expect(screen.getAllByText('Not yet reviewed').length).toBeGreaterThan(0);
+  });
+
   it('shows an error with retry when the signed URL fails', async () => {
     mockGetRegistrationById.mockReturnValue(
       registration({

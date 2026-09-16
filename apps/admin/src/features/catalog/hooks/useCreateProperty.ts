@@ -8,6 +8,7 @@ export function useCreateProperty() {
     mutationFn: (input: CreatePropertyInput) => createProperty(input),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['admin', 'properties'] });
+      qc.invalidateQueries({ queryKey: ['cms', 'properties'] });
       qc.invalidateQueries({ queryKey: ['admin', 'property-categories'] });
     },
   });

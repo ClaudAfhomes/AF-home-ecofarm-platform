@@ -3,6 +3,7 @@ import { catalogPropertySchema } from '@jad/contracts';
 import { ADMIN_STAFF } from '../../../_lib/access.js';
 import { appendAudit } from '../../../_lib/audit.js';
 import { verifyStaffModule } from '../../../_lib/auth.js';
+import { syncCatalogPropertyToCms } from '../../../_lib/catalog-cms-sync.js';
 import type { VercelRequest, VercelResponse } from '../../../_lib/http.js';
 import { mapPropertyRow } from '../../../_lib/pipeline.js';
 import { validateUpdateProperty } from '../../../_lib/cutover.js';
@@ -99,6 +100,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       targetName: String(current.name ?? id),
       detail: `Deleted property ${String(current.name ?? id)}`,
     });
+    // Unlink the CMS listing so it no longer points at a deleted catalog row.
+    await syncCatalogPropertyToCms(
+      supabase,
+      {
+        id,
+        name: String(current.name ?? id),
+        categorySlug: String(current.categorySlug ?? ''),
+      },
+      auth.userId,
+      { clearCatalogLink: true },
+    );
     res.status(200).json({ id, deleted: true });
     return;
   }
@@ -161,6 +173,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     targetName: String((updated as Record<string, unknown>).name ?? id),
     detail: `Updated property ${id}`,
   });
+  // Keep the linked CMS listing consistent (name/price/category).
+  const updatedRow = updated as Record<string, unknown>;
+  await syncCatalogPropertyToCms(
+    supabase,
+    {
+      id,
+      name: String(updatedRow.name ?? ''),
+      categorySlug: String(updatedRow.categorySlug ?? ''),
+      price: (updatedRow.price as string | null | undefined) ?? null,
+      status: String(updatedRow.status ?? 'ACTIVE'),
+    },
+    auth.userId,
+  );
   const validated = catalogPropertySchema.safeParse(
     mapPropertyRow(updated as Record<string, unknown>),
   );

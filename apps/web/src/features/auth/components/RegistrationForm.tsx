@@ -12,7 +12,7 @@ import { Button } from '../../../components/Button';
 import { apiErrorMessage } from '../../../lib/api/errorMessage';
 import { usePrograms } from '../../public/hooks/usePrograms';
 import { usePublicConfig } from '../../public/hooks/usePublicConfig';
-import { PRIVACY_POLICY_SLUG, TERMS_POLICY_SLUG, policyPath } from '../../public/content/policies';
+import { usePolicyLinks } from '../../../hooks/usePolicyLinks';
 import { getQualificationQuestions } from '../services/auth';
 import { usePersistedDraft, clearPersistedDraft } from '../hooks/usePersistedDraft';
 import { useLocationVerification } from '../hooks/useLocationVerification';
@@ -105,6 +105,31 @@ function Control(props: {
  * submits one contract-shaped payload through the caller's service function.
  * The ID file bytes ride along as base64 for the API upload (3 MB cap).
  */
+function ConsentLinks() {
+  const links = usePolicyLinks();
+  const terms = links.terms;
+  const privacy = links.privacy;
+  return (
+    <>
+      {terms ? (
+        <Link to={terms} className={styles.consentLink}>
+          JA&amp;D member terms
+        </Link>
+      ) : (
+        'JA&D member terms'
+      )}{' '}
+      and{' '}
+      {privacy ? (
+        <Link to={privacy} className={styles.consentLink}>
+          privacy policy
+        </Link>
+      ) : (
+        'privacy policy'
+      )}
+    </>
+  );
+}
+
 export function RegistrationForm({ submit, mode = 'create', initialDraft }: RegistrationFormProps) {
   const [step, setStep] = useState(0);
   const [draft, setDraft, clearDraft, isDirty] = usePersistedDraft(mode, initialDraft);
@@ -876,15 +901,7 @@ export function RegistrationForm({ submit, mode = 'create', initialDraft }: Regi
                   required
                 />
                 <span>
-                  I agree to the{' '}
-                  <Link to={policyPath(TERMS_POLICY_SLUG)} className={styles.consentLink}>
-                    JA&amp;D member terms
-                  </Link>{' '}
-                  and{' '}
-                  <Link to={policyPath(PRIVACY_POLICY_SLUG)} className={styles.consentLink}>
-                    privacy policy
-                  </Link>
-                  .
+                  I agree to the <ConsentLinks />.
                 </span>
               </label>
               {errors.consent ? (

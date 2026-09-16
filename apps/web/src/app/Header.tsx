@@ -75,8 +75,9 @@ export function Header() {
 
   const closeMenu = () => setMenuOpen(false);
   const onPropertyDetail = /^\/properties\/[^/]+\/[^/]+$/.test(pathname);
+  const onPolicyRoute = pathname.startsWith('/policies');
   const onAuthRoute = isAuthPath(pathname);
-  const solid = scrolled || menuOpen || onPropertyDetail || onAuthRoute;
+  const solid = scrolled || menuOpen || onPropertyDetail || onPolicyRoute || onAuthRoute;
 
   return (
     <header className={`${styles.header} ${solid ? styles.solid : ''}`}>

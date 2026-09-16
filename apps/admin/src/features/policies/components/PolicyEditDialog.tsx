@@ -175,19 +175,21 @@ export function PolicyEditDialog({
         </label>
         <label className={styles.field}>
           <span className={styles.fieldLabel}>Type</span>
-          <input
-            value={type}
+          <select
+            value={KNOWN_TYPES.includes(type) ? type : ''}
             onChange={(e) => setType(e.target.value)}
-            placeholder="terms"
-            list="policy-edit-type-suggestions"
             className={styles.input}
             aria-label="Type"
-          />
-          <datalist id="policy-edit-type-suggestions">
+          >
+            <option value="" disabled>
+              Select a type
+            </option>
             {KNOWN_TYPES.map((t) => (
-              <option key={t} value={t} />
+              <option key={t} value={t}>
+                {t}
+              </option>
             ))}
-          </datalist>
+          </select>
         </label>
         <label className={styles.field}>
           <span className={styles.fieldLabel}>Summary (optional)</span>

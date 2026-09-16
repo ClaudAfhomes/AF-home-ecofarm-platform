@@ -8,6 +8,7 @@ export function useDeleteProperty() {
     mutationFn: (id: string) => deleteProperty(id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['admin', 'properties'] });
+      qc.invalidateQueries({ queryKey: ['cms', 'properties'] });
       qc.invalidateQueries({ queryKey: ['admin', 'property-categories'] });
     },
   });

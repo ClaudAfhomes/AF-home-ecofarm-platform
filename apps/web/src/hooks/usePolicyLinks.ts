@@ -22,8 +22,12 @@ export function usePolicyLinks(): {
   const { data, isError } = usePolicies();
   const usingFallback = isError || !data || data.length === 0;
   const items = usingFallback ? POLICY_FALLBACK : data;
+  const slugOrType = (slug: string): boolean =>
+    items.some(
+      (policy) => policy.slug.toLowerCase() === slug || policy.type.toLowerCase() === slug,
+    );
   const linkFor = (slug: string): string | undefined =>
-    items.some((policy) => policy.slug === slug) ? policyPath(slug) : undefined;
+    slugOrType(slug) ? policyPath(slug) : undefined;
   return {
     terms: linkFor(TERMS_POLICY_SLUG),
     privacy: linkFor(PRIVACY_POLICY_SLUG),

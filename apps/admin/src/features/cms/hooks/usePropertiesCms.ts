@@ -16,6 +16,9 @@ export function useUpdatePropertiesCms() {
     mutationFn: (draft: PropertiesContent) => updateProperties(draft),
     onSuccess: (data) => {
       qc.setQueryData(['cms', 'properties'], data);
+      // Linked listings mirror name/price/category into the catalog.
+      qc.invalidateQueries({ queryKey: ['admin', 'properties'] });
+      qc.invalidateQueries({ queryKey: ['admin', 'property-categories'] });
     },
   });
 }

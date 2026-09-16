@@ -1,6 +1,7 @@
 import { ADMIN_STAFF } from '../../_lib/access.js';
 import { verifyStaffModule } from '../../_lib/auth.js';
 import { appendAudit } from '../../_lib/audit.js';
+import { syncCatalogPropertyToCms } from '../../_lib/catalog-cms-sync.js';
 import type { VercelRequest, VercelResponse } from '../../_lib/http.js';
 import { isValidPropertyRow, mapPropertyRow, prefixedId } from '../../_lib/pipeline.js';
 import { validateCreateProperty } from '../../_lib/cutover.js';
@@ -88,6 +89,8 @@ export async function createProperty(req: VercelRequest, res: VercelResponse) {
     targetName: property.name,
     detail: `Created property ${property.name}`,
   });
+  // Keep the linked CMS listing consistent (name/price/category).
+  await syncCatalogPropertyToCms(supabase, property, auth.userId);
   res.status(201).json(mapPropertyRow(property as Record<string, unknown>));
 }
 

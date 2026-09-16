@@ -1,5 +1,7 @@
+import type { PropertiesContent } from '@jad/contracts';
 import { ADMIN_STAFF } from '../../_lib/access.js';
 import { verifyStaffModule } from '../../_lib/auth.js';
+import { syncCmsPropertiesToCatalog } from '../../_lib/catalog-cms-sync.js';
 import { setCors } from '../../_lib/cors.js';
 import { getSupabaseEnv } from '../../_lib/env.js';
 import { toErrorEnvelope } from '../../_lib/envelope.js';
@@ -206,6 +208,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const { error: env, status } = toErrorEnvelope('INTERNAL', error.message, 500);
       res.status(status).json({ error: env });
       return;
+    }
+    // Catalog sync: the CMS properties listing owns presentation, but the
+    // catalog owns name/price/category for linked listings - mirror edits
+    // into `Property` so both admin editors stay consistent.
+    if (key === 'properties') {
+      await syncCmsPropertiesToCatalog(supabase, parsed.data as PropertiesContent, auth.userId);
     }
     // Feature 2: Broadcast CMS update via Supabase Realtime (public clients invalidate ['cms', key])
     // Uses service_role channel; public clients subscribe via anon broadcast. Do not block response on failure.

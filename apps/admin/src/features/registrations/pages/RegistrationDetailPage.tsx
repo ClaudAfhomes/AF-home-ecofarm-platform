@@ -44,6 +44,31 @@ function getAge(dateOfBirth: string): number | null {
   return age;
 }
 
+/** Date with a friendly fallback for missing/invalid values. */
+function formatDateSafe(value: string | null | undefined, placeholder = 'N/A'): string {
+  if (!value) return placeholder;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return placeholder;
+  return formatDate(value);
+}
+
+/** Renders a value, or a muted placeholder when the applicant left it blank. */
+function FieldValue({
+  value,
+  placeholder,
+  mono = false,
+}: {
+  value?: string | null;
+  placeholder: string;
+  mono?: boolean;
+}) {
+  const text = (value ?? '').trim();
+  if (text) {
+    return mono ? <span className={styles.mono}>{text}</span> : <>{text}</>;
+  }
+  return <span className={styles.emptyValue}>{placeholder}</span>;
+}
+
 export function RegistrationDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -144,8 +169,9 @@ export function RegistrationDetailPage() {
               tone={MEMBER_STATUS_TONE[data.status]}
             />
             <span style={{ color: 'var(--color-text-muted)', fontSize: 'var(--text-body-s)' }}>
-              Submitted {formatDate(data.submittedAt)} · {data.countryName} ({data.countryCode}) ·{' '}
-              {data.programCode}
+              Submitted {formatDateSafe(data.submittedAt)}
+              {data.countryName ? ` · ${data.countryName} (${data.countryCode})` : ''}
+              {data.programCode ? ` · ${data.programCode}` : ''}
             </span>
             <span
               className={styles.mono}
@@ -173,27 +199,45 @@ export function RegistrationDetailPage() {
             <div className={styles.field}>
               <dt>Date of Birth</dt>
               <dd>
-                {formatDate(data.dateOfBirth)}
+                {formatDateSafe(data.dateOfBirth)}
                 {age !== null ? ` · ${age} years old` : ''}
               </dd>
             </div>
             <div className={styles.field}>
+              <dt>Email</dt>
+              <dd>
+                <FieldValue value={data.email} placeholder="No email provided" />
+              </dd>
+            </div>
+            <div className={styles.field}>
               <dt>Gender</dt>
-              <dd>{data.gender}</dd>
+              <dd>
+                <FieldValue value={data.gender} placeholder="Not specified" />
+              </dd>
             </div>
             <div className={styles.field}>
               <dt>Phone</dt>
-              <dd>{data.phone}</dd>
+              <dd>
+                <FieldValue value={data.phone} placeholder="No phone provided" />
+              </dd>
             </div>
             <div className={styles.field}>
               <dt>Country</dt>
               <dd>
-                {data.countryName} ({data.countryCode})
+                {data.countryName || data.countryCode ? (
+                  `${data.countryName ?? ''}${data.countryName && data.countryCode ? ' ' : ''}${
+                    data.countryCode ? `(${data.countryCode})` : ''
+                  }`
+                ) : (
+                  <span className={styles.emptyValue}>N/A</span>
+                )}
               </dd>
             </div>
             <div className={styles.field}>
               <dt>Address</dt>
-              <dd>{data.address ?? '-'}</dd>
+              <dd>
+                <FieldValue value={data.address} placeholder="No address provided" />
+              </dd>
             </div>
           </dl>
         </div>
@@ -205,24 +249,34 @@ export function RegistrationDetailPage() {
             <div className={styles.field}>
               <dt>Program</dt>
               <dd>
-                <span style={{ fontWeight: 600 }}>{data.programCode}</span>
-                <span
-                  style={{
-                    color: 'var(--color-text-muted)',
-                    fontSize: 'var(--text-caption)',
-                    marginLeft: 6,
-                  }}
-                >
-                  ({data.programId})
-                </span>
+                {data.programCode ? (
+                  <>
+                    <span style={{ fontWeight: 600 }}>{data.programCode}</span>
+                    {data.programId ? (
+                      <span
+                        style={{
+                          color: 'var(--color-text-muted)',
+                          fontSize: 'var(--text-caption)',
+                          marginLeft: 6,
+                        }}
+                      >
+                        ({data.programId})
+                      </span>
+                    ) : null}
+                  </>
+                ) : (
+                  <span className={styles.emptyValue}>N/A</span>
+                )}
               </dd>
             </div>
             <div className={styles.field}>
               <dt>Referral Code</dt>
-              <dd className={styles.mono}>{data.referralCode ?? '-'}</dd>
+              <dd>
+                <FieldValue value={data.referralCode} placeholder="No sponsor code provided" mono />
+              </dd>
               {!data.referralCode ? (
                 <dd style={{ fontSize: 'var(--text-caption)', color: 'var(--color-text-muted)' }}>
-                  No referral - applicant registered without a sponsor
+                  Applicant registered without a sponsor
                 </dd>
               ) : null}
             </div>
@@ -284,7 +338,7 @@ export function RegistrationDetailPage() {
           <dl className={styles.fieldGrid}>
             <div className={styles.field}>
               <dt>Submitted</dt>
-              <dd>{formatDate(data.submittedAt)}</dd>
+              <dd>{formatDateSafe(data.submittedAt)}</dd>
             </div>
             <div className={styles.field}>
               <dt>Current Status</dt>
@@ -297,14 +351,14 @@ export function RegistrationDetailPage() {
             </div>
             <div className={styles.field}>
               <dt>Reviewer</dt>
-              <dd>{data.reviewedBy ?? '-'}</dd>
+              <dd>
+                <FieldValue value={data.reviewedBy} placeholder="Not yet reviewed" />
+              </dd>
             </div>
-            {data.reviewedAt ? (
-              <div className={styles.field}>
-                <dt>Reviewed At</dt>
-                <dd>{formatDate(data.reviewedAt)}</dd>
-              </div>
-            ) : null}
+            <div className={styles.field}>
+              <dt>Reviewed At</dt>
+              <dd>{formatDateSafe(data.reviewedAt, 'Not yet reviewed')}</dd>
+            </div>
             {data.rejectionNote ? (
               <>
                 <div className={styles.field}>
@@ -316,6 +370,13 @@ export function RegistrationDetailPage() {
                   <dd>{data.rejectionNote.requiredChanges}</dd>
                 </div>
               </>
+            ) : data.status === 'REJECTED' ? (
+              <div className={styles.field}>
+                <dt>Rejection Note</dt>
+                <dd>
+                  <span className={styles.emptyValue}>No rejection note recorded</span>
+                </dd>
+              </div>
             ) : null}
             <div className={styles.field}>
               <dt>Application ID</dt>

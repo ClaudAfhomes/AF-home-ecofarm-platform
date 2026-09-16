@@ -15,7 +15,7 @@ import { ORPHAN_ACCOUNT_MESSAGE } from '../../../lib/api/orphan';
 import { useQuery } from '@tanstack/react-query';
 import { getGlobalCmsPublic, getLoginCmsPublic } from '@/lib/cms';
 import { AUTH } from '../content';
-import { PRIVACY_POLICY_SLUG, TERMS_POLICY_SLUG, policyPath } from '../../public/content/policies';
+import { usePolicyLinks } from '../../../hooks/usePolicyLinks';
 import { AuthLayout } from '../components/AuthLayout';
 import { PasswordField } from '../components/PasswordField';
 import { TextField } from '../components/TextField';
@@ -31,6 +31,34 @@ import styles from './LoginPage.module.css';
  * from `MemberRole` → `Role` (never client-side). Redirects `admin` → Admin App
  * (`VITE_ADMIN_URL` → :5174/admin) and `user` → Member App (`/member` → :5173).
  */
+function LegalConsentNote() {
+  const consent = usePolicyLinks();
+  const terms = consent.terms;
+  const privacy = consent.privacy;
+  if (!terms && !privacy) return null;
+  return (
+    <p className={styles.note}>
+      Secure sign-in. By continuing, you agree to our{' '}
+      {terms ? (
+        <Link className={styles.promptLink} to={terms}>
+          Terms
+        </Link>
+      ) : (
+        'Terms'
+      )}{' '}
+      and{' '}
+      {privacy ? (
+        <Link className={styles.promptLink} to={privacy}>
+          Privacy Policy
+        </Link>
+      ) : (
+        'Privacy Policy'
+      )}
+      .
+    </p>
+  );
+}
+
 export function LoginPage() {
   const { data: cmsLogin } = useQuery({
     queryKey: ['cms', 'login'],
@@ -341,17 +369,7 @@ export function LoginPage() {
           </Link>
         </p>
 
-        <p className={styles.note}>
-          Secure sign-in. By continuing, you agree to our{' '}
-          <Link className={styles.promptLink} to={policyPath(TERMS_POLICY_SLUG)}>
-            Terms
-          </Link>{' '}
-          and{' '}
-          <Link className={styles.promptLink} to={policyPath(PRIVACY_POLICY_SLUG)}>
-            Privacy Policy
-          </Link>
-          .
-        </p>
+        <LegalConsentNote />
       </form>
     </AuthLayout>
   );

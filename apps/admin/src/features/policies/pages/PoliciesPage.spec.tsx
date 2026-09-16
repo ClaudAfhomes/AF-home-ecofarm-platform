@@ -44,7 +44,7 @@ async function publishViaDialog(user: ReturnType<typeof userEvent.setup>, title:
   await user.click(screen.getByRole('button', { name: 'New Policy' }));
   await screen.findByRole('dialog');
   await user.type(screen.getByLabelText('Title'), title);
-  await user.type(screen.getByLabelText('Type'), 'terms');
+  await user.selectOptions(screen.getByLabelText('Type'), 'terms');
   const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
   await user.upload(fileInput, PDF());
   await user.click(screen.getByRole('button', { name: 'Publish' }));
@@ -159,7 +159,7 @@ describe('PoliciesPage', () => {
     await user.click(screen.getByText('New Policy'));
     await screen.findByRole('dialog');
     await user.type(screen.getByLabelText('Title'), 'Rejected Probe');
-    await user.type(screen.getByLabelText('Type'), 'terms');
+    await user.selectOptions(screen.getByLabelText('Type'), 'terms');
     // Client accepts .pdf; the server rejects it - bypass with a direct set.
     const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
     Object.defineProperty(fileInput, 'files', { value: [PDF()], configurable: true });

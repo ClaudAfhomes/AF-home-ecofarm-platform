@@ -71,7 +71,7 @@
   min-height: 44px;
   border-radius: var(--radius-md);
   background-color: var(--color-brand-primary);
-  color: var(--color-accent-light);
+  color: var(--color-text-on-brand);
   font-weight: 600;
   text-decoration: none;
 }

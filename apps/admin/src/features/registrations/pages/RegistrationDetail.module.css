@@ -64,6 +64,12 @@
   color: var(--color-text-primary);
 }
 
+/* Missing/blank applicant values: muted, italic, never an empty row. */
+.emptyValue {
+  font-style: italic;
+  color: var(--color-text-muted);
+}
+
 .mono {
   font-family: var(--font-mono);
   font-size: var(--text-body-s);
@@ -89,57 +95,6 @@
   gap: var(--space-3);
 }
 
-.approveBtn {
-  padding: var(--space-3) var(--space-5);
-  border: none;
-  border-radius: var(--radius-sm);
-  background-color: var(--color-success);
-  color: white;
-  font-weight: 600;
-  font-size: var(--text-body-s);
-  cursor: pointer;
-  transition: background-color var(--transition-fast);
-}
-
-.approveBtn:hover:not(:disabled) {
-  background-color: color-mix(in srgb, var(--color-success) 85%, black);
-}
-
-.approveBtn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.rejectBtn {
-  padding: var(--space-3) var(--space-5);
-  border: 1px solid var(--color-danger);
-  border-radius: var(--radius-sm);
-  background-color: transparent;
-  color: var(--color-danger);
-  font-weight: 600;
-  font-size: var(--text-body-s);
-  cursor: pointer;
-  transition:
-    background-color var(--transition-fast),
-    color var(--transition-fast);
-}
-
-.rejectBtn:hover:not(:disabled) {
-  background-color: var(--color-danger);
-  color: white;
-}
-
-.rejectBtn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.rejectForm {
-  display: grid;
-  gap: var(--space-3);
-  width: 100%;
-}
-
 .rejectLabel {
   font-size: var(--text-body-s);
   font-weight: 500;
@@ -160,58 +115,6 @@
   outline: 2px solid var(--color-accent-light);
   outline-offset: -1px;
   border-color: var(--color-brand-primary);
-}
-
-.rejectActions {
-  display: flex;
-  gap: var(--space-3);
-}
-
-.confirmRejectBtn {
-  padding: var(--space-3) var(--space-5);
-  border: none;
-  border-radius: var(--radius-sm);
-  background-color: var(--color-danger);
-  color: white;
-  font-weight: 600;
-  font-size: var(--text-body-s);
-  cursor: pointer;
-  transition: background-color var(--transition-fast);
-}
-
-.confirmRejectBtn:hover:not(:disabled) {
-  background-color: color-mix(in srgb, var(--color-danger) 85%, black);
-}
-
-.confirmRejectBtn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.cancelBtn {
-  padding: var(--space-3) var(--space-5);
-  border: 1px solid var(--color-border-default);
-  border-radius: var(--radius-sm);
-  background-color: transparent;
-  color: var(--color-text-secondary);
-  font-weight: 500;
-  font-size: var(--text-body-s);
-  cursor: pointer;
-}
-
-.cancelBtn:hover:not(:disabled) {
-  background-color: var(--color-bg-surface);
-}
-
-.statusMessage {
-  margin: 0;
-  color: var(--color-text-secondary);
-  font-size: var(--text-body-s);
-  line-height: var(--line-height-body);
-}
-
-.skeletonBlock {
-  height: 120px;
 }
 
 .actionsCard {

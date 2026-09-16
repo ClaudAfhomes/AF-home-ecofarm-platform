@@ -164,19 +164,27 @@ export function PolicyFormDialog({ open, onClose }: { open: boolean; onClose: ()
         </label>
         <label className={styles.field}>
           <span className={styles.fieldLabel}>Type</span>
-          <input
-            value={type}
-            onChange={(e) => setType(e.target.value)}
-            placeholder="terms"
-            list="policy-type-suggestions"
+          <select
+            value={KNOWN_TYPES.includes(type) ? type : ''}
+            onChange={(e) => {
+              const next = e.target.value;
+              setType(next);
+              // Only seed the slug from the type when it is still empty;
+              // never clobber a title-derived slug.
+              if (next && !slug.trim()) setSlug(next);
+            }}
             className={styles.input}
             aria-label="Type"
-          />
-          <datalist id="policy-type-suggestions">
+          >
+            <option value="" disabled>
+              Select a type
+            </option>
             {KNOWN_TYPES.map((t) => (
-              <option key={t} value={t} />
+              <option key={t} value={t}>
+                {t}
+              </option>
             ))}
-          </datalist>
+          </select>
         </label>
         <label className={styles.field}>
           <span className={styles.fieldLabel}>Summary (optional)</span>
