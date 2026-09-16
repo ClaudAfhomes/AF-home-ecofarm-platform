@@ -35,8 +35,28 @@ export function RegistrationStatusPage() {
     queryFn: getRegisterCmsPublic,
     staleTime: 0,
   });
-  const statusCopy =
-    (registerCms as { status?: typeof AUTH.status } | undefined)?.status ?? AUTH.status;
+  const cmsStatus = (
+    registerCms as
+      | {
+          status?: {
+            eyebrow?: string;
+            title?: string;
+            lead?: string;
+            brandTitle?: string;
+            brandLead?: string;
+          };
+        }
+      | undefined
+  )?.status;
+  const statusCopy = {
+    eyebrow: cmsStatus?.eyebrow ?? AUTH.status.eyebrow,
+    title: cmsStatus?.title ?? AUTH.status.title,
+    lead: cmsStatus?.lead ?? 'Your application is being reviewed.',
+    brandTitle: cmsStatus?.brandTitle ?? AUTH.status.brandTitle,
+    brandLead: cmsStatus?.brandLead ?? AUTH.status.brandLead,
+    pending: AUTH.status.pending,
+    steps: AUTH.status.steps,
+  };
   const statusImage =
     (registerCms as { image?: { id: string; alt: string } } | undefined)?.image ??
     AUTH.images.login;
@@ -46,7 +66,7 @@ export function RegistrationStatusPage() {
     <AuthLayout
       eyebrow={statusCopy.eyebrow}
       title={statusCopy.title}
-      lead="Your application is being reviewed."
+      lead={statusCopy.lead}
       brandTitle={statusCopy.brandTitle}
       brandLead={statusCopy.brandLead}
       image={statusImage}

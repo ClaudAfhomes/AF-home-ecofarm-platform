@@ -114,6 +114,8 @@ export const registerResponseSchema = z.object({
    * `POST /auth/verify-email/resend`.
    */
   emailSent: z.boolean().optional(),
+  /** True when the email already had a pending application (replay, no duplicate). */
+  replayed: z.boolean().optional(),
 });
 
 export type RegisterResponse = z.infer<typeof registerResponseSchema>;

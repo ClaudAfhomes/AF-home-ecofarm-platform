@@ -81,6 +81,7 @@ export function VerifyEmailPage() {
   // True when the registration email could not be dispatched (EmailJS
   // unconfigured or the send failed) - nudge the applicant to resend.
   const sendFailed = (location.state as { emailSent?: boolean } | null)?.emailSent === false;
+  const replayed = (location.state as { replayed?: boolean } | null)?.replayed === true;
 
   useEffect(() => {
     if (cooldown <= 0) return;
@@ -162,6 +163,13 @@ export function VerifyEmailPage() {
         {serverError ? (
           <Alert variant="danger" title="We could not verify your email">
             {serverError}
+          </Alert>
+        ) : null}
+
+        {replayed ? (
+          <Alert variant="info" title="Application already pending">
+            You already have a pending application for this email. We updated it with your latest
+            details and re-sent the verification code.
           </Alert>
         ) : null}
 

@@ -269,7 +269,7 @@ describe('POST /api/v1/auth/register', () => {
     expect(typeof insert.id === 'string' && (insert.id as string).startsWith('reg-')).toBe(true);
   });
 
-  it('replays an in-flight application without duplicating', async () => {
+  it('replays an in-flight application, refreshes it, and re-sends the code', async () => {
     mocks.script.registrationRow = {
       id: 'reg-existing',
       status: 'PENDING',
@@ -280,9 +280,11 @@ describe('POST /api/v1/auth/register', () => {
     expect(seen.status).toBe(200);
     expect(seen.body).toMatchObject({
       application: { id: 'reg-existing', status: 'PENDING' },
+      replayed: true,
     });
     expect(mocks.calls.some((c) => c.op === 'createUser')).toBe(false);
-    expect(mocks.calls.some((c) => c.table === 'Registration')).toBe(false);
+    // The pending row is refreshed with the latest submission (no duplicate).
+    expect(mocks.calls.some((c) => c.table === 'Registration' && c.op === 'update')).toBe(true);
   });
 
   it('409s a decided application for the same email', async () => {

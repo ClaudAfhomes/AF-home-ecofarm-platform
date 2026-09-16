@@ -47,6 +47,7 @@ function toApplicationPayload(
   row: { id: string; status: string; createdAt: string },
   email: string,
   emailSent?: boolean,
+  replayed?: boolean,
 ) {
   return {
     application: {
@@ -57,6 +58,7 @@ function toApplicationPayload(
       createdAt: row.createdAt,
     },
     ...(emailSent !== undefined && { emailSent }),
+    ...(replayed !== undefined && { replayed }),
   };
 }
 
@@ -98,15 +100,69 @@ async function attachDocument(
 }
 
 /**
+ * Refresh a pending application with the latest submission. Replaces the
+ * applicant details so the admin queue always reflects the most recent data
+ * for that email (production-ready, same-email replay).
+ */
+async function refreshPendingRegistration(
+  supabase: Service,
+  existing: RegistrationRow,
+  input: ReturnType<typeof registerRequestSchema.parse>,
+  country: { code: string; name: string },
+  program: { id: string; code: string },
+): Promise<string | null> {
+  const now = new Date().toISOString();
+  let governmentId = (existing as unknown as { governmentId?: unknown }).governmentId as
+    Record<string, unknown> | undefined;
+  if (input.idDocument?.data) {
+    const uploaded = await uploadGovernmentId(supabase, existing.id, {
+      fileName: input.idDocument.fileName,
+      mimeType: input.idDocument.mimeType,
+      data: input.idDocument.data as string,
+    });
+    if (!uploaded.ok) return uploaded.message;
+    governmentId = {
+      ...(stripDocumentData(input.idDocument as unknown as Record<string, unknown>) as Record<
+        string,
+        unknown
+      >),
+      storagePath: uploaded.storagePath,
+    };
+  }
+  const patch: Record<string, unknown> = {
+    firstName: input.firstName,
+    middleInitial: input.middleInitial ?? null,
+    lastName: input.lastName,
+    nameSuffix: input.nameSuffix ?? null,
+    phone: input.phone,
+    dateOfBirth: input.dateOfBirth,
+    gender: input.gender,
+    countryCode: country.code,
+    countryName: country.name,
+    address: input.address ?? null,
+    programId: program.id,
+    programCode: program.code,
+    referralCode: input.referralCode?.trim() || null,
+    qualificationAnswers: input.qualificationAnswers,
+    governmentId,
+    submittedAt: now,
+    updatedAt: now,
+  };
+  const { error } = await supabase.from('Registration').update(patch).eq('id', existing.id);
+  return error ? error.message : null;
+}
+
+/**
  * POST /api/v1/auth/register - submit a membership application (public).
- * Idempotent per email: a retry while PENDING replays the same application
- * (200, no duplicate); a conflict with no application row completes the
+ * Idempotent per email: a retry while PENDING refreshes the existing
+ * application with the latest details (200, no duplicate) so the admin queue
+ * always shows current data; a conflict with no application row completes the
  * interrupted registration (orphaned auth account) instead of stranding a
  * 409. Decided outcomes (member exists, application decided) stay 409.
  * Remaining intake semantics mirror the member mock: qualified-sponsor
  * referral check, minimum age (SystemConfig), country/program validity.
  * The auth account is created unconfirmed and the email-verification OTP is
- * dispatched by Supabase Auth (BR-AUTH-001). No authentication required.
+ * dispatched (BR-AUTH-001). No authentication required.
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -158,57 +214,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.status(status).json({ error });
     return;
   }
-  // Idempotent replay: an in-flight (PENDING) application for this email
-  // returns as-is instead of duplicating (attaching a fresh document when
-  // the stored row still lacks one, e.g. after a failed first upload).
-  const existing = await findRegistrationByEmail(supabase, email);
-  if (existing) {
-    if (existing.status === 'PENDING') {
-      const attachError = await attachDocument(supabase, existing, input.idDocument);
-      if (attachError) {
-        const { error, status } = toErrorEnvelope('INTERNAL', attachError, 500);
-        res.status(status).json({ error });
-        return;
-      }
-      const emailSent = await sendVerificationOtp(
-        supabase,
-        email,
-        `${input.firstName} ${input.lastName}`.trim(),
-      );
-      res.status(200).json(
-        toApplicationPayload(
-          {
-            id: existing.id,
-            status: existing.status,
-            createdAt: String(existing.createdAt ?? new Date().toISOString()),
-          },
-          email,
-          emailSent,
-        ),
-      );
-      return;
-    }
-    if (existing.status === 'APPROVED_ACTIVE') {
-      // Orphaned application: approval always creates the member row, so an
-      // APPROVED registration with no Member for this email means the member
-      // was purged (a live member returned 409 above). Release the email
-      // (purge-everything semantics) and continue as a fresh application
-      // instead of stranding a permanent 409.
-      const { error: releaseError } = await supabase
-        .from('Registration')
-        .delete()
-        .eq('id', existing.id);
-      if (releaseError) {
-        const { error, status } = toErrorEnvelope('INTERNAL', releaseError.message, 500);
-        res.status(status).json({ error });
-        return;
-      }
-    } else {
-      const { error, status } = duplicateAccount();
-      res.status(status).json({ error });
-      return;
-    }
-  }
+  // Intake validation (sponsor, age, country, program) runs before the
+  // idempotent replay check so a re-registration with new details is fully
+  // validated and, when PENDING, the existing row is refreshed.
   if (input.referralCode) {
     const code = input.referralCode.trim();
     const { data: sponsors } = await supabase
@@ -270,6 +278,63 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.status(status).json({ error });
     return;
   }
+  // Idempotent replay: an in-flight (PENDING) application for this email
+  // refreshes the existing row with the latest details and re-sends the code.
+  const existing = await findRegistrationByEmail(supabase, email);
+  if (existing) {
+    if (existing.status === 'PENDING') {
+      const refreshError = await refreshPendingRegistration(
+        supabase,
+        existing,
+        input,
+        country as { code: string; name: string },
+        program as { id: string; code: string },
+      );
+      if (refreshError) {
+        const { error, status } = toErrorEnvelope('INTERNAL', refreshError, 500);
+        res.status(status).json({ error });
+        return;
+      }
+      const emailSent = await sendVerificationOtp(
+        supabase,
+        email,
+        `${input.firstName} ${input.lastName}`.trim(),
+      );
+      res.status(200).json(
+        toApplicationPayload(
+          {
+            id: existing.id,
+            status: existing.status,
+            createdAt: String(existing.createdAt ?? new Date().toISOString()),
+          },
+          email,
+          emailSent,
+          true,
+        ),
+      );
+      return;
+    }
+    if (existing.status === 'APPROVED_ACTIVE') {
+      // Orphaned application: approval always creates the member row, so an
+      // APPROVED registration with no Member for this email means the member
+      // was purged (a live member returned 409 above). Release the email
+      // (purge-everything semantics) and continue as a fresh application
+      // instead of stranding a permanent 409.
+      const { error: releaseError } = await supabase
+        .from('Registration')
+        .delete()
+        .eq('id', existing.id);
+      if (releaseError) {
+        const { error, status } = toErrorEnvelope('INTERNAL', releaseError.message, 500);
+        res.status(status).json({ error });
+        return;
+      }
+    } else {
+      const { error, status } = duplicateAccount();
+      res.status(status).json({ error });
+      return;
+    }
+  }
   const created = await supabase.auth.admin.createUser({
     email,
     password: input.password,
@@ -308,9 +373,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const registration = buildRegistrationRow(now);
     const { error: insertError } = await supabase.from('Registration').insert(registration);
     if (insertError) {
-      // Lost race with a concurrent submit for the same email: replay it.
+      // Lost race with a concurrent submit for the same email: refresh the
+      // winner's PENDING row with the latest details and replay it.
       const replay = await findRegistrationByEmail(supabase, email);
       if (replay && replay.status === 'PENDING') {
+        await refreshPendingRegistration(
+          supabase,
+          replay,
+          input,
+          country as { code: string; name: string },
+          program as { id: string; code: string },
+        );
         const emailSent = await sendVerificationOtp(supabase, email, applicantName);
         res.status(200).json(
           toApplicationPayload(
@@ -321,6 +394,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             },
             email,
             emailSent,
+            true,
           ),
         );
         return true;
@@ -351,6 +425,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         createdAt: now,
       },
       emailSent,
+      replayed: false,
     });
     return true;
   };
@@ -362,6 +437,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const interrupted = await findRegistrationByEmail(supabase, email);
       if (interrupted) {
         if (interrupted.status === 'PENDING') {
+          await refreshPendingRegistration(
+            supabase,
+            interrupted,
+            input,
+            country as { code: string; name: string },
+            program as { id: string; code: string },
+          );
           const emailSent = await sendVerificationOtp(supabase, email, applicantName);
           res.status(200).json(
             toApplicationPayload(
@@ -372,6 +454,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
               },
               email,
               emailSent,
+              true,
             ),
           );
           return;

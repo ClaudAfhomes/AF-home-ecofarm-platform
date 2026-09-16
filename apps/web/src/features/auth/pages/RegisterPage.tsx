@@ -51,7 +51,11 @@ export function RegisterPage() {
           }
           navigate('/register/verify-email', {
             replace: true,
-            state: { email: emailValue, emailSent: response.emailSent },
+            state: {
+              email: emailValue,
+              emailSent: response.emailSent,
+              replayed: response.replayed,
+            },
           });
         }}
       />
