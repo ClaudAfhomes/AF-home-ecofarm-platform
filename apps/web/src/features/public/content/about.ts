@@ -4,7 +4,7 @@ import type { CtaLink, Pillar } from './types';
 /**
  * About page content. The company story is written from the legacy website's
  * positioning and the three readings of the JA&D name. No corporate history,
- * founding dates, or registration facts are claimed — those remain for the
+ * founding dates, or registration facts are claimed - those remain for the
  * owner to confirm.
  */
 export const ABOUT = {
@@ -28,8 +28,8 @@ export const ABOUT = {
       body: 'Guiding buyers and sellers at every step.',
     },
     paragraphs: [
-      'JA&D Realty Services is a real-estate brokerage that specializes in titled, income-oriented property opportunities. Our niche is straightforward: we find property that already works — titled units and lots with clean documents and, where possible, a tenant already in place under a live lease.',
-      'We bridge sellers and buyers with good value for money in mind, and we guide both sides through every document and step until the transfer is complete and correct. As a brokerage, we do not pool funds, manage money, or promise returns — you own the title, and the property works for you directly.',
+      'JA&D Realty Services is a real-estate brokerage that specializes in titled, income-oriented property opportunities. Our niche is straightforward: we find property that already works - titled units and lots with clean documents and, where possible, a tenant already in place under a live lease.',
+      'We bridge sellers and buyers with good value for money in mind, and we guide both sides through every document and step until the transfer is complete and correct. As a brokerage, we do not pool funds, manage money, or promise returns - you own the title, and the property works for you directly.',
     ],
     image: ABOUT_IMAGES.advisory,
   } satisfies {
@@ -50,7 +50,7 @@ export const ABOUT = {
       },
       {
         title: 'Journey of Achievable & Dependable',
-        body: 'We keep the path to property ownership realistic and dependable — clear steps, complete paperwork, and honest guidance along the way.',
+        body: 'We keep the path to property ownership realistic and dependable - clear steps, complete paperwork, and honest guidance along the way.',
       },
       {
         title: 'Just Aspirations & Dreams',
@@ -66,7 +66,7 @@ export const ABOUT = {
   approach: {
     eyebrow: 'Our approach',
     title: 'Due diligence is non-negotiable.',
-    lead: 'Our work begins with understanding what you are looking for — as a buyer, a seller, or someone simply exploring what income-oriented property can offer. We then present opportunities that fit: titled property with documented leases and clear ownership.',
+    lead: 'Our work begins with understanding what you are looking for - as a buyer, a seller, or someone simply exploring what income-oriented property can offer. We then present opportunities that fit: titled property with documented leases and clear ownership.',
     points: [
       {
         title: 'Due diligence first',
@@ -78,7 +78,7 @@ export const ABOUT = {
       },
       {
         title: 'Clear boundaries',
-        body: 'You own the title and collect the rent directly under the existing lease — we never pool funds or manage money.',
+        body: 'You own the title and collect the rent directly under the existing lease - we never pool funds or manage money.',
       },
     ] satisfies Pillar[],
     image: ABOUT_IMAGES.trust,
@@ -92,16 +92,16 @@ export const ABOUT = {
   vision: {
     eyebrow: 'Vision',
     statement:
-      'To be the brokerage that Filipinos — at home and abroad — trust for titled, income-oriented property, where every transaction is documented, every claim is verified, and every client makes an informed decision.',
+      'To be the brokerage that Filipinos - at home and abroad - trust for titled, income-oriented property, where every transaction is documented, every claim is verified, and every client makes an informed decision.',
   } satisfies { eyebrow: string; statement: string },
   mission: {
     eyebrow: 'Mission',
     title: 'Our mission',
-    lead: 'To connect buyers and sellers with good-value, titled property opportunities — serving local and overseas Filipino clients with professional brokerage, rigorous due diligence, and complete transparency at every step.',
+    lead: 'To connect buyers and sellers with good-value, titled property opportunities - serving local and overseas Filipino clients with professional brokerage, rigorous due diligence, and complete transparency at every step.',
     points: [
       {
         title: 'Connect buyers and sellers',
-        body: 'Good-value, titled property opportunities — you own the title, and the property works for you directly.',
+        body: 'Good-value, titled property opportunities - you own the title, and the property works for you directly.',
       },
       {
         title: 'Serve clients at home and abroad',

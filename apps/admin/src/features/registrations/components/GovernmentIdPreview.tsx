@@ -13,7 +13,7 @@ type Props = {
 };
 
 /**
- * Government ID preview — shared by the registration detail page and the
+ * Government ID preview - shared by the registration detail page and the
  * member application card. Fetches the short-lived signed URL lazily on
  * open; images render inline, PDFs embed, anything else links out.
  */
@@ -40,7 +40,7 @@ export function GovernmentIdPreview({ registrationId, fileName, mimeType, hasFil
     setNonce((n) => n + 1);
   };
 
-  // Signed URLs live ~60s — fetch lazily on open. The started ref (not
+  // Signed URLs live ~60s - fetch lazily on open. The started ref (not
   // state) guards re-entry: a state flag would rerender, run cleanup, and
   // cancel its own fetch.
   useEffect(() => {
@@ -63,7 +63,7 @@ export function GovernmentIdPreview({ registrationId, fileName, mimeType, hasFil
   if (!hasFile) {
     return (
       <span style={{ fontSize: 'var(--text-caption)', color: 'var(--color-text-muted)' }}>
-        No file on record — only metadata was captured for this application.
+        No file on record - only metadata was captured for this application.
       </span>
     );
   }

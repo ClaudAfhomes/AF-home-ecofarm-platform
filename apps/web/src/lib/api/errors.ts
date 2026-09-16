@@ -29,7 +29,7 @@ export class ApiError extends Error {
 
 /**
  * The server responded, but the payload did not match the contract schema.
- * Surfaces as a generic, recoverable error state (UI-UX §10 "Error") — the
+ * Surfaces as a generic, recoverable error state (UI-UX §10 "Error") - the
  * client never silently coerces mismatched data.
  */
 export class ApiParseError extends Error {

@@ -1,12 +1,12 @@
 /**
  * Government ID document storage (Phase B8+). Private bucket, base64-JSON
  * transport (same as the CMS upload endpoint), fail-closed ordering
- * (database row first, file second — never an orphaned file).
+ * (database row first, file second - never an orphaned file).
  */
 
 export const GOVERNMENT_ID_BUCKET = 'government-ids';
 
-/** 3 MB — fits a base64 payload inside Vercel Function body limits. */
+/** 3 MB - fits a base64 payload inside Vercel Function body limits. */
 export const GOVERNMENT_ID_MAX_BYTES = 3 * 1024 * 1024;
 
 /** IDs are scans/photos: images plus PDF. */

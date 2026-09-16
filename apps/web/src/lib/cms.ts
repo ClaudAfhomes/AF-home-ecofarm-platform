@@ -75,7 +75,7 @@ export async function getGlobalCmsPublic(): Promise<GlobalContent> {
   try {
     return await request('/cms/global', globalContentSchema);
   } catch {
-    // Fallback: build from SITE statics — mirrors MOCK_GLOBAL_SEED
+    // Fallback: build from SITE statics - mirrors MOCK_GLOBAL_SEED
     return {
       brand: {
         name: SITE.name,
@@ -152,7 +152,7 @@ export async function getRegisterCmsPublic(): Promise<RegisterContent> {
   try {
     return await request('/cms/register', registerContentSchema);
   } catch {
-    // Fallback — shape matches MOCK_REGISTER_SEED minimal; keeps public functional without API
+    // Fallback - shape matches MOCK_REGISTER_SEED minimal; keeps public functional without API
     return {
       image: AUTH.images.register,
       copy: {

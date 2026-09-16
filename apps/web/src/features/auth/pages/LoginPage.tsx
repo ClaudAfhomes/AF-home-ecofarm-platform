@@ -15,7 +15,7 @@ import { ORPHAN_ACCOUNT_MESSAGE } from '../../../lib/api/orphan';
 import { useQuery } from '@tanstack/react-query';
 import { getGlobalCmsPublic, getLoginCmsPublic } from '@/lib/cms';
 import { AUTH } from '../content';
-import { PRIVACY_POLICY_ID, TERMS_POLICY_ID, policyPath } from '../../public/content/policies';
+import { PRIVACY_POLICY_SLUG, TERMS_POLICY_SLUG, policyPath } from '../../public/content/policies';
 import { AuthLayout } from '../components/AuthLayout';
 import { PasswordField } from '../components/PasswordField';
 import { TextField } from '../components/TextField';
@@ -25,7 +25,7 @@ import type { LoginErrors, LoginValues } from '../validation';
 import styles from './LoginPage.module.css';
 
 /**
- * Login (SCR-AUTH-001) — Phase 1 Supabase Auth (admin/user only, no registration).
+ * Login (SCR-AUTH-001) - Phase 1 Supabase Auth (admin/user only, no registration).
  * Uses `supabase.auth.signInWithPassword` when `VITE_SUPABASE_URL` is set,
  * otherwise falls back to mock (tests). Role is resolved authoritatively
  * from `MemberRole` → `Role` (never client-side). Redirects `admin` → Admin App
@@ -97,7 +97,7 @@ export function LoginPage() {
     setServerError(undefined);
 
     // Supabase is authoritative when configured. When VITE_SUPABASE_URL is set,
-    // authentication must go through Supabase only — no silent mock fallback.
+    // authentication must go through Supabase only - no silent mock fallback.
     // Mock remains only when Supabase is not configured or in test mode.
     const trySupabaseLogin = async (): Promise<{
       id: string;
@@ -130,7 +130,7 @@ export function LoginPage() {
         password: values.password,
       });
       if (error || !data.user) {
-        // Surface real Supabase error — do not fallback to mock
+        // Surface real Supabase error - do not fallback to mock
         throw new ApiError({
           code: 'UNAUTHORIZED',
           message: error?.message ?? 'Email or password is incorrect.',
@@ -185,7 +185,7 @@ export function LoginPage() {
       // Authoritative role resolution (staff-first): staff-only identities
       // (StaffUser, no Member row) resolve to admin; member-tier resolves via
       // MemberRole → Role; user_metadata is the last resort. Mirrors
-      // SupabaseSessionProvider so login and refresh agree — otherwise an
+      // SupabaseSessionProvider so login and refresh agree - otherwise an
       // admin lands on the member panel until refresh. Phase 1: admin / user
       // only; maps legacy SUPER_ADMIN → admin via normalizeRole.
       const authoritativeRole: string = await resolveLoginRole(
@@ -200,7 +200,7 @@ export function LoginPage() {
         try {
           await supaClient.auth.signOut();
         } catch {
-          // best effort — the ApiError below still blocks entry
+          // best effort - the ApiError below still blocks entry
         }
         throw new ApiError({
           code: 'ACCOUNT_DELETED',
@@ -343,11 +343,11 @@ export function LoginPage() {
 
         <p className={styles.note}>
           Secure sign-in. By continuing, you agree to our{' '}
-          <Link className={styles.promptLink} to={policyPath(TERMS_POLICY_ID)}>
+          <Link className={styles.promptLink} to={policyPath(TERMS_POLICY_SLUG)}>
             Terms
           </Link>{' '}
           and{' '}
-          <Link className={styles.promptLink} to={policyPath(PRIVACY_POLICY_ID)}>
+          <Link className={styles.promptLink} to={policyPath(PRIVACY_POLICY_SLUG)}>
             Privacy Policy
           </Link>
           .

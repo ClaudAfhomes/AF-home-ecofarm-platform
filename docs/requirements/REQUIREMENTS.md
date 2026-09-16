@@ -1,4 +1,4 @@
-# JAD — Functional & Non-Functional Requirements SSOT
+# JAD - Functional & Non-Functional Requirements SSOT
 
 > **Authority:** This document is the **authoritative source for approved functional and non-functional requirements** for the JA&D (JAD) system.
 >
@@ -6,7 +6,7 @@
 >
 > **Governance:** If another document conflicts with this SSOT, do **not** silently overwrite it. Identify the conflict, record the conflicting source, determine whether an approved newer decision exists, and if unresolved, mark it **REQUIRES OWNER APPROVAL**. Do not invent a resolution.
 >
-> **Version:** Project 01 — Requirements & Business Analysis (Baseline v1.0)
+> **Version:** Project 01 - Requirements & Business Analysis (Baseline v1.0)
 
 ---
 
@@ -102,7 +102,7 @@ The following must **not** be implemented as part of the current JAD scope witho
 ### 3.3 Future Scope
 
 Only explicitly identified future scope may be listed here. TBD items are **not** silently moved into scope:
-- Configurable maximum registration attempts (currently unlimited resubmission) — see OD-024.
+- Configurable maximum registration attempts (currently unlimited resubmission) - see OD-024.
 
 All other open questions (see OD-001..025) remain **REQUIRES OWNER APPROVAL** and are **not** in scope until approved.
 
@@ -141,7 +141,7 @@ All other open questions (see OD-001..025) remain **REQUIRES OWNER APPROVAL** an
 
 ## 6. Functional Requirements
 
-### 6.1 Authentication & Account — FR-AUTH
+### 6.1 Authentication & Account - FR-AUTH
 
 | ID | Requirement | Status |
 |---|---|---|
@@ -150,7 +150,7 @@ All other open questions (see OD-001..025) remain **REQUIRES OWNER APPROVAL** an
 | FR-AUTH-003 | Admin approval is required before a member becomes Active. | **CONFIRMED** |
 | FR-AUTH-004 | Members and staff shall authenticate to access role-scoped functionality. | **CONFIRMED** (platform capability) |
 
-### 6.2 Registration & Qualification — FR-REG
+### 6.2 Registration & Qualification - FR-REG
 
 | ID | Requirement | Status |
 |---|---|---|
@@ -167,14 +167,14 @@ All other open questions (see OD-001..025) remain **REQUIRES OWNER APPROVAL** an
 | FR-REG-011 | Gender shall be a configurable set of values (defaults: Male, Female, LGBT), configurable by Super Admin. | **CONFIRMED** |
 | FR-REG-012 | Country shall be a structured value that a member cannot change manually. | **CONFIRMED** |
 
-### 6.3 Member Profile — FR-MEM
+### 6.3 Member Profile - FR-MEM
 
 | ID | Requirement | Status |
 |---|---|---|
 | FR-MEM-001 | Member profiles shall capture structured fields: First Name, Last Name, Middle Initial, Extension/Suffix, Date of Birth, Gender, Address, Country, Phone, Email, optional Profile Photo. | **CONFIRMED** |
-| FR-MEM-002 | Members shall view their own admin-team thread, send text messages, and receive replies in the same thread with live (Realtime) updates. | **CONFIRMED** (owner-approved scope, 2026-09-14 — ADR-013) |
+| FR-MEM-002 | Members shall view their own admin-team thread, send text messages, and receive replies in the same thread with live (Realtime) updates. | **CONFIRMED** (owner-approved scope, 2026-09-14 - ADR-013) |
 
-### 6.4 Abroad Geolocation — FR-GEO
+### 6.4 Abroad Geolocation - FR-GEO
 
 | ID | Requirement | Status |
 |---|---|---|
@@ -187,7 +187,7 @@ All other open questions (see OD-001..025) remain **REQUIRES OWNER APPROVAL** an
 | FR-GEO-007 | Location accuracy threshold. | **TBD / REQUIRES APPROVAL (OD-014)** |
 | FR-GEO-008 | Anti-GPS-spoofing requirements. | **TBD / REQUIRES APPROVAL (OD-015)** |
 
-### 6.5 Referral & Sponsor — FR-REF
+### 6.5 Referral & Sponsor - FR-REF
 
 | ID | Requirement | Status |
 |---|---|---|
@@ -199,14 +199,14 @@ All other open questions (see OD-001..025) remain **REQUIRES OWNER APPROVAL** an
 | FR-REF-006 | A sponsor may be assigned to a member through Admin approval. | **CONFIRMED** |
 | FR-REF-007 | Sponsor changes shall require Admin approval and be audited; exact permitted circumstances are TBD. | **CONFIRMED** (control) / **TBD** (circumstances, OD-013) |
 
-### 6.6 Customers — FR-CUS
+### 6.6 Customers - FR-CUS
 
 | ID | Requirement | Status |
 |---|---|---|
 | FR-CUS-001 | A seller shall be able to record a non-member customer without customer membership. | **CONFIRMED** |
 | FR-CUS-002 | Customer records shall capture: Full Name, Phone, Email, Property, Property Value. | **CONFIRMED** |
 
-### 6.7 Property Management — FR-PRP
+### 6.7 Property Management - FR-PRP
 
 | ID | Requirement | Status |
 |---|---|---|
@@ -215,7 +215,7 @@ All other open questions (see OD-001..025) remain **REQUIRES OWNER APPROVAL** an
 | FR-PRP-003 | Property values shall come from the Admin-managed catalog. | **CONFIRMED** |
 | FR-PRP-004 | Historical transactions shall preserve the property value applicable at transaction time; catalog price changes shall not alter existing sales. | **CONFIRMED** |
 
-### 6.8 Sales & Qualifying Sales — FR-SAL
+### 6.8 Sales & Qualifying Sales - FR-SAL
 
 | ID | Requirement | Status |
 |---|---|---|
@@ -227,7 +227,7 @@ All other open questions (see OD-001..025) remain **REQUIRES OWNER APPROVAL** an
 | FR-SAL-006 | Maximum sale resubmission attempts shall be configurable; after the maximum, the sale is LOCKED. | **CONFIRMED** |
 | FR-SAL-007 | Reopening a locked sale shall require Admin/Super Admin review and be audited. | **CONFIRMED** |
 
-### 6.9 Commission — FR-COM
+### 6.9 Commission - FR-COM
 
 | ID | Requirement | Status |
 |---|---|---|
@@ -245,7 +245,7 @@ All other open questions (see OD-001..025) remain **REQUIRES OWNER APPROVAL** an
 | FR-COM-012 | Commission records shall be immutable; corrections use separate transactions. | **CONFIRMED** |
 | FR-COM-013 | Group Incentive shall be a separate company-defined bonus and shall not create multi-level commission. Eligibility, rate, formula, trigger, basis, timing, and program applicability. | **CONFIRMED** (concept) / **TBD** (parameters, OD-006..012) |
 
-### 6.10 eWallet & Financial Ledger — FR-WAL
+### 6.10 eWallet & Financial Ledger - FR-WAL
 
 | ID | Requirement | Status |
 |---|---|---|
@@ -254,14 +254,14 @@ All other open questions (see OD-001..025) remain **REQUIRES OWNER APPROVAL** an
 | FR-WAL-003 | Available Balance shall never become negative. | **CONFIRMED** |
 | FR-WAL-004 | Pending commissions shall be excluded from Available Balance. | **CONFIRMED** |
 
-### 6.11 Financial Adjustments — FR-ADJ
+### 6.11 Financial Adjustments - FR-ADJ
 
 | ID | Requirement | Status |
 |---|---|---|
 | FR-ADJ-001 | Financial adjustments shall be performed only by Super Admin. | **CONFIRMED** |
 | FR-ADJ-002 | Adjustments shall record: Member, Amount, Credit/Debit, Reason, Performing Super Admin, Date/time. | **CONFIRMED** |
 
-### 6.12 Payout Accounts — FR-PAY
+### 6.12 Payout Accounts - FR-PAY
 
 | ID | Requirement | Status |
 |---|---|---|
@@ -272,7 +272,7 @@ All other open questions (see OD-001..025) remain **REQUIRES OWNER APPROVAL** an
 | FR-PAY-005 | Only verified accounts may be selected for withdrawal. | **CONFIRMED** |
 | FR-PAY-006 | One account may be designated as Primary. | **CONFIRMED** |
 
-### 6.13 Withdrawal — FR-WDR
+### 6.13 Withdrawal - FR-WDR
 
 | ID | Requirement | Status |
 |---|---|---|
@@ -283,7 +283,7 @@ All other open questions (see OD-001..025) remain **REQUIRES OWNER APPROVAL** an
 | FR-WDR-005 | A rejected withdrawal shall not be editable/resubmittable; a new withdrawal request is required. | **CONFIRMED** |
 | FR-WDR-006 | Final withdrawal status model and processing workflow. | **TBD / REQUIRES APPROVAL (OD-017, OD-018)** |
 
-### 6.14 Digital Voucher / QR Credits — FR-VCH
+### 6.14 Digital Voucher / QR Credits - FR-VCH
 
 | ID | Requirement | Status |
 |---|---|---|
@@ -295,7 +295,7 @@ All other open questions (see OD-001..025) remain **REQUIRES OWNER APPROVAL** an
 | FR-VCH-006 | Redemption shall be atomic, preventing double redemption and race conditions. | **CONFIRMED** |
 | FR-VCH-007 | Voucher transferability, revocation, expiration behavior, merchant permissions, and voucher-specific restrictions. | **TBD / REQUIRES APPROVAL (OD-019..023)** |
 
-### 6.15 Cryptographic Signing — FR-SEC
+### 6.15 Cryptographic Signing - FR-SEC
 
 | ID | Requirement | Status |
 |---|---|---|
@@ -304,7 +304,7 @@ All other open questions (see OD-001..025) remain **REQUIRES OWNER APPROVAL** an
 | FR-SEC-003 | Signing shall occur through a separately controlled, CTO-authorized signing process/service. | **CONFIRMED** |
 | FR-SEC-004 | The key shall not be exposed if application infrastructure is compromised. | **CONFIRMED** |
 
-### 6.16 Admin, Marketing & Communications — FR-ADM
+### 6.16 Admin, Marketing & Communications - FR-ADM
 
 | ID | Requirement | Status |
 |---|---|---|
@@ -313,9 +313,9 @@ All other open questions (see OD-001..025) remain **REQUIRES OWNER APPROVAL** an
 | FR-ADM-003 | Members shall be able to forward permitted content via Facebook Messenger and Viber, and download permitted materials. | **CONFIRMED** |
 | FR-ADM-004 | Admins shall manage policies, program guidelines, Terms and Conditions, and company rules. | **CONFIRMED** |
 | FR-ADM-005 | Admins shall broadcast promotions, training invitations, Zoom/Google Meet invitations, company announcements, and push notifications. | **CONFIRMED** |
-| FR-ADM-006 | Admins (super_admin/admin) shall view a per-member conversation inbox and reply within each member's thread; every staff reply is audited. | **CONFIRMED** (owner-approved scope, 2026-09-14 — ADR-013) |
+| FR-ADM-006 | Admins (super_admin/admin) shall view a per-member conversation inbox and reply within each member's thread; every staff reply is audited. | **CONFIRMED** (owner-approved scope, 2026-09-14 - ADR-013) |
 
-### 6.17 Reporting & Genealogy — FR-RPT
+### 6.17 Reporting & Genealogy - FR-RPT
 
 | ID | Requirement | Status |
 |---|---|---|
@@ -324,7 +324,7 @@ All other open questions (see OD-001..025) remain **REQUIRES OWNER APPROVAL** an
 | FR-RPT-003 | Total Earned shall be defined against the financial ledger and shall exclude pending/non-available funds; precise definition TBD. | **REQUIRES IMPLEMENTATION DEFINITION (OD-025)** |
 | FR-RPT-004 | My Genealogy shall visualize referral relationships without implying multi-level direct referral commissions. | **CONFIRMED** |
 
-### 6.18 Domestic / Abroad Programs — FR-PRG
+### 6.18 Domestic / Abroad Programs - FR-PRG
 
 | ID | Requirement | Status |
 |---|---|---|
@@ -332,7 +332,7 @@ All other open questions (see OD-001..025) remain **REQUIRES OWNER APPROVAL** an
 | FR-PRG-002 | Programs shall support independent configuration of: registration rules, qualification questions, geolocation requirements, commission rates, referral rules, incentive rules, eligible properties/products. | **CONFIRMED** |
 | FR-PRG-003 | Exact differences between Domestic and Abroad rules. | **TBD / REQUIRES APPROVAL (OD-001..005)** |
 
-### 6.19 External Payment Boundary — FR-BND
+### 6.19 External Payment Boundary - FR-BND
 
 | ID | Requirement | Status |
 |---|---|---|
@@ -445,12 +445,12 @@ Admin: payout account verification (Pending → Review → Confirmed)
 
 - **Single-Level Referral:** Direct Referral commission is paid only to the direct sponsor (BR-REF-001, BR-REF-002).
 - **No multi-level direct referral commission** (BR-REF-002; BI-003, BI-004).
-- **Admin-controlled properties** — no arbitrary seller-created properties (BR-PRP-001, BR-PRP-002).
-- **Immutable financial records** — commissions and ledger entries cannot be edited/deleted (BR-LED-001; BI-005).
+- **Admin-controlled properties** - no arbitrary seller-created properties (BR-PRP-001, BR-PRP-002).
+- **Immutable financial records** - commissions and ledger entries cannot be edited/deleted (BR-LED-001; BI-005).
 - **Pending commissions cannot be withdrawn** and are excluded from Available Balance (BR-COM-006; BI-002).
 - **Available Balance must never become negative** (BR-WAL-002; BI-001).
-- **Payment execution remains external** — JAD records only (BR-BND-001).
-- **CTO-controlled signing key** — master key inaccessible to application infrastructure (BR-SEC-001..004; BI-008).
+- **Payment execution remains external** - JAD records only (BR-BND-001).
+- **CTO-controlled signing key** - master key inaccessible to application infrastructure (BR-SEC-001..004; BI-008).
 - **Domestic/Abroad may have separate rules** (BR-PRG-001, BR-PRG-002).
 - **No general automatic refund workflow** (BR-CAN-004; BI-010).
 
@@ -479,16 +479,16 @@ The following are working assumptions, **not** confirmed requirements:
 ## 11. Dependencies
 
 ### 11.1 Technical Dependencies
-- Email service (verification and notifications) — NFR-AUTH-002, FR-ADM-005.
-- Geolocation services (GPS/IP) — FR-GEO-001, FR-GEO-002.
-- Push notification infrastructure — FR-ADM-005.
-- CTO-controlled signing process/service — FR-SEC-003.
-- External payment/payout platforms (bank transfer, GCash, other approved) — FR-BND-002.
+- Email service (verification and notifications) - NFR-AUTH-002, FR-ADM-005.
+- Geolocation services (GPS/IP) - FR-GEO-001, FR-GEO-002.
+- Push notification infrastructure - FR-ADM-005.
+- CTO-controlled signing process/service - FR-SEC-003.
+- External payment/payout platforms (bank transfer, GCash, other approved) - FR-BND-002.
 
 ### 11.2 Business / Operational Dependencies
 - Owner-defined business rules for all OD-001..025 items before those features can be finalized.
-- Payment/accounting verification performed by Admin/Finance/Super Admin — FR-SAL-003.
-- Admin/Finance operational processes (ID verification, payout verification, sale/payment approval) — FR-REG-002, FR-SAL-002, FR-PAY-003.
+- Payment/accounting verification performed by Admin/Finance/Super Admin - FR-SAL-003.
+- Admin/Finance operational processes (ID verification, payout verification, sale/payment approval) - FR-REG-002, FR-SAL-002, FR-PAY-003.
 
 ---
 
@@ -506,7 +506,7 @@ Objective, testable criteria for major requirements.
 | AC-COM-002 | FR-COM-009..012 | (a) Cancelling the transaction before clearing cancels the Pending commission; (b) cancelling after clearing creates a Commission Reversal leaving the original transaction immutable; (c) no commission record can be edited or deleted through any UI or API. |
 | AC-WAL-001 | FR-WAL-001..004 | Given any sequence of ledger operations, Available Balance is never negative, and Pending commissions never contribute to it. |
 | AC-WDR-001 | FR-WDR-001..005 | (a) A withdrawal request reserves the amount, which cannot be reused; (b) completion permanently deducts it; (c) rejection releases the reservation, restores the balance, records a reason, and requires a new request (the rejected request cannot be edited/resubmitted). |
-| AC-VCH-001 | FR-VCH-001..006 | Given a merchant redemption attempt: (a) all listed verifications run online; (b) the redemption is atomic — two simultaneous attempts result in exactly one successful redemption; (c) partial redemption reduces remaining value correctly and history is recorded. |
+| AC-VCH-001 | FR-VCH-001..006 | Given a merchant redemption attempt: (a) all listed verifications run online; (b) the redemption is atomic - two simultaneous attempts result in exactly one successful redemption; (c) partial redemption reduces remaining value correctly and history is recorded. |
 | AC-SEC-001 | FR-SEC-001..004 | (a) No application component can access the master signing key; (b) signing is performed only through the CTO-authorized process/service; (c) a simulated application-infrastructure compromise does not expose the key. |
 | AC-ADJ-001 | FR-ADJ-001..002 | Only Super Admin can perform a financial adjustment, and every adjustment records member, amount, credit/debit, reason, performing Super Admin, and date/time. |
 | AC-BND-001 | FR-BND-001..003 | The system records payment/payout information without executing money movement, and exposes no payment gateway/processing capabilities. |
@@ -524,7 +524,7 @@ Source legend: **QA** = latest approved Q&A baseline (reconciled). **TECH** = JA
 | FR-AUTH-001 | BO-01 | BR-AUTH-001 | Member | Account verification | AC-REG-001 | QA | CONFIRMED |
 | FR-AUTH-002 | BO-01 | BR-AUTH-002 | Member | Account statuses | AC-REG-001 | QA | CONFIRMED |
 | FR-AUTH-003 | BO-01 | BR-AUTH-003 | Admin | Account approval | AC-REG-001 | QA | CONFIRMED |
-| FR-AUTH-004 | BO-08 | — | All | Authentication | — | TECH | CONFIRMED |
+| FR-AUTH-004 | BO-08 | - | All | Authentication | - | TECH | CONFIRMED |
 | FR-REG-001 | BO-01 | BR-REG-001 | Member | Registration | AC-REG-001 | QA | CONFIRMED |
 | FR-REG-002 | BO-01 | BR-REG-002 | Admin | ID verification | AC-REG-001 | QA | CONFIRMED |
 | FR-REG-003 | BO-01 | BR-REG-003 | Member | Qualification questions | AC-REG-001 | QA | CONFIRMED |
@@ -535,9 +535,9 @@ Source legend: **QA** = latest approved Q&A baseline (reconciled). **TECH** = JA
 | FR-REG-008 | BO-01 | BR-QUAL-001 | Member | Qualification | AC-REG-001 | QA | CONFIRMED |
 | FR-REG-009 | BO-03 | BR-REG-008 | Member | Sponsor-less registration | AC-REF-001 | QA | CONFIRMED |
 | FR-REG-010 | BO-03 | BR-REG-009 | Member | Optional sponsor code | AC-REF-001 | QA | CONFIRMED |
-| FR-REG-011 | BO-01 | BR-REG-011 | Super Admin | Gender config | — | QA | CONFIRMED |
-| FR-REG-012 | BO-01 | BR-REG-010 | Member | Country immutability | — | QA | CONFIRMED |
-| FR-MEM-001 | BO-01 | BR-REG-010 | Member | Member profile | — | QA | CONFIRMED |
+| FR-REG-011 | BO-01 | BR-REG-011 | Super Admin | Gender config | - | QA | CONFIRMED |
+| FR-REG-012 | BO-01 | BR-REG-010 | Member | Country immutability | - | QA | CONFIRMED |
+| FR-MEM-001 | BO-01 | BR-REG-010 | Member | Member profile | - | QA | CONFIRMED |
 | FR-GEO-001 | BO-07 | BR-GEO-001 | Member | Abroad geolocation | AC-GEO-001 | QA | CONFIRMED |
 | FR-GEO-002 | BO-07 | BR-GEO-001 | Member | IP fallback | AC-GEO-001 | QA | CONFIRMED |
 | FR-GEO-003 | BO-07 | BR-GEO-002 | Member | PH block | AC-GEO-001 | QA | CONFIRMED |
@@ -553,11 +553,11 @@ Source legend: **QA** = latest approved Q&A baseline (reconciled). **TECH** = JA
 | FR-REF-005 | BO-04 | BR-REF-002 | System | No MLM commission | AC-COM-001 | QA | CONFIRMED |
 | FR-REF-006 | BO-03 | BR-REF-006 | Admin | Sponsor assignment | AC-REF-001 | QA | CONFIRMED |
 | FR-REF-007 | BO-03 | BR-REF-007 | Admin | Sponsor change | AC-REF-001 | QA | CONFIRMED / TBD |
-| FR-CUS-001 | BO-02 | BR-CUS-001 | Active+Qualified | Customer records | — | QA | CONFIRMED |
-| FR-CUS-002 | BO-02 | BR-CUS-002 | Active+Qualified | Customer fields | — | QA | CONFIRMED |
-| FR-PRP-001 | BO-02 | BR-PRP-001 | Admin | Property catalog | — | QA | CONFIRMED |
-| FR-PRP-002 | BO-04 | BR-PRP-002 | Admin | No seller properties | — | QA | CONFIRMED |
-| FR-PRP-003 | BO-02 | BR-PRP-003 | Admin | Catalog values | — | QA | CONFIRMED |
+| FR-CUS-001 | BO-02 | BR-CUS-001 | Active+Qualified | Customer records | - | QA | CONFIRMED |
+| FR-CUS-002 | BO-02 | BR-CUS-002 | Active+Qualified | Customer fields | - | QA | CONFIRMED |
+| FR-PRP-001 | BO-02 | BR-PRP-001 | Admin | Property catalog | - | QA | CONFIRMED |
+| FR-PRP-002 | BO-04 | BR-PRP-002 | Admin | No seller properties | - | QA | CONFIRMED |
+| FR-PRP-003 | BO-02 | BR-PRP-003 | Admin | Catalog values | - | QA | CONFIRMED |
 | FR-PRP-004 | BO-04 | BR-PRP-004 | System | Historical value | AC-COM-001 | QA | CONFIRMED |
 | FR-SAL-001 | BO-02 | BR-SAL-001 | Active+Qualified | Sale submission | AC-SAL-001 | QA | CONFIRMED |
 | FR-SAL-002 | BO-02 | BR-SAL-002 | Admin | Sale approval | AC-SAL-001 | QA | CONFIRMED |
@@ -578,19 +578,19 @@ Source legend: **QA** = latest approved Q&A baseline (reconciled). **TECH** = JA
 | FR-COM-010 | BO-04 | BR-CAN-002 | System | Available reversal | AC-COM-002 | QA | CONFIRMED |
 | FR-COM-011 | BO-04 | BR-CAN-003 | Super Admin | Withdrawn recovery | AC-COM-002 | QA | CONFIRMED |
 | FR-COM-012 | BO-04 | BR-LED-001/002 | System | Ledger immutability | AC-COM-002 | QA | CONFIRMED |
-| FR-COM-013 | BO-04 | BR-COM-008 | System | Group Incentive | — | QA | CONFIRMED / TBD |
+| FR-COM-013 | BO-04 | BR-COM-008 | System | Group Incentive | - | QA | CONFIRMED / TBD |
 | FR-WAL-001 | BO-04 | BR-WAL-001 | System | Financial ledger | AC-WAL-001 | QA | CONFIRMED |
 | FR-WAL-002 | BO-04 | BR-WAL-001 | System | Ledger types | AC-WAL-001 | QA | CONFIRMED |
 | FR-WAL-003 | BO-04 | BR-WAL-002 | System | Non-negative balance | AC-WAL-001 | QA | CONFIRMED |
 | FR-WAL-004 | BO-04 | BR-WAL-003 | System | Pending exclusion | AC-WAL-001 | QA | CONFIRMED |
 | FR-ADJ-001 | BO-04 | BR-ADJ-001 | Super Admin | Adjustments | AC-ADJ-001 | QA | CONFIRMED |
 | FR-ADJ-002 | BO-04 | BR-ADJ-002 | Super Admin | Adjustment audit | AC-ADJ-001 | QA | CONFIRMED |
-| FR-PAY-001 | BO-04 | BR-PAY-001 | Member | Multiple accounts | — | QA | CONFIRMED |
-| FR-PAY-002 | BO-04 | BR-PAY-002 | Super Admin | Methods | — | QA | CONFIRMED / TBD |
-| FR-PAY-003 | BO-04 | BR-PAY-003 | Admin | Verification | — | QA | CONFIRMED |
-| FR-PAY-004 | BO-04 | BR-PAY-004 | Admin | Lifecycle | — | QA | CONFIRMED |
-| FR-PAY-005 | BO-04 | BR-PAY-005 | System | Verified only | — | QA | CONFIRMED |
-| FR-PAY-006 | BO-04 | BR-PAY-006 | Member | Primary account | — | QA | CONFIRMED |
+| FR-PAY-001 | BO-04 | BR-PAY-001 | Member | Multiple accounts | - | QA | CONFIRMED |
+| FR-PAY-002 | BO-04 | BR-PAY-002 | Super Admin | Methods | - | QA | CONFIRMED / TBD |
+| FR-PAY-003 | BO-04 | BR-PAY-003 | Admin | Verification | - | QA | CONFIRMED |
+| FR-PAY-004 | BO-04 | BR-PAY-004 | Admin | Lifecycle | - | QA | CONFIRMED |
+| FR-PAY-005 | BO-04 | BR-PAY-005 | System | Verified only | - | QA | CONFIRMED |
+| FR-PAY-006 | BO-04 | BR-PAY-006 | Member | Primary account | - | QA | CONFIRMED |
 | FR-WDR-001 | BO-04 | BR-WDR-001 | Member | Withdrawal request | AC-WDR-001 | QA | CONFIRMED |
 | FR-WDR-002 | BO-04 | BR-WDR-002 | System | Reservation | AC-WDR-001 | QA | CONFIRMED |
 | FR-WDR-003 | BO-04 | BR-WDR-003 | System | Completion | AC-WDR-001 | QA | CONFIRMED |
@@ -608,18 +608,18 @@ Source legend: **QA** = latest approved Q&A baseline (reconciled). **TECH** = JA
 | FR-SEC-002 | BO-08 | BR-SEC-002 | CTO | Key isolation | AC-SEC-001 | QA | CONFIRMED |
 | FR-SEC-003 | BO-08 | BR-SEC-003 | CTO | Signing service | AC-SEC-001 | QA | CONFIRMED |
 | FR-SEC-004 | BO-08 | BR-SEC-004 | System | Compromise resilience | AC-SEC-001 | QA | CONFIRMED |
-| FR-ADM-001 | BO-04 | BR-CFG-001 | Super Admin | Config service | — | QA | CONFIRMED |
-| FR-ADM-002 | BO-06 | BR-MKT-001 | Admin | Media management | — | QA | CONFIRMED |
-| FR-ADM-003 | BO-06 | BR-MKT-002 | Member | Forwarding/download | — | QA | CONFIRMED |
-| FR-ADM-004 | BO-06 | BR-NOT-001 | Admin | Policies | — | QA | CONFIRMED |
-| FR-ADM-005 | BO-06 | BR-NOT-002 | Admin | Broadcasts | — | QA | CONFIRMED |
-| FR-RPT-001 | BO-03 | BR-RPT-001 | Member | Direct Referrals | — | QA | CONFIRMED |
-| FR-RPT-002 | BO-03 | BR-RPT-002 | Member | Group Network | — | QA | CONFIRMED |
-| FR-RPT-003 | BO-04 | BR-RPT-003 | Member | Total Earned | — | QA | REQUIRES IMPLEMENTATION DEFINITION |
-| FR-RPT-004 | BO-03 | BR-RPT-004 | Member | Genealogy | — | QA | CONFIRMED |
-| FR-PRG-001 | BO-07 | BR-PRG-001 | Super Admin | Program separation | — | QA | CONFIRMED |
-| FR-PRG-002 | BO-07 | BR-PRG-002 | Super Admin | Independent config | — | QA | CONFIRMED |
-| FR-PRG-003 | BO-07 | BR-PRG-003 | Super Admin | Program rules | — | QA | TBD / REQUIRES APPROVAL |
+| FR-ADM-001 | BO-04 | BR-CFG-001 | Super Admin | Config service | - | QA | CONFIRMED |
+| FR-ADM-002 | BO-06 | BR-MKT-001 | Admin | Media management | - | QA | CONFIRMED |
+| FR-ADM-003 | BO-06 | BR-MKT-002 | Member | Forwarding/download | - | QA | CONFIRMED |
+| FR-ADM-004 | BO-06 | BR-NOT-001 | Admin | Policies | - | QA | CONFIRMED |
+| FR-ADM-005 | BO-06 | BR-NOT-002 | Admin | Broadcasts | - | QA | CONFIRMED |
+| FR-RPT-001 | BO-03 | BR-RPT-001 | Member | Direct Referrals | - | QA | CONFIRMED |
+| FR-RPT-002 | BO-03 | BR-RPT-002 | Member | Group Network | - | QA | CONFIRMED |
+| FR-RPT-003 | BO-04 | BR-RPT-003 | Member | Total Earned | - | QA | REQUIRES IMPLEMENTATION DEFINITION |
+| FR-RPT-004 | BO-03 | BR-RPT-004 | Member | Genealogy | - | QA | CONFIRMED |
+| FR-PRG-001 | BO-07 | BR-PRG-001 | Super Admin | Program separation | - | QA | CONFIRMED |
+| FR-PRG-002 | BO-07 | BR-PRG-002 | Super Admin | Independent config | - | QA | CONFIRMED |
+| FR-PRG-003 | BO-07 | BR-PRG-003 | Super Admin | Program rules | - | QA | TBD / REQUIRES APPROVAL |
 | FR-BND-001 | BO-04 | BR-BND-001 | System | Record-only | AC-BND-001 | QA | CONFIRMED |
 | FR-BND-002 | BO-04 | BR-BND-002 | External | External execution | AC-BND-001 | QA | CONFIRMED |
 | FR-BND-003 | BO-04 | BR-BND-003 | System | Gateway out of scope | AC-BND-001 | QA | CONFIRMED |
@@ -630,12 +630,12 @@ Source legend: **QA** = latest approved Q&A baseline (reconciled). **TECH** = JA
 
 All TBD items are tracked as Owner Decision Items (OD-001..025) in `../business/BUSINESS-RULES.md` §12. Requirements referencing an OD are **not in scope** until the decision is approved:
 
-- FR-REG-006 (OD-024) — max registration attempts
-- FR-GEO-007/008 (OD-014/015) — geolocation accuracy & anti-spoofing
-- FR-REF-007 (OD-013) — sponsor-change circumstances
-- FR-COM-013 (OD-006..012) — Group Incentive parameters
-- FR-PAY-002 (OD-016) — payout providers
-- FR-WDR-006 (OD-017/018) — withdrawal status model/workflow
-- FR-VCH-007 (OD-019..023) — voucher rules
-- FR-PRG-003 (OD-001..005) — Domestic/Abroad differences
-- FR-RPT-003 (OD-025) — Total Earned definition
+- FR-REG-006 (OD-024) - max registration attempts
+- FR-GEO-007/008 (OD-014/015) - geolocation accuracy & anti-spoofing
+- FR-REF-007 (OD-013) - sponsor-change circumstances
+- FR-COM-013 (OD-006..012) - Group Incentive parameters
+- FR-PAY-002 (OD-016) - payout providers
+- FR-WDR-006 (OD-017/018) - withdrawal status model/workflow
+- FR-VCH-007 (OD-019..023) - voucher rules
+- FR-PRG-003 (OD-001..005) - Domestic/Abroad differences
+- FR-RPT-003 (OD-025) - Total Earned definition

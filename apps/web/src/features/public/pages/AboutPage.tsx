@@ -22,7 +22,7 @@ const CHECK_ICON = (
   </svg>
 );
 
-/** Public About Us page — CMS-driven with static fallback (Q6). */
+/** Public About Us page - CMS-driven with static fallback (Q6). */
 export function AboutPage() {
   const { data: cms } = useQuery({
     queryKey: ['cms', 'about'],
@@ -49,7 +49,7 @@ export function AboutPage() {
         image={content.hero.image}
       />
 
-      {/* 01 — Who we are */}
+      {/* 01 - Who we are */}
       <section className={styles.section}>
         <div className={`container ${styles.introGrid}`}>
           <div className={styles.introMedia}>
@@ -75,7 +75,7 @@ export function AboutPage() {
         </div>
       </section>
 
-      {/* 02 — The JA&D philosophy */}
+      {/* 02 - The JA&D philosophy */}
       <section className={`${styles.section} ${styles.sectionMuted}`}>
         <div className="container">
           <SectionHeader
@@ -99,7 +99,7 @@ export function AboutPage() {
         </div>
       </section>
 
-      {/* 03 — Our approach */}
+      {/* 03 - Our approach */}
       <section className={styles.section}>
         <div className={`container ${styles.approachGrid}`}>
           <div>
@@ -128,7 +128,7 @@ export function AboutPage() {
         </div>
       </section>
 
-      {/* 04 — Vision */}
+      {/* 04 - Vision */}
       <section className={`${styles.section} ${styles.sectionMuted}`}>
         <div className="container">
           <div className={styles.vision}>
@@ -138,7 +138,7 @@ export function AboutPage() {
         </div>
       </section>
 
-      {/* 05 — Mission */}
+      {/* 05 - Mission */}
       <section className={styles.section}>
         <div className="container">
           <SectionHeader

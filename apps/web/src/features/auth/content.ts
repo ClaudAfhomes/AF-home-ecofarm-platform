@@ -2,13 +2,10 @@ import { LOGO, photoUrl } from '../public/content';
 import type { Photo, ProcessStep } from '../public/content/types';
 
 /**
- * Member auth content (SCR-AUTH-001 Login / SCR-AUTH-002 Registration preview).
+ * Member auth content (SCR-AUTH-001 Login / SCR-AUTH-002 Registration).
  *
- * Frontend-only preview: authentication and registration are NOT implemented
- * (backend/API out of scope). Copy stays within documented requirements —
- * no earnings, approval, or qualification promises. Credential policy is
- * ASSUMPTION 1 (TBD); the 8-character minimum below is a UI assumption to be
- * confirmed with the approved backend policy.
+ * Copy stays within documented requirements: no earnings, approval, or
+ * qualification promises. Passwords require at least 8 characters.
  */
 export const AUTH = {
   /** Routes (registered in app/App.tsx). */
@@ -16,7 +13,7 @@ export const AUTH = {
   registerPath: '/register',
   forgotPasswordPath: '/auth/forgot-password',
   resetPasswordPath: '/auth/reset-password',
-  /** Contact route — the documented public channel for support requests. */
+  /** Contact route - the documented public channel for support requests. */
   supportPath: '/contact',
   /** Brand images for the editorial split panels (centralized Unsplash catalog). */
   images: {
@@ -35,7 +32,7 @@ export const AUTH = {
     lead: 'Access your JA&D member account.',
     brandTitle: 'Where Big Dreams meet property that already earns',
     brandLead:
-      'Sign in to manage your membership, property interests, and account details — in one secure place.',
+      'Sign in to manage your membership, property interests, and account details - in one secure place.',
     fields: {
       identifier: {
         label: 'Email or phone number',
@@ -54,26 +51,16 @@ export const AUTH = {
       linkLabel: 'Create your account',
       to: '/register',
     },
-    /**
-     * Generic authentication error state. With authentication not implemented,
-     * this is the honest resolution of a submit — a clearly-labeled preview
-     * notice, never a fake success.
-     */
+    /** Generic authentication failure notice. */
     unavailable: {
-      title: 'Sign-in isn\u2019t available yet',
+      title: 'We could not sign you in',
       message:
-        'Member authentication launches with the JA&D member portal. This form is a preview of the sign-in experience — nothing was submitted. We will let you know when member accounts are live.',
+        'Check your email or phone number and password, then try again. If the problem continues, contact support.',
     },
-    /**
-     * Success transition placeholder — FUTURE INTEGRATION ONLY. This state is
-     * unreachable in the current preview (no backend): once `POST /auth/login`
-     * + `/auth/me` (session-cookie auth, ADR-006) exist, a successful login
-     * will transition here and route to the member dashboard.
-     */
+    /** Successful-authentication transition. */
     success: {
       title: 'Welcome back',
-      message:
-        'You are signed in. Redirecting to your member dashboard — this is a placeholder for the future session-restore transition.',
+      message: 'You are signed in. Taking you to your member dashboard.',
     },
   },
   register: {
@@ -82,7 +69,7 @@ export const AUTH = {
     lead: 'Create your member account and begin your journey with JA&D.',
     brandTitle: 'Begin your journey with JA&D',
     brandLead:
-      'Membership has no purchase requirement. Registration is free and open — approval follows verification and review.',
+      'Membership has no purchase requirement. Registration is free and open - approval follows verification and review.',
     fields: {
       firstName: { label: 'First name', autocomplete: 'given-name' },
       lastName: { label: 'Last name', autocomplete: 'family-name' },
@@ -96,7 +83,7 @@ export const AUTH = {
       confirmPassword: { label: 'Confirm password', autocomplete: 'new-password' },
       referralCode: {
         label: 'Sponsor / referral code',
-        hint: 'Optional — leave blank if you were not referred by a member.',
+        hint: 'Optional - leave blank if you were not referred by a member.',
         autocomplete: 'off',
       },
       consent: {
@@ -118,7 +105,7 @@ export const AUTH = {
     steps: [
       {
         title: 'Apply',
-        body: 'Submit your member details — no purchase required.',
+        body: 'Submit your member details - no purchase required.',
       },
       {
         title: 'Verify & review',
@@ -130,26 +117,20 @@ export const AUTH = {
       },
     ] satisfies ProcessStep[],
     /**
-     * Pending/review state — FRONTEND PREVIEW ONLY. Nothing is persisted, so
-     * this panel is clearly labeled: it shows the expected process without
-     * claiming that an account or application was created.
+     * Pending/review state, shown after a submitted application.
      */
     pending: {
-      title: 'Registration is coming soon \u2014 this is a preview',
+      title: 'Application under review',
       message:
-        'Nothing was submitted. When member registration goes live, your application will be sent for email verification and JA&D review before your account can become active.',
+        'Your application has been received. We will email you once verification and review are complete and your account becomes active.',
     },
-    /**
-     * Generic registration error placeholder — FUTURE INTEGRATION ONLY.
-     * Unreachable in the current preview (no backend); will map API error
-     * envelope codes (e.g. 422/429) once `POST /auth/register` exists.
-     */
+    /** Generic registration error notice. */
     error: {
       title: 'We could not complete your registration',
       message: 'Please try again shortly, or contact us for assistance.',
     },
   },
-  /** Email verification (SCR-AUTH-003, FEAT-009) — a one-time code verifies ownership (BR-AUTH-001). */
+  /** Email verification (SCR-AUTH-003, FEAT-009) - a one-time code verifies ownership (BR-AUTH-001). */
   verifyEmail: {
     eyebrow: 'Verify your email',
     title: 'Check your email',
@@ -165,17 +146,8 @@ export const AUTH = {
     resendLabel: 'Resend code',
     resendingLabel: 'Resending\u2026',
     codeSent: 'A new code was sent to your email address.',
-    /**
-     * MOCK-ONLY banner: the dev mock returns the code that the "email" would
-     * carry so the frontend-only flow is usable. Never rendered in production —
-     * the real API emails the code and returns none.
-     */
-    simulatedEmail: {
-      title: 'Simulated email (dev-only)',
-      message: 'This is not a real email. The code below is shown by the local mock API:',
-    },
   },
-  /** Application status after verification (SCR-AUTH-004) — `Pending` review by JA&D. */
+  /** Application status after verification (SCR-AUTH-004) - `Pending` review by JA&D. */
   status: {
     eyebrow: 'Application received',
     title: 'Application received',
@@ -209,18 +181,14 @@ export const AUTH = {
     successMessage:
       'If an account exists for that address, a password reset link is on its way. Follow it to choose a new password.',
     backLabel: 'Back to login',
-    simulatedEmail: {
-      title: 'Simulated email (dev-only)',
-      message: 'Password recovery is not wired to a provider in this preview — no email was sent.',
-    },
   },
-  /** Reset-password — lands from the Supabase recovery link with a session. */
+  /** Reset-password - lands from the Supabase recovery link with a session. */
   resetPasswordPage: {
     eyebrow: 'Set a new password',
     title: 'Choose a new password',
     lead: 'Enter a new password for your account.',
     brandTitle: 'Your password keeps your membership secure',
-    brandLead: 'Use at least 8 characters — a mix of letters and numbers is best.',
+    brandLead: 'Use at least 8 characters - a mix of letters and numbers is best.',
     fields: {
       password: {
         label: 'New password',

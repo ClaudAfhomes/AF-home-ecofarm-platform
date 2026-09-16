@@ -6,7 +6,7 @@ import { methodNotAllowed, okList, requireService } from '../../_lib/rest.js';
 import { toErrorEnvelope } from '../../_lib/envelope.js';
 
 /**
- * GET /admin/adjustments — staff-authored financial adjustments, newest first
+ * GET /admin/adjustments - staff-authored financial adjustments, newest first
  * (super_admin ONLY). Non-SUP callers get 403; the admin UI falls back to mock
  * data for those roles so the Audit page keeps working for everyone.
  */

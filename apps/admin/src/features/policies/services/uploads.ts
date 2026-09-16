@@ -3,7 +3,7 @@ import { getSupabaseClient } from '../../../lib/supabase';
 
 /**
  * PDF upload for admin policies (FR-ADM-004). PDFs live in the public
- * `marketing-tools` bucket — the client never names the bucket; it PUTs a
+ * `marketing-tools` bucket - the client never names the bucket; it PUTs a
  * server-signed URL and persists the returned `publicUrl` as the policy's
  * `documentUrl`. Limits mirror the server's DOCUMENT rules
  * (`api/v1/cms/upload/sign.ts` KIND_UPLOAD_RULES) and the bucket's
@@ -33,14 +33,14 @@ export async function uploadPolicyPdf(
   selectedFile: File,
 ): Promise<{ documentUrl: string } | { error: string }> {
   const supabase = getSupabaseClient();
-  if (!supabase) return { error: 'Upload unavailable — please reload and try again.' };
+  if (!supabase) return { error: 'Upload unavailable - please reload and try again.' };
 
   let token: string | undefined;
   try {
     const sess = await supabase.auth.getSession();
     token = sess?.data?.session?.access_token ?? undefined;
   } catch {
-    /* proceed without token — sign endpoint handles missing auth */
+    /* proceed without token - sign endpoint handles missing auth */
   }
 
   let signRes: Response;

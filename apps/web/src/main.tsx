@@ -13,13 +13,13 @@ import '@jad/ui/tokens.css';
 import '@jad/ui/base.css';
 import './styles/global.css';
 
-// Disable browser scroll restoration as early as possible — before the router mounts.
+// Disable browser scroll restoration as early as possible - before the router mounts.
 // This prevents the browser from restoring scroll position on navigation.
 if ('scrollRestoration' in history) {
   history.scrollRestoration = 'manual';
 }
 
-// Dev-only mock API. Installed only when Supabase is not configured — with a
+// Dev-only mock API. Installed only when Supabase is not configured - with a
 // backend, requests flow through the Vite proxy to api/v1 instead. The app
 // talks to it through the real service functions (lib/api/client) exactly as
 // it will talk to the backend in production.

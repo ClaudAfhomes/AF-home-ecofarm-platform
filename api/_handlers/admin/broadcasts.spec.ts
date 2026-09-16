@@ -4,7 +4,7 @@ import type { VercelRequest, VercelResponse } from '../../_lib/http.js';
 
 import handler from './broadcasts.js';
 
-/** GET /admin/broadcasts — broadcast announcements for the composer. Supabase is fully mocked. */
+/** GET /admin/broadcasts - broadcast announcements for the composer. Supabase is fully mocked. */
 const mocks = vi.hoisted(() => {
   const calls: { op: string; table?: string; arg?: unknown }[] = [];
   const script = {

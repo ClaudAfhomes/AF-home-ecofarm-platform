@@ -11,17 +11,19 @@ import {
   Skeleton,
 } from '@jad/ui';
 import { formatMoney } from '@jad/shared';
-import type { SystemConfigEntry } from '@jad/contracts';
+import type { ProgramAdmin, SystemConfigEntry } from '@jad/contracts';
 
 import { useSession } from '../../../lib/session';
 import { useConfig } from '../hooks/useConfig';
 import { useUpdateConfig } from '../hooks/useUpdateConfig';
 import { usePrograms } from '../hooks/usePrograms';
+import { useAdminPrograms } from '../hooks/useAdminPrograms';
+import { ProgramFormDialog } from '../components/ProgramFormDialog';
 import styles from './ConfigPage.module.css';
 
 /**
  * Config value kinds. Most parameters are numeric, but list-valued rows such
- * as Gender Options (`GENDERS`, a JSON array) must stay editable as text —
+ * as Gender Options (`GENDERS`, a JSON array) must stay editable as text -
  * forcing `Number()` on every row disables Save for them (reported bug).
  */
 function isGenderOptionsKey(key: string): boolean {
@@ -97,7 +99,7 @@ function validateEntry(key: string, rawValue: string): string | null {
     return null;
   }
 
-  // Unknown keys are plain text — only the known numeric parameters require numbers.
+  // Unknown keys are plain text - only the known numeric parameters require numbers.
   if (!isNumericKey(key)) return null;
 
   const num = Number(trimmed);
@@ -174,7 +176,6 @@ function ProgramsSkeleton() {
 
 export function ConfigPage() {
   const { data, isPending, isError, error, refetch } = useConfig();
-  const { data: programs, isPending: programsPending } = usePrograms();
   const { user } = useSession();
   const updateMutation = useUpdateConfig();
 
@@ -182,11 +183,20 @@ export function ConfigPage() {
   // other staff roles get a read-only view.
   const canEdit = user?.roleId === 'super_admin';
 
+  // Super admins see every program (incl. retired) so they can reactivate;
+  // other roles get the public active-only list.
+  const adminProgramsQuery = useAdminPrograms({ enabled: canEdit });
+  const publicProgramsQuery = usePrograms({ enabled: !canEdit });
+  const programs = canEdit ? adminProgramsQuery.data : publicProgramsQuery.data;
+  const programsPending = canEdit ? adminProgramsQuery.isPending : publicProgramsQuery.isPending;
+
   const [editing, setEditing] = useState<SystemConfigEntry | null>(null);
   const [editValue, setEditValue] = useState('');
   const [editError, setEditError] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [hasInteracted, setHasInteracted] = useState(false);
+  const [programDialogOpen, setProgramDialogOpen] = useState(false);
+  const [editingProgram, setEditingProgram] = useState<ProgramAdmin | null>(null);
 
   const entries = data ?? [];
 
@@ -287,10 +297,25 @@ export function ConfigPage() {
       )}
 
       <div className={styles.section}>
-        <h2 className={styles.sectionTitle}>Programs</h2>
-        <p className={styles.sectionDescription}>
-          Qualification programs that define registration tracks and member eligibility.
-        </p>
+        <div className={styles.sectionHeader}>
+          <div>
+            <h2 className={styles.sectionTitle}>Programs</h2>
+            <p className={styles.sectionDescription}>
+              Qualification programs that define registration tracks and member eligibility. They
+              appear publicly on the Contact form, registration, and policy pages.
+            </p>
+          </div>
+          {canEdit ? (
+            <Button
+              onClick={() => {
+                setEditingProgram(null);
+                setProgramDialogOpen(true);
+              }}
+            >
+              New program
+            </Button>
+          ) : null}
+        </div>
 
         {programsPending ? (
           <ProgramsSkeleton />
@@ -305,6 +330,24 @@ export function ConfigPage() {
                 {program.description && (
                   <p className={styles.programDescription}>{program.description}</p>
                 )}
+                {canEdit && 'isActive' in program && !program.isActive ? (
+                  <span className={styles.programInactive}>
+                    Inactive - hidden from the public site
+                  </span>
+                ) : null}
+                {canEdit ? (
+                  <div className={styles.programActions}>
+                    <Button
+                      variant="secondary"
+                      onClick={() => {
+                        setEditingProgram(program as ProgramAdmin);
+                        setProgramDialogOpen(true);
+                      }}
+                    >
+                      Edit
+                    </Button>
+                  </div>
+                ) : null}
               </div>
             ))}
           </div>
@@ -315,6 +358,15 @@ export function ConfigPage() {
           />
         )}
       </div>
+
+      <ProgramFormDialog
+        open={programDialogOpen}
+        program={editingProgram}
+        onClose={() => {
+          setProgramDialogOpen(false);
+          setEditingProgram(null);
+        }}
+      />
 
       <Dialog
         open={editing !== null}

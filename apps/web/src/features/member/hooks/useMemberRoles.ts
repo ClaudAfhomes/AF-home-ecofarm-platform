@@ -38,7 +38,7 @@ export function useMemberRoles() {
         } | null;
         if (client && user?.id) {
           try {
-            // Only the quoted "MemberRole" table exists in the schema —
+            // Only the quoted "MemberRole" table exists in the schema -
             // legacy variants are gone (probing them only yields PGRST205).
             let links: { roleId: string }[] | null = null;
             let linkErr: unknown = null;

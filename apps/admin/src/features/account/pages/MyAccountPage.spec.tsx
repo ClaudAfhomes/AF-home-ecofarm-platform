@@ -8,7 +8,7 @@ import { installMockApi, renderWithProviders } from '../../../test/utils';
 import { MyAccountPage } from './MyAccountPage';
 
 /**
- * My Account (/admin/profile) — the signed-in staff member views identity,
+ * My Account (/admin/profile) - the signed-in staff member views identity,
  * edits their display name, and changes their password. Red: the page does
  * not exist yet.
  */

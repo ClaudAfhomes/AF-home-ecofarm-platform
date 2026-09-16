@@ -144,7 +144,7 @@ describe('POST /me/resubmit government ID', () => {
     );
     expect(seen.status).toBe(200);
     expect(mocks.calls.some((c) => c.table === 'government-ids')).toBe(false);
-    // Returning to PENDING re-opens review, including the government ID —
+    // Returning to PENDING re-opens review, including the government ID -
     // the approval-time flag is cleared.
     const memberUpdate = mocks.calls.find((c) => c.table === 'Member')?.arg as Record<
       string,

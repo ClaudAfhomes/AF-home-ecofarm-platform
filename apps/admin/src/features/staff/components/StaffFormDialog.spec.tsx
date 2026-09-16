@@ -66,7 +66,7 @@ describe('StaffFormDialog', () => {
     await user.click(screen.getByText('Create Staff'));
     expect(await screen.findByText('Enter a valid email address.')).toBeInTheDocument();
 
-    // Uniqueness is enforced server-side (409) — the dialog surfaces it as
+    // Uniqueness is enforced server-side (409) - the dialog surfaces it as
     // a submit error instead of checking mock data.
     await user.clear(screen.getByLabelText('Email'));
     await user.type(screen.getByLabelText('Email'), 'ada.admin@jad.example');
@@ -157,7 +157,7 @@ describe('StaffFormDialog', () => {
     await user.type(screen.getByLabelText('Name'), 'Default Hire');
     await user.type(screen.getByLabelText('Email'), 'default.hire@jad.example');
     await user.type(screen.getByLabelText('Temporary password'), 'TempPass1');
-    // Leave the role select untouched — the dialog must submit a role that
+    // Leave the role select untouched - the dialog must submit a role that
     // actually exists in the loaded list, never the stale 'admin' default.
     await user.click(screen.getByText('Create Staff'));
 

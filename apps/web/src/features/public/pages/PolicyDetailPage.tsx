@@ -4,12 +4,18 @@ import { ButtonLink } from '../../../components/ButtonLink';
 import { Skeleton } from '../../../components/Skeleton';
 import { usePolicies } from '../../../hooks/usePolicies';
 import { Hero } from '../components/Hero';
+import { PolicyProgramsList } from '../components/PolicyPrograms';
 import { ABOUT_IMAGES } from '../content';
-import { POLICIES_PATH, POLICY_FALLBACK } from '../content/policies';
+import {
+  POLICIES_PATH,
+  POLICY_FALLBACK,
+  findPolicy,
+  splitProgramsToken,
+} from '../content/policies';
 import styles from './PolicyDetailPage.module.css';
 
 /**
- * Public policy detail — renders the API policy when present, otherwise the
+ * Public policy detail - renders the API policy when present, otherwise the
  * static fallback (Q6). Content renders as plain text (SECURITY.md); the
  * uploaded PDF is preferred when attached.
  */
@@ -17,7 +23,7 @@ export function PolicyDetailPage() {
   const { policyId = '' } = useParams();
   const { data, isPending } = usePolicies();
   const items = (data?.length ?? 0) > 0 ? data! : POLICY_FALLBACK;
-  const policy = items.find((candidate) => candidate.id === policyId);
+  const policy = findPolicy(items, policyId);
 
   if (isPending) {
     return (
@@ -82,9 +88,27 @@ export function PolicyDetailPage() {
               All policies
             </Link>
           )}
-          {policy.content?.trim() ? (
-            <div className={`${styles.prose} prose`}>{policy.content}</div>
-          ) : null}
+          {policy.content?.trim()
+            ? (() => {
+                const blocks = splitProgramsToken(policy.content);
+                const hasToken = blocks.some((block) => block.kind === 'programs');
+                return hasToken ? (
+                  <div className={`${styles.prose} prose`}>
+                    {blocks.map((block, index) =>
+                      block.kind === 'programs' ? (
+                        <PolicyProgramsList key={`programs-${index}`} />
+                      ) : (
+                        <p key={`text-${index}`} className={styles.proseBlock}>
+                          {block.text}
+                        </p>
+                      ),
+                    )}
+                  </div>
+                ) : (
+                  <div className={`${styles.prose} prose`}>{policy.content}</div>
+                );
+              })()
+            : null}
         </div>
       </section>
     </div>

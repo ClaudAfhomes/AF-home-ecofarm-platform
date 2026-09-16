@@ -1,6 +1,6 @@
--- Phase 2B — Referral uniqueness & reference FKs (review F-09 / F-10 / F-17).
+-- Phase 2B - Referral uniqueness & reference FKs (review F-09 / F-10 / F-17).
 --
--- Note: Withdrawal.payoutAccountId is intentionally left FK-less — seeded
+-- Note: Withdrawal.payoutAccountId is intentionally left FK-less - seeded
 -- rows reference BOTH PayoutAccount (admin queue: wdr-004..006 → pac-*) and
 -- MemberPayoutAccount (member: wdr-001..003 → pa-*) ids. A correct FK is only
 -- possible after the Phase-5 payout-model unification (owner decision D2).
@@ -18,11 +18,11 @@
 
 -- Unique referral codes (empty-string rows excluded so the '' default never
 -- collides; the app generates codes that are non-empty and unique). Column is
--- quoted camelCase — an unquoted reference folds to lowercase and errors.
+-- quoted camelCase - an unquoted reference folds to lowercase and errors.
 create unique index if not exists "Member_referralCode_uidx" on "Member"("referralCode")
   where "referralCode" is not null and "referralCode" <> '';
 
--- Program references (nullable — legacy rows may predate a program).
+-- Program references (nullable - legacy rows may predate a program).
 DO $$ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'registration_program_fkey') THEN
     alter table "Registration" add constraint registration_program_fkey

@@ -4,7 +4,7 @@ import { isValidCommissionRow, mapCommissionRow } from '../../_lib/money.js';
 import { methodNotAllowed, okList, requireService } from '../../_lib/rest.js';
 import { toErrorEnvelope } from '../../_lib/envelope.js';
 
-/** GET /me/commissions — own commissions incl. status, newest first. */
+/** GET /me/commissions - own commissions incl. status, newest first. */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');

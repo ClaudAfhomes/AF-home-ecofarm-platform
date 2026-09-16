@@ -23,7 +23,7 @@ describe('registrationStatusSchema', () => {
   it('allows only PENDING and REJECTED (no APPROVED_ACTIVE in registrations)', () => {
     expect(registrationStatusSchema.safeParse('PENDING').success).toBe(true);
     expect(registrationStatusSchema.safeParse('REJECTED').success).toBe(true);
-    // Approval moves the application to Member — APPROVED_ACTIVE lives in
+    // Approval moves the application to Member - APPROVED_ACTIVE lives in
     // the Member domain, never in Registration.
     expect(registrationStatusSchema.safeParse('APPROVED_ACTIVE').success).toBe(false);
   });

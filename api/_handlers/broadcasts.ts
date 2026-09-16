@@ -10,7 +10,7 @@ import { prefixedId } from '../_lib/pipeline.js';
 import { methodNotAllowed, readJsonBody, requireService } from '../_lib/rest.js';
 
 /**
- * POST /broadcasts — admin announcement to all members (API-SPECIFICATION #72,
+ * POST /broadcasts - admin announcement to all members (API-SPECIFICATION #72,
  * FEAT-063, FR-ADM-005). A broadcast is a Notification row with member_id NULL;
  * the member feed (`GET /me/broadcasts`) serves it to every member. Per-member
  * read state lives in NotificationRead, so the broadcast row itself carries no
@@ -82,7 +82,7 @@ async function createBroadcast(req: VercelRequest, res: VercelResponse) {
   res.status(201).json(validated.data);
 }
 
-/** POST /broadcasts — admin create only (the member read path is GET /me/broadcasts). */
+/** POST /broadcasts - admin create only (the member read path is GET /me/broadcasts). */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');

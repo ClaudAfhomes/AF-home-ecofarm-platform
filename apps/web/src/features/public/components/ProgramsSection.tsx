@@ -6,7 +6,7 @@ import { usePrograms } from '../hooks/usePrograms';
 import styles from './ProgramsSection.module.css';
 
 /**
- * Live programs list — `GET /programs` (PUBLIC, FEAT-068 / FR-PRG-001).
+ * Live programs list - `GET /programs` (PUBLIC, FEAT-068 / FR-PRG-001).
  * Renders the required UI states (UI-UX §10): loading / empty / error / data.
  */
 export function ProgramsSection() {

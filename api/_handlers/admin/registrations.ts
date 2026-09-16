@@ -6,7 +6,7 @@ import { methodNotAllowed, requireService } from '../../_lib/rest.js';
 import { toErrorEnvelope } from '../../_lib/envelope.js';
 import { registrationSchema } from '@jad/contracts';
 
-/** GET /admin/registrations — application queue, newest first. */
+/** GET /admin/registrations - application queue, newest first. */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
@@ -39,7 +39,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const rows = (((data as unknown[]) ?? []) as Record<string, unknown>[]).map(mapRegistrationRow);
   // Never silently lose queue rows: a row that fails validation is dropped
   // from the list while the dashboard count still includes it. Log the id +
-  // failing field paths (never values — PII) so the next mismatch is
+  // failing field paths (never values - PII) so the next mismatch is
   // diagnosable from server logs alone. The envelope reports `meta.invalid`
   // (`meta` is passthrough for `requestList`, so old clients ignore it) so
   // the queue page can banner hidden rows instead of claiming "Queue is

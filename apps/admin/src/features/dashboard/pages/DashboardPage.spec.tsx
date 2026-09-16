@@ -24,14 +24,14 @@ describe('DashboardPage', () => {
     expect(screen.getByText('Sales')).toBeInTheDocument();
     expect(screen.getByText('Members')).toBeInTheDocument();
     expect(screen.getByText('Withdrawals')).toBeInTheDocument();
-    expect(await screen.findByText(/Welcome back, Admin — \d+ pending/)).toBeInTheDocument();
+    expect(await screen.findByText(/Welcome back, Admin - \d+ pending/)).toBeInTheDocument();
     expect(screen.getByText('As of today')).toBeInTheDocument();
   });
 
   it('shows no admin queues for MEMBER', async () => {
     renderWithProviders(<DashboardPage />, { user: MOCK_MEMBER });
 
-    expect(await screen.findByText(/Welcome back, User — 0 pending/)).toBeInTheDocument();
+    expect(await screen.findByText(/Welcome back, User - 0 pending/)).toBeInTheDocument();
     expect(screen.queryByText('Registrations')).not.toBeInTheDocument();
     expect(screen.queryByText('All clear')).not.toBeInTheDocument();
   });

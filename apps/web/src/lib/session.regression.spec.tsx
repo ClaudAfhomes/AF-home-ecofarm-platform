@@ -58,7 +58,7 @@ function Probe() {
   );
 }
 
-describe('SupabaseSessionProvider – authoritative role via StaffUser (regression)', () => {
+describe('SupabaseSessionProvider - authoritative role via StaffUser (regression)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockGetSession.mockResolvedValue({ data: { session: null } });
@@ -285,7 +285,7 @@ describe('SupabaseSessionProvider – authoritative role via StaffUser (regressi
     authCb('TOKEN_REFRESHED', { user: supaUser('adm-001', 'admin@jad.local') } as unknown as never);
 
     await waitFor(() => expect(screen.getByTestId('sessionError')).toHaveTextContent('yes'));
-    // Preserved — never silently swapped to a member session.
+    // Preserved - never silently swapped to a member session.
     expect(screen.getByTestId('status')).toHaveTextContent('authenticated');
     expect(screen.getByTestId('role')).toHaveTextContent('admin');
     expect(screen.getByTestId('user')).toHaveTextContent('adm-001');

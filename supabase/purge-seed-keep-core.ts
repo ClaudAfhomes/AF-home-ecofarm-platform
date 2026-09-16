@@ -2,9 +2,9 @@
  * Seed-data purge that preserves ONLY the production core (Phase B).
  *
  * Preserves (never touched):
- *   - `cms_contents`      — Website CMS (8 keys: homepage, about, properties,
+ *   - `cms_contents` - Website CMS (8 keys: homepage, about, properties,
  *                           faqs, contact, global, login, register)
- *   - `SystemConfig`      — System Configuration (9 CONFIG_SEEDS keys)
+ *   - `SystemConfig` - System Configuration (9 CONFIG_SEEDS keys)
  *
  * Deletes (leaf-first, every FK enforced the whole time):
  *   - All member/staff/transactional/reference rows (see PURGE_ORDER)
@@ -50,7 +50,7 @@ function loadEnvFile(path: string): void {
       if (!(key in process.env) && value) process.env[key] = value;
     }
   } catch {
-    // missing file — fall through to whatever the environment provides
+    // missing file - fall through to whatever the environment provides
   }
 }
 
@@ -59,7 +59,7 @@ loadEnvFile('.env');
 // Seed-managed tables in leaf-first delete order (dependents before the rows
 // they reference, so RESTRICT FKs never fire). `column` is the PK used for
 // the match-all delete filter. `cms_contents` + `SystemConfig` are
-// deliberately ABSENT (preserved core). `AuditLog` is last — it references
+// deliberately ABSENT (preserved core). `AuditLog` is last - it references
 // nothing and nothing references it (actor FKs were split to StaffUser with
 // SET NULL), so deleting it cannot orphan anything.
 const PURGE_ORDER: { table: string; column: string }[] = [
@@ -90,13 +90,13 @@ const PURGE_ORDER: { table: string; column: string }[] = [
   { table: 'AuditLog', column: 'id' },
 ];
 
-// Preserved core — asserted non-empty and unchanged after --execute.
+// Preserved core - asserted non-empty and unchanged after --execute.
 const PRESERVED: { table: string; column: string; expected: number }[] = [
   { table: 'cms_contents', column: 'key', expected: 8 },
   { table: 'SystemConfig', column: 'key', expected: 9 },
 ];
 
-// Sentinel values no real row carries — match-all delete without disabling
+// Sentinel values no real row carries - match-all delete without disabling
 // anything. UUID PK/FK columns get the nil UUID; text PKs get the string
 // sentinel. Every column in PURGE_ORDER must be classified here: a text
 // sentinel sent to a uuid column aborts the whole run (Postgres rejects the
@@ -170,7 +170,7 @@ async function deleteAll(
       return { exists: false, deleted: 0 };
     }
     throw new Error(
-      `delete ${table} failed (constraints enforced — resolve manually, then re-run): ${error.message}`,
+      `delete ${table} failed (constraints enforced - resolve manually, then re-run): ${error.message}`,
     );
   }
   return { exists: true, deleted: count ?? 0 };
@@ -188,7 +188,7 @@ function keepAuthEmails(): Set<string> {
 async function listAuthEmails(supabase: SupabaseClient): Promise<string[]> {
   const { data, error } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1000 });
   if (error)
-    throw new Error(`auth user lookup failed — aborting rather than guessing: ${error.message}`);
+    throw new Error(`auth user lookup failed - aborting rather than guessing: ${error.message}`);
   return (data?.users ?? []).map((u) => u.email ?? '(no email)');
 }
 
@@ -198,7 +198,7 @@ async function deleteAuthExcept(
 ): Promise<{ deleted: string[]; kept: string[] }> {
   const { data, error } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1000 });
   if (error)
-    throw new Error(`auth user lookup failed — aborting rather than guessing: ${error.message}`);
+    throw new Error(`auth user lookup failed - aborting rather than guessing: ${error.message}`);
   const deleted: string[] = [];
   const kept: string[] = [];
   for (const user of data?.users ?? []) {
@@ -323,7 +323,7 @@ async function main(): Promise<void> {
 
   if (mode === 'dry-run') {
     console.log(
-      `\nDRY-RUN — no changes made. Re-run with --execute plus DEV_RESET_ALLOW_REFS=${ref} to purge. ` +
+      `\nDRY-RUN - no changes made. Re-run with --execute plus DEV_RESET_ALLOW_REFS=${ref} to purge. ` +
         `Afterwards run \`provision-superadmin.ts\` to rebuild roles + the prod super-admin.`,
     );
     return;
@@ -332,7 +332,7 @@ async function main(): Promise<void> {
   if (!allowed.includes(ref)) {
     console.error(
       `Refusing: project ref "${ref}" is not listed in DEV_RESET_ALLOW_REFS. ` +
-        `This script only runs against explicitly allowlisted LOCAL/DEV projects — never production without approval. Aborting with no changes.`,
+        `This script only runs against explicitly allowlisted LOCAL/DEV projects - never production without approval. Aborting with no changes.`,
     );
     process.exit(1);
   }
@@ -366,7 +366,7 @@ async function main(): Promise<void> {
   console.log(`Post-purge orphans: ${orphans.length}`);
   for (const o of orphans.slice(0, 20)) console.log(`  orphan ${o}`);
   if (orphans.length > 0 || !coreOk) {
-    console.error('Verification FAILED — inspect output above before provisioning.');
+    console.error('Verification FAILED - inspect output above before provisioning.');
     process.exit(2);
   }
   console.log(

@@ -1,12 +1,12 @@
-# JAD — Testing SSOT (TESTING.md)
+# JAD - Testing SSOT (TESTING.md)
 
-> **Authority:** Defines **how the JA&D platform is validated** — strategy, test levels, coverage expectations, quality gates, and Definition of Done. It is the single source of truth for testing and must govern all verification work. Companion to `API-SPECIFICATION.md` (contract), `INTEGRATION-SPECIFICATION.md` (integration behavior), `BUSINESS-RULES.md` (rules/invariants), `REQUIREMENTS.md` (requirements/acceptance criteria), `TECH-STACK.md` (tooling), `FOLDER-STRUCTURE.md` (test locations), and `DEVELOPMENT-GUIDELINES.md` (engineering conventions).
+> **Authority:** Defines **how the JA&D platform is validated** - strategy, test levels, coverage expectations, quality gates, and Definition of Done. It is the single source of truth for testing and must govern all verification work. Companion to `API-SPECIFICATION.md` (contract), `INTEGRATION-SPECIFICATION.md` (integration behavior), `BUSINESS-RULES.md` (rules/invariants), `REQUIREMENTS.md` (requirements/acceptance criteria), `TECH-STACK.md` (tooling), `FOLDER-STRUCTURE.md` (test locations), and `DEVELOPMENT-GUIDELINES.md` (engineering conventions).
 >
 > **Current verified state (IMPORTANT):** The repository contains **documentation only**. There is **no source code, no `package.json`, no test configuration, no CI configuration, and no Git repository**. All tooling and test infrastructure below is **PROPOSED** (per `TECH-STACK.md` §10/§11) unless marked otherwise; nothing is implemented or verified.
 >
 > **Status vocabulary:** **CONFIRMED** (established requirement/rule) · **PROPOSED** (recommended, not approved) · **REQUIRES APPROVAL** (material decision) · **REQUIRES VERIFICATION** (value/claim unconfirmed) · **TBD** (undecided) · **REQUIRED** (must be done for a phase/feature to be complete) · **OPTIONAL** (recommended but not a gate).
 >
-> **Version:** Project 10 — Testing & Quality Engineering (Baseline v1.0)
+> **Version:** Project 10 - Testing & Quality Engineering (Baseline v1.0)
 
 ---
 
@@ -15,7 +15,7 @@
 ### 1.1 Quality strategy
 
 - **Risk-based, not checkbox-based.** Testing effort is allocated to the risks that threaten the confirmed invariants and requirements (ROADMAP §10). Highest-priority risks: **financial integrity** (R-04), **authorization/object-level leakage** (R-05), and **atomicity/race conditions** (R-07). These are tested at every level and are always part of the critical regression suite (§12).
-- **Requirements and rules drive tests.** Every accepted feature is validated against its acceptance criteria (AC-* in REQUIREMENTS §12) and its governing business rules (BR/BI in BUSINESS-RULES). A test suite is not considered complete because it "passes" — it must demonstrably cover the confirmed requirements (§16, §17).
+- **Requirements and rules drive tests.** Every accepted feature is validated against its acceptance criteria (AC-* in REQUIREMENTS §12) and its governing business rules (BR/BI in BUSINESS-RULES). A test suite is not considered complete because it "passes" - it must demonstrably cover the confirmed requirements (§16, §17).
 - **Invariants are continuously enforced.** BI-001..BI-010 are tested as automated invariant tests in CI from the moment their governing feature ships (ARCHITECTURE §11, ROADMAP §5.2, BACKEND-ARCHITECTURE §21).
 - **Security and authorization are proven server-side.** Hidden UI controls are never treated as proof of authorization (§8). Every protected action is tested against the role matrix directly at the API boundary.
 - **No invented scope.** Testing covers only confirmed requirements, business rules, invariants, and the endpoints in `API-SPECIFICATION.md`. Nothing is tested "for completeness" merely to inflate coverage; equally, no confirmed requirement may go untested.
@@ -46,23 +46,23 @@ Priority is derived from the confirmed risk register (ROADMAP §10):
 
 ### 1.4 Test ownership and responsibilities
 
-Ownership follows the confirmed engineering conventions (DEVELOPMENT-GUIDELINES §13, §16; FOLDER-STRUCTURE §9) — no separate organizational structure is defined in the SSOT:
+Ownership follows the confirmed engineering conventions (DEVELOPMENT-GUIDELINES §13, §16; FOLDER-STRUCTURE §9) - no separate organizational structure is defined in the SSOT:
 
 | Responsibility | Who | Evidence |
 |---|---|---|
-| Feature-scoped unit/component/integration tests | Feature owners (developers) — tests colocated with the feature (FOLDER-STRUCTURE §2.2, §3) | DEVELOPMENT-GUIDELINES §13 ("shared code is owned"), §15 |
+| Feature-scoped unit/component/integration tests | Feature owners (developers) - tests colocated with the feature (FOLDER-STRUCTURE §2.2, §3) | DEVELOPMENT-GUIDELINES §13 ("shared code is owned"), §15 |
 | Shared package tests (`packages/contracts`, `packages/shared`) | Owners of the shared code; every shared item has defined owners and tests | DEVELOPMENT-GUIDELINES §13 |
 | Invariant tests (BI-001..BI-010) | Platform-wide, run in CI; owned by the backend team | TECH-STACK §10, BACKEND-ARCHITECTURE §21 |
 | Authorization/security tests | Backend + security review (CTO boundary per ROADMAP §11) | NFR-AUTHZ-001/002, NFR-SEC-001/002, BI-008 |
 | Acceptance-criteria validation per phase | Reviewer/QA validation as defined by the phase exit criteria | ROADMAP §9 (validation of AC-*) |
 | Approval of gates and unresolved items | Owner/Stakeholder (and CTO for the signing boundary) | ROADMAP §11 approval boundary |
-| Tooling/environment provisioning | Deployment-stage decision — **REQUIRES APPROVAL** | ARCH-DEC-008, ROADMAP §11 |
+| Tooling/environment provisioning | Deployment-stage decision - **REQUIRES APPROVAL** | ARCH-DEC-008, ROADMAP §11 |
 
 > A dedicated QA team structure, test-environment SLA, and CI runner ownership are **not defined in the SSOT** and are **REQUIRES APPROVAL** before they are relied on (§20).
 
 ### 1.5 Test levels used
 
-Levels in this document (ordered bottom-up): **Unit → Component → Integration → API → E2E/UI**. **Authorization** and **security** are cross-cutting suites applied at the API and UI levels. Each level is defined in §3–§9; the pyramid shape is defined in §2.
+Levels in this document (ordered bottom-up): **Unit → Component → Integration → API → E2E/UI**. **Authorization** and **security** are cross-cutting suites applied at the API and UI levels. Each level is defined in §3-§9; the pyramid shape is defined in §2.
 
 ### 1.6 Testing throughout the lifecycle
 
@@ -79,11 +79,11 @@ Levels in this document (ordered bottom-up): **Unit → Component → Integratio
 Prefer fast, deterministic, lower-level tests; reserve broader tests for critical workflows.
 
 ```text
-            /       E2E  (Playwright) — few, critical journeys only
-          /      UI / Component (states, a11y) — feature screens
-        /     API (Supertest) — contract, authZ, business rules, errors
-      /   Integration — DB + app, cross-module, stubbed providers
-    /  Unit (Vitest) — domain rules, use cases, pure logic, shared math
+            /       E2E  (Playwright) - few, critical journeys only
+          /      UI / Component (states, a11y) - feature screens
+        /     API (Supertest) - contract, authZ, business rules, errors
+      /   Integration - DB + app, cross-module, stubbed providers
+    /  Unit (Vitest) - domain rules, use cases, pure logic, shared math
 ```
 
 | Level | When used | Volume | Determinism |
@@ -103,14 +103,14 @@ Prefer fast, deterministic, lower-level tests; reserve broader tests for critica
 **Tooling (PROPOSED):** Vitest (TECH-STACK §10; DEVELOPMENT-GUIDELINES §15).
 
 **Scope (REQUIRED):**
-- **Domain logic:** entities, value objects, and business rules in the domain layer — framework-free by design (ARCHITECTURE §14; FOLDER-STRUCTURE §2.2 "domain files depend on nothing framework/DB-specific"). Examples: sale eligibility (BR-SAL-001), commission calculation (BR-COM-001/002, §6 formulas), clearing lifecycle (BR-CLC-001), cancellation/reversal (BR-CAN-001/002), withdrawal reservation (BR-WDR-001/002), voucher verification conditions (FR-VCH-005).
+- **Domain logic:** entities, value objects, and business rules in the domain layer - framework-free by design (ARCHITECTURE §14; FOLDER-STRUCTURE §2.2 "domain files depend on nothing framework/DB-specific"). Examples: sale eligibility (BR-SAL-001), commission calculation (BR-COM-001/002, §6 formulas), clearing lifecycle (BR-CLC-001), cancellation/reversal (BR-CAN-001/002), withdrawal reservation (BR-WDR-001/002), voucher verification conditions (FR-VCH-005).
 - **Use cases (application layer):** orchestration and transaction boundaries, with adapters **mocked/stubbed** (FOLDER-STRUCTURE §2.2 `test/application`). Use cases contain no framework logic (BACKEND-ARCHITECTURE §4/§18).
-- **Validation:** Zod schemas in `packages/contracts` — every schema has boundary and invalid-input tests; money/rate are exact decimals and floats are rejected (API-SPECIFICATION §1.3; BR-WAL-002).
-- **Utility functions:** money math (exact decimal; no float math — BR-COM-001/002, TECH-STACK §5/§8), id/slug helpers, pagination/cursor helpers (API-SPECIFICATION §4), `packages/shared` (must remain framework-free — FOLDER-STRUCTURE §4).
+- **Validation:** Zod schemas in `packages/contracts` - every schema has boundary and invalid-input tests; money/rate are exact decimals and floats are rejected (API-SPECIFICATION §1.3; BR-WAL-002).
+- **Utility functions:** money math (exact decimal; no float math - BR-COM-001/002, TECH-STACK §5/§8), id/slug helpers, pagination/cursor helpers (API-SPECIFICATION §4), `packages/shared` (must remain framework-free - FOLDER-STRUCTURE §4).
 - **Pure logic in frontends:** formatting, hooks, schema-derived logic (MOBILE-ARCHITECTURE §18 maps the same approach for mobile).
 
 **Boundary conditions (REQUIRED)** for every validated rule:
-- Age boundary at the configured minimum (18, configurable — BUSINESS-RULES §2; FR-ADM-001).
+- Age boundary at the configured minimum (18, configurable - BUSINESS-RULES §2; FR-ADM-001).
 - Balance at exactly 0, at Available limit, and above it (BI-001, BI-002).
 - Redeem amount equal to, below, and above remaining voucher value (BR-VCH-002).
 - Commission rate changes applying to future transactions only (BR-COM-007).
@@ -118,7 +118,7 @@ Prefer fast, deterministic, lower-level tests; reserve broader tests for critica
 
 **Mocking/stubbing rules:**
 - Adapters (email, geolocation, push, signing client, storage) are always behind interfaces and are replaced in tests (ARCHITECTURE §5; BACKEND-ARCHITECTURE §2.1). **Mock the interface, not the provider.**
-- Database is **not** mocked in use-case unit tests; repositories are replaced with in-memory fakes for pure orchestration tests, while **real DB behavior is covered by integration tests** (§4) — never substitute mocked DB behavior for the invariant/constraint tests.
+- Database is **not** mocked in use-case unit tests; repositories are replaced with in-memory fakes for pure orchestration tests, while **real DB behavior is covered by integration tests** (§4) - never substitute mocked DB behavior for the invariant/constraint tests.
 - Mocks must not encode the behavior under test (no self-confirming mocks).
 
 ---
@@ -128,12 +128,12 @@ Prefer fast, deterministic, lower-level tests; reserve broader tests for critica
 **Tooling (PROPOSED):** Supertest against the app; real PostgreSQL via docker-compose (FOLDER-STRUCTURE §5; BACKEND-ARCHITECTURE §21). Location: `apps/api/test/integration` (FOLDER-STRUCTURE §2).
 
 **Scope (REQUIRED):**
-- **App ↔ database:** constraints and invariants enforced at the DB layer — CHECK (balance ≥ 0, BI-001), unique redemption (BI-007), immutability via REVOKE UPDATE/DELETE on financial tables (BI-005, DATABASE-DESIGN §22), FK integrity, `SERIALIZABLE` ledger writes (TECH-STACK §5).
+- **App ↔ database:** constraints and invariants enforced at the DB layer - CHECK (balance ≥ 0, BI-001), unique redemption (BI-007), immutability via REVOKE UPDATE/DELETE on financial tables (BI-005, DATABASE-DESIGN §22), FK integrity, `SERIALIZABLE` ledger writes (TECH-STACK §5).
 - **Migrations:** every versioned migration applies cleanly on a fresh DB; seeds are idempotent (DATABASE-DESIGN §18/§19; ROADMAP R-12).
 - **Cross-module flows:** qualifying sale → commission creation → clearing → ledger (ROADMAP §9 "integration tests passed"); referral → direct referral commission; withdrawal → reservation → completion/rejection releasing balance (BR-WDR-005); voucher → atomic redemption → history (BI-007).
-- **Authentication integration:** email-verification token flow with the email adapter stubbed (BR-AUTH-001, FR-AUTH-001); session creation/rotation/revocation against the DB-backed session store (PROPOSED — BACKEND-ARCHITECTURE §8).
+- **Authentication integration:** email-verification token flow with the email adapter stubbed (BR-AUTH-001, FR-AUTH-001); session creation/rotation/revocation against the DB-backed session store (PROPOSED - BACKEND-ARCHITECTURE §8).
 - **External services (stubbed):** every confirmed integration (email, geolocation, payout, push, signing, object storage) has a stub that simulates success **and each mapped failure** (INTEGRATION-SPECIFICATION §13). Provider timeouts/errors map to the generic error envelope; provider internals never leak; audit rows are still written for audited actions.
-- **Frontend/backend boundary:** the typed client generated from OpenAPI (PROPOSED) is tested against the contract; a schema change fails CI (contract tests — INTEGRATION-SPECIFICATION §13; API-SPECIFICATION §5.4).
+- **Frontend/backend boundary:** the typed client generated from OpenAPI (PROPOSED) is tested against the contract; a schema change fails CI (contract tests - INTEGRATION-SPECIFICATION §13; API-SPECIFICATION §5.4).
 
 **Idempotency tests (REQUIRED):** replay of the same `Idempotency-Key` on `POST /sales`, `POST /me/withdrawals`, `POST /vouchers/:id/redemptions`, `POST /financial-adjustments` returns the stored response with no side-effect duplication (API-SPECIFICATION §5.3; BI-007; BR-WDR-002).
 
@@ -143,7 +143,7 @@ Prefer fast, deterministic, lower-level tests; reserve broader tests for critica
 
 ## 5. API Tests
 
-**Tooling (PROPOSED):** Vitest fetch against Vercel dev (Supertest only if dedicated backend added — TECH-STACK §10). Location: `apps/api/test/e2e` or `api/_lib` unit. Every endpoint in API-SPECIFICATION §6 is covered.
+**Tooling (PROPOSED):** Vitest fetch against Vercel dev (Supertest only if dedicated backend added - TECH-STACK §10). Location: `apps/api/test/e2e` or `api/_lib` unit. Every endpoint in API-SPECIFICATION §6 is covered.
 
 For **each endpoint** the following are REQUIRED:
 
@@ -151,14 +151,14 @@ For **each endpoint** the following are REQUIRED:
 |---|---|
 | HTTP method & status codes | Correct code per API-SPECIFICATION §1.2 semantics (200/201/204/400/401/403/404/409/422/429/500) |
 | Request validation | Zod rejects malformed/missing/extra fields; money as exact decimal, floats rejected (§1.3) |
-| Response schema | Shape matches the shared contract (`{ data, meta }` for collections; resource object for single; error envelope for errors — §1.1, §3) |
+| Response schema | Shape matches the shared contract (`{ data, meta }` for collections; resource object for single; error envelope for errors - §1.1, §3) |
 | Authentication | Unauthenticated → 401; `/auth/me`, `/auth/refresh`, `/auth/logout` require an authenticated session |
-| Authorization | Role matrix enforced (BUSINESS-RULES §3) — see §8 |
+| Authorization | Role matrix enforced (BUSINESS-RULES §3) - see §8 |
 | Business rules | Eligibility and rule violations return 403/422/409 with the documented code (e.g., `MEMBER_NOT_QUALIFIED`, `SALE_LOCKED`, `INSUFFICIENT_BALANCE`, `PAYOUT_ACCOUNT_UNVERIFIED`) |
 | Error responses | Error envelope fields (`code`, `message`, `details`, `requestId`, `timestamp`); stable codes (§3) |
 | Invalid/missing input | Mandatory rejection reasons (BR-REG-004, BR-SAL-005, BR-WDR-004) → `REJECTION_REASON_REQUIRED`; required fields missing → 400 |
-| Resource ownership | A member cannot read/modify another member's resource (404 hides existence — §1.2, §8); object-level enforcement on every member-scoped endpoint |
-| Direct API access | Every protected mutation is tested with an unauthenticated and a wrong-role principal — client-side hiding is never the protection (§8) |
+| Resource ownership | A member cannot read/modify another member's resource (404 hides existence - §1.2, §8); object-level enforcement on every member-scoped endpoint |
+| Direct API access | Every protected mutation is tested with an unauthenticated and a wrong-role principal - client-side hiding is never the protection (§8) |
 | Pagination/filtering/sort | Page vs cursor behavior per §4; allowlisted filter/sort keys; no unbounded responses |
 | Rate limiting | Strict limits on auth and redemption paths return 429 when exceeded (§5.2) |
 | Idempotency | Duplicate submission returns stored response without re-application (§5.3) |
@@ -169,9 +169,9 @@ For **each endpoint** the following are REQUIRED:
 
 ## 6. E2E Tests
 
-**Tooling (PROPOSED):** Playwright (TECH-STACK §10; DEVELOPMENT-GUIDELINES §15). Location: `apps/*/test` (component + Playwright e2e — FOLDER-STRUCTURE §3).
+**Tooling (PROPOSED):** Playwright (TECH-STACK §10; DEVELOPMENT-GUIDELINES §15). Location: `apps/*/test` (component + Playwright e2e - FOLDER-STRUCTURE §3).
 
-**Guiding rule:** E2E is reserved for **confirmed critical journeys** (the AC-* phase gates and the MVP path). Not every scenario is an E2E test — most behavior is covered at lower levels (§2).
+**Guiding rule:** E2E is reserved for **confirmed critical journeys** (the AC-* phase gates and the MVP path). Not every scenario is an E2E test - most behavior is covered at lower levels (§2).
 
 **Critical journeys (REQUIRED E2E):**
 1. **Registration → qualification → approval** (AC-REG-001): register → email verify → Admin ID verify → approve → `Approved-Active`; reject → reason shown → resubmit.
@@ -180,7 +180,7 @@ For **each endpoint** the following are REQUIRED:
 4. **Voucher redemption (atomic)** (AC-VCH-001, P8): merchant scans → verifies → full/partial redemption → remaining value → double-attempt prevented.
 5. **Financial adjustment** (AC-ADJ-001): Super Admin applies credit/debit with reason → ledger + audit updated.
 
-**Gated journeys (NOT E2E until approved):** Abroad geolocation PH-block/exception (P11, FR-GEO-001..006 confirmed mechanics — may be E2E once integrated), Group Incentive (P12), voucher extended rules (OD-019..023), Total Earned (OD-025). These must not be automated as implemented until the Owner decisions are approved.
+**Gated journeys (NOT E2E until approved):** Abroad geolocation PH-block/exception (P11, FR-GEO-001..006 confirmed mechanics - may be E2E once integrated), Group Incentive (P12), voucher extended rules (OD-019..023), Total Earned (OD-025). These must not be automated as implemented until the Owner decisions are approved.
 
 **E2E scheduling:** a minimal, stable critical-journey suite runs per release gate and per MVP gate (ROADMAP §7.4); full nightly E2E is **REQUIRES APPROVAL** (infra/scheduling decision, §20).
 
@@ -188,7 +188,7 @@ For **each endpoint** the following are REQUIRED:
 
 ## 7. UI Tests
 
-**Tooling (PROPOSED):** Vitest (component) + Playwright (UI). Scope follows the screen register (UI-UX §6.2/§6.3) — **no invented screens**.
+**Tooling (PROPOSED):** Vitest (component) + Playwright (UI). Scope follows the screen register (UI-UX §6.2/§6.3) - **no invented screens**.
 
 **Required UI coverage per screen:** every screen must be tested for the states it is required to render (UI-UX §10):
 
@@ -202,7 +202,7 @@ For **each endpoint** the following are REQUIRED:
 | Success states | Success feedback and next action (UI-UX §8.12) |
 | Navigation | Route guards (session restore via `/auth/me`), 401 → login preserving destination, back behavior (FRONTEND-ARCHITECTURE §1.4/§8; MOBILE-ARCHITECTURE §8) |
 | Responsive behavior | Member/merchant web is responsive-first (ARCH-DEC-005/006); tested at supported breakpoints defined in DESIGN-SYSTEM |
-| Accessibility | UI meets UI-UX §12 / DESIGN-SYSTEM §7 — a11y defects are bugs (DEVELOPMENT-GUIDELINES §15) |
+| Accessibility | UI meets UI-UX §12 / DESIGN-SYSTEM §7 - a11y defects are bugs (DEVELOPMENT-GUIDELINES §15) |
 | Server-state behavior | Retry of idempotent reads; **no automatic retry of non-idempotent mutations**; Idempotency-Key preserved (DEVELOPMENT-GUIDELINES §5.2) |
 
 **Config-driven UI:** options rendered from the config service (`GET /config/public`) are tested with the configurable values changing, never hard-coded (DEVELOPMENT-GUIDELINES §18; BR-CFG-001, NFR-MAINT-001).
@@ -211,7 +211,7 @@ For **each endpoint** the following are REQUIRED:
 
 ## 8. Authorization Tests
 
-**Foundation:** RBAC matrix in BUSINESS-RULES §3, object-level rules (NFR-AUTHZ-002), and the role shorthand/Auth column in API-SPECIFICATION §2.2/§6. **Hidden UI controls are never proof of authorization** — every assertion is made at the API boundary (DEVELOPMENT-GUIDELINES §15; FRONTEND-ARCHITECTURE §8).
+**Foundation:** RBAC matrix in BUSINESS-RULES §3, object-level rules (NFR-AUTHZ-002), and the role shorthand/Auth column in API-SPECIFICATION §2.2/§6. **Hidden UI controls are never proof of authorization** - every assertion is made at the API boundary (DEVELOPMENT-GUIDELINES §15; FRONTEND-ARCHITECTURE §8).
 
 For **every protected endpoint**, the following are REQUIRED:
 
@@ -219,12 +219,12 @@ For **every protected endpoint**, the following are REQUIRED:
 |---|---|
 | Correct role | Authorized principal succeeds |
 | Incorrect role | 403; business-eligibility failures return 422/403 as specified (§2.2) |
-| Missing permission | Staff role without the action's permission → 403 (e.g., Admin attempting a financial adjustment → 403; only Super Admin may adjust — BR-ADJ-001) |
-| Resource ownership | Member accessing another member's resource → 404 (never 403/200 — existence hidden, §1.2) |
+| Missing permission | Staff role without the action's permission → 403 (e.g., Admin attempting a financial adjustment → 403; only Super Admin may adjust - BR-ADJ-001) |
+| Resource ownership | Member accessing another member's resource → 404 (never 403/200 - existence hidden, §1.2) |
 | Cross-user access | Member A cannot act on member B's sales/ledger/withdrawals/payout accounts/vouchers |
 | Cross-role access | Member cannot invoke staff paths (e.g., `POST /sales/:id/approve`); staff cannot act through member `/me` paths (§2.2) |
 | Privileged operations | Super Admin-only (adjustments, config, audit), Admin-only (registration decisions, ID/payout verification, catalog), Admin/Finance/Super Admin (payment verification, withdrawal completion/rejection) |
-| Direct API bypass | A crafted request to a protected endpoint without the UI — asserts server-side enforcement |
+| Direct API bypass | A crafted request to a protected endpoint without the UI - asserts server-side enforcement |
 
 **Coverage matrix (REQUIRED):** maintain a role × endpoint matrix test that iterates every (endpoint, role) pair to a pass/fail expectation derived from API-SPECIFICATION §6 + BUSINESS-RULES §3. The matrix must include at minimum: `PUBLIC`, `AUTH`, `MEM`, `AQ`, `ADM`, `FIN`, `SUP`, `MRCH`, and the unauthenticated principal.
 
@@ -237,13 +237,13 @@ Security testing is scoped to the **actual architecture** (session auth, cookie 
 | Area | What is tested | Source |
 |---|---|---|
 | Authentication | Session lifecycle (login/logout/refresh rotation); email-verification gate before approval (BR-AUTH-001); 401 on missing/invalid session | API-SPECIFICATION §2.1; NFR-AUTH-001/002 |
-| Authorization | Full RBAC matrix + object-level tests (§8) — the primary security control | NFR-AUTHZ-001/002 |
+| Authorization | Full RBAC matrix + object-level tests (§8) - the primary security control | NFR-AUTHZ-001/002 |
 | Broken access control | IDOR/BOLA attempts on every member-scoped resource (404 hides existence) | NFR-AUTHZ-002; API-SPECIFICATION §8 |
 | Input validation | Zod rejection of malformed input; exact-decimal money; oversized input limits | API-SPECIFICATION §1.3 |
 | Injection | Parameterized queries only; no concatenated SQL; a malicious-value API test asserts no SQL error leaks | API-SPECIFICATION §8; DATABASE-DESIGN §22 |
 | XSS | React escaping; no `dangerouslySetInnerHTML` with untrusted content; user/admin-supplied text rendered safely | FRONTEND-ARCHITECTURE; DEVELOPMENT-GUIDELINES §15 |
 | Sensitive-data exposure | No PII/financial data in logs or error responses; 500s generic; profiles/IDs redacted where not needed; no secrets in client bundles | API-SPECIFICATION §8; NFR-CONF-001, NFR-DATA-001; DEVELOPMENT-GUIDELINES §18 |
-| Session handling | HttpOnly/Secure/SameSite cookie attributes; CSRF protection for cookie-authenticated requests; refresh rotation | API-SPECIFICATION §8 (CSRF mechanism REQUIRES APPROVAL — BACKEND-ARCHITECTURE §21) |
+| Session handling | HttpOnly/Secure/SameSite cookie attributes; CSRF protection for cookie-authenticated requests; refresh rotation | API-SPECIFICATION §8 (CSRF mechanism REQUIRES APPROVAL - BACKEND-ARCHITECTURE §21) |
 | API security | Rate limiting (429) on auth/redemption; CORS first-party allowlist; `Idempotency-Key` never logged (sensitive replay token) | API-SPECIFICATION §5.2/§8; BACKEND-ARCHITECTURE §11 |
 | Database security | Least-privilege DB roles; UPDATE/DELETE revoked on financial/audit tables (BI-005); no role holds blanket DDL/DML | DATABASE-DESIGN §22 |
 | Secrets/configuration | Secrets only in environment/secret manager; `.env*` ignored; no committed credentials; config params served via API (never env/bundle) | API-SPECIFICATION §8; DEVELOPMENT-GUIDELINES §18; FOLDER-STRUCTURE §7 |
@@ -260,7 +260,7 @@ Systematic edge-case coverage is REQUIRED, applied at the lowest level that dete
 
 | Category | Confirmed examples |
 |---|---|
-| Boundary values | Age = configured minimum; balance = 0 / = Available / > Available; redeem amount = remaining value; resubmission = max attempts (→ LOCKED); clearing period boundary (future-only — BR-COM-007) |
+| Boundary values | Age = configured minimum; balance = 0 / = Available / > Available; redeem amount = remaining value; resubmission = max attempts (→ LOCKED); clearing period boundary (future-only - BR-COM-007) |
 | Empty values | Empty catalog (no properties for sale submission); no payout accounts (guidance state); no transactions in ledger; empty referral list |
 | Missing values | Missing mandatory fields; missing mandatory rejection reason (BR-REG-004, BR-SAL-005, BR-WDR-004) |
 | Invalid values | Float money; negative amount; negative remaining value (C-13); unknown status/role; invalid referral code (BR-REG-009); invalid voucher signature |
@@ -268,7 +268,7 @@ Systematic edge-case coverage is REQUIRED, applied at the lowest level that dete
 | Large inputs | Oversized payloads rejected (400); large genealogy tree virtualization (UI-UX §6.3 SCR-MEM-018, §11.4 overflow); no unbounded ledger/commission responses (§4) |
 | Unexpected states | Action attempted in a state that does not permit it (e.g., resubmit a LOCKED sale → 409 `SALE_LOCKED`); withdraw without verified payout account (422) |
 | Concurrent actions | Concurrent redemptions (exactly one success); concurrent reservations (at most one success, no negative balance) |
-| State transitions | Every confirmed state model (BUSINESS-RULES §5): Member, Sale, Commission, Payout Account, Withdrawal — invalid transitions rejected; no invented states (FOLDER-STRUCTURE §9.8) |
+| State transitions | Every confirmed state model (BUSINESS-RULES §5): Member, Sale, Commission, Payout Account, Withdrawal - invalid transitions rejected; no invented states (FOLDER-STRUCTURE §9.8) |
 | Data inconsistencies | Ledger/audit rows never modified/deleted (BI-005); historical property value unchanged after catalog price change (BI-006); rejection reason recorded and displayed |
 
 ---
@@ -282,7 +282,7 @@ Systematic edge-case coverage is REQUIRED, applied at the lowest level that dete
 | Validation failures | 400/422 before any side effect; nothing persisted | API-SPECIFICATION §1.3 |
 | Network failures (client) | Offline/banner state; in-progress forms and Idempotency-Key preserved; safe retry; no offline mutations (mobile) | DEVELOPMENT-GUIDELINES §6; MOBILE-ARCHITECTURE §11 |
 | API failures | Error envelope with stable code; generic, recoverable UI; no raw internals | API-SPECIFICATION §3; UI-UX §10 |
-| Database failures | Transaction rolls back — no partial ledger/audit state (NFR-ATOM-001/002); 500 generic; readiness `/ready` reflects DB connectivity | BACKEND-ARCHITECTURE §15 |
+| Database failures | Transaction rolls back - no partial ledger/audit state (NFR-ATOM-001/002); 500 generic; readiness `/ready` reflects DB connectivity | BACKEND-ARCHITECTURE §15 |
 | Timeouts | Time-bounded external calls; safe generic client response; server-side logging | BACKEND-ARCHITECTURE §11.7; INTEGRATION-SPECIFICATION §9 |
 | External-service failures | Mapped to generic error; provider detail logged server-side only; audit still written; idempotent ops remain safe to retry | INTEGRATION-SPECIFICATION §9; API-SPECIFICATION §8 |
 | Partial failures | No partial application on financial paths (atomic transactions) | API-SPECIFICATION §8; DATABASE-DESIGN §15.2 |
@@ -317,16 +317,16 @@ Systematic edge-case coverage is REQUIRED, applied at the lowest level that dete
 
 ## 13. Performance Testing
 
-Performance testing is **not** a blanket requirement. It is defined only where confirmed risks justify it, and **no numeric targets are invented** (NFR-PERF-001 is TBD — REQUIRES APPROVAL).
+Performance testing is **not** a blanket requirement. It is defined only where confirmed risks justify it, and **no numeric targets are invented** (NFR-PERF-001 is TBD - REQUIRES APPROVAL).
 
 **Justified areas (risk-based, PROPOSED):**
-- **Large datasets:** genealogy/reporting reads with large trees (UI-UX §6.3 SCR-MEM-018 — large-tree virtualization); ledger/commission history pagination must never be unbounded (API-SPECIFICATION §4).
+- **Large datasets:** genealogy/reporting reads with large trees (UI-UX §6.3 SCR-MEM-018 - large-tree virtualization); ledger/commission history pagination must never be unbounded (API-SPECIFICATION §4).
 - **Expensive operations:** atomic voucher redemption under contention; withdrawal reservation under concurrent load (NFR-ATOM-001/002); the clearing scheduler job processing many commissions.
-- **High traffic:** registration/login and redemption are rate-limited paths (§5.2) — load checks should not contradict the documented limits.
-- **Broadcast fan-out:** push/notification delivery (FEAT-063) at scale — depends on provider (ASSUMPTION 6).
+- **High traffic:** registration/login and redemption are rate-limited paths (§5.2) - load checks should not contradict the documented limits.
+- **Broadcast fan-out:** push/notification delivery (FEAT-063) at scale - depends on provider (ASSUMPTION 6).
 
 **Requirements (REQUIRED once targets exist):**
-- NFR-PERF-001, NFR-AVAIL-001, NFR-REL-001, NFR-SCAL-001 targets are **TBD** — performance test scope, tooling, and pass criteria are **REQUIRES APPROVAL** and must not be invented.
+- NFR-PERF-001, NFR-AVAIL-001, NFR-REL-001, NFR-SCAL-001 targets are **TBD** - performance test scope, tooling, and pass criteria are **REQUIRES APPROVAL** and must not be invented.
 - Tests assert **correctness under load** (e.g., exactly-one-success redemption, no negative balance) in addition to any latency/throughput measures.
 - No performance test may bypass invariants, rate limits, or authorization.
 
@@ -339,14 +339,14 @@ Performance testing is **not** a blanket requirement. It is defined only where c
 | Local development | Fast unit/component/API feedback | Local fixtures; fresh DB | Stubbed adapters | `docker-compose` provides api, db, worker, web, admin, merchant (FOLDER-STRUCTURE §5) |
 | Test/QA | Integration + E2E against a shared instance | Controlled, reproducible fixtures | Stubbed; real provider sandboxes only where provider approved (OD-016, ASSUMPTIONS) | Full AC-* validation |
 | Staging | Release/MVP gate; E2E critical journeys; performance (when approved) | Anonymized, non-production data | Sandbox/approved providers | Required for any real-provider integration test |
-| Production | **Restricted** — no testing | Never production data for tests | — | Health/readiness probes only (`/health`, `/ready` — PROPOSED, BACKEND-ARCHITECTURE §15) |
+| Production | **Restricted** - no testing | Never production data for tests | - | Health/readiness probes only (`/health`, `/ready` - PROPOSED, BACKEND-ARCHITECTURE §15) |
 
 **Rules (REQUIRED):**
 - **Never rely on production data or production secrets for ordinary testing.** Production credentials are never used in test environments; seeds are non-real (DEVELOPMENT-GUIDELINES §18; DATABASE-DESIGN §19).
-- Business parameters are served via the config module (BR-CFG-001) — tests must set them via the API/seed, not env, so NFR-MAINT-001 behavior is validated.
+- Business parameters are served via the config module (BR-CFG-001) - tests must set them via the API/seed, not env, so NFR-MAINT-001 behavior is validated.
 - Every environment uses typed env via `packages/config`; `.env.example` at each app root; `.env*` never committed (FOLDER-STRUCTURE §7).
 - Database state for tests is **fresh and deterministic** (migrations + idempotent seed); no cumulative drift between runs.
-- Provider selections and staging/infrastructure provisioning are deployment-stage decisions — **REQUIRES APPROVAL** (ARCH-DEC-008, ROADMAP §11).
+- Provider selections and staging/infrastructure provisioning are deployment-stage decisions - **REQUIRES APPROVAL** (ARCH-DEC-008, ROADMAP §11).
 
 ---
 
@@ -354,13 +354,13 @@ Performance testing is **not** a blanket requirement. It is defined only where c
 
 **Requirements (REQUIRED):**
 - **Controlled and reproducible:** deterministic fixtures per feature; seeded via idempotent seeds (DATABASE-DESIGN §19). No dependence on manual environment state.
-- **Isolation:** each test (or test class) operates on isolated data — transaction-per-test or unique fixture keys — so tests never collide.
+- **Isolation:** each test (or test class) operates on isolated data - transaction-per-test or unique fixture keys - so tests never collide.
 - **Reset/cleanup:** test environments reset to a known baseline (migrations + seeds); no cross-test leakage.
 - **Boundary and negative data:** explicit fixtures for the boundary cases in §10 (age minimum, balance zero/limit, redemption full/partial, max resubmission, invalid money/rates).
-- **Role/permission test accounts:** a controlled set of principals covering the RBAC matrix — unauthenticated, Member, AQ, Admin, Finance, Super Admin, Merchant (BUSINESS-RULES §3) — with known credentials scoped to test environments only.
+- **Role/permission test accounts:** a controlled set of principals covering the RBAC matrix - unauthenticated, Member, AQ, Admin, Finance, Super Admin, Merchant (BUSINESS-RULES §3) - with known credentials scoped to test environments only.
 - **No sensitive real-world data:** seeds contain placeholder, non-real data (DATABASE-DESIGN §19: dev accounts are random/non-real; payout identifiers and ID documents are placeholders). Anonymization for staging **REQUIRES APPROVAL**.
-- **No secrets:** test environments never contain production secrets or the signing master key (BI-008). Voucher test fixtures are signed by a **test-only signing key** — never the production master key.
-- **Financial data:** test ledger/commission/audit rows follow immutability rules (BI-005) — tests must not UPDATE/DELETE financial rows, mirroring production roles.
+- **No secrets:** test environments never contain production secrets or the signing master key (BI-008). Voucher test fixtures are signed by a **test-only signing key** - never the production master key.
+- **Financial data:** test ledger/commission/audit rows follow immutability rules (BI-005) - tests must not UPDATE/DELETE financial rows, mirroring production roles.
 
 ---
 
@@ -370,16 +370,16 @@ Coverage is **risk- and requirement-based**. Code-coverage percentage alone is n
 
 | Coverage type | Meaning | Requirement |
 |---|---|---|
-| Requirement coverage | Every FR has its AC exercised by tests | REQUIRED — 100% of confirmed FRs mapped to ≥1 test (REQUIREMENTS §12; ROADMAP §9) |
+| Requirement coverage | Every FR has its AC exercised by tests | REQUIRED - 100% of confirmed FRs mapped to ≥1 test (REQUIREMENTS §12; ROADMAP §9) |
 | Business-rule coverage | Every BR asserted by ≥1 test; BI-001..BI-010 automated in CI | REQUIRED (BUSINESS-RULES; ARCHITECTURE §11) |
 | Critical-path coverage | The MVP/E2E journeys (§6) exercised end-to-end | REQUIRED at phase/release gates (ROADMAP §7.4) |
 | Permission coverage | Role × endpoint matrix fully executed (§8) | REQUIRED |
 | Security coverage | §9 security suite + signing boundary (AC-SEC-001) | REQUIRED |
 | Error-path coverage | Every error code (API-SPECIFICATION §3) produced by ≥1 test | REQUIRED |
 | Regression coverage | Critical regression suite green after every change (§12) | REQUIRED |
-| Code coverage | Line/branch measures where useful | Thresholds **REQUIRES APPROVAL** (TECH-STACK §10: "Coverage targets not approved — TBD") |
+| Code coverage | Line/branch measures where useful | Thresholds **REQUIRES APPROVAL** (TECH-STACK §10: "Coverage targets not approved - TBD") |
 
-**Reporting (REQUIRED):** traceability is recorded in test metadata (FR/BR/BI/AC references). A feature is not covered if a required FR/BR has no executable test — regardless of line coverage.
+**Reporting (REQUIRED):** traceability is recorded in test metadata (FR/BR/BI/AC references). A feature is not covered if a required FR/BR has no executable test - regardless of line coverage.
 
 ---
 
@@ -389,7 +389,7 @@ A change, feature, or phase is **not** releasable unless the following hold (der
 
 | Gate | Criterion |
 |---|---|
-| CI execution | Build + lint + test + typecheck pass per PR (PROPOSED pipeline — provider REQUIRES APPROVAL) |
+| CI execution | Build + lint + test + typecheck pass per PR (PROPOSED pipeline - provider REQUIRES APPROVAL) |
 | Critical test failures | Zero critical-suite failures: invariants, authorization matrix, financial-path API tests, idempotency/concurrency |
 | Requirement coverage | All phase FRs/NFRs implemented **and verified by tests**; no confirmed requirement untested |
 | Authorization/security validation | RBAC matrix + object-level tests pass; audit trails verified (NFR-SEC-002, NFR-AUD-001); no unresolved security finding |
@@ -406,13 +406,13 @@ A change, feature, or phase is **not** releasable unless the following hold (der
 
 A feature is **Done** only when **all** of the following hold:
 
-- [ ] Critical tests pass (invariants, authorization matrix, financial-path, idempotency, concurrency) — none failing or skipped.
-- [ ] All confirmed requirements of the feature are **tested** (not just implemented) — AC-* exercised; no critical requirement untested.
-- [ ] Authorization is verified at the API boundary for every protected action (correct role, wrong role, ownership, bypass) — not assumed from hidden UI.
+- [ ] Critical tests pass (invariants, authorization matrix, financial-path, idempotency, concurrency) - none failing or skipped.
+- [ ] All confirmed requirements of the feature are **tested** (not just implemented) - AC-* exercised; no critical requirement untested.
+- [ ] Authorization is verified at the API boundary for every protected action (correct role, wrong role, ownership, bypass) - not assumed from hidden UI.
 - [ ] Security risks for the feature are resolved or explicitly accepted with approval; no unresolved high/critical findings.
 - [ ] Important edge cases (§10) and failure scenarios (§11) for the feature are tested; failures leave no inconsistent state.
 - [ ] No failure is ignored or silenced; no test was weakened, deleted, or de-prioritized merely to make the suite pass.
-- [ ] Required regression testing (§12) was run — affected feature, contract, security, and API suites are green.
+- [ ] Required regression testing (§12) was run - affected feature, contract, security, and API suites are green.
 - [ ] Traceability is recorded (FR/BR/BI/AC references present in the tests).
 - [ ] OD-gated behavior was not silently implemented or tested as approved.
 
@@ -448,7 +448,7 @@ This document introduces **no** new requirement, business rule, role, workflow, 
 |---|---|---|---|
 | RA-01 | Testing toolchain adoption (Vitest, Supertest, Playwright) | PROPOSED, not approved (TECH-STACK §10) | Approve toolchain |
 | RA-02 | CI provider, pipeline definition, and E2E scheduling (per-PR vs nightly) | Provider OPEN (ARCH-DEC-008); pipeline PROPOSED (TECH-STACK §11); E2E scheduling not defined | Approve CI design |
-| RA-03 | Code-coverage thresholds (%) | "Coverage targets not approved — TBD" (TECH-STACK §10) | Set thresholds |
+| RA-03 | Code-coverage thresholds (%) | "Coverage targets not approved - TBD" (TECH-STACK §10) | Set thresholds |
 | RA-04 | NFR-PERF-001 / AVAIL-001 / REL-001 / SCAL-001 targets and performance test scope/tooling | All TBD (REQUIREMENTS §7) | Set targets |
 | RA-05 | CSRF mechanism for cookie-authenticated requests | Required (§8) but mechanism unspecified (BACKEND-ARCHITECTURE §21) | Approve mechanism |
 | RA-06 | Mobile (RN) test tooling, renderer, and E2E framework (Detox/Maestro) | REQUIRES APPROVAL (MOBILE-ARCHITECTURE §18, MA-11) | Approve mobile tooling |

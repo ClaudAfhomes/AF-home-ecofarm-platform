@@ -1,4 +1,4 @@
--- Phase D — Super-admin permanent member purge (owner-approved exception).
+-- Phase D - Super-admin permanent member purge (owner-approved exception).
 --
 -- Sanctioned default lifecycle remains ARCHIVE (POST /admin/members/:id/archive).
 -- This function is the sole hard-delete path, super_admin-only at the API
@@ -8,7 +8,7 @@
 -- accounts, owned vouchers/adjustments, member roles, notifications, and the
 -- Member row itself. The API then deletes the auth.users row and writes a
 -- MEMBER_PURGED audit entry (audit of the purge survives; only the member's
--- own history is destroyed — the authorized BI-005 exception).
+-- own history is destroyed - the authorized BI-005 exception).
 --
 -- Semantics:
 --   - Financial records owned by the member are DELETED here (ledger/commissions/

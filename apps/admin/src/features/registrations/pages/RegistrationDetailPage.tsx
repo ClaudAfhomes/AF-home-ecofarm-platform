@@ -162,7 +162,7 @@ export function RegistrationDetailPage() {
         }
       />
       <div className={styles.detailGrid}>
-        {/* Applicant Details — consolidated Personal + Address */}
+        {/* Applicant Details - consolidated Personal + Address */}
         <div className={styles.card}>
           <h2 className={styles.cardTitle}>Applicant Details</h2>
           <dl className={styles.fieldGrid}>
@@ -193,7 +193,7 @@ export function RegistrationDetailPage() {
             </div>
             <div className={styles.field}>
               <dt>Address</dt>
-              <dd>{data.address ?? '—'}</dd>
+              <dd>{data.address ?? '-'}</dd>
             </div>
           </dl>
         </div>
@@ -219,10 +219,10 @@ export function RegistrationDetailPage() {
             </div>
             <div className={styles.field}>
               <dt>Referral Code</dt>
-              <dd className={styles.mono}>{data.referralCode ?? '—'}</dd>
+              <dd className={styles.mono}>{data.referralCode ?? '-'}</dd>
               {!data.referralCode ? (
                 <dd style={{ fontSize: 'var(--text-caption)', color: 'var(--color-text-muted)' }}>
-                  No referral — applicant registered without a sponsor
+                  No referral - applicant registered without a sponsor
                 </dd>
               ) : null}
             </div>
@@ -297,7 +297,7 @@ export function RegistrationDetailPage() {
             </div>
             <div className={styles.field}>
               <dt>Reviewer</dt>
-              <dd>{data.reviewedBy ?? '—'}</dd>
+              <dd>{data.reviewedBy ?? '-'}</dd>
             </div>
             {data.reviewedAt ? (
               <div className={styles.field}>

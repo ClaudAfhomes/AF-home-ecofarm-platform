@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router';
 
-import { Button, ErrorState, Icon, Skeleton, getInitials, useToast } from '@jad/ui';
+import { Button, ErrorState, Icon, Skeleton, getInitials, notifyError } from '@jad/ui';
 import type { Message } from '@jad/contracts';
 
 import { ApiError } from '../../../lib/api/errors';
@@ -30,7 +30,6 @@ interface ConversationThreadProps {
  */
 export function ConversationThread({ memberId, memberName, memberEmail }: ConversationThreadProps) {
   const { user } = useSession();
-  const { toast } = useToast();
   const threadQuery = useConversationThread(memberId);
   const sendMutation = useSendStaffMessage(memberId);
   const markReadMutation = useMarkConversationRead(memberId);
@@ -69,7 +68,7 @@ export function ConversationThread({ memberId, memberName, memberEmail }: Conver
   }, [threadQuery.isSuccess, memberId]);
 
   // Composer auto-grow: follow content up to the cap so the box never
-  // scrolls internally (direct DOM write only — no state, no extra render).
+  // scrolls internally (direct DOM write only - no state, no extra render).
   useEffect(() => {
     const el = composerRef.current;
     if (!el) return;
@@ -88,10 +87,9 @@ export function ConversationThread({ memberId, memberName, memberEmail }: Conver
         requestAnimationFrame(scrollToBottom);
       },
       onError: (error) => {
-        toast({
+        notifyError({
           title: 'Could not send reply',
           message: error instanceof ApiError ? error.message : 'We could not send your message.',
-          tone: 'danger',
         });
       },
     });

@@ -7,11 +7,11 @@ import styles from './MessengerButton.module.css';
 /**
  * Persistent floating "Let's Talk" Messenger link, rendered by the shared
  * public layout so it appears on every public page. Uses an inline SVG
- * (project convention — no icon library) and a real anchor with an explicit
+ * (project convention - no icon library) and a real anchor with an explicit
  * accessible label, target, and rel for safe external navigation.
  *
  * The white icon + label are pinned via explicit `:link`/`:visited`/`:hover`/
- * `:active`/`:focus`/`:focus-visible` overrides — the global `a:visited`
+ * `:active`/`:focus`/`:focus-visible` overrides - the global `a:visited`
  * rule would otherwise recolor the link brand-blue after it has been visited.
  */
 export function MessengerButton() {

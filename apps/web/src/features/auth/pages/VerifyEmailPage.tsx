@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router';
+
+import { notifySuccess } from '@jad/ui';
 
 import { Alert } from '../../../components/Alert';
 import { Button } from '../../../components/Button';
@@ -14,13 +16,20 @@ import { resendVerificationCode, verifyEmail } from '../services/auth';
 import styles from './VerifyEmailPage.module.css';
 
 const CODE_RE = /^\d{6}$/;
+const RESEND_COOLDOWN_SECONDS = 60;
+
+function formatCountdown(totalSeconds: number): string {
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${String(seconds).padStart(2, '0')}`;
+}
 
 /**
  * Email verification (SCR-AUTH-003, FEAT-009). Verifies the one-time code from
- * `POST /auth/verify-email` (BR-AUTH-001 — verification precedes approval) and
+ * `POST /auth/verify-email` (BR-AUTH-001 - verification precedes approval) and
  * routes to the application status screen. In dev the mock "email" is simulated
  * via `POST /auth/verify-email/resend`, which returns the code the email would
- * carry — shown in a clearly-labeled dev-only banner, never presented as real.
+ * carry - shown in a clearly-labeled dev-only banner, never presented as real.
  */
 export function VerifyEmailPage() {
   const navigate = useNavigate();
@@ -62,10 +71,22 @@ export function VerifyEmailPage() {
   const [code, setCode] = useState('');
   const [errors, setErrors] = useState<{ email?: string; code?: string }>({});
   const [serverError, setServerError] = useState<string | undefined>();
-  const [devOnlyCode, setDevOnlyCode] = useState<string | undefined>();
-  const [codeSent, setCodeSent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [resending, setResending] = useState(false);
+  const [cooldown, setCooldown] = useState(() =>
+    (location.state as { emailSent?: boolean } | null)?.emailSent === true
+      ? RESEND_COOLDOWN_SECONDS
+      : 0,
+  );
+  // True when the registration email could not be dispatched (EmailJS
+  // unconfigured or the send failed) - nudge the applicant to resend.
+  const sendFailed = (location.state as { emailSent?: boolean } | null)?.emailSent === false;
+
+  useEffect(() => {
+    if (cooldown <= 0) return;
+    const timer = window.setTimeout(() => setCooldown((current) => current - 1), 1000);
+    return () => window.clearTimeout(timer);
+  }, [cooldown]);
 
   const setField = (field: 'email' | 'code', value: string) => {
     if (field === 'email') setEmail(value);
@@ -101,6 +122,7 @@ export function VerifyEmailPage() {
       } catch {
         // ignore
       }
+      notifySuccess({ title: 'Email verified' });
       navigate('/register/status', {
         replace: true,
         state: { email: trimmed },
@@ -112,14 +134,13 @@ export function VerifyEmailPage() {
   };
 
   const onResend = async () => {
-    if (resending || !email.trim()) return;
+    if (resending || cooldown > 0 || !email.trim()) return;
     setResending(true);
     setServerError(undefined);
-    setCodeSent(false);
     try {
       const response = await resendVerificationCode(email.trim());
-      setDevOnlyCode(response.devOnlyCode);
-      setCodeSent(true);
+      setCooldown(response.retryAfterSeconds ?? RESEND_COOLDOWN_SECONDS);
+      notifySuccess({ title: AUTH.verifyEmail.codeSent });
     } catch (error) {
       setServerError(apiErrorMessage(error, 'We could not resend the code. Please try again.'));
     } finally {
@@ -144,15 +165,9 @@ export function VerifyEmailPage() {
           </Alert>
         ) : null}
 
-        {devOnlyCode ? (
-          <Alert variant="info" title={AUTH.verifyEmail.simulatedEmail.title}>
-            {AUTH.verifyEmail.simulatedEmail.message} <strong>{devOnlyCode}</strong>
-          </Alert>
-        ) : null}
-
-        {codeSent ? (
-          <Alert variant="success" title={AUTH.verifyEmail.codeSent}>
-            {codeSent ? AUTH.verifyEmail.codeSent : ''}
+        {sendFailed ? (
+          <Alert variant="warning" title="We could not send the email">
+            Tap “Resend code” below to try again, or check the address is correct.
           </Alert>
         ) : null}
 
@@ -185,9 +200,13 @@ export function VerifyEmailPage() {
             type="button"
             className={styles.resendButton}
             onClick={onResend}
-            disabled={resending || !email.trim()}
+            disabled={resending || cooldown > 0 || !email.trim()}
           >
-            {resending ? AUTH.verifyEmail.resendingLabel : AUTH.verifyEmail.resendLabel}
+            {resending
+              ? AUTH.verifyEmail.resendingLabel
+              : cooldown > 0
+                ? `Resend in ${formatCountdown(cooldown)}`
+                : AUTH.verifyEmail.resendLabel}
           </button>
         </div>
 

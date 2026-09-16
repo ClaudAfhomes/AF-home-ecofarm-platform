@@ -28,7 +28,7 @@ describe('PublicNavLink', () => {
     expect(screen.getByRole('link', { name: 'About Us' })).toHaveAttribute('aria-current', 'page');
   });
 
-  it('does not reset scroll itself — scroll reset is centralized in <ScrollToTop />', async () => {
+  it('does not reset scroll itself - scroll reset is centralized in <ScrollToTop />', async () => {
     const user = userEvent.setup();
     renderWithProviders(<PublicNavLink to="/about">About Us</PublicNavLink>);
 

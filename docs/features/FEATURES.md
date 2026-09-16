@@ -1,4 +1,4 @@
-# JAD — Feature & Implementation Inventory
+# JAD - Feature & Implementation Inventory
 
 > **Authority:** This document is the **authoritative feature and implementation inventory** for the JA&D (JAD) system.
 >
@@ -6,7 +6,7 @@
 >
 > **Planning authority:** Implementation sequencing, phases, milestones, and MVP scope are defined in `ROADMAP.md`.
 >
-> **Version:** Project 01 — Feature & Implementation Planning (Baseline v1.0)
+> **Version:** Project 01 - Feature & Implementation Planning (Baseline v1.0)
 
 ---
 
@@ -23,18 +23,18 @@
 | `BLOCKED` | Cannot proceed until an owner decision / external dependency is resolved |
 | `DEFERRED` | Deliberately scheduled beyond current planning horizon |
 
-> All features are `NOT_STARTED` at this baseline (verified: repository contains documentation only — no application code).
+> All features are `NOT_STARTED` at this baseline (verified: repository contains documentation only - no application code).
 
 ## 2. Priority Model
 
 | Priority | Meaning |
 |---|---|
-| `P0` | Critical — required for the core business model / MVP |
-| `P1` | High — required for approved capabilities |
-| `P2` | Medium — supporting capabilities |
-| `P3` | Low / future — owner-decision-gated or deferred |
+| `P0` | Critical - required for the core business model / MVP |
+| `P1` | High - required for approved capabilities |
+| `P2` | Medium - supporting capabilities |
+| `P3` | Low / future - owner-decision-gated or deferred |
 
-Where the source documents do not establish a priority, it is marked `TBD — Owner confirmation required`.
+Where the source documents do not establish a priority, it is marked `TBD - Owner confirmation required`.
 
 ---
 
@@ -66,18 +66,18 @@ Where the source documents do not establish a priority, it is marked `TBD — Ow
 
 ## 4. Feature Inventory
 
-### FG-PLATFORM — Platform Foundation (P1)
+### FG-PLATFORM - Platform Foundation (P1)
 
-#### FEAT-001 — Platform Foundation & Data Model
+#### FEAT-001 - Platform Foundation & Data Model
 | Field | Value |
 |---|---|
 | Module / Group | FG-PLATFORM |
-| Phase | P1 — Foundation & Platform Core |
+| Phase | P1 - Foundation & Platform Core |
 | Priority | P0 |
 | Status | NOT_STARTED |
 | Requirements | NFR-SEC-001 (base), NFR-CONF-001, NFR-DATA-001, NFR-INT-001, NFR-AVAIL-001, NFR-REL-001, NFR-PERF-001, NFR-SCAL-001 |
-| Business rules | — (platform enabler) |
-| Dependencies | — |
+| Business rules | - (platform enabler) |
+| Dependencies | - |
 
 Description: Monorepo/project scaffolding for the approved TypeScript full-stack stack; core data model covering all confirmed entities (members, accounts, sales, commissions, ledger, payout accounts, withdrawals, vouchers, properties, customers, referral relationships); transactional and atomicity foundations.
 
@@ -87,7 +87,7 @@ Acceptance criteria: Repository scaffolds; schema covers every confirmed entity 
 
 Notes: Tech-stack choice (TypeScript full-stack) recorded as an approved session decision; deployment/infrastructure choices are **OPEN**.
 
-#### FEAT-002 — Authentication & Session Management
+#### FEAT-002 - Authentication & Session Management
 | Field | Value |
 |---|---|
 | Module / Group | FG-PLATFORM |
@@ -95,7 +95,7 @@ Notes: Tech-stack choice (TypeScript full-stack) recorded as an approved session
 | Priority | P0 |
 | Status | NOT_STARTED |
 | Requirements | FR-AUTH-004, NFR-AUTH-001 |
-| Business rules | — |
+| Business rules | - |
 | Dependencies | FEAT-001 |
 
 Description: Members and staff authenticate to access role-scoped functionality.
@@ -104,7 +104,7 @@ User story: As a member, I want to sign in securely, so that I can access my JAD
 
 Acceptance criteria: Members and staff authenticate with verifiable credentials; sessions enforce role scoping. Specific credential policy is **ASSUMPTION 1** (no mechanism approved).
 
-#### FEAT-003 — RBAC & Object-Level Authorization
+#### FEAT-003 - RBAC & Object-Level Authorization
 | Field | Value |
 |---|---|
 | Module / Group | FG-PLATFORM |
@@ -121,7 +121,7 @@ User story: As a platform administrator, I want least-privilege role controls, s
 
 Acceptance criteria: Actions are restricted per BUSINESS-RULES.md §3; members cannot access other members' records; no escalation path violates the defined matrix.
 
-#### FEAT-004 — Audit Logging & Immutable Trails
+#### FEAT-004 - Audit Logging & Immutable Trails
 | Field | Value |
 |---|---|
 | Module / Group | FG-PLATFORM |
@@ -138,7 +138,7 @@ User story: As a Super Admin, I want audit trails on sensitive actions, so that 
 
 Acceptance criteria: Every defined exception/verification/approval action records actor, target, date/time, reason (where applicable), and result; trails cannot be edited or deleted.
 
-#### FEAT-005 — Platform Configuration Service
+#### FEAT-005 - Platform Configuration Service
 | Field | Value |
 |---|---|
 | Module / Group | FG-CONFIG |
@@ -155,7 +155,7 @@ User story: As a Super Admin, I want to adjust business parameters, so that rate
 
 Acceptance criteria: Parameters listed in FR-ADM-001 are configurable by Super Admin; changes take effect for future transactions; parameter changes require no code changes.
 
-#### FEAT-006 — Email Service Integration
+#### FEAT-006 - Email Service Integration
 | Field | Value |
 |---|---|
 | Module / Group | FG-PLATFORM |
@@ -164,7 +164,7 @@ Acceptance criteria: Parameters listed in FR-ADM-001 are configurable by Super A
 | Status | NOT_STARTED |
 | Requirements | NFR-AUTH-002, FR-ADM-005 (email channel) |
 | Business rules | BR-AUTH-001 |
-| Dependencies | FEAT-001 (external dependency: provider unconfirmed — ASSUMPTION 2) |
+| Dependencies | FEAT-001 (external dependency: provider unconfirmed - ASSUMPTION 2) |
 
 Description: Email delivery for verification and notifications.
 
@@ -174,13 +174,13 @@ Acceptance criteria: Verification emails are delivered and processed; provider s
 
 ---
 
-### FG-MEMBERS — Members & Qualification (P2)
+### FG-MEMBERS - Members & Qualification (P2)
 
-#### FEAT-007 — Member Registration & Account Statuses
+#### FEAT-007 - Member Registration & Account Statuses
 | Field | Value |
 |---|---|
 | Module / Group | FG-MEMBERS |
-| Phase | P2 — Members & Qualification |
+| Phase | P2 - Members & Qualification |
 | Priority | P0 |
 | Status | NOT_STARTED |
 | Requirements | FR-AUTH-002, FR-AUTH-003, FR-REG-007, FR-REG-009, FR-REG-010, FR-REG-012 |
@@ -193,7 +193,7 @@ User story: As an applicant, I want to register without purchasing anything, so 
 
 Acceptance criteria: No purchase step exists in the flow (AC-REG-001); statuses limited to the three confirmed values; registration without sponsor is allowed; optional referral code accepted; member cannot change country.
 
-#### FEAT-008 — Member Profile
+#### FEAT-008 - Member Profile
 | Field | Value |
 |---|---|
 | Module / Group | FG-MEMBERS |
@@ -210,7 +210,7 @@ User story: As a member, I want a complete profile, so that my identity and cont
 
 Acceptance criteria: All confirmed fields are captured; profile photo is optional; country is not user-editable.
 
-#### FEAT-009 — Email Verification
+#### FEAT-009 - Email Verification
 | Field | Value |
 |---|---|
 | Module / Group | FG-MEMBERS |
@@ -224,7 +224,7 @@ Acceptance criteria: All confirmed fields are captured; profile photo is optiona
 
 User story: As an applicant, I want my email verified, so that my account can be approved.
 
-#### FEAT-010 — Government ID Submission & Manual Verification
+#### FEAT-010 - Government ID Submission & Manual Verification
 | Field | Value |
 |---|---|
 | Module / Group | FG-MEMBERS |
@@ -238,7 +238,7 @@ User story: As an applicant, I want my email verified, so that my account can be
 
 User story: As an applicant, I want to submit my government ID, so that I can be verified for qualification.
 
-#### FEAT-011 — Admin Registration Approval / Rejection
+#### FEAT-011 - Admin Registration Approval / Rejection
 | Field | Value |
 |---|---|
 | Module / Group | FG-MEMBERS |
@@ -248,11 +248,11 @@ User story: As an applicant, I want to submit my government ID, so that I can be
 | Requirements | FR-REG-004, FR-REG-005 |
 | Business rules | BR-REG-004, BR-REG-005 |
 | Dependencies | FEAT-003, FEAT-009, FEAT-010 |
-| Acceptance criteria | Rejection records a mandatory reason; rejected registration can be resubmitted (currently unlimited attempts — OD-024) (AC-REG-001). |
+| Acceptance criteria | Rejection records a mandatory reason; rejected registration can be resubmitted (currently unlimited attempts - OD-024) (AC-REG-001). |
 
 User story: As an Admin, I want to approve or reject registrations with a reason, so that only qualified members become Active.
 
-#### FEAT-012 — Qualification Questions
+#### FEAT-012 - Qualification Questions
 | Field | Value |
 |---|---|
 | Module / Group | FG-MEMBERS |
@@ -266,7 +266,7 @@ User story: As an Admin, I want to approve or reject registrations with a reason
 
 User story: As an applicant, I want to complete qualification questions, so that I can reach Active + Qualified status.
 
-#### FEAT-013 — Age Validation (Configurable Minimum)
+#### FEAT-013 - Age Validation (Configurable Minimum)
 | Field | Value |
 |---|---|
 | Module / Group | FG-MEMBERS |
@@ -282,13 +282,13 @@ User story: As a Super Admin, I want the minimum age enforced and configurable, 
 
 ---
 
-### FG-REF — Referral & Sponsor (P3)
+### FG-REF - Referral & Sponsor (P3)
 
-#### FEAT-019 — Referral Code Generation
+#### FEAT-019 - Referral Code Generation
 | Field | Value |
 |---|---|
 | Module / Group | FG-REF |
-| Phase | P3 — Referral & Sponsor |
+| Phase | P3 - Referral & Sponsor |
 | Priority | P0 |
 | Status | NOT_STARTED |
 | Requirements | FR-REF-001, FR-REF-002 |
@@ -298,7 +298,7 @@ User story: As a Super Admin, I want the minimum age enforced and configurable, 
 
 User story: As a member, I want a unique referral code, so that I can refer others under my account.
 
-#### FEAT-020 — Sponsor Assignment
+#### FEAT-020 - Sponsor Assignment
 | Field | Value |
 |---|---|
 | Module / Group | FG-REF |
@@ -312,7 +312,7 @@ User story: As a member, I want a unique referral code, so that I can refer othe
 
 User story: As an Admin, I want to assign sponsors through approval, so that sponsor-less members can be placed in the network.
 
-#### FEAT-021 — Single-Level Referral Relationship
+#### FEAT-021 - Single-Level Referral Relationship
 | Field | Value |
 |---|---|
 | Module / Group | FG-REF |
@@ -326,7 +326,7 @@ User story: As an Admin, I want to assign sponsors through approval, so that spo
 
 User story: As a member, I want referrals recognized only one level deep, so that the network model stays compliant.
 
-#### FEAT-022 — Sponsor Change Workflow
+#### FEAT-022 - Sponsor Change Workflow
 | Field | Value |
 |---|---|
 | Module / Group | FG-REF |
@@ -340,7 +340,7 @@ User story: As a member, I want referrals recognized only one level deep, so tha
 | User story | As an Admin, I want sponsor changes controlled and audited, so that network integrity is preserved. |
 | Notes | Workflow control (approval + audit) is CONFIRMED; the circumstances allowing a change are **BLOCKED on OD-013**. |
 
-#### FEAT-023 — Sponsor Eligibility Enforcement
+#### FEAT-023 - Sponsor Eligibility Enforcement
 | Field | Value |
 |---|---|
 | Module / Group | FG-REF |
@@ -356,13 +356,13 @@ User story: As an Active + Qualified member, I want to sponsor others, so that I
 
 ---
 
-### FG-CATALOG — Customers & Property Catalog (P4)
+### FG-CATALOG - Customers & Property Catalog (P4)
 
-#### FEAT-024 — Customer Records
+#### FEAT-024 - Customer Records
 | Field | Value |
 |---|---|
 | Module / Group | FG-CATALOG |
-| Phase | P4 — Catalog, Customers & Sales |
+| Phase | P4 - Catalog, Customers & Sales |
 | Priority | P1 |
 | Status | NOT_STARTED |
 | Requirements | FR-CUS-001, FR-CUS-002 |
@@ -372,7 +372,7 @@ User story: As an Active + Qualified member, I want to sponsor others, so that I
 
 User story: As an Active + Qualified member, I want to record non-member customers, so that I can submit qualifying sales.
 
-#### FEAT-025 — Admin Property Catalog
+#### FEAT-025 - Admin Property Catalog
 | Field | Value |
 |---|---|
 | Module / Group | FG-CATALOG |
@@ -386,7 +386,7 @@ User story: As an Active + Qualified member, I want to record non-member custome
 
 User story: As an Admin, I want to control the property catalog, so that values are authoritative and consistent.
 
-#### FEAT-026 — Historical Property Value Preservation
+#### FEAT-026 - Historical Property Value Preservation
 | Field | Value |
 |---|---|
 | Module / Group | FG-CATALOG |
@@ -402,9 +402,9 @@ User story: As a system, I want historical sale values frozen, so that past comm
 
 ---
 
-### FG-SALES — Sales & Qualifying Sale (P4)
+### FG-SALES - Sales & Qualifying Sale (P4)
 
-#### FEAT-027 — Sale Submission
+#### FEAT-027 - Sale Submission
 | Field | Value |
 |---|---|
 | Module / Group | FG-SALES |
@@ -418,7 +418,7 @@ User story: As a system, I want historical sale values frozen, so that past comm
 
 User story: As an Active + Qualified member, I want to submit customer sales, so that I can earn commission.
 
-#### FEAT-028 — Sale Approval / Rejection with Reason
+#### FEAT-028 - Sale Approval / Rejection with Reason
 | Field | Value |
 |---|---|
 | Module / Group | FG-SALES |
@@ -432,7 +432,7 @@ User story: As an Active + Qualified member, I want to submit customer sales, so
 
 User story: As an Admin, I want to approve or reject sales with a reason, so that only valid sales progress.
 
-#### FEAT-029 — Payment Verification
+#### FEAT-029 - Payment Verification
 | Field | Value |
 |---|---|
 | Module / Group | FG-SALES |
@@ -446,7 +446,7 @@ User story: As an Admin, I want to approve or reject sales with a reason, so tha
 
 User story: As a Finance officer, I want to verify payments, so that sales can become commission-qualifying.
 
-#### FEAT-030 — Qualifying Sale Determination
+#### FEAT-030 - Qualifying Sale Determination
 | Field | Value |
 |---|---|
 | Module / Group | FG-SALES |
@@ -460,7 +460,7 @@ User story: As a Finance officer, I want to verify payments, so that sales can b
 
 User story: As a system, I want to determine Qualifying Sales, so that commissions are created correctly.
 
-#### FEAT-031 — Sale Resubmission & Lock
+#### FEAT-031 - Sale Resubmission & Lock
 | Field | Value |
 |---|---|
 | Module / Group | FG-SALES |
@@ -474,7 +474,7 @@ User story: As a system, I want to determine Qualifying Sales, so that commissio
 
 User story: As a Super Admin, I want resubmission limits configurable, so that abuse is prevented.
 
-#### FEAT-032 — Reopening Locked Sales
+#### FEAT-032 - Reopening Locked Sales
 | Field | Value |
 |---|---|
 | Module / Group | FG-SALES |
@@ -490,13 +490,13 @@ User story: As an Admin, I want to review and reopen locked sales, so that legit
 
 ---
 
-### FG-COMMISSION — Commission Engine (P5)
+### FG-COMMISSION - Commission Engine (P5)
 
-#### FEAT-033 — Direct Commission Engine
+#### FEAT-033 - Direct Commission Engine
 | Field | Value |
 |---|---|
 | Module / Group | FG-COMMISSION |
-| Phase | P5 — Commission Engine |
+| Phase | P5 - Commission Engine |
 | Priority | P0 |
 | Status | NOT_STARTED |
 | Requirements | FR-COM-001, FR-COM-004 |
@@ -506,7 +506,7 @@ User story: As an Admin, I want to review and reopen locked sales, so that legit
 
 User story: As an Active + Qualified member, I want to earn Direct Commission on qualifying sales, so that I am rewarded for selling.
 
-#### FEAT-034 — Direct Referral Engine
+#### FEAT-034 - Direct Referral Engine
 | Field | Value |
 |---|---|
 | Module / Group | FG-COMMISSION |
@@ -520,7 +520,7 @@ User story: As an Active + Qualified member, I want to earn Direct Commission on
 
 User story: As a direct sponsor, I want Direct Referral commission, so that I am rewarded for growing the network.
 
-#### FEAT-035 — Commission Creation & Pending Lifecycle
+#### FEAT-035 - Commission Creation & Pending Lifecycle
 | Field | Value |
 |---|---|
 | Module / Group | FG-COMMISSION |
@@ -534,7 +534,7 @@ User story: As a direct sponsor, I want Direct Referral commission, so that I am
 
 User story: As a system, I want commissions created as Pending, so that availability is controlled by clearing.
 
-#### FEAT-036 — Commission Clearing Scheduler
+#### FEAT-036 - Commission Clearing Scheduler
 | Field | Value |
 |---|---|
 | Module / Group | FG-COMMISSION |
@@ -548,7 +548,7 @@ User story: As a system, I want commissions created as Pending, so that availabi
 
 User story: As a Super Admin, I want the clearing period configurable, so that payout timing can be adjusted.
 
-#### FEAT-037 — Commission Cancellation (Pre-Clearing)
+#### FEAT-037 - Commission Cancellation (Pre-Clearing)
 | Field | Value |
 |---|---|
 | Module / Group | FG-COMMISSION |
@@ -562,7 +562,7 @@ User story: As a Super Admin, I want the clearing period configurable, so that p
 
 User story: As a system, I want Pending commissions cancelled on early transaction cancellation, so that ledger stays accurate.
 
-#### FEAT-038 — Commission Reversal (Post-Clearing)
+#### FEAT-038 - Commission Reversal (Post-Clearing)
 | Field | Value |
 |---|---|
 | Module / Group | FG-COMMISSION |
@@ -576,7 +576,7 @@ User story: As a system, I want Pending commissions cancelled on early transacti
 
 User story: As a system, I want Available commissions reversed on late cancellation, so that the ledger reconciles.
 
-#### FEAT-039 — Withdrawn Commission Recovery
+#### FEAT-039 - Withdrawn Commission Recovery
 | Field | Value |
 |---|---|
 | Module / Group | FG-COMMISSION |
@@ -590,7 +590,7 @@ User story: As a system, I want Available commissions reversed on late cancellat
 
 User story: As a Super Admin, I want to manually recover withdrawn reversed commissions, so that balances can be corrected.
 
-#### FEAT-040 — Immutable Commission Ledger
+#### FEAT-040 - Immutable Commission Ledger
 | Field | Value |
 |---|---|
 | Module / Group | FG-COMMISSION |
@@ -604,29 +604,29 @@ User story: As a Super Admin, I want to manually recover withdrawn reversed comm
 
 User story: As a system, I want an immutable commission ledger, so that financial history is trustworthy.
 
-#### FEAT-041 — Group Incentive
+#### FEAT-041 - Group Incentive
 | Field | Value |
 |---|---|
 | Module / Group | FG-COMMISSION |
-| Phase | P12 — Group Incentive (deferred) |
+| Phase | P12 - Group Incentive (deferred) |
 | Priority | P3 (concept confirmed; parameters TBD) |
 | Status | DEFERRED |
 | Requirements | FR-COM-013 |
 | Business rules | BR-COM-008 |
 | Dependencies | **OD-006..012** (eligibility, rate, formula, trigger, basis, timing, program applicability) |
-| Acceptance criteria | TBD — defined only after Owner decisions OD-006..012. Must not create multi-level commission (BI-004). |
+| Acceptance criteria | TBD - defined only after Owner decisions OD-006..012. Must not create multi-level commission (BI-004). |
 | User story | As an Active + Qualified member, I want to earn a group bonus, so that team performance is rewarded. |
 | Notes | Concept is CONFIRMED; **all parameters are BLOCKED on OD-006..012**. Do not invent. |
 
 ---
 
-### FG-EWALLET — eWallet & Financial Ledger (P6)
+### FG-EWALLET - eWallet & Financial Ledger (P6)
 
-#### FEAT-042 — Financial Ledger
+#### FEAT-042 - Financial Ledger
 | Field | Value |
 |---|---|
 | Module / Group | FG-EWALLET |
-| Phase | P6 — eWallet & Financial Ledger |
+| Phase | P6 - eWallet & Financial Ledger |
 | Priority | P0 |
 | Status | NOT_STARTED |
 | Requirements | FR-WAL-001, FR-WAL-002 |
@@ -636,7 +636,7 @@ User story: As a system, I want an immutable commission ledger, so that financia
 
 User story: As a member, I want a complete financial ledger, so that every credit and debit is traceable.
 
-#### FEAT-043 — Available Balance (Non-Negative, Excludes Pending)
+#### FEAT-043 - Available Balance (Non-Negative, Excludes Pending)
 | Field | Value |
 |---|---|
 | Module / Group | FG-EWALLET |
@@ -650,7 +650,7 @@ User story: As a member, I want a complete financial ledger, so that every credi
 
 User story: As a member, I want my available balance accurate, so that I only withdraw real funds.
 
-#### FEAT-071 — Financial Adjustments (Super Admin)
+#### FEAT-071 - Financial Adjustments (Super Admin)
 | Field | Value |
 |---|---|
 | Module / Group | FG-EWALLET |
@@ -666,9 +666,9 @@ User story: As a Super Admin, I want to apply financial adjustments, so that ver
 
 ---
 
-### FG-MESSAGING — Admin ↔ Member Messaging (P9)
+### FG-MESSAGING - Admin ↔ Member Messaging (P9)
 
-#### FEAT-072 — Admin ↔ Member Messaging (one thread per member)
+#### FEAT-072 - Admin ↔ Member Messaging (one thread per member)
 | Field | Value |
 |---|---|
 | Module / Group | FG-MESSAGING |
@@ -684,13 +684,13 @@ User story: As a member, I want to message the admin team and read their replies
 
 ---
 
-### FG-PAYOUT — Payout Accounts (P7)
+### FG-PAYOUT - Payout Accounts (P7)
 
-#### FEAT-044 — Payout Account Management
+#### FEAT-044 - Payout Account Management
 | Field | Value |
 |---|---|
 | Module / Group | FG-PAYOUT |
-| Phase | P7 — Payouts & Withdrawals |
+| Phase | P7 - Payouts & Withdrawals |
 | Priority | P0 |
 | Status | NOT_STARTED |
 | Requirements | FR-PAY-001, FR-PAY-006 |
@@ -700,7 +700,7 @@ User story: As a member, I want to message the admin team and read their replies
 
 User story: As a member, I want to manage payout accounts, so that I can receive withdrawals.
 
-#### FEAT-045 — Payout Account Verification
+#### FEAT-045 - Payout Account Verification
 | Field | Value |
 |---|---|
 | Module / Group | FG-PAYOUT |
@@ -714,7 +714,7 @@ User story: As a member, I want to manage payout accounts, so that I can receive
 
 User story: As an Admin, I want to verify payout accounts, so that only legitimate accounts receive funds.
 
-#### FEAT-046 — Verified-Account Withdrawal Selection
+#### FEAT-046 - Verified-Account Withdrawal Selection
 | Field | Value |
 |---|---|
 | Module / Group | FG-PAYOUT |
@@ -728,7 +728,7 @@ User story: As an Admin, I want to verify payout accounts, so that only legitima
 
 User story: As a member, I want to withdraw only through verified accounts, so that payouts are safe.
 
-#### FEAT-047 — Payout Methods
+#### FEAT-047 - Payout Methods
 | Field | Value |
 |---|---|
 | Module / Group | FG-PAYOUT |
@@ -738,15 +738,15 @@ User story: As a member, I want to withdraw only through verified accounts, so t
 | Requirements | FR-PAY-002 |
 | Business rules | BR-PAY-002 |
 | Dependencies | **OD-016** (final supported providers) |
-| Acceptance criteria | TBD — final provider set per OD-016. |
+| Acceptance criteria | TBD - final provider set per OD-016. |
 | User story | As a member, I want supported payout methods, so that I can choose how to receive funds. |
 | Notes | Candidates: traditional banks, digital banks, GCash, other. **Final set BLOCKED on OD-016.** |
 
 ---
 
-### FG-WDR — Withdrawals (P7)
+### FG-WDR - Withdrawals (P7)
 
-#### FEAT-048 — Withdrawal Request & Reservation
+#### FEAT-048 - Withdrawal Request & Reservation
 | Field | Value |
 |---|---|
 | Module / Group | FG-WDR |
@@ -760,7 +760,7 @@ User story: As a member, I want to withdraw only through verified accounts, so t
 
 User story: As a member, I want to request withdrawals up to my available balance, so that I can cash out.
 
-#### FEAT-049 — Withdrawal Completion
+#### FEAT-049 - Withdrawal Completion
 | Field | Value |
 |---|---|
 | Module / Group | FG-WDR |
@@ -774,7 +774,7 @@ User story: As a member, I want to request withdrawals up to my available balanc
 
 User story: As a member, I want completed withdrawals final, so that my balance reflects reality.
 
-#### FEAT-050 — Withdrawal Rejection & Release
+#### FEAT-050 - Withdrawal Rejection & Release
 | Field | Value |
 |---|---|
 | Module / Group | FG-WDR |
@@ -784,11 +784,11 @@ User story: As a member, I want completed withdrawals final, so that my balance 
 | Requirements | FR-WDR-004, FR-WDR-005 |
 | Business rules | BR-WDR-004, BR-WDR-005 |
 | Dependencies | FEAT-048 |
-| Acceptance criteria | Rejection releases reservation and restores balance; rejection records a reason; rejected request cannot be edited/resubmitted — a new request is required (AC-WDR-001). |
+| Acceptance criteria | Rejection releases reservation and restores balance; rejection records a reason; rejected request cannot be edited/resubmitted - a new request is required (AC-WDR-001). |
 
 User story: As a member, I want rejected withdrawals released and re-requested, so that I retain control of my funds.
 
-#### FEAT-051 — Withdrawal Status Model
+#### FEAT-051 - Withdrawal Status Model
 | Field | Value |
 |---|---|
 | Module / Group | FG-WDR |
@@ -798,15 +798,15 @@ User story: As a member, I want rejected withdrawals released and re-requested, 
 | Requirements | FR-WDR-006 |
 | Business rules | BR-WDR-006 |
 | Dependencies | **OD-017, OD-018** (final processing workflow & status model) |
-| Acceptance criteria | TBD — defined only after OD-017/018. Do not invent additional states. |
+| Acceptance criteria | TBD - defined only after OD-017/018. Do not invent additional states. |
 | User story | As an operator, I want a defined withdrawal status model, so that processing is predictable. |
 | Notes | **BLOCKED on OD-017/018.** |
 
 ---
 
-### FG-BND — External Payment Boundary (P7)
+### FG-BND - External Payment Boundary (P7)
 
-#### FEAT-070 — External Payment/Payout Boundary Records
+#### FEAT-070 - External Payment/Payout Boundary Records
 | Field | Value |
 |---|---|
 | Module / Group | FG-BND |
@@ -822,22 +822,22 @@ User story: As a system, I want to record payments and payouts, so that external
 
 ---
 
-### FG-VOUCHER — Vouchers & QR Redemption (P8)
+### FG-VOUCHER - Vouchers & QR Redemption (P8)
 
 > **Implemented model (ADR-014, 2026-09-15):** the FEAT-052..059 P8 entries below describe
 > the CTO-signing / merchant-redemption architecture and are **PROPOSED / future**. The
 > implemented vouchers flow (Phase B7, in the admin + member apps) is: **admin "Create
-> Voucher"** (a definition — title + value, no member), **"Assign to Member"** on the voucher
+> Voucher"** (a definition - title + value, no member), **"Assign to Member"** on the voucher
 > detail page (member + per-assignment expiry/validity → unique member voucher +
 > locally-generated QR), **admin QR scan** (`/admin/vouchers/scan` verify-only) and **admin
 > redeem in full** (`/admin/vouchers/:id/redeem`). Partial redemption, merchant portal, and
 > signing service remain gated (OD-019..023, ADR-007).
 
-#### FEAT-052 — Voucher Issuance & Signing Flow
+#### FEAT-052 - Voucher Issuance & Signing Flow
 | Field | Value |
 |---|---|
 | Module / Group | FG-VOUCHER |
-| Phase | P8 — Vouchers & QR Redemption Security |
+| Phase | P8 - Vouchers & QR Redemption Security |
 | Priority | P1 |
 | Status | NOT_STARTED |
 | Requirements | FR-SEC-001..003 (signing enablers) |
@@ -847,7 +847,7 @@ User story: As a system, I want to record payments and payouts, so that external
 | User story | As the CTO, I want vouchers signed only through the controlled process, so that they cannot be forged. |
 | Notes | Voucher issuance is a necessary consequence of the confirmed signing/redemption requirements; issuance workflow specifics are **ASSUMPTION** (no issuance requirements exist beyond signing and redemption). |
 
-#### FEAT-053 — Voucher Redemption (Full / Partial)
+#### FEAT-053 - Voucher Redemption (Full / Partial)
 | Field | Value |
 |---|---|
 | Module / Group | FG-VOUCHER |
@@ -861,7 +861,7 @@ User story: As a system, I want to record payments and payouts, so that external
 
 User story: As a merchant, I want to redeem vouchers fully or partially, so that value is consumed accurately.
 
-#### FEAT-054 — Redemption History
+#### FEAT-054 - Redemption History
 | Field | Value |
 |---|---|
 | Module / Group | FG-VOUCHER |
@@ -875,7 +875,7 @@ User story: As a merchant, I want to redeem vouchers fully or partially, so that
 
 User story: As an Admin, I want redemption history retained, so that voucher usage is auditable.
 
-#### FEAT-055 — Online Merchant Redemption Portal
+#### FEAT-055 - Online Merchant Redemption Portal
 | Field | Value |
 |---|---|
 | Module / Group | FG-VOUCHER |
@@ -889,7 +889,7 @@ User story: As an Admin, I want redemption history retained, so that voucher usa
 
 User story: As a merchant, I want to redeem vouchers online through JAD, so that redemption is secure and verified.
 
-#### FEAT-056 — Redemption Verification Checks
+#### FEAT-056 - Redemption Verification Checks
 | Field | Value |
 |---|---|
 | Module / Group | FG-VOUCHER |
@@ -903,7 +903,7 @@ User story: As a merchant, I want to redeem vouchers online through JAD, so that
 
 User story: As a system, I want full verification before redemption, so that invalid vouchers are rejected.
 
-#### FEAT-057 — Atomic Redemption
+#### FEAT-057 - Atomic Redemption
 | Field | Value |
 |---|---|
 | Module / Group | FG-VOUCHER |
@@ -917,7 +917,7 @@ User story: As a system, I want full verification before redemption, so that inv
 
 User story: As a system, I want atomic redemption, so that vouchers cannot be double-redeemed.
 
-#### FEAT-058 — Voucher Rules (Transfer / Revoke / Expiry / Merchant Permissions)
+#### FEAT-058 - Voucher Rules (Transfer / Revoke / Expiry / Merchant Permissions)
 | Field | Value |
 |---|---|
 | Module / Group | FG-VOUCHER |
@@ -927,15 +927,15 @@ User story: As a system, I want atomic redemption, so that vouchers cannot be do
 | Requirements | FR-VCH-007 |
 | Business rules | BR-VCH-007 |
 | Dependencies | **OD-019..023** |
-| Acceptance criteria | TBD — defined only after OD-019..023. |
+| Acceptance criteria | TBD - defined only after OD-019..023. |
 | User story | As an Admin, I want voucher rules defined, so that voucher use is controlled. |
 | Notes | **BLOCKED on OD-019..023.** |
 
 ---
 
-### FG-SECURITY — Security & Signing (P8)
+### FG-SECURITY - Security & Signing (P8)
 
-#### FEAT-059 — CTO-Controlled Signing Service Integration
+#### FEAT-059 - CTO-Controlled Signing Service Integration
 | Field | Value |
 |---|---|
 | Module / Group | FG-SECURITY |
@@ -951,13 +951,13 @@ User story: As the CTO, I want the signing key exclusively under my control, so 
 
 ---
 
-### FG-CONTENT — Marketing, Policies & Notifications (P9)
+### FG-CONTENT - Marketing, Policies & Notifications (P9)
 
-#### FEAT-060 — Media Management
+#### FEAT-060 - Media Management
 | Field | Value |
 |---|---|
 | Module / Group | FG-CONTENT |
-| Phase | P9 — Marketing, Policies & Notifications |
+| Phase | P9 - Marketing, Policies & Notifications |
 | Priority | P2 |
 | Status | NOT_STARTED |
 | Requirements | FR-ADM-002 |
@@ -967,7 +967,7 @@ User story: As the CTO, I want the signing key exclusively under my control, so 
 
 User story: As an Admin, I want to manage media, so that promotions are current.
 
-#### FEAT-061 — Content Forwarding & Download
+#### FEAT-061 - Content Forwarding & Download
 | Field | Value |
 |---|---|
 | Module / Group | FG-CONTENT |
@@ -981,7 +981,7 @@ User story: As an Admin, I want to manage media, so that promotions are current.
 
 User story: As a member, I want to forward permitted materials, so that I can share promotions with my network.
 
-#### FEAT-062 — Policies & Guidelines Management
+#### FEAT-062 - Policies & Guidelines Management
 | Field | Value |
 |---|---|
 | Module / Group | FG-CONTENT |
@@ -995,7 +995,7 @@ User story: As a member, I want to forward permitted materials, so that I can sh
 
 User story: As an Admin, I want to manage policies, so that members see the latest rules.
 
-#### FEAT-063 — Broadcasts & Push Notifications
+#### FEAT-063 - Broadcasts & Push Notifications
 | Field | Value |
 |---|---|
 | Module / Group | FG-CONTENT |
@@ -1011,13 +1011,13 @@ User story: As an Admin, I want to broadcast updates, so that members are inform
 
 ---
 
-### FG-REPORTING — Reporting & Genealogy (P10)
+### FG-REPORTING - Reporting & Genealogy (P10)
 
-#### FEAT-064 — Direct Referrals View
+#### FEAT-064 - Direct Referrals View
 | Field | Value |
 |---|---|
 | Module / Group | FG-REPORTING |
-| Phase | P10 — Reporting & Genealogy |
+| Phase | P10 - Reporting & Genealogy |
 | Priority | P1 |
 | Status | NOT_STARTED |
 | Requirements | FR-RPT-001 |
@@ -1027,7 +1027,7 @@ User story: As an Admin, I want to broadcast updates, so that members are inform
 
 User story: As a member, I want to view my direct referrals, so that I understand my network.
 
-#### FEAT-065 — Group Network View
+#### FEAT-065 - Group Network View
 | Field | Value |
 |---|---|
 | Module / Group | FG-REPORTING |
@@ -1041,7 +1041,7 @@ User story: As a member, I want to view my direct referrals, so that I understan
 
 User story: As a member, I want a network overview, so that I can monitor growth without implied commissions.
 
-#### FEAT-066 — Total Earned
+#### FEAT-066 - Total Earned
 | Field | Value |
 |---|---|
 | Module / Group | FG-REPORTING |
@@ -1051,11 +1051,11 @@ User story: As a member, I want a network overview, so that I can monitor growth
 | Requirements | FR-RPT-003 |
 | Business rules | BR-RPT-003 |
 | Dependencies | **OD-025** (precise definition against the ledger); FEAT-042 |
-| Acceptance criteria | TBD — must be ledger-defined and must exclude pending/non-available funds once OD-025 is decided. |
+| Acceptance criteria | TBD - must be ledger-defined and must exclude pending/non-available funds once OD-025 is decided. |
 | User story | As a member, I want an accurate Total Earned, so that I know what I have truly earned. |
 | Notes | **BLOCKED on OD-025.** |
 
-#### FEAT-067 — My Genealogy Visualization
+#### FEAT-067 - My Genealogy Visualization
 | Field | Value |
 |---|---|
 | Module / Group | FG-REPORTING |
@@ -1071,13 +1071,13 @@ User story: As a member, I want to view my genealogy, so that I can see my refer
 
 ---
 
-### FG-PROGRAMS — Domestic / Abroad Programs (P11)
+### FG-PROGRAMS - Domestic / Abroad Programs (P11)
 
-#### FEAT-014 — Abroad Geolocation Determination
+#### FEAT-014 - Abroad Geolocation Determination
 | Field | Value |
 |---|---|
 | Module / Group | FG-PROGRAMS (GEO) |
-| Phase | P11 — Abroad Program & Geolocation |
+| Phase | P11 - Abroad Program & Geolocation |
 | Priority | P2 |
 | Status | NOT_STARTED |
 | Requirements | FR-GEO-001, FR-GEO-002 |
@@ -1087,7 +1087,7 @@ User story: As a member, I want to view my genealogy, so that I can see my refer
 
 User story: As an Abroad applicant, I want my location determined, so that I can register in the correct program.
 
-#### FEAT-015 — Philippines Detection & Abroad Block
+#### FEAT-015 - Philippines Detection & Abroad Block
 | Field | Value |
 |---|---|
 | Module / Group | FG-PROGRAMS (GEO) |
@@ -1101,7 +1101,7 @@ User story: As an Abroad applicant, I want my location determined, so that I can
 
 User story: As a system, I want to block Philippines-based applicants from the Abroad program, so that program boundaries hold.
 
-#### FEAT-016 — Location Exception Workflow
+#### FEAT-016 - Location Exception Workflow
 | Field | Value |
 |---|---|
 | Module / Group | FG-PROGRAMS (GEO) |
@@ -1115,7 +1115,7 @@ User story: As a system, I want to block Philippines-based applicants from the A
 
 User story: As an Abroad applicant, I want to request a location exception, so that genuine edge cases can be reviewed.
 
-#### FEAT-017 — Geolocation Accuracy Threshold
+#### FEAT-017 - Geolocation Accuracy Threshold
 | Field | Value |
 |---|---|
 | Module / Group | FG-PROGRAMS (GEO) |
@@ -1125,11 +1125,11 @@ User story: As an Abroad applicant, I want to request a location exception, so t
 | Requirements | FR-GEO-007 |
 | Business rules | BR-GEO-005 |
 | Dependencies | **OD-014** |
-| Acceptance criteria | TBD — defined only after OD-014. |
+| Acceptance criteria | TBD - defined only after OD-014. |
 | User story | As a system, I want a location accuracy threshold, so that spoofed locations are rejected. |
 | Notes | **BLOCKED on OD-014.** |
 
-#### FEAT-018 — Anti-GPS-Spoofing
+#### FEAT-018 - Anti-GPS-Spoofing
 | Field | Value |
 |---|---|
 | Module / Group | FG-PROGRAMS (GEO) |
@@ -1139,11 +1139,11 @@ User story: As an Abroad applicant, I want to request a location exception, so t
 | Requirements | FR-GEO-008 |
 | Business rules | BR-GEO-006 |
 | Dependencies | **OD-015** |
-| Acceptance criteria | TBD — defined only after OD-015. |
+| Acceptance criteria | TBD - defined only after OD-015. |
 | User story | As a system, I want anti-spoofing protections, so that Abroad eligibility is not gamed. |
 | Notes | **BLOCKED on OD-015.** |
 
-#### FEAT-068 — Program Separation & Independent Configuration
+#### FEAT-068 - Program Separation & Independent Configuration
 | Field | Value |
 |---|---|
 | Module / Group | FG-PROGRAMS |
@@ -1157,7 +1157,7 @@ User story: As an Abroad applicant, I want to request a location exception, so t
 
 User story: As a Super Admin, I want programs configured independently, so that Domestic and Abroad operate by their own rules.
 
-#### FEAT-069 — Domestic / Abroad Rule Differences
+#### FEAT-069 - Domestic / Abroad Rule Differences
 | Field | Value |
 |---|---|
 | Module / Group | FG-PROGRAMS |
@@ -1167,7 +1167,7 @@ User story: As a Super Admin, I want programs configured independently, so that 
 | Requirements | FR-PRG-003 |
 | Business rules | BR-PRG-003 |
 | Dependencies | **OD-001..005** |
-| Acceptance criteria | TBD — defined only after OD-001..005. |
+| Acceptance criteria | TBD - defined only after OD-001..005. |
 | User story | As a Super Admin, I want exact program rules defined, so that program-specific behavior is correct. |
 | Notes | **BLOCKED on OD-001..005.** |
 
@@ -1188,7 +1188,7 @@ User story: As a Super Admin, I want programs configured independently, so that 
 | FR-REG-003 | FEAT-012 |
 | FR-REG-004 | FEAT-011 |
 | FR-REG-005 | FEAT-011 |
-| FR-REG-006 | (future — OD-024; no active feature) |
+| FR-REG-006 | (future - OD-024; no active feature) |
 | FR-REG-007 | FEAT-007 |
 | FR-REG-008 | FEAT-012 |
 | FR-REG-009 | FEAT-007, FEAT-020 |
@@ -1347,7 +1347,7 @@ Every feature references its governing business rules in the Feature Inventory a
 | FEAT-017 | OD-014 (geolocation accuracy threshold) |
 | FEAT-018 | OD-015 (anti-GPS-spoofing) |
 | FEAT-022 | OD-013 (sponsor-change circumstances; workflow itself is confirmed) |
-| FEAT-041 | OD-006..012 (Group Incentive parameters) — status DEFERRED |
+| FEAT-041 | OD-006..012 (Group Incentive parameters) - status DEFERRED |
 | FEAT-047 | OD-016 (final payout providers) |
 | FEAT-051 | OD-017, OD-018 (withdrawal status model / workflow) |
 | FEAT-058 | OD-019..023 (voucher transfer/revoke/expiry/merchant permissions) |
@@ -1355,7 +1355,7 @@ Every feature references its governing business rules in the Feature Inventory a
 | FEAT-069 | OD-001..005 (Domestic/Abroad rule differences) |
 
 ### 6.2 Requirements with No Active Feature
-- **FR-REG-006** (max registration attempts) — explicitly FUTURE scope (OD-024). No feature until approved. Recorded intentionally.
+- **FR-REG-006** (max registration attempts) - explicitly FUTURE scope (OD-024). No feature until approved. Recorded intentionally.
 
 ### 6.3 Traceability Status
 - All CONFIRMED functional requirements mapped to at least one feature. **No orphaned confirmed requirements.**

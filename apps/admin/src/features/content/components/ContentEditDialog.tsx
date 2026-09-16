@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { Button, Dialog, Icon, useToast } from '@jad/ui';
+import { Button, Dialog, Icon, notifyError, notifySuccess } from '@jad/ui';
 import type { ContentKind, ForwardableContent } from '@jad/contracts';
 
 import { useUpdateContent } from '../hooks/useUpdateContent';
@@ -28,7 +28,6 @@ export function ContentEditDialog({
   item: ForwardableContent | null;
   onClose: () => void;
 }) {
-  const { toast } = useToast();
   const updateContent = useUpdateContent();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -168,7 +167,7 @@ export function ContentEditDialog({
           ...(downloadUrl !== undefined && { downloadUrl }),
         },
       });
-      toast({
+      notifySuccess({
         title: 'Marketing tool updated',
         message: `"${title.trim()}" was saved${
           typeof downloadUrl === 'string'
@@ -177,11 +176,10 @@ export function ContentEditDialog({
               ? ', file removed'
               : ''
         }.`,
-        tone: 'success',
       });
       onClose();
     } catch (e) {
-      toast({ title: 'Update failed', message: (e as Error).message, tone: 'danger' });
+      notifyError({ title: 'Update failed', message: (e as Error).message });
     } finally {
       setSaving(false);
     }
@@ -255,7 +253,7 @@ export function ContentEditDialog({
                 }}
               />
               <span style={{ fontSize: 'var(--text-caption)', color: 'var(--color-text-muted)' }}>
-                New file preview — Save to replace the current file.
+                New file preview - Save to replace the current file.
               </span>
             </div>
           ) : current.downloadUrl && !removeMarked ? (
@@ -287,7 +285,7 @@ export function ContentEditDialog({
           ) : removeMarked ? (
             <div style={{ display: 'grid', gap: 'var(--space-2)' }}>
               <span style={{ fontSize: 'var(--text-body-s)' }}>
-                File marked for removal — Save to confirm.
+                File marked for removal - Save to confirm.
               </span>
               <span>
                 <Button
@@ -301,7 +299,7 @@ export function ContentEditDialog({
             </div>
           ) : (
             <span style={{ fontSize: 'var(--text-caption)', color: 'var(--color-text-muted)' }}>
-              No file attached — upload one below to add it.
+              No file attached - upload one below to add it.
             </span>
           )}
           <label className={styles.fileDropzone}>

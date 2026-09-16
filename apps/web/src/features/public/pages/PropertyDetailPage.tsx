@@ -155,7 +155,7 @@ export function PropertyDetailPage() {
 
       <CTASection
         title="Interested in this kind of property?"
-        lead="Talk with JA&D Realty Services and tell us what you are looking for — we will match you with the right opportunity."
+        lead="Talk with JA&D Realty Services and tell us what you are looking for - we will match you with the right opportunity."
         primaryCta={{ label: 'Talk to Us', to: '/contact' }}
         secondaryCta={{ label: 'View All Properties', to: PROPERTIES_PATH }}
       />

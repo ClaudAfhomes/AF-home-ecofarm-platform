@@ -11,7 +11,7 @@ import { methodNotAllowed, readJsonBody, requireService } from '../../../../_lib
 import { toErrorEnvelope } from '../../../../_lib/envelope.js';
 
 /**
- * POST /admin/withdrawals/:id/reject — atomic staff rejection via the DB
+ * POST /admin/withdrawals/:id/reject - atomic staff rejection via the DB
  * function (single transaction: status, ledger WITHDRAWAL_REVERSAL, wallet
  * release, audit). Reason is validated inside the function (mandatory ≤500).
  */

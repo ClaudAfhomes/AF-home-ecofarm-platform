@@ -1,6 +1,6 @@
 /**
  * Shared Vercel request/response shapes for api/ handlers.
- * Both the Vercel runtime and api/dev-server.ts adapt to these types —
+ * Both the Vercel runtime and api/dev-server.ts adapt to these types -
  * handlers stay identical in both environments.
  */
 export type VercelRequest = {

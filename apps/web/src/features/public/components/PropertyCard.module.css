@@ -18,7 +18,7 @@
   border-color: var(--color-border-strong);
 }
 
-/* Photo stage — the floating price pill sits on the image. */
+/* Photo stage - the floating price pill sits on the image. */
 .media {
   position: relative;
 }

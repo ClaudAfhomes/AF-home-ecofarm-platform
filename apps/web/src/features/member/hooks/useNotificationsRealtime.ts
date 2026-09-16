@@ -4,12 +4,12 @@ import { useQueryClient } from '@tanstack/react-query';
 import { getSupabaseClient, isSupabaseConfigured } from '../../../lib/supabase';
 
 /**
- * Member notification Realtime — subscribes to `Notification` INSERTs visible
+ * Member notification Realtime - subscribes to `Notification` INSERTs visible
  * to the member (own rows + broadcasts with member_id NULL) and invalidates
  * the matching TanStack Query cache `['member', 'broadcasts', userId]`.
  *
  * Architecture mirrors `useCmsRealtime`: the API stays the authoritative read
- * path — Realtime only invalidates, never replaces state. The `or` filter is
+ * path - Realtime only invalidates, never replaces state. The `or` filter is
  * required because a plain `memberId=eq.<id>` postgres_changes filter excludes
  * broadcast rows (member_id IS NULL), and broadcasts are the primary live
  * traffic. RLS (`notification_member_read`) scopes server-side in addition.

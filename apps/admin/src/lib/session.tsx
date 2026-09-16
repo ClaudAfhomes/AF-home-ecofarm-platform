@@ -35,7 +35,7 @@ export interface SessionUser {
    * Server-resolved role display name and effective permission modules
    * (from `GET /admin/session`). Preferred over re-deriving from the
    * role catalog, which non-super-admin staff cannot read. Absent for
-   * mock/dev-test sessions — renderers fall back to role records, then
+   * mock/dev-test sessions - renderers fall back to role records, then
    * system labels / the raw role id.
    */
   roleName?: string;
@@ -118,7 +118,7 @@ export function SupabaseSessionProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<SessionStatus>('loading');
   const [user, setUser] = useState<SessionUser | null>(null);
   const [sessionError, setSessionError] = useState(false);
-  // Last verified session — restored on transient resolution failures so a
+  // Last verified session - restored on transient resolution failures so a
   // stale-token race (idle tab return) never demotes staff to non-staff.
   const lastGoodUser = useRef<SessionUser | null>(null);
   const revalidateRef = useRef<() => Promise<void>>(async () => {});
@@ -154,11 +154,11 @@ export function SupabaseSessionProvider({ children }: { children: ReactNode }) {
     }
 
     /**
-     * Own staff session via the service-role endpoint (Phase 6 — the admin
+     * Own staff session via the service-role endpoint (Phase 6 - the admin
      * client never reads Role tables with the anon key). Discriminates a
      * verified answer (200, or 403/404 = verified non-staff) from transient
      * failures (401 expired token, 5xx, network, unparsable body) so callers
-     * never confuse "could not verify" with "not staff" — that confusion is
+     * never confuse "could not verify" with "not staff" - that confusion is
      * what stranded idle-returning admins on Access denied. Explicit Bearer
      * (not cookies) so it works in every storage mode.
      */
@@ -179,7 +179,7 @@ export function SupabaseSessionProvider({ children }: { children: ReactNode }) {
           credentials: 'same-origin',
         });
         if (!res.ok) {
-          // Verified non-staff identity — safe to demote.
+          // Verified non-staff identity - safe to demote.
           if (res.status === 403 || res.status === 404)
             return { status: res.status, slugs: [], mustChangePassword: false };
           // 401/5xx → transient (stale token, backend hiccup).
@@ -418,7 +418,7 @@ export function SupabaseSessionProvider({ children }: { children: ReactNode }) {
     revalidateRef.current = revalidate;
 
     revalidate().catch(() => {
-      // getSession itself failed — stay loading rather than guessing.
+      // getSession itself failed - stay loading rather than guessing.
     });
     const { data: sub } = client.auth.onAuthStateChange(async (_event, session) => {
       const typed = session as {
@@ -502,7 +502,7 @@ function TestSessionProvider({
         user: initialUser,
         role: initialUser.role,
         // Preserve null (resolved: no staff access) distinctly from undefined
-        // (unresolved) — navItemsForRole treats them differently.
+        // (unresolved) - navItemsForRole treats them differently.
         roleId: initialUser.roleId,
         isQualified: initialUser.isQualified ?? false,
         sessionError,
@@ -556,7 +556,7 @@ export function SessionProvider({
       </MockSessionProvider>
     );
   }
-  // Supabase SSOT when configured — fixes cross-origin 5173 vs 5174 via cookie storage
+  // Supabase SSOT when configured - fixes cross-origin 5173 vs 5174 via cookie storage
   if (isSupabaseConfigured()) {
     return <SupabaseSessionProvider>{children}</SupabaseSessionProvider>;
   }

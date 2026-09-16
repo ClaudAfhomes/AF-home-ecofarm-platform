@@ -7,7 +7,7 @@ import { methodNotAllowed, readJsonBody, requireService } from '../../_lib/rest.
 import { toErrorEnvelope } from '../../_lib/envelope.js';
 
 /**
- * POST /me/resubmit — corrected data for a REJECTED application. Applies the
+ * POST /me/resubmit - corrected data for a REJECTED application. Applies the
  * editable fields to the Member row and its linked Registration, then returns
  * both to PENDING (unlimited resubmissions, BR-REG-005). Country is immutable.
  */
@@ -88,7 +88,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const memberPatch: Record<string, unknown> = {
     status: 'PENDING',
     isQualified: false,
-    // Returning to PENDING re-opens review, including the government ID —
+    // Returning to PENDING re-opens review, including the government ID -
     // clear the approval-time flag (mirrors the mock's isIdVerified reset).
     idVerified: false,
   };

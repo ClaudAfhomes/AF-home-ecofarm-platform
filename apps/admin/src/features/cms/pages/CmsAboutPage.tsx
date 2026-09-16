@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import { Button, ConfirmDialog, ErrorState, PageHeader, Skeleton } from '@jad/ui';
+import { Button, ConfirmDialog, ErrorState, notifySuccess, PageHeader, Skeleton } from '@jad/ui';
 import { aboutContentSchema, type AboutContent } from '@jad/contracts';
 
 import { CmsAccordionControls } from '../components/CmsAccordionControls';
@@ -194,8 +194,7 @@ export function CmsAboutPage() {
       await update.mutateAsync(draft);
       const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       setLastSaved(`just now at ${now}`);
-      setSaveMessage('All changes saved.');
-      setTimeout(() => setSaveMessage(null), 3000);
+      notifySuccess({ title: 'Changes saved' });
     } catch (e) {
       setSaveMessage(e instanceof Error ? e.message : 'Save failed');
     }
@@ -216,8 +215,8 @@ export function CmsAboutPage() {
       <PageHeader title="About CMS" description="Manage the public About page content." />
 
       {saveMessage ? (
-        <div className={styles.bannerSuccess} role="status" aria-live="polite">
-          <strong>All changes saved</strong>: {saveMessage}
+        <div className={styles.bannerError} role="alert">
+          {saveMessage}
         </div>
       ) : null}
 

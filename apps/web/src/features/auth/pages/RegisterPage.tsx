@@ -47,11 +47,11 @@ export function RegisterPage() {
           try {
             sessionStorage.setItem('jad:register:email', emailValue);
           } catch {
-            // storage may be unavailable in some environments — non-blocking
+            // storage may be unavailable in some environments - non-blocking
           }
           navigate('/register/verify-email', {
             replace: true,
-            state: { email: emailValue },
+            state: { email: emailValue, emailSent: response.emailSent },
           });
         }}
       />

@@ -16,7 +16,7 @@ import type { StatusTone } from '@jad/ui';
 
 /**
  * Presentation-only mappers for member/sale statuses and dates. Status
- * vocabulary comes from the contracts — the UI never invents labels. Dates are
+ * vocabulary comes from the contracts - the UI never invents labels. Dates are
  * formatted for display only (ISO-8601 strings from the API).
  */
 
@@ -69,7 +69,7 @@ export function formatDate(iso: string): string {
   return date.toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
-/** Clock time for chat meta — e.g. `10:15 AM`. */
+/** Clock time for chat meta - e.g. `10:15 AM`. */
 export function formatTime(iso: string): string {
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return iso;
@@ -194,7 +194,7 @@ export function ledgerDirectionLabel(direction: 'CREDIT' | 'DEBIT'): string {
   return direction === 'CREDIT' ? 'Credit' : 'Debit';
 }
 
-/** Signed money display — presentation only, no arithmetic (CREDIT `+`, DEBIT `−`). */
+/** Signed money display - presentation only, no arithmetic (CREDIT `+`, DEBIT `−`). */
 export function formatSignedMoney(amount: string, direction: 'CREDIT' | 'DEBIT'): string {
   const sign = direction === 'CREDIT' ? '+' : '\u2212';
   return `${sign}${formatMoney(amount)}`;
@@ -230,7 +230,7 @@ export function contentKindLabel(kind: ContentKind): string {
 /**
  * Pending-commissions total shared by the dashboard card and the eWallet
  * card: PENDING-status commissions in clearing. NOT the wallet's
- * pendingAmount (reserved withdrawal funds) — the two must never be mixed.
+ * pendingAmount (reserved withdrawal funds) - the two must never be mixed.
  * Exact-decimal sum; unknown shapes fall back to '0.00' via the caller.
  */
 export function sumPendingCommissions(commissions: readonly Commission[] | undefined): string {

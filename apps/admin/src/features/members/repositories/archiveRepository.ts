@@ -4,7 +4,7 @@ import { archivedMemberSchema, type ArchivedMember } from '@jad/contracts';
 
 import { request, requestList } from '../../../lib/api/client';
 
-/** Archived roster + restore — REST over api/v1 (Phase B3 cutover). */
+/** Archived roster + restore - REST over api/v1 (Phase B3 cutover). */
 export async function getArchived(): Promise<ArchivedMember[]> {
   return requestList('/admin/members/archived', archivedMemberSchema);
 }

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 /**
- * Collection envelope: `{ data, meta }` — CONFIRMED by API-SPECIFICATION.md §1.1/§4.
+ * Collection envelope: `{ data, meta }` - CONFIRMED by API-SPECIFICATION.md §1.1/§4.
  * `meta` is passthrough to tolerate per-endpoint pagination fields (§4) without
  * inventing a fixed shape.
  */

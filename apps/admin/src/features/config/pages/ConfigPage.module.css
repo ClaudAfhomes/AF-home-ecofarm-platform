@@ -79,6 +79,18 @@
   margin-top: var(--space-6);
 }
 
+.sectionHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.sectionHeader .sectionDescription {
+  margin-bottom: var(--space-4);
+}
+
 .sectionTitle {
   margin: 0 0 var(--space-1);
   font-size: var(--text-body);
@@ -144,6 +156,31 @@
   line-height: 1.5;
 }
 
+.programActions {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.programInactive {
+  font-size: var(--text-caption);
+  font-weight: 600;
+  color: var(--color-text-danger);
+}
+
+.programForm {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.programActiveToggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-body-s);
+  color: var(--color-text-primary);
+}
+
 .skeletonTitle {
   height: 20px;
   width: 120px;
@@ -179,6 +216,25 @@
 }
 
 .editInput:focus {
+  border-color: var(--color-brand);
+}
+
+.editTextarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 8px var(--space-3);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-body);
+  font-family: var(--font-body);
+  color: var(--color-text-primary);
+  background: var(--color-bg-surface);
+  outline: none;
+  resize: vertical;
+  transition: border-color var(--transition-fast);
+}
+
+.editTextarea:focus {
   border-color: var(--color-brand);
 }
 

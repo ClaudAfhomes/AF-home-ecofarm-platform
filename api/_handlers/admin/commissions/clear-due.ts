@@ -7,7 +7,7 @@ import { methodNotAllowed, requireService } from '../../../_lib/rest.js';
 import { toErrorEnvelope } from '../../../_lib/envelope.js';
 
 /**
- * POST /admin/commissions/clear-due — run the commission clearing batch
+ * POST /admin/commissions/clear-due - run the commission clearing batch
  * on demand (staff, audited). Moves every due PENDING commission (createdAt
  * at/older than COMMISSION_CLEARING_DAYS) to AVAILABLE with ledger + wallet
  * movement, via the atomic `commission_clear_batch` function. The daily

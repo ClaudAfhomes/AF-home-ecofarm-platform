@@ -188,7 +188,7 @@ describe('MemberDetailPage permanent purge (super_admin)', () => {
     await user.type(within(dialog).getByLabelText(/Reason/), 'Duplicate test account');
     await user.click(within(dialog).getByRole('button', { name: 'Delete Permanently' }));
 
-    // The Member row is gone but the login still works — this must be loud.
+    // The Member row is gone but the login still works - this must be loud.
     expect(await screen.findByText(/auth.*account.*still|still.*log in/i)).toBeInTheDocument();
   });
 });

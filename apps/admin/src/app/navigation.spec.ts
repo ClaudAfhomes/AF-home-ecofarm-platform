@@ -17,7 +17,7 @@ describe('admin navigation registry', () => {
     expect(navItemsForRole(null)).toEqual([]);
   });
 
-  it('shows all admin sections to admin — single admin type', () => {
+  it('shows all admin sections to admin - single admin type', () => {
     const labels = navItemsForRole('admin').map((item) => item.label);
     expect(labels).toContain('Dashboard');
     expect(labels).toContain('Members');

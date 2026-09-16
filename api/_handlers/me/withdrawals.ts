@@ -67,7 +67,7 @@ export async function listWithdrawals(req: VercelRequest, res: VercelResponse) {
 }
 
 /**
- * POST /me/withdrawals — atomic reserve via the DB function (single
+ * POST /me/withdrawals - atomic reserve via the DB function (single
  * transaction: wallet row-lock, ledger append, wallet update, idempotency).
  * The function returns {created, withdrawal} or {error}; replays map to 200,
  * fresh reservations to 201.

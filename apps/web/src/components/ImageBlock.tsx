@@ -23,7 +23,7 @@ export interface ImageBlockProps {
 /**
  * Responsive image block for site photography. Remote images are lazy-loaded
  * below the fold, given a fixed aspect ratio to prevent layout shift, and fall
- * back to a neutral panel if the image cannot load — never a broken-image icon.
+ * back to a neutral panel if the image cannot load - never a broken-image icon.
  */
 export function ImageBlock({
   src,

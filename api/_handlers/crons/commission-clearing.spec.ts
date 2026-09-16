@@ -5,7 +5,7 @@ import type { VercelRequest, VercelResponse } from '../../_lib/http.js';
 import cronHandler from './commission-clearing.js';
 
 /**
- * GET /crons/commission-clearing — unauthenticated daily trigger for the
+ * GET /crons/commission-clearing - unauthenticated daily trigger for the
  * atomic `commission_clear_batch` function. Safe by design (idempotent,
  * time-gated); Supabase is fully mocked.
  */

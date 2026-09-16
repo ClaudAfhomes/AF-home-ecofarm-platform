@@ -23,7 +23,7 @@ const FILTERS: { value: SaleStatus | 'All'; label: string }[] = [
 /**
  * Sales list (SCR-MEM-005, FR-SAL-001). The member's own qualifying sales from
  * `GET /sales`, newest first, with the sale status from the API state machine
- * (BUSINESS-RULES §5). A sale's value is the server snapshot (BI-006) — never
+ * (BUSINESS-RULES §5). A sale's value is the server snapshot (BI-006) - never
  * re-derived client-side.
  */
 export function SalesListPage() {

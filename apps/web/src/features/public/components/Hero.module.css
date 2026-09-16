@@ -1,6 +1,6 @@
 /* Shared hero system (Home + every public landing page).
    One background image, one scrim, one typographic system, one CTA placement.
-   `home` is tall with trust markers; `page` is shorter and calmer — both use
+   `home` is tall with trust markers; `page` is shorter and calmer - both use
    the same overlay/leading-edge composition so the five pages read as one brand. */
 
 .hero {

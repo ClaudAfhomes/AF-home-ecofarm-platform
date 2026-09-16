@@ -4,7 +4,7 @@ import { toErrorEnvelope } from '../_lib/envelope.js';
 import type { VercelRequest, VercelResponse } from '../_lib/http.js';
 import { methodNotAllowed, okList, requireService } from '../_lib/rest.js';
 
-/** GET /programs — public program list (API-SPECIFICATION #78). */
+/** GET /programs - public program list (API-SPECIFICATION #78). */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
@@ -18,9 +18,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
   const supabase = requireService(res);
   if (!supabase) return;
+  // Public list: active programs only (retired ones stay referenced by
+  // existing registrations/members but never surface publicly).
   const { data, error } = await supabase
     .from('Program')
     .select('id, code, name, description')
+    .eq('isActive', true)
     .order('id');
   if (error) {
     const { error: env, status } = toErrorEnvelope('INTERNAL', error.message, 500);

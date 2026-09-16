@@ -23,7 +23,7 @@ import styles from './VoucherDetailPage.module.css';
 /**
  * Voucher detail (SCR-MEM-021, FR-VCH-001..003). Shows the voucher and its
  * remaining value (Original − Redeemed = Remaining, BR-VCH-002) plus its
- * human code (JAD-VCH-…) and QR code. Ownership is server-authoritative — an
+ * human code (JAD-VCH-…) and QR code. Ownership is server-authoritative - an
  * unknown or non-owned id renders a not-found state. Production copy, no dev
  * preview.
  */
@@ -193,7 +193,7 @@ export function VoucherDetailPage() {
       <Dialog
         open={qrOpen}
         onClose={() => setQrOpen(false)}
-        title={`QR code — ${voucherQuery.data?.code ?? 'Voucher'}`}
+        title={`QR code - ${voucherQuery.data?.code ?? 'Voucher'}`}
         footer={
           voucherQuery.data ? (
             <button

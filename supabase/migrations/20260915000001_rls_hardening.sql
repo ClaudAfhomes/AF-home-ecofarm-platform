@@ -1,13 +1,13 @@
--- Phase 1A — RLS hardening (Database review F-01 / F-02).
+-- Phase 1A - RLS hardening (Database review F-01 / F-02).
 --
 -- An authenticated member could previously UPDATE their own Member row
 -- (status, isQualified, accountStatus) and INSERT/DELETE their own MemberRole
--- links against any readable Role — privilege escalation that bypasses every
+-- links against any readable Role - privilege escalation that bypasses every
 -- application role gate. Role.permissions and management fields were also
 -- readable by any signed-in user.
 --
 -- New model:
---   Member     authenticated SELECT own row only (no writes — all writes via
+--   Member     authenticated SELECT own row only (no writes - all writes via
 --              service-role API / SECURITY DEFINER functions)
 --   MemberRole authenticated SELECT own links only (labels for the member
 --              portal; no link mutations)

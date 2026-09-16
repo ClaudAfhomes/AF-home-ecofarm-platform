@@ -41,7 +41,7 @@ describe('RequireQualifiedMember', () => {
 
   it('uses the server summary even when the session snapshot is stale', async () => {
     // Session still carries the pre-approval flag (false); the API reports the
-    // fresh qualified state — the guard must trust the server, not the login.
+    // fresh qualified state - the guard must trust the server, not the login.
     mockFetchJson(qualifiedSummary(true));
     const stale = { ...MOCK_MEMBER_NOT_QUALIFIED } as SessionUser;
     renderAt('/member/sales/new', stale);

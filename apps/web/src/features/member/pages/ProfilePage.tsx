@@ -3,7 +3,15 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 
 import type { UpdateProfileRequest } from '@jad/contracts';
-import { Breadcrumbs, ConfirmDialog, ErrorState, PageHeader, Skeleton, StatusChip } from '@jad/ui';
+import {
+  Breadcrumbs,
+  ConfirmDialog,
+  ErrorState,
+  notifySuccess,
+  PageHeader,
+  Skeleton,
+  StatusChip,
+} from '@jad/ui';
 
 import { Button } from '../../../components/Button';
 import { Alert } from '../../../components/Alert';
@@ -18,7 +26,7 @@ import styles from './ProfilePage.module.css';
 
 /**
  * Member profile (SCR-MEM-002). Read-only view of `GET /members/:id` (own
- * profile only — object-level, NFR-AUTHZ-002) with an edit mode for mutable
+ * profile only - object-level, NFR-AUTHZ-002) with an edit mode for mutable
  * fields (`PATCH /me`). Country is immutable (BR-REG-010) and rendered
  * read-only; the referral code is immutable (BR-REF-004) and not editable.
  */
@@ -28,7 +36,6 @@ export function ProfilePage() {
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState<UpdateProfileRequest | undefined>(undefined);
   const [error, setError] = useState<string | undefined>();
-  const [success, setSuccess] = useState<string | undefined>();
   const [copied, setCopied] = useState(false);
   const [confirmDiscardOpen, setConfirmDiscardOpen] = useState(false);
 
@@ -52,8 +59,7 @@ export function ProfilePage() {
       setEditing(false);
       setError(undefined);
       setForm(undefined);
-      setSuccess('Profile updated');
-      window.setTimeout(() => setSuccess(undefined), 3000);
+      notifySuccess({ title: 'Profile updated' });
       void queryClient.invalidateQueries({ queryKey: ['member', 'profile'] });
       void queryClient.invalidateQueries({ queryKey: ['member', 'sales'] });
     },
@@ -162,11 +168,6 @@ export function ProfilePage() {
       {error ? (
         <Alert variant="danger" title="We could not save your profile">
           {error}
-        </Alert>
-      ) : null}
-      {success && !editing ? (
-        <Alert variant="success" title="Profile updated">
-          {success}
         </Alert>
       ) : null}
 

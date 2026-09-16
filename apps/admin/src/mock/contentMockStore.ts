@@ -6,7 +6,7 @@ import { MOCK_CONTENT } from './data';
  * In-memory mock store for Marketing Tools (FR-ADM-003). Mutations write
  * through here so the mock list stays consistent across GET + detail reads
  * within a dev/test session. Mirrors `POST /admin/content` (share targets
- * server-provided). Production reads/writes the real endpoint — this is a
+ * server-provided). Production reads/writes the real endpoint - this is a
  * test double only.
  */
 

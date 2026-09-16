@@ -17,7 +17,8 @@ import {
   TableHead,
   TableHeaderCell,
   TableRow,
-  useToast,
+  notifyError,
+  notifySuccess,
 } from '@jad/ui';
 
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -56,7 +57,6 @@ export function MembersPage() {
     'ALL' | 'PENDING' | 'APPROVED_ACTIVE' | 'REJECTED'
   >('ALL');
   const [accountFilter, setAccountFilter] = useState<'ALL' | 'ACTIVE' | 'INACTIVE'>('ALL');
-  const { toast } = useToast();
   const qc = useQueryClient();
   const [showCreate, setShowCreate] = useState(false);
   const [editingMember, setEditingMember] = useState<AdminMember | null>(null);
@@ -136,13 +136,12 @@ export function MembersPage() {
       await archiveMember(archiveTarget.id);
       await qc.invalidateQueries({ queryKey: ['admin', 'members'] });
       await qc.invalidateQueries({ queryKey: ['admin', 'archived'] });
-      toast({
+      notifySuccess({
         title: 'Member archived',
         message: `${archiveTarget.firstName} ${archiveTarget.lastName} moved to archives`,
-        tone: 'success',
       });
     } catch (e) {
-      toast({ title: 'Archive failed', message: (e as Error).message, tone: 'danger' });
+      notifyError({ title: 'Archive failed', message: (e as Error).message });
     } finally {
       setArchiveTarget(null);
     }
@@ -154,13 +153,12 @@ export function MembersPage() {
       await restoreArchivedMember(restoreTarget);
       await qc.invalidateQueries({ queryKey: ['admin', 'members'] });
       await qc.invalidateQueries({ queryKey: ['admin', 'archived'] });
-      toast({
+      notifySuccess({
         title: 'Member restored',
         message: 'Member restored to active list',
-        tone: 'success',
       });
     } catch (e) {
-      toast({ title: 'Restore failed', message: (e as Error).message, tone: 'danger' });
+      notifyError({ title: 'Restore failed', message: (e as Error).message });
     } finally {
       setRestoreTarget(null);
     }
@@ -422,7 +420,7 @@ export function MembersPage() {
                             tone={row.isQualified ? 'success' : 'neutral'}
                           />
                         ) : (
-                          '—'
+                          '-'
                         )}
                       </TableCell>
                       <TableCell label="Actions" align="right">

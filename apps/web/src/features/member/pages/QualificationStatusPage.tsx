@@ -28,7 +28,7 @@ function requirementAction(key: string, met: boolean): { label: string; to: stri
 
 /**
  * Qualification status (SCR-MEM-004, FR-REG-008, BR-QUAL-001). Renders the
- * server-authoritative requirement checklist from `GET /me/qualification` —
+ * server-authoritative requirement checklist from `GET /me/qualification` -
  * the UI never derives Active + Qualified client-side. A REJECTED member is
  * directed to resubmit (SCR-AUTH-005).
  */
@@ -118,7 +118,7 @@ export function QualificationStatusPage() {
 
         {summary.status === 'APPROVED_ACTIVE' && !summary.isQualified ? (
           <Alert variant="warning" title="Active but not yet qualified">
-            You’re Active — complete the remaining requirements below to unlock sales and referrals.
+            You’re Active - complete the remaining requirements below to unlock sales and referrals.
             See{' '}
             <Link className={styles.alertLink} to="/member/policies">
               Policies

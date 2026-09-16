@@ -12,8 +12,8 @@ import {
 } from '@jad/contracts';
 
 /**
- * GET /admin/session — own staff session (Phase 6 staff separation).
- * PATCH /admin/session — update own display name (My Account).
+ * GET /admin/session - own staff session (Phase 6 staff separation).
+ * PATCH /admin/session - update own display name (My Account).
  * Any authenticated caller; resolves the StaffUser row + role slugs via
  * service_role so admin clients never read Role tables with the anon key.
  * 404 when the caller holds no staff identity (client treats as non-staff).
@@ -53,7 +53,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     status: string;
     mustChangePassword?: boolean;
   };
-  // A disabled staff identity must not resolve a session — the shell would
+  // A disabled staff identity must not resolve a session - the shell would
   // otherwise load while every data call 403s. verifyStaff enforces the same.
   if (row.status === 'DISABLED') {
     const { error: env, status } = toErrorEnvelope('FORBIDDEN', 'Account disabled.', 403);
@@ -97,7 +97,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         user_metadata: { full_name: parsed.data.name },
       });
     } catch {
-      // fall through — StaffUser already updated
+      // fall through - StaffUser already updated
     }
     await appendAudit(supabase, {
       action: 'STAFF_PROFILE_UPDATED',
@@ -125,7 +125,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (sessionRoleId) {
     // Single source of role identity shared with verifyStaffModule:
     // record name wins and effective modules come from the stored set
-    // (matrix fallback for seed-empty system rows). Never throws — a
+    // (matrix fallback for seed-empty system rows). Never throws - a
     // failed lookup degrades to the shared labels/empty set and the
     // client's catalog fallback.
     const systemLabels = STAFF_ROLE_LABEL as Record<string, string>;

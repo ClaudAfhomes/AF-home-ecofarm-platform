@@ -9,7 +9,8 @@ import {
   PageHeader,
   Skeleton,
   StatusChip,
-  useToast,
+  notifyError,
+  notifySuccess,
 } from '@jad/ui';
 
 import { usePolicies } from '../hooks/usePolicies';
@@ -19,12 +20,11 @@ import { policyTypeLabel, policyTypeTone } from '../status';
 import { formatDate } from '../../../lib/format';
 import styles from './PolicyDetailPage.module.css';
 
-/** Policy Detail — read-only view of a single policy, with its required PDF. */
+/** Policy Detail - read-only view of a single policy, with its required PDF. */
 export function PolicyDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { toast } = useToast();
   const { data, isPending, isError, error } = usePolicies();
   const deletePolicy = useDeletePolicy();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -36,15 +36,14 @@ export function PolicyDetailPage() {
     if (!item) return;
     try {
       await deletePolicy.mutateAsync(item.id);
-      toast({
+      notifySuccess({
         title: 'Policy deleted',
         message: `"${item.title}" was permanently removed. Its uploaded PDF stays in storage.`,
-        tone: 'success',
       });
       await queryClient.invalidateQueries({ queryKey: ['admin', 'policies'] });
       navigate('/admin/policies');
     } catch (e) {
-      toast({ title: 'Delete failed', message: (e as Error).message, tone: 'danger' });
+      notifyError({ title: 'Delete failed', message: (e as Error).message });
       setShowDeleteConfirm(false);
     }
   };
@@ -111,7 +110,7 @@ export function PolicyDetailPage() {
             <div className={styles.previewSection}>
               <h3 className={styles.sectionTitle}>PDF</h3>
               <p className={styles.descriptionText}>
-                No PDF attached yet — use Edit to upload the required document.
+                No PDF attached yet - use Edit to upload the required document.
               </p>
             </div>
           )}

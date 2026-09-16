@@ -1,10 +1,10 @@
-# JAD — Business Rules SSOT
+# JAD - Business Rules SSOT
 
 > **Authority:** This document is the **authoritative source for approved business rules** for the JA&D (JAD) system.
 >
 > **Governance:** If another document conflicts with these rules, do **not** silently overwrite this SSOT. Identify the conflict, record the conflicting source, determine whether an approved newer decision exists, and if unresolved, mark it **REQUIRES OWNER APPROVAL**. Do not invent a resolution.
 >
-> **Version:** Project 01 — Requirements & Business Analysis (Baseline v1.0)
+> **Version:** Project 01 - Requirements & Business Analysis (Baseline v1.0)
 
 ---
 
@@ -239,7 +239,7 @@ Each rule has a stable ID (`BR-<MODULE>-<NNN>`). Statuses reflect the latest app
 
 | ID | Rule | Status |
 |---|---|---|
-| BR-MSG-001 | Each member has exactly **one conversation thread** with the admin team; messages are text-only (1–4000 chars, plain text, never rendered as HTML). | **CONFIRMED** |
+| BR-MSG-001 | Each member has exactly **one conversation thread** with the admin team; messages are text-only (1-4000 chars, plain text, never rendered as HTML). | **CONFIRMED** |
 | BR-MSG-002 | Threads are retained (no hard delete except the sanctioned member purge); message content is member-generated PII subject to the open general retention decision (DATABASE-DESIGN DA-13). | **CONFIRMED** |
 | BR-MSG-003 | Staff replies are visible to authorized staff only (staff module `messages`; SELECT-only RLS gated by `is_staff_user()`); every staff reply is audited (`MESSAGE_SENT`, NFR-SEC-002). | **CONFIRMED** |
 | BR-MSG-004 | All message writes go through service-role API handlers; authenticated users hold SELECT-only RLS, and per-side read watermarks drive unread counts. | **CONFIRMED** |
@@ -306,7 +306,7 @@ Role permissions are **distinct from business eligibility**. Business eligibilit
 | **Finance** | Verify applicable payments. | Financial adjustments (Super Admin only); execute money movement. |
 | **Super Admin** | Everything Admin/Finance can do, plus: configure business parameters (min age, gender values, commission rates, clearing period, resubmission limits, voucher redemption mode); perform financial adjustments; resolve/recover already-withdrawn reversed commissions; reopen locked sales. | Expose/possess the master signing key (CTO boundary). |
 | **Merchant** | Redeem vouchers online through JAD (subject to verification). | Redeem offline; double-redeem. |
-| **CTO** | Controls the master voucher signing key and signing process/service exclusively. | — |
+| **CTO** | Controls the master voucher signing key and signing process/service exclusively. | - |
 | **Customer** | Non-member subject of a recorded sale. | Nothing system-facing (recorded by seller). |
 | **External payment providers/platforms** | Execute actual money movement (bank transfer, GCash, other approved platforms). | None within JAD scope (payment gateway infra is OUT OF SCOPE). |
 
@@ -320,10 +320,10 @@ Role permissions are **distinct from business eligibility**. Business eligibilit
 |---|---|---|
 | **Sale lifecycle** | Submitted → Admin Approved → Payment Verified → **Qualifying Sale** | Rejection requires reason; seller may correct and resubmit; configurable max attempts → **LOCKED**. |
 | **Payment verification** | Performed by Admin, Finance, or Super Admin | Required before commission-qualifying. |
-| **Commission creation** | On qualification → created immediately as **Pending** | — |
+| **Commission creation** | On qualification → created immediately as **Pending** | - |
 | **Commission clearing** | Pending → (7-day clearing, configurable) → Confirmed/Available | Applies to future commissions only. |
 | **Withdrawal reservation** | Request → amount Reserved → funds not reusable | Up to Available Balance. |
-| **Withdrawal completion** | Reserved → Completed → Permanently Deducted | — |
+| **Withdrawal completion** | Reserved → Completed → Permanently Deducted | - |
 | **Withdrawal rejection** | Rejected → Reservation Released → Available Balance Restored | Reason required; new request required (no edit/resubmit). |
 | **Voucher redemption** | Online through JAD → verify signature/authenticity/status/expiration/conditions/balance/history → **atomic** decrement | Prevents double/race redemption. |
 | **Financial adjustment** | Super Admin only; recorded with member, amount, credit/debit, reason, performing Super Admin, date/time | Never automated for the general case. |
@@ -485,7 +485,7 @@ The system must **never** implement the following without explicit Owner approva
 9. Automatic customer refund system.
 10. Any rule marked TBD being silently converted into an implementation decision.
 11. Weakening of the CTO-controlled signing boundary.
-12. Purchase required for membership or referral eligibility (SUPERSEDED assumption — must not be reintroduced).
+12. Purchase required for membership or referral eligibility (SUPERSEDED assumption - must not be reintroduced).
 
 ---
 
@@ -528,7 +528,7 @@ For every item: a stable **Decision ID**, the open question, why it matters, aff
 ### Sources
 - JA&D App Technical Scope (original)
 - JAD Business Requirements Addendum
-- Latest approved Q&A decisions (reconciled baseline — authoritative)
+- Latest approved Q&A decisions (reconciled baseline - authoritative)
 
 ### Superseded Rules
 

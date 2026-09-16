@@ -5,7 +5,7 @@ import type { VercelRequest, VercelResponse } from '../../../../_lib/http.js';
 import { methodNotAllowed, requireService } from '../../../../_lib/rest.js';
 import { toErrorEnvelope } from '../../../../_lib/envelope.js';
 
-/** POST /admin/members/:id/restore — return an archived member to the roster. */
+/** POST /admin/members/:id/restore - return an archived member to the roster. */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');

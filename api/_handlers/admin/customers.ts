@@ -5,7 +5,7 @@ import { isValidCustomerRow, mapCustomerRow } from '../../_lib/pipeline.js';
 import { methodNotAllowed, okList, requireService } from '../../_lib/rest.js';
 import { toErrorEnvelope } from '../../_lib/envelope.js';
 
-/** GET /admin/customers — full customer list for sale forms. */
+/** GET /admin/customers - full customer list for sale forms. */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');

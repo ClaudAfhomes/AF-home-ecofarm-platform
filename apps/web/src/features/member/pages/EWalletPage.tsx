@@ -13,7 +13,7 @@ import styles from './EWalletPage.module.css';
 /**
  * eWallet summary (SCR-MEM-001, FR-WAL-003/004). Available Balance is the
  * only amount that can be withdrawn; Pending commissions are excluded until
- * they clear (BI-002, BR-WAL-003). Balances are server-computed — the client
+ * they clear (BI-002, BR-WAL-003). Balances are server-computed - the client
  * never derives them.
  */
 export function EWalletPage() {
@@ -22,7 +22,7 @@ export function EWalletPage() {
   const commissionsQuery = useCommissions();
 
   // Pending card = PENDING commissions in clearing (same source as the
-  // dashboard card) — never wallet.pendingAmount (reserved withdrawals).
+  // dashboard card) - never wallet.pendingAmount (reserved withdrawals).
   const pendingCommissions = sumPendingCommissions(commissionsQuery.data);
 
   const available = walletQuery.data?.availableBalance ?? '0.00';
@@ -86,7 +86,7 @@ export function EWalletPage() {
               </span>
             </div>
             <span className={styles.cardValue}>
-              {commissionsQuery.isLoading ? '—' : formatMoney(pendingCommissions)}
+              {commissionsQuery.isLoading ? '-' : formatMoney(pendingCommissions)}
             </span>
             <span className={styles.cardHint}>
               Clears to Available after the clearing period (BI-002, BR-WAL-003).
@@ -142,7 +142,7 @@ export function EWalletPage() {
         {payoutsQuery.isSuccess && pendingPayoutCount > 0 ? (
           <Alert variant="info" title="Payout verification pending">
             You have {pendingPayoutCount} payout account{pendingPayoutCount === 1 ? '' : 's'}{' '}
-            pending verification — typically 24–48h.{' '}
+            pending verification - typically 24-48h.{' '}
             <Link to="/member/payouts">View payout accounts</Link>.
           </Alert>
         ) : null}

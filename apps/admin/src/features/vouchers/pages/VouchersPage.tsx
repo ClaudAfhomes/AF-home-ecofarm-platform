@@ -59,7 +59,7 @@ function TableSkeleton() {
   );
 }
 
-/** Vouchers — voucher definitions (title + value) that admins assign to members. */
+/** Vouchers - voucher definitions (title + value) that admins assign to members. */
 export function VouchersPage() {
   const navigate = useNavigate();
   const { data, isPending, isError, error, refetch } = useVouchers();

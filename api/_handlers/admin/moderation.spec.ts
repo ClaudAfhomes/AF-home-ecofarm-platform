@@ -9,7 +9,7 @@ import createMember from './members.js';
 /**
  * Moderation write contracts (bugfix): approve provisions from the
  * phone-based registration identity, reject returns the full row, and
- * member creation returns the full validated member — the client validates
+ * member creation returns the full validated member - the client validates
  * all three against full schemas, so partial shapes used to fail parsing
  * AFTER a successful write.
  */
@@ -57,7 +57,7 @@ const mocks = vi.hoisted(() => {
         return { data: [{ roleId: 'r-1' }], error: null };
       }
       // First Registration read sees the current row; later reads (after the
-      // status update) see the updated row — mirrors read-your-write.
+      // status update) see the updated row - mirrors read-your-write.
       if (table === 'Registration') {
         script.registrationReads += 1;
         const data =
@@ -277,7 +277,7 @@ describe('POST /admin/registrations/:id/approve', () => {
     const memberUpsert = mocks.calls.find((c) => c.table === 'Member' && c.op === 'upsert')
       ?.arg as Record<string, unknown>;
     expect(memberUpsert.sponsorId).toBe('sponsor-uuid');
-    // Approval is the manual government-ID gate — the flag persists because
+    // Approval is the manual government-ID gate - the flag persists because
     // the Registration row (and its governmentId) is deleted below.
     expect(memberUpsert.idVerified).toBe(true);
   });
@@ -455,7 +455,7 @@ describe('POST /admin/registrations/:id/reject', () => {
       res,
     );
     expect(seen.status).toBe(200);
-    // Full registrationSchema shape — the client validates the whole row.
+    // Full registrationSchema shape - the client validates the whole row.
     expect(seen.body).toMatchObject({
       id: 'reg-001',
       status: 'REJECTED',
@@ -521,7 +521,7 @@ describe('POST /admin/members', () => {
     );
     expect(seen.status).toBe(201);
     const body = seen.body as Record<string, unknown>;
-    // Full adminMemberSchema shape — previously only {id, status}.
+    // Full adminMemberSchema shape - previously only {id, status}.
     expect(body).toMatchObject({
       id: 'auth-uuid-2',
       firstName: 'Jane',

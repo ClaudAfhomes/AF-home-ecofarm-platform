@@ -5,7 +5,7 @@ import type { CmsPhoto } from '@jad/contracts';
 /**
  * Dynamically updates the favicon from CMS `global.browserIcon`.
  * Falls back to the static `/ja-d-logo.png` if CMS is unavailable.
- * No SSR — Vite SPA only.
+ * No SSR - Vite SPA only.
  */
 export function useDynamicFavicon(browserIcon?: CmsPhoto | null): void {
   useEffect(() => {

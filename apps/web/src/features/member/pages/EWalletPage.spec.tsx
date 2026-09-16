@@ -61,7 +61,7 @@ describe('member EWalletPage', () => {
 
     expect(await screen.findByText('₱140,000.00')).toBeInTheDocument();
     // Pending card = PENDING commissions (424000.00), not the wallet's
-    // pendingAmount (636000.00, reserved withdrawals) — must match dashboard.
+    // pendingAmount (636000.00, reserved withdrawals) - must match dashboard.
     expect(screen.getByText('₱424,000.00')).toBeInTheDocument();
     expect(screen.queryByText('₱636,000.00')).not.toBeInTheDocument();
     expect(screen.getByText('Pending')).toBeInTheDocument();

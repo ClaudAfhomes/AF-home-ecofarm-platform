@@ -4,7 +4,7 @@ import type { RoleRecord, StaffModule } from '@jad/contracts';
 import type { MockStaffMember } from '../../mock/data';
 
 /**
- * Role governance guards (pure logic — pages render the reasons).
+ * Role governance guards (pure logic - pages render the reasons).
  * Governance survival: at least one role must always grant each of the
  * governance modules (`staff`, `audit`, `config`); nobody may strip their
  * own role's governance access; roles holding members cannot be deleted.
@@ -48,7 +48,7 @@ export function guardRolePermissions(
     const labels = removed.map((m) => STAFF_MODULE_LABEL[m]).join(', ');
     return {
       ok: false,
-      reason: `Cannot revoke ${labels} — this is the last role granting ${removed.length === 1 ? 'it' : 'them'}. Grant ${removed.length === 1 ? 'it' : 'them'} to another role first.`,
+      reason: `Cannot revoke ${labels} - this is the last role granting ${removed.length === 1 ? 'it' : 'them'}. Grant ${removed.length === 1 ? 'it' : 'them'} to another role first.`,
     };
   }
   return { ok: true };
@@ -80,7 +80,7 @@ export function guardRoleDelete(
     const labels = sole.map((m) => STAFF_MODULE_LABEL[m]).join(', ');
     return {
       ok: false,
-      reason: `Cannot delete this role — it is the last role granting ${labels}.`,
+      reason: `Cannot delete this role - it is the last role granting ${labels}.`,
     };
   }
   return { ok: true };

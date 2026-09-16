@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import { ConfirmDialog, ErrorState, PageHeader, Skeleton } from '@jad/ui';
+import { ConfirmDialog, ErrorState, notifySuccess, PageHeader, Skeleton } from '@jad/ui';
 import { loginContentSchema, type LoginContent } from '@jad/contracts';
 
 import { CmsAccordionControls } from '../components/CmsAccordionControls';
@@ -195,7 +195,7 @@ export function CmsLoginPage() {
     setSaveMessage(null);
     update.mutate(draft, {
       onSuccess: () => {
-        setSaveMessage('All changes saved');
+        notifySuccess({ title: 'Changes saved' });
         setLastSaved(new Date().toISOString());
       },
       onError: (err: unknown) => {
@@ -290,7 +290,7 @@ export function CmsLoginPage() {
 
       <div className={styles.stack}>
         {saveMessage ? (
-          <p className={styles.saveNote} role="status">
+          <p className={styles.saveNote} role="alert">
             {saveMessage}
           </p>
         ) : null}

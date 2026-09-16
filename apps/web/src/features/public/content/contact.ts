@@ -4,7 +4,7 @@ import type { CtaLink } from './types';
 /**
  * Single source of truth for the JA&D Messenger destination. Used by the
  * floating "Let's Talk" button, property detail "Message Us" CTAs, and the
- * contact page — never duplicated.
+ * contact page - never duplicated.
  */
 export const MESSENGER_URL = 'https://m.me/JADRealtyServices';
 
@@ -23,7 +23,7 @@ export type ContactMethod = {
 
 /**
  * Contact page content. Contact details follow the legacy website (supplied
- * by the project owner); the form is presentational and does not submit —
+ * by the project owner); the form is presentational and does not submit -
  * submission will be connected with the live site later.
  */
 export const CONTACT = {
@@ -52,18 +52,18 @@ export const CONTACT = {
     {
       label: 'Office address',
       value:
-        'Alaminos Commercial Complex, Unit 103–104, Maharlika Road, Brgy. San Juan, Alaminos, Laguna',
+        'Alaminos Commercial Complex, Unit 103-104, Maharlika Road, Brgy. San Juan, Alaminos, Laguna',
       icon: 'location',
     },
   ] satisfies ContactMethod[],
   form: {
     heading: 'Send us a message',
-    note: 'Tell us what you are looking for — we will get back to you with the next steps.',
+    note: 'Tell us what you are looking for - we will get back to you with the next steps.',
     submitLabel: 'Send Message',
   },
   cta: {
     title: 'Prefer to explore on your own first?',
-    lead: 'Browse the property categories and common questions — then reach out when you are ready.',
+    lead: 'Browse the property categories and common questions - then reach out when you are ready.',
     primaryCta: { label: 'Explore Properties', to: '/properties' } satisfies CtaLink,
     secondaryCta: { label: 'Read the FAQs', to: '/faqs' } satisfies CtaLink,
   },
@@ -73,7 +73,7 @@ export const CONTACT = {
     {
       label: 'Office address',
       value:
-        'Alaminos Commercial Complex, Unit 103–104, Maharlika Road, Brgy. San Juan, Alaminos, Laguna',
+        'Alaminos Commercial Complex, Unit 103-104, Maharlika Road, Brgy. San Juan, Alaminos, Laguna',
     },
     { label: 'Email', value: 'info.jaandd@gmail.com' },
     { label: 'Phone', value: '0965-250-0052' },

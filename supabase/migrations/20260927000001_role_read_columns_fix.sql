@@ -8,7 +8,7 @@
 -- (select slug[,name] on the anon client) is denied and silently falls back
 -- to user_metadata/defaults.
 --
--- Fix: converge to the intended end state from ANY current state — revoke
+-- Fix: converge to the intended end state from ANY current state - revoke
 -- everything on Role from authenticated, then grant back exactly the two
 -- label columns. RLS policy role_read_authenticated (using true) is
 -- untouched; anon access is untouched (none); service_role is untouched.
@@ -21,7 +21,7 @@
 --     and privilege_type = 'SELECT'
 --     and column_name not in ('slug', 'name');
 -- Idempotent (REVOKE/GRANT re-runs are safe).
--- Down (rollback only — restores the over-exposed state, never ship outside
+-- Down (rollback only - restores the over-exposed state, never ship outside
 -- an approved rollback window):
 --   grant select (permissions, key, is_system, description, "createdAt", id)
 --     on "Role" to authenticated;

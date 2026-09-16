@@ -60,7 +60,7 @@ interface BranchProps {
 }
 
 /**
- * A genealogy tree branch — one node (the member + their direct referrals,
+ * A genealogy tree branch - one node (the member + their direct referrals,
  * recursively). Expand/collapse per node; never shows or computes multi-level
  * commission (BI-004, BR-RPT-004). The mock tree is small; for large trees the
  * list must be virtualized (UI-UX §11.4) before real API rollout.
@@ -132,7 +132,7 @@ const varUnit = 24;
 
 /**
  * My Genealogy (SCR-MEM-018, FR-RPT-004). Tree visualization of referral
- * relationships — reporting only, no MLM implication (BI-004). Supports
+ * relationships - reporting only, no MLM implication (BI-004). Supports
  * expand/collapse and filtering by member status; jumps to the Direct Referrals
  * list (primary actions, UI-UX SCR-MEM-018).
  */
@@ -171,7 +171,7 @@ export function MyGenealogyPage() {
     <section>
       <PageHeader
         title="My Genealogy"
-        description="Your referral tree — a reporting view, not a commission structure."
+        description="Your referral tree - a reporting view, not a commission structure."
         actions={
           <div className={styles.headerActions}>
             <ButtonLink to="/member/referrals/direct" variant="secondary">

@@ -60,7 +60,7 @@ function TableSkeleton() {
   );
 }
 
-/** Roles directory — inspect and manage role permission sets. */
+/** Roles directory - inspect and manage role permission sets. */
 export function RolesPage() {
   const navigate = useNavigate();
   const { data, isPending, isError, error, refetch } = useRoles();

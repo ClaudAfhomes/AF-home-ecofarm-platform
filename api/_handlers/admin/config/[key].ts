@@ -4,7 +4,7 @@ import { toErrorEnvelope } from '../../../_lib/envelope.js';
 import type { VercelRequest, VercelResponse } from '../../../_lib/http.js';
 import { methodNotAllowed, readJsonBody, requireService } from '../../../_lib/rest.js';
 
-/** PATCH /admin/config/:key — super_admin-only parameter update, audited. */
+/** PATCH /admin/config/:key - super_admin-only parameter update, audited. */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'PATCH,OPTIONS');

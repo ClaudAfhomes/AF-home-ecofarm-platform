@@ -7,7 +7,7 @@ import { getFaqsCmsPublic } from '@/lib/cms';
 import { FAQS } from '../content';
 import styles from './FaqsPage.module.css';
 
-/** Public FAQs page — CMS-driven with static fallback (Q6). */
+/** Public FAQs page - CMS-driven with static fallback (Q6). */
 export function FaqsPage() {
   const { data: cms } = useQuery({
     queryKey: ['cms', 'faqs'],

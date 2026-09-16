@@ -1,7 +1,7 @@
--- Phase 5 — Actor attribution split (Member/Staff separation).
+-- Phase 5 - Actor attribution split (Member/Staff separation).
 --
 -- Actor columns (who did it) span two domains, but a single FK can only
--- reference one table — and any FK on an audit trail blocks deletes in the
+-- reference one table - and any FK on an audit trail blocks deletes in the
 -- referenced domain. Live audit (Phase 5): AuditLog.actor_id has 37 staffer
 -- actors AND 1 member actor, so it cannot point at either domain table.
 -- The other four actor columns are staffer-only (verified 0 non-staff).
@@ -20,12 +20,12 @@
 -- rows (Phase 3 Outcome A).
 --
 -- Validation (run before/after apply):
---   AuditLog non-staffer actors may exist (allowed — no FK after this file).
+--   AuditLog non-staffer actors may exist (allowed - no FK after this file).
 --   Zero rows may reference a NON-EXISTENT StaffUser in the four repointed
 --   columns (all values must already be staffer uuids with StaffUser rows).
 -- Idempotent per constraint (dropped then re-added with an explicit name).
 -- Down: re-add each FK referencing "Member"(id) with its original action
---   (AuditLog NO ACTION; the other four SET NULL — see 20260916000001 and
+--   (AuditLog NO ACTION; the other four SET NULL - see 20260916000001 and
 --   20260918000001 for the original shapes).
 
 do $$ begin

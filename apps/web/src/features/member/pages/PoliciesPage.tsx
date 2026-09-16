@@ -10,7 +10,7 @@ import styles from './PoliciesPage.module.css';
 /**
  * Policies (SCR-MEM-023, FR-ADM-004). Policies, program guidelines, and Terms
  * and Conditions (BR-NOT-001). Public endpoint (#69); titles/types come from the
- * API — never invented in the UI. Production static mock, no dev preview.
+ * API - never invented in the UI. Production static mock, no dev preview.
  */
 export function PoliciesPage() {
   const policiesQuery = usePolicies();
@@ -104,7 +104,7 @@ export function PoliciesPage() {
         <ul className={styles.list}>
           {filtered.map((policy) => (
             <li key={policy.id}>
-              <Link className={styles.card} to={`/member/policies/${policy.id}`}>
+              <Link className={styles.card} to={`/member/policies/${policy.slug}`}>
                 <span className={styles.cardMain}>
                   <span className={styles.kind}>
                     <Icon

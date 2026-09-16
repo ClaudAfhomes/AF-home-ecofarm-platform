@@ -4,7 +4,7 @@ import { formatDayLabel } from '../../lib/format';
 
 const GROUP_GAP_MS = 5 * 60 * 1000;
 
-/** Composer auto-grow ceiling (~5 rows) — the box never scrolls internally below it. */
+/** Composer auto-grow ceiling (~5 rows) - the box never scrolls internally below it. */
 export const COMPOSER_MAX_HEIGHT_PX = 132;
 
 /**
@@ -40,7 +40,7 @@ function sameGroup(a: Message, b: Message): boolean {
 /**
  * Flatten an oldest→newest thread into render items: a day separator when the
  * calendar day changes, and message entries with group boundaries (consecutive
- * same-sender messages within 5 minutes share a bubble cluster — the sender
+ * same-sender messages within 5 minutes share a bubble cluster - the sender
  * and timestamp render once per group).
  */
 export function buildThreadItems(messages: Message[], now: Date = new Date()): ThreadItem[] {

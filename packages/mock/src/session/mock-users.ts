@@ -1,6 +1,6 @@
 import type { MockUser } from './types';
 
-/** Default mock users for the development role switcher — Phase 1: admin/user only. */
+/** Default mock users for the development role switcher - Phase 1: admin/user only. */
 export const MOCK_MEMBER: MockUser = {
   id: 'mem-001',
   name: 'Juan Dela Cruz',
@@ -45,7 +45,7 @@ export const MOCK_SUPER_ADMIN: MockUser = {
   roleId: 'super_admin',
 };
 
-// Legacy aliases for tests that still import MOCK_ADMIN/MOCK_FINANCE — now single admin type
+// Legacy aliases for tests that still import MOCK_ADMIN/MOCK_FINANCE - now single admin type
 export const MOCK_ADMIN: MockUser = MOCK_SUPER_ADMIN;
 export const MOCK_FINANCE: MockUser = {
   id: 'fin-001',

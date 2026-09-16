@@ -1,6 +1,6 @@
--- Countries master data — ISO 3166-1 alpha-2 canonical reference
+-- Countries master data - ISO 3166-1 alpha-2 canonical reference
 -- E-31 Country (config). Reference for location verification, member profile, public config.
--- No bounding boxes / polygons / coordinate logic — provider resolves country, this table validates/identifies.
+-- No bounding boxes / polygons / coordinate logic - provider resolves country, this table validates/identifies.
 -- Follows existing RLS pattern (cms_contents): public read (anon, authenticated), service_role write.
 
 create table if not exists public.countries (
@@ -38,7 +38,7 @@ end $$;
 -- Indexes
 create index if not exists countries_is_active_idx on public.countries (is_active) where is_active = true;
 
--- Seed — ISO 3166-1 alpha-2 official names. Idempotent via ON CONFLICT.
+-- Seed - ISO 3166-1 alpha-2 official names. Idempotent via ON CONFLICT.
 insert into public.countries (code, name, is_active) values
   ('AF','Afghanistan',true),
   ('AL','Albania',true),

@@ -4,7 +4,7 @@ import type { NavItem } from './types';
  * Site-wide identity and navigation.
  *
  * Brand positioning follows the legacy website: "Where Big Dreams Meet
- * Property That Already Earns" — a brokerage specializing in titled,
+ * Property That Already Earns" - a brokerage specializing in titled,
  * income-oriented, tenant-occupied property opportunities.
  */
 export const SITE = {

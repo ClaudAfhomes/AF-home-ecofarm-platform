@@ -115,7 +115,7 @@
   font-weight: 600;
 }
 
-/* Long values (e.g. "520 m² – 3 lots available") get cramped in a two-column
+/* Long values (e.g. "520 m² - 3 lots available") get cramped in a two-column
    layout on very narrow screens; collapse to a single column there. */
 @media (max-width: 419px) {
   .facts {

@@ -6,7 +6,7 @@ import type { VercelRequest, VercelResponse } from '../../../_lib/http.js';
 import { methodNotAllowed, requireService } from '../../../_lib/rest.js';
 
 /**
- * GET /me/messages/summary — member thread badge (API-SPECIFICATION #93):
+ * GET /me/messages/summary - member thread badge (API-SPECIFICATION #93):
  * unread staff replies + last message time. No Conversation row yet means
  * no thread: `{ unreadCount: 0 }`.
  */

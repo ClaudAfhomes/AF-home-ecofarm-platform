@@ -1,10 +1,10 @@
 /**
- * Local API dev server — Q1 Vercel Functions fallback for `vercel dev`.
+ * Local API dev server - Q1 Vercel Functions fallback for `vercel dev`.
  * Runs on :3000 so Vite proxy `/api → http://localhost:3000` works without
  * `@vercel/static-build` / `turbo run build`.
  *
  * Reuses the exact same router as the deployed single Vercel function
- * (`api/v1/[...slug].ts`) via `api/_lib/router.ts` — no logic is duplicated.
+ * (`api/v1/[...slug].ts`) via `api/_lib/router.ts` - no logic is duplicated.
  * Security/auth/validation/RLS behavior is preserved because the same handler
  * code is invoked.
  *
@@ -183,7 +183,7 @@ for (const gap of findRouteCoverageGaps(
 )) {
   // eslint-disable-next-line no-console
   console.warn(
-    `[dev-server] WARNING: ${gap.file} is ${gap.reason === 'not-imported' ? 'not imported' : 'imported but never routed'} — requests to it will 404. Add it to the route table.`,
+    `[dev-server] WARNING: ${gap.file} is ${gap.reason === 'not-imported' ? 'not imported' : 'imported but never routed'} - requests to it will 404. Add it to the route table.`,
   );
 }
 
@@ -201,7 +201,7 @@ void (async () => {
     if (missing.length > 0) {
       // eslint-disable-next-line no-console
       console.error(
-        `[dev-server] FATAL: messaging schema missing (${missing.join(', ')}) — run \`pnpm db:migrate\` or apply supabase/migrations/20261008000001_messaging.sql.`,
+        `[dev-server] FATAL: messaging schema missing (${missing.join(', ')}) - run \`pnpm db:migrate\` or apply supabase/migrations/20261008000001_messaging.sql.`,
       );
     }
   } catch (e) {

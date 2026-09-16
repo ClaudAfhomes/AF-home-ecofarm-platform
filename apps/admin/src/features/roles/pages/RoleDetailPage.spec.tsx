@@ -3,7 +3,6 @@ import { render, screen } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter, Route, Routes } from 'react-router';
 import userEvent from '@testing-library/user-event';
-import { ToastProvider } from '@jad/ui';
 import { STAFF_PERMISSIONS } from '@jad/contracts';
 import { MOCK_STAFF_ADMIN, MOCK_SUPER_ADMIN } from '@jad/mock';
 
@@ -15,17 +14,15 @@ import { RoleDetailPage } from './RoleDetailPage';
 function renderDetail(user: SessionUser = MOCK_SUPER_ADMIN, routeId = 'role-finance-reviewer') {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
-    <ToastProvider>
-      <SessionProvider initialUser={user} restoreDelayMs={0}>
-        <QueryClientProvider client={client}>
-          <MemoryRouter initialEntries={[`/admin/roles/${routeId}`]}>
-            <Routes>
-              <Route path="/admin/roles/:id" element={<RoleDetailPage />} />
-            </Routes>
-          </MemoryRouter>
-        </QueryClientProvider>
-      </SessionProvider>
-    </ToastProvider>,
+    <SessionProvider initialUser={user} restoreDelayMs={0}>
+      <QueryClientProvider client={client}>
+        <MemoryRouter initialEntries={[`/admin/roles/${routeId}`]}>
+          <Routes>
+            <Route path="/admin/roles/:id" element={<RoleDetailPage />} />
+          </Routes>
+        </MemoryRouter>
+      </QueryClientProvider>
+    </SessionProvider>,
   );
 }
 

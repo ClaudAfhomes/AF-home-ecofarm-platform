@@ -10,7 +10,8 @@ import {
   PageHeader,
   Skeleton,
   StatusChip,
-  useToast,
+  notifyError,
+  notifySuccess,
 } from '@jad/ui';
 import { formatMoney } from '@jad/shared';
 
@@ -24,7 +25,7 @@ import styles from './SaleDetail.module.css';
 
 /**
  * Estimated commission from the configured rate (exact-decimal rate string,
- * up to 4 places). BigInt math — no float. PG round() half-away matches
+ * up to 4 places). BigInt math - no float. PG round() half-away matches
  * `(x + 5000) / 10000` for these non-negative amounts.
  */
 function estimateCommission(value: string, rate: string): string {
@@ -49,7 +50,7 @@ function rateLabel(rate: string): string {
   return `${(num * 100).toFixed(2)}%`;
 }
 
-/** Sale detail — status progression, approve/reject/verify actions (SCR-ADM-009).
+/** Sale detail - status progression, approve/reject/verify actions (SCR-ADM-009).
  * Review: SUBMITTED → ADMIN_APPROVED → PAYMENT_VERIFIED → QUALIFYING_SALE.
  * Reject requires mandatory reason (BR-SAL-005). LOCKED after max resubmissions (BR-SAL-006).
  * Transitions persist via PATCH /admin/sales/:id (validated + audited server-side).
@@ -58,7 +59,6 @@ export function SaleDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { toast } = useToast();
   const deleteMut = useDeleteSale();
   const { data, isPending, isError, error } = useSale(id!);
   const [rejectReason, setRejectReason] = useState('');
@@ -139,11 +139,11 @@ export function SaleDetailPage() {
     if (!data) return;
     try {
       await deleteMut.mutateAsync(data.id);
-      toast({ title: 'Sale deleted', message: `${data.propertyName} removed`, tone: 'success' });
+      notifySuccess({ title: 'Sale deleted', message: `${data.propertyName} removed` });
       setShowDeleteConfirm(false);
       navigate('/admin/sales');
     } catch (e) {
-      toast({ title: 'Delete failed', message: (e as Error).message, tone: 'danger' });
+      notifyError({ title: 'Delete failed', message: (e as Error).message });
     }
   };
 
@@ -489,7 +489,7 @@ export function SaleDetailPage() {
                           className={styles.rejectInput}
                           value={rejectReason}
                           onChange={(e) => setRejectReason(e.target.value.slice(0, 500))}
-                          placeholder="Provide a reason for rejection (BR-SAL-005) — member sees it inline + via notification"
+                          placeholder="Provide a reason for rejection (BR-SAL-005) - member sees it inline + via notification"
                           rows={3}
                           maxLength={500}
                         />
@@ -573,9 +573,9 @@ export function SaleDetailPage() {
                       : currentStatus === 'QUALIFYING_SALE'
                         ? 'This sale has completed the full approval workflow.'
                         : currentStatus === 'REJECTED'
-                          ? 'Rejected — reason shown above, member notified.'
+                          ? 'Rejected - reason shown above, member notified.'
                           : currentStatus === 'LOCKED'
-                            ? 'Locked — reopen requires Admin/Super Admin review (audit).'
+                            ? 'Locked - reopen requires Admin/Super Admin review (audit).'
                             : 'No further actions are available.'}
                   </p>
                   {currentStatus !== data.status && (

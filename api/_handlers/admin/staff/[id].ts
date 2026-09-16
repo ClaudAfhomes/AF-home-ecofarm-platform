@@ -134,7 +134,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
 
-  // PATCH — { roleId?, status? } with self + governance guards.
+  // PATCH - { roleId?, status? } with self + governance guards.
   const parsedBody = readJsonBody(req);
   if (!parsedBody.ok) {
     const { error, status } = parsedBody.error;

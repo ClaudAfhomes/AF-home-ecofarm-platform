@@ -12,7 +12,7 @@
 -- untouched and stays additive.
 --
 -- One-time backfill: members already at/over the threshold are qualified.
--- NOTE: this can qualify members an admin deliberately left unqualified —
+-- NOTE: this can qualify members an admin deliberately left unqualified - 
 -- that is the owner-approved meaning of the configured minimum; the audit
 -- log distinguishes manual grants (`MEMBER_UPDATED`) from these
 -- (`SALE_QUALIFIED` detail note).
@@ -120,7 +120,7 @@ begin
   end if;
   insert into "AuditLog" (action, actor_id, actor_role, target_type, target_id, target_name, detail, created_at)
     values ('SALE_QUALIFIED', p_actor, p_role, 'Sale', p_id,
-            v_sale."propertyName" || ' — ' || v_sale."customerName",
+            v_sale."propertyName" || ' - ' || v_sale."customerName",
             'Qualified sale ' || p_id || '. ' || v_detail, v_now);
   select to_jsonb(s) into v_sale from "Sale" s where s.id = p_id;
   return jsonb_build_object('sale', v_sale);

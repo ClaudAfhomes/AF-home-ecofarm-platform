@@ -4,8 +4,6 @@ import { BrowserRouter } from 'react-router';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { createMockServer } from '@jad/mock';
 
-import { ToastProvider } from '@jad/ui';
-
 import App from './app/App';
 import { queryClient } from './lib/query';
 import { SessionProvider } from './lib/session';
@@ -16,7 +14,7 @@ import '@jad/ui/tokens.css';
 import '@jad/ui/base.css';
 import './styles/global.css';
 
-// Installed only when Supabase is not configured — with a backend, requests
+// Installed only when Supabase is not configured - with a backend, requests
 // flow through the Vite proxy to api/v1 instead.
 if (import.meta.env.DEV && !isSupabaseConfigured()) {
   createMockServer(adminMockHandlers).install();
@@ -29,14 +27,12 @@ if (!rootElement) {
 
 createRoot(rootElement).render(
   <StrictMode>
-    <ToastProvider>
-      <SessionProvider>
-        <QueryClientProvider client={queryClient}>
-          <BrowserRouter>
-            <App />
-          </BrowserRouter>
-        </QueryClientProvider>
-      </SessionProvider>
-    </ToastProvider>
+    <SessionProvider>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </QueryClientProvider>
+    </SessionProvider>
   </StrictMode>,
 );

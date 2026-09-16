@@ -7,7 +7,7 @@ import type { VercelRequest, VercelResponse } from '../../../_lib/http.js';
 import { methodNotAllowed, requireService } from '../../../_lib/rest.js';
 
 /**
- * GET /admin/messages/summary — staff inbox badge (API-SPECIFICATION #94):
+ * GET /admin/messages/summary - staff inbox badge (API-SPECIFICATION #94):
  * total unread member messages plus the count of threads holding them.
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {

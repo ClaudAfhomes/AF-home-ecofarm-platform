@@ -13,7 +13,7 @@ function renderCms(route = '/admin/cms/global', user = MOCK_SUPER_ADMIN) {
   return renderWithProviders(<CmsGlobalPage />, { route, user });
 }
 
-describe('CmsGlobalPage — Global Content CMS', () => {
+describe('CmsGlobalPage - Global Content CMS', () => {
   let server: ReturnType<typeof installMockApi>;
 
   beforeEach(() => {

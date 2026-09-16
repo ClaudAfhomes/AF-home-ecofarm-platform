@@ -9,7 +9,7 @@ import styles from './MessagesWorkspace.module.css';
 
 /**
  * Admin Messages surface. Mobile: list, then thread on selection. Desktop
- * (≥1024px): a two-pane master–detail — inbox left, thread right — so staff
+ * (≥1024px): a two-pane master-detail - inbox left, thread right - so staff
  * move between members without losing their place.
  */
 export function MessagesWorkspace() {

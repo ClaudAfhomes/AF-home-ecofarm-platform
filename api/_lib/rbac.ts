@@ -47,7 +47,7 @@ export type DbRole = {
  * Effective permission modules for a role row. Stored modules win when
  * present. Canonical system roles (`super_admin/admin/finance/merchant`)
  * fall back to the `STAFF_PERMISSIONS` matrix when the stored array is
- * empty — seed/provision scripts can create the row without permissions, and
+ * empty - seed/provision scripts can create the row without permissions, and
  * without this the API (and every role select) would treat the role as
  * nonexistent. Custom roles keep their stored set (possibly empty).
  */
@@ -106,7 +106,7 @@ export async function staffRoleModules(
   return effectivePermissions(row.slug ?? row.key ?? '', row.permissions);
 }
 
-/** Staff slugs held by a staff user (via StaffAssignment links — Phase 1 staff domain). */
+/** Staff slugs held by a staff user (via StaffAssignment links - Phase 1 staff domain). */
 export async function staffAssignmentSlugs(svc: Db, staffUserId: string): Promise<string[]> {
   const { data: links, error } = await svc
     .from('StaffAssignment')
@@ -137,8 +137,8 @@ export type StaffEntry = {
 
 /**
  * All staff users holding at least one staff role, mapped to the directory
- * shape (Phase 1 staff domain — reads StaffUser, never Member).
- * `createdBy` is not stored — reported as `System` (documented).
+ * shape (Phase 1 staff domain - reads StaffUser, never Member).
+ * `createdBy` is not stored - reported as `System` (documented).
  */
 export async function listStaffEntries(svc: Db): Promise<StaffEntry[]> {
   const { data: users, error } = await svc.from('StaffUser').select('*');

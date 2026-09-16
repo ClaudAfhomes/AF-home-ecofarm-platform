@@ -19,7 +19,7 @@ export interface DateFieldProps {
 }
 
 /**
- * Date input for auth forms — native <input type="date"> with modern
+ * Date input for auth forms - native <input type="date"> with modern
  * shadcn-inspired styling (48px, border, focus ring, custom calendar icon).
  * Keeps native picker for a11y/keyboard/mobile while looking consistent
  * with TextField/SelectField (DESIGN-SYSTEM §6.2).

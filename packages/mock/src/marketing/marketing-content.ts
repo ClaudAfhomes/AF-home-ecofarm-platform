@@ -1,7 +1,7 @@
 import type { ForwardableContent } from '@jad/contracts';
 
 /**
- * Canonical marketing content seed — shared between admin and member apps.
+ * Canonical marketing content seed - shared between admin and member apps.
  * Admin list shows all 12 (paginated); member gallery shows all 12 (filterable).
  * Every item is a production-like, owner-ready asset. No promos (owned by
  * Notifications), no internal docs, no dev placeholders.

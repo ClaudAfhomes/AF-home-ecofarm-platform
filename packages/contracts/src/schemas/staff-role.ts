@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 /**
- * Staff roles for admin-shell RBAC — frontend/UI-UX pass (static mocks).
+ * Staff roles for admin-shell RBAC - frontend/UI-UX pass (static mocks).
  * Distinct from the session `Role` (`admin`/`user` in `./role.js`), which
  * remains the authentication gate. `StaffRole` drives per-module visibility
  * in the admin shell. Exactly one staff role per staff user.
@@ -9,7 +9,7 @@ import { z } from 'zod';
  * SSOT: docs/business/BUSINESS-RULES.md #3 (Admin / Finance / Super Admin /
  * Merchant capabilities), docs/ui-ux/UI-UX.md #6.2 screen register,
  * docs/architecture/API-SPECIFICATION.md #6 endpoint inventory. Frontend
- * visibility is never authorization — the real backend enforces every
+ * visibility is never authorization - the real backend enforces every
  * request server-side.
  */
 export const staffRoleSchema = z.enum(['super_admin', 'admin', 'finance', 'merchant']);
@@ -25,7 +25,7 @@ export const STAFF_ROLE_LABEL: Record<StaffRole, string> = {
 
 /**
  * Admin-shell modules (one key per nav destination family). Keys are stable
- * module identifiers — they intentionally do not embed route paths, which
+ * module identifiers - they intentionally do not embed route paths, which
  * are still PROPOSED (no SSOT defines admin route paths yet).
  */
 export const staffModuleSchema = z.enum([
@@ -51,7 +51,7 @@ export type StaffModule = z.infer<typeof staffModuleSchema>;
 
 /**
  * Permission matrix: modules visible to each system staff role. This is the
- * system-role seed — the single source for default permissions. Custom
+ * system-role seed - the single source for default permissions. Custom
  * roles are `RoleRecord`s whose permissions start as a copy of (or a blank
  * set edited from) these rows; the seed itself never changes at runtime.
  *
@@ -136,13 +136,13 @@ export const roleRecordSchema = z.object({
 
 export type RoleRecord = z.infer<typeof roleRecordSchema>;
 
-/** Staff access standing — stored on StaffUser.status (Phase 1 staff domain). */
+/** Staff access standing - stored on StaffUser.status (Phase 1 staff domain). */
 export const staffStatusSchema = z.enum(['ACTIVE', 'DISABLED']);
 
 export type StaffStatus = z.infer<typeof staffStatusSchema>;
 
 /**
- * Staff password rule (ASSUMPTION 1 — no approved credential policy; the
+ * Staff password rule (ASSUMPTION 1 - no approved credential policy; the
  * 8-character minimum mirrors the member registration UI assumption).
  * Applies to super-admin-set temporary passwords and staff-chosen passwords.
  */
@@ -150,7 +150,7 @@ export const staffPasswordSchema = z.string().min(8).max(72);
 
 export type StaffPassword = z.infer<typeof staffPasswordSchema>;
 
-/** `POST /admin/staff` — create a staff account with a temporary password (FR-ADM). */
+/** `POST /admin/staff` - create a staff account with a temporary password (FR-ADM). */
 export const createStaffRequestSchema = z.object({
   name: z.string().trim().min(1).max(120),
   email: z.string().trim().email(),
@@ -162,14 +162,14 @@ export const createStaffRequestSchema = z.object({
 
 export type CreateStaffRequest = z.infer<typeof createStaffRequestSchema>;
 
-/** `PATCH /admin/session` — the signed-in staff member updates their own display name. */
+/** `PATCH /admin/session` - the signed-in staff member updates their own display name. */
 export const updateStaffProfileRequestSchema = z.object({
   name: z.string().trim().min(1).max(120),
 });
 
 export type UpdateStaffProfileRequest = z.infer<typeof updateStaffProfileRequestSchema>;
 
-/** `POST /admin/session/password` — change own password (current verified server-side). */
+/** `POST /admin/session/password` - change own password (current verified server-side). */
 export const changeStaffPasswordRequestSchema = z.object({
   currentPassword: z.string().min(1),
   newPassword: staffPasswordSchema,
@@ -178,7 +178,7 @@ export const changeStaffPasswordRequestSchema = z.object({
 export type ChangeStaffPasswordRequest = z.infer<typeof changeStaffPasswordRequestSchema>;
 
 /**
- * Staff identity — internal user profile, separate from Member (Phase 1
+ * Staff identity - internal user profile, separate from Member (Phase 1
  * staff separation). Keyed by the auth user id; owns no financial,
  * genealogy, or member data by construction.
  */
@@ -190,7 +190,7 @@ export const staffUserSchema = z.object({
   createdAt: z.string(),
   /**
    * True while the account still runs on a super-admin-set temporary
-   * password — the holder must change it before using the admin shell.
+   * password - the holder must change it before using the admin shell.
    * Optional so pre-flag fixtures still validate; writers always set it.
    */
   mustChangePassword: z.boolean().optional(),
@@ -198,7 +198,7 @@ export const staffUserSchema = z.object({
 
 export type StaffUser = z.infer<typeof staffUserSchema>;
 
-/** Staff role assignment — replaces MemberRole for staff users. */
+/** Staff role assignment - replaces MemberRole for staff users. */
 export const staffAssignmentSchema = z.object({
   staffUserId: z.string().min(1),
   roleId: z.string().min(1),
@@ -208,7 +208,7 @@ export const staffAssignmentSchema = z.object({
 export type StaffAssignment = z.infer<typeof staffAssignmentSchema>;
 
 /**
- * Staff session — `GET /admin/session` (Phase 6). Server-resolved via
+ * Staff session - `GET /admin/session` (Phase 6). Server-resolved via
  * service_role so admin clients never read Role tables with the anon key.
  */
 export const staffSessionSchema = z.object({
@@ -222,7 +222,7 @@ export const staffSessionSchema = z.object({
   /**
    * Server-resolved role identity (record key/slug, display name, effective
    * permission modules). Optional so pre-resolution fixtures and mock
-   * sessions — which lack a resolving server — still validate; writers
+   * sessions - which lack a resolving server - still validate; writers
    * (the real `GET /admin/session`) always set them. Lets the admin shell
    * render the signed-in staff member's role name and navigation without
    * fetching the super_admin-only role catalog for self-resolution.
@@ -235,7 +235,7 @@ export const staffSessionSchema = z.object({
 export type StaffSession = z.infer<typeof staffSessionSchema>;
 
 /**
- * Staff directory entry — a Member holding exactly one role.
+ * Staff directory entry - a Member holding exactly one role.
  * Served by `GET /admin/staff[/:id]`; `roleId` is the role key (system id or
  * custom `role-<slug>`).
  */
@@ -252,7 +252,7 @@ export const staffMemberSchema = z.object({
 export type StaffMember = z.infer<typeof staffMemberSchema>;
 
 /**
- * Audit log entry — served by `GET /admin/audit-log`, written by
+ * Audit log entry - served by `GET /admin/audit-log`, written by
  * `api/_lib/audit.ts` on every mutating admin call.
  */
 export const auditLogEntrySchema = z.object({
@@ -307,7 +307,7 @@ export function isRoleNameUnique(
  * Unknown ids resolve to no modules (deny by default).
  *
  * A non-empty `sessionModules` set (carried on the server-resolved staff
- * session) is authoritative and wins over records — it is how non-
+ * session) is authoritative and wins over records - it is how non-
  * super-admin staff (who cannot read the role catalog) resolve their own
  * modules for navigation and route guards.
  */
@@ -351,7 +351,7 @@ export const STAFF_MODULE_LABEL: Record<StaffModule, string> = {
  * Modules a custom (non-system) role may never hold. The API keeps the
  * corresponding endpoints super_admin-slug-gated (`staff`, `audit`) or
  * super_admin-only for writes (`config`), so granting them would only
- * produce navigation that 403s — block them at creation/editing so the
+ * produce navigation that 403s - block them at creation/editing so the
  * shell and the API stay consistent. `programs` redirects into System
  * Configuration, which custom roles cannot read anyway.
  */

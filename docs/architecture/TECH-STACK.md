@@ -1,12 +1,12 @@
-# JAD — Technology Stack SSOT (TECH-STACK.md)
+# JAD - Technology Stack SSOT (TECH-STACK.md)
 
 > **Authority:** Defines the approved/proposed technology stack for the JA&D platform. Companion to `ARCHITECTURE.md`.
 >
 > **Status vocabulary:** **CONFIRMED** (approved by project documentation or session decisions) · **PROPOSED** (recommended, not yet approved) · **ASSUMPTION** (working assumption) · **REQUIRES APPROVAL** (material decision) · **REQUIRES VERIFICATION** (version/claim not yet confirmed).
 >
-> **Critical rule:** The repository contains **no code and no dependency manifests**. Therefore **no version number in this document is verified** — every version is `REQUIRES VERIFICATION` until a manifest/lockfile exists. Versions below are current known-good suggestions, not approvals.
+> **Critical rule:** The repository contains **no code and no dependency manifests**. Therefore **no version number in this document is verified** - every version is `REQUIRES VERIFICATION` until a manifest/lockfile exists. Versions below are current known-good suggestions, not approvals.
 >
-> **Version:** Project 03 — Architecture & System Design (Baseline v1.0)
+> **Version:** Project 03 - Architecture & System Design (Baseline v1.0)
 
 ---
 
@@ -85,13 +85,13 @@ Rationale: Vercel Functions keep business logic server-side with minimal infra, 
 |---|---|---|
 | Engine | PostgreSQL | CONFIRMED (ARCH-DEC-003) |
 | Transactions | ACID; row-level locks; `SERIALIZABLE` where needed for balance/redemption | PROPOSED |
-| Money type | `NUMERIC` (exact decimal) — never floating point | PROPOSED (mandatory for BR-WAL-002) |
+| Money type | `NUMERIC` (exact decimal) - never floating point | PROPOSED (mandatory for BR-WAL-002) |
 | Constraints | CHECK (balance ≥ 0), unique (redemption), FKs | PROPOSED (BI-001, BI-007) |
 | Snapshot | Property value stored on sale record (BI-006) | CONFIRMED rule → implementation PROPOSED |
 | Migrations | Drizzle Kit / SQL migrations in repo | PROPOSED |
 | Ledger design | Append-only ledger table; balance derived/validated from ledger | PROPOSED |
 
-**Mandatory DB constraints derived from invariants:** BI-001 (available_balance ≥ 0), BI-002 (pending not available), BI-005 (no UPDATE/DELETE on financial tables — enforced by schema/roles), BI-007 (unique voucher redemption).
+**Mandatory DB constraints derived from invariants:** BI-001 (available_balance ≥ 0), BI-002 (pending not available), BI-005 (no UPDATE/DELETE on financial tables - enforced by schema/roles), BI-007 (unique voucher redemption).
 
 ---
 
@@ -115,7 +115,7 @@ Rationale: Ledger correctness (single writer, row locking, invariants) favors ex
 | Mechanism | Supabase Auth (JWT, verified server-side, PKCE) | CONFIRMED (Q1/Q3) |
 | Session store | Supabase Auth session (JWT + RLS); DB `Member`/`MemberRole` for RBAC | PROPOSED |
 | Email verification | Token via email service (BR-AUTH-001) | CONFIRMED requirement |
-| Password policy | Not approved — TBD (ASSUMPTION 1) | TBD |
+| Password policy | Not approved - TBD (ASSUMPTION 1) | TBD |
 
 ---
 
@@ -151,7 +151,7 @@ See `API-SPECIFICATION.md` for full conventions.
 | UI e2e | Playwright | PROPOSED |
 | Invariant tests | BI-001..BI-010 as automated tests in CI | PROPOSED |
 | Concurrency tests | Redemption/withdrawal race-condition tests | PROPOSED |
-| Coverage targets | Not approved — TBD (REQUIRES APPROVAL) | TBD |
+| Coverage targets | Not approved - TBD (REQUIRES APPROVAL) | TBD |
 
 ---
 
@@ -173,7 +173,7 @@ See `API-SPECIFICATION.md` for full conventions.
 | Frontend hosting | Vercel (web/admin) | PROPOSED (Q1) |
 | Backend | Vercel Functions (api/) | PROPOSED (Q1) |
 | Database/Auth/Storage/Realtime | Supabase (Postgres 15+ / Auth / Storage / Realtime) | PROPOSED (Q1) |
-| Orchestration / hosting | Provider **OPEN** (ROADMAP R-10) — Vercel + Supabase are target per Q1 | **REQUIRES APPROVAL** |
+| Orchestration / hosting | Provider **OPEN** (ROADMAP R-10) - Vercel + Supabase are target per Q1 | **REQUIRES APPROVAL** |
 | Database hosting | Managed PostgreSQL via Supabase | **REQUIRES APPROVAL** |
 | Reverse proxy / load balancer | Vercel edge (standard) | PROPOSED |
 | Secrets | Secret manager / env per environment; never in source (NFR) | PROPOSED |
@@ -218,9 +218,9 @@ See `API-SPECIFICATION.md` for full conventions.
 
 | Primary | Alternative (acceptable) |
 |---|---|
-| Vercel Functions | Fastify/Express or Supabase Edge Functions (only if Vercel rejected — REQUIRES APPROVAL) |
-| React + Vite | Next.js (only for member app if SSR needed — REQUIRES APPROVAL) |
-| Supabase JS client | Drizzle (if dedicated backend added — REQUIRES APPROVAL) |
+| Vercel Functions | Fastify/Express or Supabase Edge Functions (only if Vercel rejected - REQUIRES APPROVAL) |
+| React + Vite | Next.js (only for member app if SSR needed - REQUIRES APPROVAL) |
+| Supabase JS client | Drizzle (if dedicated backend added - REQUIRES APPROVAL) |
 | Vitest | Jest |
 | Zustand + TanStack Query | Redux Toolkit (only if team mandates) |
 
@@ -230,8 +230,8 @@ See `API-SPECIFICATION.md` for full conventions.
 
 Per approved out-of-scope boundaries and invariants:
 
-1. **Payment gateway / card processor SDKs** (BR-BND-003) — e.g., Stripe/PayMongo/Braintree payment APIs for collecting or moving money.
-2. **Wallet APIs that move real money** (BR-BND-001) — JAD records only.
+1. **Payment gateway / card processor SDKs** (BR-BND-003) - e.g., Stripe/PayMongo/Braintree payment APIs for collecting or moving money.
+2. **Wallet APIs that move real money** (BR-BND-001) - JAD records only.
 3. **Any floating-point money representation** (BR-WAL-002 correctness).
 4. **NoSQL as the system of record** for financial data (no ACID/constraints).
 5. **In-app MLM/network-commission libraries** (BR-REF-002).

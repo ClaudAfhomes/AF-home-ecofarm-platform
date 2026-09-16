@@ -2,7 +2,7 @@
  * Shared Supabase env resolution for api/ handlers (server-only).
  * Resolution order mirrors supabase/seed.ts: explicit SUPABASE_URL, then
  * VITE_/NEXT_PUBLIC_ variants, then derived from DATABASE_URL. Never commit
- * secrets — all values come from process env.
+ * secrets - all values come from process env.
  */
 export function getSupabaseEnv() {
   let url =

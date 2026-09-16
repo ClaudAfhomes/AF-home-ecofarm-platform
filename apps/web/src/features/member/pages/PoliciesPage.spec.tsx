@@ -11,6 +11,7 @@ const POLICIES = {
   data: [
     {
       id: 'pol-001',
+      slug: 'terms',
       title: 'Terms and Conditions',
       type: 'terms',
       updatedAt: '2026-07-01T10:00:00.000Z',
@@ -18,6 +19,7 @@ const POLICIES = {
     },
     {
       id: 'pol-002',
+      slug: 'guidelines',
       title: 'Program Guidelines',
       type: 'guidelines',
       updatedAt: '2026-07-15T10:00:00.000Z',
@@ -37,10 +39,10 @@ describe('member PoliciesPage', () => {
     expect(screen.getAllByText(/updated/).length).toBe(2);
     expect(screen.getByRole('link', { name: /Terms and Conditions/ })).toHaveAttribute(
       'href',
-      '/member/policies/pol-001',
+      '/member/policies/terms',
     );
 
-    // Beautiful list — breadcrumbs, timeframe, search, count, raised cards
+    // Beautiful list - breadcrumbs, timeframe, search, count, raised cards
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
     expect(screen.getByText('Resources')).toBeInTheDocument();
     expect(screen.getAllByText('Policies')).toHaveLength(2);

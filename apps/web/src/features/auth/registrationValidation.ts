@@ -2,7 +2,7 @@ import type { IdDocument, QualificationAnswer } from '@jad/contracts';
 
 /**
  * Multi-step registration draft validation (SCR-AUTH-002/005).
- * UX validation only — the client is never the security boundary. Rules stay
+ * UX validation only - the client is never the security boundary. Rules stay
  * within documented requirements (BR-REG-001..013); the 8-character password
  * minimum remains ASSUMPTION 1 (TBD) as in the login/register previews.
  */
@@ -11,7 +11,7 @@ export const PASSWORD_MIN_LENGTH = 8;
 export const SPONSOR_CODE_MAX_LENGTH = 40;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_RE = /^\+?[\d\s().-]{7,}$/;
-/** ID file cap — matches the API 3 MB limit (base64 must fit Function bodies). */
+/** ID file cap - matches the API 3 MB limit (base64 must fit Function bodies). */
 export const MAX_FILE_BYTES = 3 * 1024 * 1024;
 
 export interface RegistrationDraft {
@@ -74,7 +74,7 @@ export function cutoffDateForMinAge(minAge: number, now = new Date()): string {
   return `${y}-${m}-${d}`;
 }
 
-/** Step 0 — program choice + personal profile (BR-REG-001/002/008/010/011). */
+/** Step 0 - program choice + personal profile (BR-REG-001/002/008/010/011). */
 export function validateProgramProfile(
   draft: RegistrationDraft,
   minAge: number,
@@ -104,7 +104,7 @@ export function validateProgramProfile(
   return errors;
 }
 
-/** Step 1 — qualification questions answered (FR-REG-003; content TBD OD-002). */
+/** Step 1 - qualification questions answered (FR-REG-003; content TBD OD-002). */
 export function validateQualification(
   answers: Record<string, string>,
   questions: { id: string; questionText: string }[],
@@ -118,7 +118,7 @@ export function validateQualification(
   return errors;
 }
 
-/** Step 2 — optional referral code (BR-REG-006; validated server-side). */
+/** Step 2 - optional referral code (BR-REG-006; validated server-side). */
 export function validateReferralCode(referralCode: string): Record<string, string> {
   const errors: Record<string, string> = {};
   if (referralCode.trim().length > SPONSOR_CODE_MAX_LENGTH) {
@@ -127,19 +127,19 @@ export function validateReferralCode(referralCode: string): Record<string, strin
   return errors;
 }
 
-/** Step 3 — government ID upload (FR-REG-002, FEAT-010). File bytes ride along
+/** Step 3 - government ID upload (FR-REG-002, FEAT-010). File bytes ride along
  * as base64 for the API upload; metadata alone is a legacy shape. */
 export function validateIdDocument(idDocument: IdDocument | undefined): Record<string, string> {
   const errors: Record<string, string> = {};
   if (!idDocument) {
     errors.idDocument = 'Attach a clear copy of a valid government-issued ID.';
   } else if (idDocument.sizeBytes > MAX_FILE_BYTES) {
-    errors.idDocument = 'File is too large — attach an ID copy under 5 MB.';
+    errors.idDocument = 'File is too large - attach an ID copy under 5 MB.';
   }
   return errors;
 }
 
-/** Step 4 — account credentials + terms consent. */
+/** Step 4 - account credentials + terms consent. */
 export function validateAccount(draft: RegistrationDraft): Record<string, string> {
   const errors: Record<string, string> = {};
   const email = draft.email.trim();
@@ -157,7 +157,7 @@ export function validateAccount(draft: RegistrationDraft): Record<string, string
   return errors;
 }
 
-/** First invalid field id, in display order — for focus management. */
+/** First invalid field id, in display order - for focus management. */
 export function firstInvalidField(
   errors: Record<string, string>,
   order: string[],

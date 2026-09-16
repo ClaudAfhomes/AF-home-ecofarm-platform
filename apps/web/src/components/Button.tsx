@@ -1,5 +1,7 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
+import { Spinner } from '@jad/ui';
+
 import styles from './Button.module.css';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost';
@@ -14,7 +16,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 /**
  * Shared button primitive (DESIGN-SYSTEM §6.1). Variants: primary (main action),
  * secondary (supporting), ghost (in-context). Danger variant is intentionally
- * NOT provided — the public website has no destructive actions. For link-style
+ * NOT provided - the public website has no destructive actions. For link-style
  * actions use `ButtonLink`. Minimum target size 44px (DESIGN-SYSTEM §7.4).
  */
 export function Button({
@@ -39,7 +41,8 @@ export function Button({
     >
       {loading ? (
         <span className={styles.loadingLabel} role="status">
-          Loading…
+          <Spinner size="sm" />
+          <span>Loading…</span>
         </span>
       ) : (
         children

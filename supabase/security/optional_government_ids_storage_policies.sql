@@ -1,4 +1,4 @@
--- OPTIONAL hardening — government-ids storage deny policies.
+-- OPTIONAL hardening - government-ids storage deny policies.
 --
 -- The government-ids bucket is private, written via service-role, and read
 -- exclusively through 60s signed URLs, so no storage.objects policy is

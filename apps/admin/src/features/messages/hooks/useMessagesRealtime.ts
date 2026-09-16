@@ -4,13 +4,13 @@ import { useQueryClient } from '@tanstack/react-query';
 import { getSupabaseClient, isSupabaseConfigured } from '../../../lib/supabase';
 
 /**
- * Admin messaging Realtime — subscribes to `Message` INSERTs across every
+ * Admin messaging Realtime - subscribes to `Message` INSERTs across every
  * member thread and invalidates the inbox + summary queries.
  *
  * Mirrors the member `useMessagesRealtime`: the API stays the authoritative
  * read path; Realtime only invalidates. Staff delivery relies on the
  * SELECT-only `message_staff_select` RLS policy gated by `is_staff_user()`
- * (the first staff RLS read policy — ADR-013). Mounted once in `AdminLayout`.
+ * (the first staff RLS read policy - ADR-013). Mounted once in `AdminLayout`.
  * In TEST/MODE and non-Supabase environments it is a no-op.
  */
 export function useMessagesRealtime(enabled: boolean) {

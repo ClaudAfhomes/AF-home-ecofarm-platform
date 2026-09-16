@@ -7,7 +7,7 @@ import { methodNotAllowed, requireService } from '../../_lib/rest.js';
 import { toErrorEnvelope } from '../../_lib/envelope.js';
 
 /**
- * GET /admin/queues — dashboard queue counts (super_admin, admin).
+ * GET /admin/queues - dashboard queue counts (super_admin, admin).
  * Server facts, never derived client-side.
  */
 export async function getQueues(req: VercelRequest, res: VercelResponse) {

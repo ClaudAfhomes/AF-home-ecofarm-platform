@@ -2,14 +2,14 @@ import { resendVerificationRequestSchema } from '@jad/contracts';
 
 import { toErrorEnvelope } from '../../../_lib/envelope.js';
 import type { VercelRequest, VercelResponse } from '../../../_lib/http.js';
-import { requireAnonClient } from '../../../_lib/otp.js';
-import { methodNotAllowed, readJsonBody } from '../../../_lib/rest.js';
+import { methodNotAllowed, readJsonBody, requireService } from '../../../_lib/rest.js';
+import { issueVerificationCode } from '../../../_lib/verification-code.js';
 
 /**
- * POST /api/v1/auth/verify-email/resend — re-issue the email-verification
- * one-time code (FEAT-009). Public. The code is dispatched by Supabase Auth
- * (`signInWithOtp`); no code is returned here — the real email carries it
- * (`devOnlyCode` is mock-only).
+ * POST /api/v1/auth/verify-email/resend - re-issue the email-verification
+ * one-time code (FEAT-009). Public. A fresh code is generated and delivered
+ * via EmailJS; no code is returned here (`devOnlyCode` is mock-only).
+ * Enforces a 60s resend cooldown and an hourly send cap.
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -36,26 +36,29 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
   const { email } = parsed.data;
-  const anon = requireAnonClient();
-  if (!anon) {
-    const { error, status } = toErrorEnvelope('INTERNAL', 'Supabase not configured', 500);
+  const supabase = requireService(res);
+  if (!supabase) return;
+  const result = await issueVerificationCode(supabase, { email });
+  if (result.rateLimited) {
+    const { error, status } = toErrorEnvelope(
+      'TOO_MANY_REQUESTS',
+      'Too many codes requested. Please try again later.',
+      429,
+    );
     res.status(status).json({ error });
     return;
   }
-  const { error } = await anon.auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
-  if (error) {
-    // GoTrue rate-limit message ("For security purposes, you can only request
-    // this after 60 seconds") plus generic rate/too-many signatures.
-    const rateLimited = /rate|too many|temporar|you can only request/i.test(error.message);
-    const { error: envelope, status } = toErrorEnvelope(
-      rateLimited ? 'TOO_MANY_REQUESTS' : 'VALIDATION_ERROR',
-      rateLimited
-        ? 'Please wait a moment before requesting another code.'
-        : 'We could not send a new code to this email address.',
-      rateLimited ? 429 : 400,
+  if (!result.sent) {
+    const { error, status } = toErrorEnvelope(
+      'INTERNAL',
+      'We could not send a new code right now. Please try again shortly.',
+      503,
     );
-    res.status(status).json({ error: envelope });
+    res.status(status).json({ error });
     return;
   }
-  res.status(200).json({ email });
+  res.status(200).json({
+    email,
+    ...(result.cooldownSeconds !== undefined && { retryAfterSeconds: result.cooldownSeconds }),
+  });
 }

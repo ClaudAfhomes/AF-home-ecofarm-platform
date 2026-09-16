@@ -6,7 +6,7 @@
 --   Message       id text PK (server `msg-…`), "memberId" uuid → Member(id)
 --                 (denormalized for own-row RLS + realtime filter),
 --                 "senderType" MEMBER|STAFF, "senderId" uuid (Member.id or
---                 StaffUser.id — deliberately no FK across the two identity
+--                 StaffUser.id - deliberately no FK across the two identity
 --                 domains), "senderName" display snapshot, body text 1..4000
 --                 (plain text v1; the UI never renders it as HTML).
 -- All writes go through the service-role API (authenticated are SELECT-only,

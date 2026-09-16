@@ -9,7 +9,8 @@ import {
   PageHeader,
   Skeleton,
   StatusChip,
-  useToast,
+  notifyError,
+  notifySuccess,
 } from '@jad/ui';
 import type { ContentKind } from '@jad/contracts';
 
@@ -37,12 +38,11 @@ function isPdfUrl(url?: string): boolean {
   }
 }
 
-/** Marketing Tool Detail — read-only view of a single forwardable content item. */
+/** Marketing Tool Detail - read-only view of a single forwardable content item. */
 export function MarketingToolDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { toast } = useToast();
   const { data, isPending, isError, error } = useContent();
   const deleteContent = useDeleteContent();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -54,17 +54,16 @@ export function MarketingToolDetailPage() {
     if (!item) return;
     try {
       const result = await deleteContent.mutateAsync(item.id);
-      toast({
+      notifySuccess({
         title: 'Marketing tool deleted',
         message: result.fileRemoved
           ? `"${item.title}" was permanently removed, including its uploaded file.`
           : `"${item.title}" was permanently removed.`,
-        tone: 'success',
       });
       await queryClient.invalidateQueries({ queryKey: ['admin', 'content'] });
       navigate('/admin/marketing-tools');
     } catch (e) {
-      toast({ title: 'Delete failed', message: (e as Error).message, tone: 'danger' });
+      notifyError({ title: 'Delete failed', message: (e as Error).message });
       setShowDeleteConfirm(false);
     }
   };

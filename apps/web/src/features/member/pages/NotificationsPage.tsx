@@ -35,7 +35,7 @@ const READ_FILTERS: { value: ReadFilter; label: string }[] = [
  * Notifications (SCR-MEM-024, FR-ADM-005). The member's broadcast/announcement
  * feed (own + broadcast rows). Read state is a per-member server receipt:
  * opening the Viewer marks the item read, with explicit per-item and
- * mark-all actions. Broadcast rows are shared — receipts never touch them.
+ * mark-all actions. Broadcast rows are shared - receipts never touch them.
  */
 export function NotificationsPage() {
   const { user } = useSession();
@@ -133,7 +133,7 @@ export function NotificationsPage() {
     <section>
       <PageHeader
         title="Notifications"
-        description="Updates and announcements from JA&D — latest first."
+        description="Updates and announcements from JA&D - latest first."
         actions={
           <div className={styles.headerActions}>
             <Button

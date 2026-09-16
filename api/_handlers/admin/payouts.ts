@@ -5,7 +5,7 @@ import { isValidPayoutAccountRow, mapPayoutAccountRow } from '../../_lib/pipelin
 import { methodNotAllowed, okList, requireService } from '../../_lib/rest.js';
 import { toErrorEnvelope } from '../../_lib/envelope.js';
 
-/** GET /admin/payouts — payout accounts queue (super_admin, admin, finance). */
+/** GET /admin/payouts - payout accounts queue (super_admin, admin, finance). */
 export async function listPayouts(req: VercelRequest, res: VercelResponse) {
   const auth = await verifyStaffModule(req, 'payouts', FINANCE_VIEW);
   if ('error' in auth) {

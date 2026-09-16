@@ -6,7 +6,7 @@ import { toErrorEnvelope } from '../../_lib/envelope.js';
 
 /** Merge per-member read receipts over notification rows. A broadcast row
  * (member_id NULL) is shared, so its row read_at can never mark it read for
- * one member — the receipt is the SSOT. Member-scoped rows fall back to the
+ * one member - the receipt is the SSOT. Member-scoped rows fall back to the
  * row read_at (legacy/seed state converged by the NotificationRead backfill).
  */
 export function mergeReadReceipts(
@@ -28,7 +28,7 @@ export function mergeReadReceipts(
 }
 
 /**
- * GET /me/broadcasts — own + broadcast notifications, newest first
+ * GET /me/broadcasts - own + broadcast notifications, newest first
  * (API-SPECIFICATION #73). Per-member `readAt` merges NotificationRead
  * receipts over the row state.
  */
@@ -76,7 +76,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       receipts = receiptRows as typeof receipts;
     }
   } catch {
-    // pre-migration: no receipts table — row state stands alone.
+    // pre-migration: no receipts table - row state stands alone.
   }
   const rows = mergeReadReceipts(notifications, receipts);
   okList(res, rows.filter(isValidNotificationRow));

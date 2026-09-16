@@ -1,21 +1,21 @@
-# F2-C Delivery Report — Member Panel Remediation & Hardening
+# F2-C Delivery Report - Member Panel Remediation & Hardening
 
 Phase F2-C hardens the member portal built across F2-A/F2-B. Two P1 production hazards are fixed (DEV mock session leaking into the real app; `POST /sales` without idempotency) plus the prioritized P2 list (semantic link buttons, 44px touch targets, exact-decimal money validation in one place, validation status alignment). No SSOT/business-rule changes were made.
 
 ## P1 fixes
 
-### P1-1 — Mock session is now a DEV-only stand-in, never an auth boundary
+### P1-1 - Mock session is now a DEV-only stand-in, never an auth boundary
 
 Previously the member/admin panels were implicitly "signed in" as mock users and the mock session rode along in production bundles. Now each app owns a session seam:
 
-- `apps/web/src/lib/session.tsx` and `apps/admin/src/lib/session.tsx`: app-owned `SessionContext` + `useSession()`. `SessionProvider` statically branches on `import.meta.env.DEV` — DEV mounts the mock session (`MockSessionProvider` + `MockSessionBridge`, preserving the role switcher); production mounts `UnauthenticatedSessionProvider` (always `unauthenticated`, `user:null`, `role:null`, no-op `loginAs`/`logout`). Until real backend auth lands, every production visitor is unauthenticated — there is no client-side authz trust.
+- `apps/web/src/lib/session.tsx` and `apps/admin/src/lib/session.tsx`: app-owned `SessionContext` + `useSession()`. `SessionProvider` statically branches on `import.meta.env.DEV` - DEV mounts the mock session (`MockSessionProvider` + `MockSessionBridge`, preserving the role switcher); production mounts `UnauthenticatedSessionProvider` (always `unauthenticated`, `user:null`, `role:null`, no-op `loginAs`/`logout`). Until real backend auth lands, every production visitor is unauthenticated - there is no client-side authz trust.
 - The admin provider uses a `null` sentinel (`initialUser?: SessionUser | null`) so an explicit `null` forces unauthenticated while omitting the prop keeps the DEV auto-authenticated default. This fixes the earlier bug where an `undefined` default re-applied `MOCK_ADMIN` and broke the "Forbidden for unauthenticated" path.
 - 8 web consumers (`RequireMember`, `RequireQualifiedMember`, `MemberLayout`, `useMember.ts`, `DashboardPage`, `ReferralCodePage`, `ResubmitPage`, `LoginPage`) and 3 admin consumers (`RequireRole`, `AdminLayout`, `DashboardPage`) now read state from `useSession`; `MockUserSwitcher` remains DEV-gated in `main.tsx`.
 - Test helpers (`src/test/utils.tsx`, member and admin variants) and 6 specs migrated to `SessionProvider` with a typed `SessionUser` option.
 
 **Prod-bundle verification (grep on built assets):** `apps/web/dist` and `apps/admin/dist` contain **zero** matches for `MockSessionProvider`, `useMockSession`, `MockUserSwitcher`, mock user ids/emails, or mock-server markers. The mock server (handlers/store) and the `@jad/mock` session are fully tree-shaken out of production.
 
-### P1-2 — `POST /sales` is idempotent
+### P1-2 - `POST /sales` is idempotent
 
 `POST /sales` now requires and honors the `Idempotency-Key` (API-SPECIFICATION §5.3) exactly like `POST /me/withdrawals`:
 
@@ -40,15 +40,15 @@ Previously the member/admin panels were implicitly "signed in" as mock users and
 
 ## Assumptions & deviations (need Owner sign-off)
 
-1. **Session seam is app-owned and production is unauthenticated** — real auth (HttpOnly session cookie, `/auth/me`) is F3; the `UnauthenticatedSessionProvider` is the correct place to wire it in.
-2. **Mock idempotency store is in-memory** — real persistence, key hashing, and TTL (24h, PROPOSED) are backend concerns (API-SPEC §5.3, DATABASE-DESIGN §20); the client behavior (reuse key on retry, never persist) is already correct.
+1. **Session seam is app-owned and production is unauthenticated** - real auth (HttpOnly session cookie, `/auth/me`) is F3; the `UnauthenticatedSessionProvider` is the correct place to wire it in.
+2. **Mock idempotency store is in-memory** - real persistence, key hashing, and TTL (24h, PROPOSED) are backend concerns (API-SPEC §5.3, DATABASE-DESIGN §20); the client behavior (reuse key on retry, never persist) is already correct.
 3. **Validation status 400** is now consistent with API-SPEC §1.2 across the mock and the client test fixtures.
-4. **Demo-credential copy literal** (`AUTH.login.demo`, `juan.delacruz@example.com` / `password123`) remains as inert text in the production web bundle. It is DEV-gated in `LoginPage.tsx` and never rendered in production, and it is approved placeholder content — not a mock-API leak. Removing it entirely would require splitting the demo block into a DEV-only module; deferred to keep this pass from expanding scope.
-5. **Lazy loading / code-splitting not performed** — Vite flags a >500 kB chunk. Route-level splitting is an architectural expansion (new React.lazy/Suspense wiring) and is deferred to a dedicated performance phase; it is the top remaining perf item.
+4. **Demo-credential copy literal** (`AUTH.login.demo`, `juan.delacruz@example.com` / `password123`) remains as inert text in the production web bundle. It is DEV-gated in `LoginPage.tsx` and never rendered in production, and it is approved placeholder content - not a mock-API leak. Removing it entirely would require splitting the demo block into a DEV-only module; deferred to keep this pass from expanding scope.
+5. **Lazy loading / code-splitting not performed** - Vite flags a >500 kB chunk. Route-level splitting is an architectural expansion (new React.lazy/Suspense wiring) and is deferred to a dedicated performance phase; it is the top remaining perf item.
 
 ## Gaps / out of scope (F3+)
 
 - Real backend auth + session restore (F3); persistence/TTL for idempotency keys; rate limiting.
 - Optional lower-risk spec gaps not added: `ReferralCodePage`, `QualificationStatusPage`, `ResubmitPage`, `ProfilePage` (existing patterns cover load/error/empty states; low risk).
-- Route-level code-splitting (lazy loading) — recommended next perf phase.
+- Route-level code-splitting (lazy loading) - recommended next perf phase.
 - Remove the inert demo-credential copy from the prod bundle via a DEV-only module (cosmetic).

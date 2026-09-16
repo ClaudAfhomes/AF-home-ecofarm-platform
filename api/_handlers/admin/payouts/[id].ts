@@ -9,7 +9,7 @@ import { methodNotAllowed, readJsonBody, requireService } from '../../../_lib/re
 import { toErrorEnvelope } from '../../../_lib/envelope.js';
 
 /**
- * PATCH /admin/payouts/:id — verify (PENDING/ADMIN_REVIEW → CONFIRMED) or
+ * PATCH /admin/payouts/:id - verify (PENDING/ADMIN_REVIEW → CONFIRMED) or
  * reject (→ REJECTED, reason mandatory, ≤500 chars). Finance works the
  * verification queue; every decision is audited.
  */
@@ -125,7 +125,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     actorRole: auth.slugs[0] ?? 'admin',
     targetType: 'PayoutAccount',
     targetId: id,
-    targetName: `${String(current.accountName ?? id)} — ${String(current.method ?? '')}`,
+    targetName: `${String(current.accountName ?? id)} - ${String(current.method ?? '')}`,
     detail:
       status === 'CONFIRMED'
         ? `Confirmed payout account ${id}`

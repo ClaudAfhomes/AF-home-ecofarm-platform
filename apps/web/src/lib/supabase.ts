@@ -1,15 +1,15 @@
 /**
- * Supabase client — Phase 3: Storage (marketing-tools) + Realtime (notifications).
+ * Supabase client - Phase 3: Storage (marketing-tools) + Realtime (notifications).
  * When VITE_SUPABASE_URL + VITE_SUPABASE_ANON_KEY are set (Supabase project created),
  * uses native ESM `createClient` with cross-port cookie storage in DEV (localhost:5173
  * vs :5174 are distinct origins for localStorage but share document.cookie on localhost).
  * In production, defaults to Supabase localStorage unless cookie Domain is needed.
  *
  * Buckets:
- * - `marketing-tools` (public read, SUPER_ADMIN write) — IMAGE/VIDEO/PDF for
+ * - `marketing-tools` (public read, SUPER_ADMIN write) - IMAGE/VIDEO/PDF for
  *   ContentLibraryPage. Replaces unsplash/gtv/w3 samples with `storage.objects`
  *   signed URLs (`admin/content` upload).
- * - `Realtime` channel `notifications:memberId=eq.<id>` — NotificationsPage
+ * - `Realtime` channel `notifications:memberId=eq.<id>` - NotificationsPage
  *   `useBroadcasts` (pg `notifications` table) live updates.
  */
 
@@ -72,7 +72,7 @@ const cookieStorage = {
   },
 };
 
-/** Test helper — reset singleton between vitest cases */
+/** Test helper - reset singleton between vitest cases */
 export function resetSupabaseClientForTest(): void {
   cached = null;
   refreshInflight = null;
@@ -82,7 +82,7 @@ let refreshInflight: Promise<boolean> | null = null;
 
 /**
  * Attempt one token rotation after a 401 (expired access token, or a
- * cross-port refresh race between :5173 and :5174 sharing one cookie —
+ * cross-port refresh race between :5173 and :5174 sharing one cookie -
  * navigator.locks don't span origins, so rotations can collide). Memoized so
  * concurrent 401s share a single rotation instead of stampeding. Returns
  * true when a usable session exists afterwards.
@@ -115,11 +115,11 @@ export async function clearSession(): Promise<void> {
   try {
     await getSupabaseClient()?.auth.signOut();
   } catch {
-    // Session already dead — nothing left to clear.
+    // Session already dead - nothing left to clear.
   }
 }
 
-// Storage helpers (Phase 3) — marketing-tools bucket (public read, SUPER_ADMIN write DATABASE-DESIGN.md:139)
+// Storage helpers (Phase 3) - marketing-tools bucket (public read, SUPER_ADMIN write DATABASE-DESIGN.md:139)
 export function isSupabaseStorageConfigured(): boolean {
   return isSupabaseConfigured();
 }
@@ -148,7 +148,7 @@ export async function listMarketingToolsFromStorage(): Promise<MarketingToolFrom
     });
 }
 
-// Realtime helpers (Phase 3) — notifications channel notifications:memberId=eq.* DATABASE-DESIGN.md:141
+// Realtime helpers (Phase 3) - notifications channel notifications:memberId=eq.* DATABASE-DESIGN.md:141
 export function subscribeNotificationsRealtime(
   memberId: string,
   onInsert: (payload: unknown) => void,

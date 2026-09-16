@@ -34,7 +34,7 @@ function formatRate(rate: string): string {
  * records with the confirmed status vocabulary. Records are immutable
  * (BI-005); amounts are server snapshots (BI-006). Direct Commission (8%) and
  * Direct Referral (4%) can both apply to the same sale (BR-COM-001/002).
- * Full list for now — low volume (<100); future cursor pagination like Ledger
+ * Full list for now - low volume (<100); future cursor pagination like Ledger
  * if NFR-SCAL-001 demands (API-SPECIFICATION §4).
  */
 export function CommissionsListPage() {

@@ -6,7 +6,7 @@ import { methodNotAllowed, okList, requireService } from '../../_lib/rest.js';
 import { toErrorEnvelope } from '../../_lib/envelope.js';
 
 /**
- * GET /admin/vouchers — assigned vouchers with member linkage
+ * GET /admin/vouchers - assigned vouchers with member linkage
  * (super_admin, admin, finance). Optional `?templateId=` narrows to one
  * template's assignments (used by the template detail page).
  */

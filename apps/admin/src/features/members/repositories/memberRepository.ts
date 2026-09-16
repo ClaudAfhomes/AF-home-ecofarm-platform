@@ -11,7 +11,7 @@ import {
 import { request, requestList } from '../../../lib/api/client';
 
 /**
- * Member repository — REST over api/v1 (Phase B3 cutover).
+ * Member repository - REST over api/v1 (Phase B3 cutover).
  * Centralizes transitions: ACTIVE ↔ INACTIVE, → ARCHIVED.
  */
 export async function getMembers(): Promise<AdminMember[]> {
@@ -43,7 +43,7 @@ export async function activateMember(id: string): Promise<AdminMember> {
 }
 
 /**
- * Grant/revoke qualification (super_admin + admin; approved members only —
+ * Grant/revoke qualification (super_admin + admin; approved members only -
  * enforced server-side). Qualification is the Active + Qualified gate that
  * unlocks sales submission and sponsorship.
  */
@@ -63,7 +63,7 @@ export interface CreateMemberInput {
   programCode: string;
   dateOfBirth: string;
   temporaryPassword: string;
-  /** Optional sponsor's referral CODE (not a uuid) — resolved server-side. */
+  /** Optional sponsor's referral CODE (not a uuid) - resolved server-side. */
   referralCode?: string;
 }
 
@@ -80,7 +80,7 @@ export async function createMember(input: CreateMemberInput): Promise<AdminMembe
  * Accepts the sponsor's referral CODE (resolved like registration approval),
  * or null to clear the link. Deliberately separate from `updateMember`:
  * `MemberProfile.referralCode` is the member's OWN code, while this field is
- * the sponsor's code — sharing the call would invite misrouting.
+ * the sponsor's code - sharing the call would invite misrouting.
  */
 export async function setMemberSponsor(
   id: string,
@@ -101,7 +101,7 @@ export async function archiveMember(id: string): Promise<{ archivedId: string }>
 
 /**
  * Permanently delete a member and their entire record graph (super_admin
- * only, enforced server-side). Irreversible — prefer `archiveMember` unless
+ * only, enforced server-side). Irreversible - prefer `archiveMember` unless
  * the record must be destroyed (e.g. test data, lawful erasure requests).
  */
 export async function deleteMemberPermanently(

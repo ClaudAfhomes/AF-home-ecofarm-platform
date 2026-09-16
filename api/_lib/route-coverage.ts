@@ -2,16 +2,16 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 /**
- * Route coverage — prevents silent 404s for new handler files.
+ * Route coverage - prevents silent 404s for new handler files.
  *
  * `api/_lib/router.ts` routes by a hand-maintained if/else chain, so a newly
  * added `api/_handlers/**` handler 404s (`No handler for ...`) until both an
- * import and a branch are added — exactly how `DELETE/PATCH /admin/content/:id`
+ * import and a branch are added - exactly how `DELETE/PATCH /admin/content/:id`
  * broke after `content/[id].ts` landed without a route. This module scans
  * the handler tree and reports files that are not imported or whose import
  * binding is never used in a branch; the dev server logs them loudly at
  * startup and the spec below fails CI the moment a route is forgotten. Pure
- * functions — no server boot, no network.
+ * functions - no server boot, no network.
  */
 
 const HANDLER_IMPORT_RE = /^import\s+([A-Za-z_$][\w$]*)\s+from\s+'(\.\.\/_handlers\/[^']+)'/gm;
@@ -64,7 +64,7 @@ export function findRouteCoverageGaps(
     imports.set(match[2]!, match[1]!);
   }
   // Lazy-load branches (`lazy(() => import('../_handlers/...'))`) count as
-  // both the import and the usage — no binding to check.
+  // both the import and the usage - no binding to check.
   const dynamic = new Set<string>();
   for (const match of routerSource.matchAll(HANDLER_DYNAMIC_RE)) {
     dynamic.add(match[1]!);

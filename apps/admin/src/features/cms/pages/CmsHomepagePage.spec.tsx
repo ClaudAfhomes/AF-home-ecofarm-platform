@@ -13,7 +13,7 @@ function renderCms(route = '/admin/cms/homepage', user = MOCK_SUPER_ADMIN) {
   return renderWithProviders(<CmsHomepagePage />, { route, user });
 }
 
-describe('CmsHomepagePage — Phase 1 Homepage CMS', () => {
+describe('CmsHomepagePage - Phase 1 Homepage CMS', () => {
   let server: ReturnType<typeof installMockApi>;
 
   beforeEach(() => {
@@ -91,7 +91,7 @@ describe('CmsHomepagePage — Phase 1 Homepage CMS', () => {
         </QueryClientProvider>
       </SessionProvider>,
     );
-    // Hard redirect — renders null, not Forbidden nor page
+    // Hard redirect - renders null, not Forbidden nor page
     await new Promise((r) => setTimeout(r, 0));
     expect(screen.queryByText('Access denied')).not.toBeInTheDocument();
     expect(screen.queryByText('Homepage CMS')).not.toBeInTheDocument();
@@ -145,7 +145,7 @@ describe('CmsHomepagePage — Phase 1 Homepage CMS', () => {
 
   it('initial CMS values match public HOME content (alignment)', async () => {
     const cmsSeed = __getHomepageSeed();
-    // Verify seed derived from HOME — spot-check every section (full HOME copy verified at build via cmsRepository)
+    // Verify seed derived from HOME - spot-check every section (full HOME copy verified at build via cmsRepository)
     // These literals are the exact HOME values from apps/web/src/features/public/content/home.ts
     expect(cmsSeed.hero.title).toBe('Where Big Dreams Meet Property That Already Earns');
     expect(cmsSeed.hero.eyebrow).toBe('JA&D Realty Services');
@@ -155,7 +155,7 @@ describe('CmsHomepagePage — Phase 1 Homepage CMS', () => {
       id: 'photo-1600585154340-be6161a56a0c',
       alt: 'A modern residence with warm interior lighting at dusk',
     });
-    expect(cmsSeed.value.title).toBe('Good value for money — handled with diligence.');
+    expect(cmsSeed.value.title).toBe('Good value for money - handled with diligence.');
     expect(cmsSeed.value.paragraphs).toHaveLength(2);
     expect(cmsSeed.categories.title).toBe('A portfolio built around how you live and invest.');
     expect(cmsSeed.featured.title).toBe('A glimpse of what we bring to the table.');
@@ -194,7 +194,7 @@ describe('CmsHomepagePage — Phase 1 Homepage CMS', () => {
 
     // draft reflects immediately in form value
     expect(screen.getByDisplayValue('New Homepage Title')).toBeInTheDocument();
-    // dirty chip — one per dirty section, so use getAllByText
+    // dirty chip - one per dirty section, so use getAllByText
     expect(screen.getAllByText('Unsaved changes').length).toBeGreaterThan(0);
     expect(screen.getByText('Save')).toBeEnabled();
   });
@@ -207,7 +207,7 @@ describe('CmsHomepagePage — Phase 1 Homepage CMS', () => {
     const ctaLabel = screen.getByDisplayValue('Explore Properties');
     await user.clear(ctaLabel);
     await user.type(ctaLabel, 'Browse Listings');
-    // Preview still shows hero title, but CTA label change is not in preview hero (only title/lead) — verify input updated
+    // Preview still shows hero title, but CTA label change is not in preview hero (only title/lead) - verify input updated
     expect(screen.getByDisplayValue('Browse Listings')).toBeInTheDocument();
   });
 
@@ -250,7 +250,7 @@ describe('CmsHomepagePage — Phase 1 Homepage CMS', () => {
     await user.clear(restoredInput);
     await user.type(restoredInput, 'Saved Title');
     await user.click(screen.getByText('Save'));
-    // banner shows All changes saved — may be chip + banner, so use getAllByText
+    // banner shows All changes saved - may be chip + banner, so use getAllByText
     expect((await screen.findAllByText(/All changes saved/)).length).toBeGreaterThan(0);
     // after save, dirty should be false and title persists
     await waitFor(() => expect(screen.queryByText('Unsaved changes')).not.toBeInTheDocument());
@@ -265,7 +265,7 @@ describe('CmsHomepagePage — Phase 1 Homepage CMS', () => {
       'Where Big Dreams Meet Property That Already Earns',
     );
     await user.clear(titleInput);
-    // title is required — validation error should appear and Save disabled
+    // title is required - validation error should appear and Save disabled
     expect(await screen.findByText('Title is required')).toBeInTheDocument();
     expect(screen.getByText('Save')).toBeDisabled();
   });
@@ -288,7 +288,7 @@ describe('CmsHomepagePage — Phase 1 Homepage CMS', () => {
     const user = userEvent.setup();
     renderCms();
     await screen.findByRole('heading', { name: 'Hero' });
-    // Approach is collapsed by default (Step 3) — expand it first
+    // Approach is collapsed by default (Step 3) - expand it first
     await user.click(screen.getByRole('button', { name: /Approach/ }));
     // edit Approach step 1 title
     const stepInput = screen.getByDisplayValue('Understand your goal');

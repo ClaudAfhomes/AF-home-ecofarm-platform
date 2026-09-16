@@ -9,7 +9,7 @@
   gap: var(--space-6);
 }
 
-/* Registration journey timeline — compact overview of Apply → Verify → Active. */
+/* Registration journey timeline - compact overview of Apply → Verify → Active. */
 .timeline {
   display: grid;
   gap: var(--space-3);
@@ -83,7 +83,7 @@
   line-height: 1.5;
 }
 
-/* Step progress strip — numbers only, single row */
+/* Step progress strip - numbers only, single row */
 .steps {
   display: flex;
   flex-wrap: nowrap;

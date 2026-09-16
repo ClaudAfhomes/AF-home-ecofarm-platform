@@ -12,7 +12,7 @@ interface ErrorBoundaryState {
 
 /**
  * App-level error boundary (FRONTEND-ARCHITECTURE §9). Catches render-time
- * (unexpected) exceptions only and shows a designed, recoverable error state —
+ * (unexpected) exceptions only and shows a designed, recoverable error state -
  * never a raw stack trace. API/form errors are handled by the query layer and
  * UI states, not by this boundary.
  */

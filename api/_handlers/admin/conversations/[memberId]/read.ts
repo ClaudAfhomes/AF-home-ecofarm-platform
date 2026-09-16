@@ -7,7 +7,7 @@ import type { VercelRequest, VercelResponse } from '../../../../_lib/http.js';
 import { methodNotAllowed, requireService } from '../../../../_lib/rest.js';
 
 /**
- * POST /admin/conversations/:memberId/read — mark a member's thread read for
+ * POST /admin/conversations/:memberId/read - mark a member's thread read for
  * staff (API-SPECIFICATION #93). Upserts the Conversation watermark
  * (staffLastReadAt=now, staffUnread=0); idempotent, also creates the
  * watermark when the member has no thread yet.

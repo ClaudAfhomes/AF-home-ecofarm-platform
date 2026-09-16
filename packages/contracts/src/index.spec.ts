@@ -163,6 +163,7 @@ describe('policySchema', () => {
     expect(
       policySchema.safeParse({
         id: 'pol1',
+        slug: 'terms',
         title: 'Terms',
         type: 'TERMS',
         content: '...',
@@ -171,10 +172,25 @@ describe('policySchema', () => {
     ).toBe(true);
   });
 
+  it('rejects a policy without a slug', () => {
+    expect(
+      policySchema.safeParse({
+        id: 'pol1',
+        title: 'Terms',
+        type: 'TERMS',
+        updatedAt: '2026-08-18T10:00:00Z',
+      }).success,
+    ).toBe(false);
+  });
+
   it('rejects a policy without a title', () => {
     expect(
-      policySchema.safeParse({ id: 'pol1', type: 'TERMS', updatedAt: '2026-08-18T10:00:00Z' })
-        .success,
+      policySchema.safeParse({
+        id: 'pol1',
+        slug: 'terms',
+        type: 'TERMS',
+        updatedAt: '2026-08-18T10:00:00Z',
+      }).success,
     ).toBe(false);
   });
 });

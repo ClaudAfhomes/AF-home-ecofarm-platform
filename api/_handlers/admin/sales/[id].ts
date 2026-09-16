@@ -112,7 +112,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
 
-  // PATCH — field edits plus guarded status transitions.
+  // PATCH - field edits plus guarded status transitions.
   const parsedBody = readJsonBody(req);
   if (!parsedBody.ok) {
     const { error, status } = parsedBody.error;
@@ -253,7 +253,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     actorRole: auth.slugs[0] ?? 'admin',
     targetType: 'Sale',
     targetId: id,
-    targetName: `${parsed.data.propertyName} — ${parsed.data.customerName}`,
+    targetName: `${parsed.data.propertyName} - ${parsed.data.customerName}`,
     detail:
       typeof patch.status === 'string'
         ? `Sale ${String(current.status)} → ${patch.status}`

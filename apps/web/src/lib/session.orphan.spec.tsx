@@ -57,7 +57,7 @@ function Probe() {
   );
 }
 
-describe('SupabaseSessionProvider – orphaned auth user (Member row deleted)', () => {
+describe('SupabaseSessionProvider - orphaned auth user (Member row deleted)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     seenTables.length = 0;

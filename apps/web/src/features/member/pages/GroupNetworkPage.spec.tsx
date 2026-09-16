@@ -45,7 +45,7 @@ describe('member GroupNetworkPage', () => {
     expect(screen.getByText('All time · Reporting only')).toBeInTheDocument();
     expect(screen.getByText('View Direct Referrals')).toBeInTheDocument();
     expect(screen.getByText('View Genealogy')).toBeInTheDocument();
-    // Phase 3 ring — every referrals page links to the gated Total Earned
+    // Phase 3 ring - every referrals page links to the gated Total Earned
     expect(screen.getByRole('link', { name: 'View Total Earned' })).toHaveAttribute(
       'href',
       '/member/referrals/earned',

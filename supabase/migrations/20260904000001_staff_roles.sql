@@ -5,7 +5,7 @@
 -- Merchant capabilities).
 
 insert into "Role"(slug, name, description) values
-  ('super_admin', 'Super Admin', 'Platform super user — full governance (BUSINESS-RULES #3)'),
+  ('super_admin', 'Super Admin', 'Platform super user - full governance (BUSINESS-RULES #3)'),
   ('finance', 'Finance', 'Payment verification scope (BUSINESS-RULES #3)'),
   ('merchant', 'Merchant', 'Voucher redemption scope (BUSINESS-RULES #3)')
 on conflict (slug) do nothing;

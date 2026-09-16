@@ -5,7 +5,7 @@ import type { VercelRequest, VercelResponse } from '../../_lib/http.js';
 import handler from './registrations.js';
 
 /**
- * GET /admin/registrations — the queue must never silently lose rows.
+ * GET /admin/registrations - the queue must never silently lose rows.
  * PostgREST serializes nullable columns as JSON `null`; rows with NULL
  * optional fields (address, referralCode, reviewed*) must still validate and
  * be returned. Genuinely invalid rows are dropped but logged with their id

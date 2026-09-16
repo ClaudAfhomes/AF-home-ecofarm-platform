@@ -301,7 +301,7 @@ export function PayoutsPage() {
                               Rejected
                             </span>
                           ) : (
-                            <span style={{ color: 'var(--color-text-muted)' }}>—</span>
+                            <span style={{ color: 'var(--color-text-muted)' }}>-</span>
                           )}
                         </TableCell>
                       </TableRow>
@@ -360,7 +360,7 @@ export function PayoutsPage() {
                       color: 'var(--color-text-secondary)',
                     }}
                   >
-                    Rejection requires a reason — it will be shown inline on the member Payouts page
+                    Rejection requires a reason - it will be shown inline on the member Payouts page
                     and as an in-app notification.
                   </p>
                   <label style={{ display: 'grid', gap: 4 }}>

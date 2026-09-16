@@ -4,7 +4,7 @@ import type { FormEvent } from 'react';
 import { Link, useParams } from 'react-router';
 
 import { formatMoney } from '@jad/shared';
-import { Breadcrumbs, ErrorState, PageHeader, Skeleton, StatusChip } from '@jad/ui';
+import { Breadcrumbs, ErrorState, notifySuccess, PageHeader, Skeleton, StatusChip } from '@jad/ui';
 import type { SaleStatus } from '@jad/contracts';
 
 import { Alert } from '../../../components/Alert';
@@ -72,7 +72,6 @@ export function SaleDetailPage() {
   const [customerId, setCustomerId] = useState('');
   const [propertyId, setPropertyId] = useState('');
   const [serverError, setServerError] = useState<string | undefined>();
-  const [notice, setNotice] = useState<string | undefined>();
   const [copied, setCopied] = useState(false);
   const [idempotencyKey, setIdempotencyKey] = useState(() =>
     typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : `idem-${Date.now()}`,
@@ -102,7 +101,7 @@ export function SaleDetailPage() {
       void queryClient.invalidateQueries({ queryKey: ['member', 'sales', saleId] });
       setIdempotencyKey(regenerateKey());
       setServerError(undefined);
-      setNotice('Sale resubmitted — now awaiting approval.');
+      notifySuccess({ title: 'Sale resubmitted', message: 'Now awaiting approval.' });
       setResubmitting(false);
     },
   });
@@ -111,7 +110,10 @@ export function SaleDetailPage() {
     mutationFn: () => requestReopenSale(saleId),
     onSuccess: () => {
       setServerError(undefined);
-      setNotice('Your request was recorded. JA&D staff will review the locked sale.');
+      notifySuccess({
+        title: 'Request recorded',
+        message: 'JA&D staff will review the locked sale.',
+      });
     },
     onError: (error) => {
       setServerError(apiErrorMessage(error, 'We could not request a reopen. Please try again.'));
@@ -129,13 +131,13 @@ export function SaleDetailPage() {
     }
   };
 
-  // Focus alert stack when notice/error appears for screen-reader announcement.
+  // Focus alert stack when an error appears for screen-reader announcement.
   const alertRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    if ((notice || serverError) && alertRef.current) {
+    if (serverError && alertRef.current) {
       alertRef.current.focus();
     }
-  }, [notice, serverError]);
+  }, [serverError]);
 
   const customerOptions = (customersQuery.data ?? []).map((customer) => ({
     value: customer.id,
@@ -143,7 +145,7 @@ export function SaleDetailPage() {
   }));
   const propertyOptions = properties.map((property) => ({
     value: property.id,
-    label: `${property.name} — ${formatMoney(property.price!)}`,
+    label: `${property.name} - ${formatMoney(property.price!)}`,
   }));
   const selectedResubmitProperty = useMemo(
     () => properties.find((property) => property.id === propertyId),
@@ -218,7 +220,6 @@ export function SaleDetailPage() {
       return;
     }
     setServerError(undefined);
-    setNotice(undefined);
     resubmitMutation.mutate(undefined, {
       onError: (error) => {
         setServerError(apiErrorMessage(error, 'We could not resubmit the sale. Please try again.'));
@@ -252,12 +253,6 @@ export function SaleDetailPage() {
           {serverError ? (
             <Alert variant="danger" title="We could not complete that action">
               {serverError}
-            </Alert>
-          ) : null}
-
-          {notice ? (
-            <Alert variant="success" title="Request recorded">
-              {notice}
             </Alert>
           ) : null}
         </div>
@@ -407,7 +402,7 @@ export function SaleDetailPage() {
             ) : (
               <p className={styles.statusNote}>
                 {sale.status === 'REJECTED'
-                  ? 'This sale was rejected. Correct the details below and resubmit — you have ' +
+                  ? 'This sale was rejected. Correct the details below and resubmit - you have ' +
                     `${3 - sale.resubmissionCount} attempt${3 - sale.resubmissionCount === 1 ? '' : 's'} remaining.`
                   : 'This sale is locked after maximum resubmission attempts. Request a reopen for Admin review.'}
               </p>
@@ -424,17 +419,17 @@ export function SaleDetailPage() {
           ) : null}
           {sale.status === 'ADMIN_APPROVED' ? (
             <Alert variant="info" title="Awaiting payment verification">
-              Admin approved — now awaiting payment verification by JA&amp;D Finance.
+              Admin approved - now awaiting payment verification by JA&amp;D Finance.
             </Alert>
           ) : null}
           {sale.status === 'PAYMENT_VERIFIED' ? (
             <Alert variant="info" title="Awaiting qualification">
-              Payment verified — awaiting confirmation as a qualifying sale.
+              Payment verified - awaiting confirmation as a qualifying sale.
             </Alert>
           ) : null}
           {sale.status === 'QUALIFYING_SALE' ? (
             <Alert variant="success" title="Qualifying sale">
-              This sale is qualifying — commission was created as Pending and will become Available
+              This sale is qualifying - commission was created as Pending and will become Available
               after the 7-day clearing period.{' '}
               <Link className={styles.inlineLink} to="/member/commissions">
                 View commissions
@@ -461,7 +456,7 @@ export function SaleDetailPage() {
               </Button>
               {reopenMutation.isSuccess ? (
                 <span className={styles.inlineHint} role="status">
-                  JA&amp;D will review — you’ll be notified.
+                  JA&amp;D will review - you’ll be notified.
                 </span>
               ) : null}
             </div>
@@ -534,7 +529,7 @@ export function SaleDetailPage() {
                     <span className={styles.snapshotValue}>
                       {formatMoney(selectedResubmitProperty.price!)}
                     </span>{' '}
-                    — this amount will be recorded and never changes.
+                    - this amount will be recorded and never changes.
                     {selectedResubmitProperty.id !== sale.propertyId ? (
                       <span className={styles.snapshotDiff}>
                         {' '}

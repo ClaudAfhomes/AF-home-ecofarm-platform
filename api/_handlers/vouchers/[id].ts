@@ -4,7 +4,7 @@ import { isValidVoucherRow, mapVoucherRow } from '../../_lib/pipeline.js';
 import { methodNotAllowed, requireService } from '../../_lib/rest.js';
 import { toErrorEnvelope } from '../../_lib/envelope.js';
 
-/** GET /vouchers/:id — one of the member's own vouchers (staff use /admin/vouchers). */
+/** GET /vouchers/:id - one of the member's own vouchers (staff use /admin/vouchers). */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');

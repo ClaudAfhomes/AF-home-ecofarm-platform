@@ -1,4 +1,4 @@
--- Phase 3A — Atomic money functions (review F-07 / F-08 / F-23 / F-28; ADR-001).
+-- Phase 3A - Atomic money functions (review F-07 / F-08 / F-23 / F-28; ADR-001).
 --
 -- The withdrawal reserve/complete/reject flows were N sequential PostgREST
 -- writes from the API process (no transaction). These SECURITY DEFINER
@@ -126,7 +126,7 @@ begin
   end if;
   insert into "AuditLog" (action, actor_id, actor_role, target_type, target_id, target_name, detail, created_at)
     values ('WITHDRAWAL_COMPLETED', p_actor, p_role, 'Withdrawal', p_id,
-            'Withdrawal ' || p_id || ' — ' || v_w.amount, 'Completed withdrawal ' || p_id, v_now);
+            'Withdrawal ' || p_id || ' - ' || v_w.amount, 'Completed withdrawal ' || p_id, v_now);
   return jsonb_build_object('status', 'COMPLETED', 'completedAt', v_now, 'amount', v_w.amount);
 end;
 $$;
@@ -166,7 +166,7 @@ begin
   end if;
   insert into "AuditLog" (action, actor_id, actor_role, target_type, target_id, target_name, detail, created_at)
     values ('WITHDRAWAL_REJECTED', p_actor, p_role, 'Withdrawal', p_id,
-            'Withdrawal ' || p_id || ' — ' || v_w.amount,
+            'Withdrawal ' || p_id || ' - ' || v_w.amount,
             'Rejected withdrawal ' || p_id || ': ' || p_reason, v_now);
   return jsonb_build_object('status', 'REJECTED', 'rejectedAt', v_now, 'amount', v_w.amount);
 end;
@@ -174,7 +174,7 @@ $$;
 
 -- Restrict execution: these SECURITY DEFINER functions must only ever be
 -- invoked by the service-role client (the API handlers). Anonymous and
--- authenticated users get no EXECUTE — otherwise any signed-in member could
+-- authenticated users get no EXECUTE - otherwise any signed-in member could
 -- call withdrawal_complete/reject on arbitrary ids, or withdraw_reserve
 -- against another member's wallet.
 revoke execute on function public.withdraw_reserve(uuid, text, text, text) from public, anon, authenticated;

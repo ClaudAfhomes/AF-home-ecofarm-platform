@@ -20,7 +20,7 @@ function isCmsKey(key: unknown): key is CmsKey {
 }
 
 /**
- * Public CMS Realtime — subscribes to Supabase Realtime for cms_contents changes
+ * Public CMS Realtime - subscribes to Supabase Realtime for cms_contents changes
  * and invalidates the matching TanStack Query cache `['cms', key]`.
  *
  * Architecture: Supabase PostgreSQL (cms_contents) → Supabase Realtime (broadcast + postgres_changes)
@@ -87,6 +87,16 @@ export function useCmsRealtime() {
               queryClient.invalidateQueries({ queryKey: ['cms', k] });
             }
           }
+        },
+      );
+
+      // Policies live in their own table (not cms_contents); admin CRUD
+      // invalidates the public `['policies']` query on any change.
+      channel.on(
+        'postgres_changes' as never,
+        { event: '*', schema: 'public', table: 'Policy' } as never,
+        () => {
+          queryClient.invalidateQueries({ queryKey: ['policies'] });
         },
       );
 

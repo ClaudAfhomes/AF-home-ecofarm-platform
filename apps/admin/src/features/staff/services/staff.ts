@@ -10,7 +10,7 @@ export interface StaffAuditActor {
   actorRole: string;
 }
 
-/** Staff directory — REST over api/v1 (Phase B4 cutover). */
+/** Staff directory - REST over api/v1 (Phase B4 cutover). */
 export function getStaff(): Promise<MockStaffMember[]> {
   return requestList('/admin/staff', staffMemberSchema);
 }

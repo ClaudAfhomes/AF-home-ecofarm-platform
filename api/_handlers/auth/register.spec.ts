@@ -7,7 +7,7 @@ import registerHandler from './register.js';
 /**
  * Public registration intake (Phase B8+): validation, uniqueness, referral,
  * age, country/program validity, and the PENDING application contract.
- * No authentication — the endpoint is public.
+ * No authentication - the endpoint is public.
  */
 const mocks = vi.hoisted(() => {
   const calls: { table: string; op: string; arg?: unknown }[] = [];
@@ -51,6 +51,10 @@ const mocks = vi.hoisted(() => {
         calls.push({ table, op: 'insert', arg: row });
         return { error: null };
       },
+      upsert: async (row: unknown) => {
+        calls.push({ table, op: 'upsert', arg: row });
+        return { error: null };
+      },
       delete: () => {
         calls.push({ table, op: 'delete' });
         return {
@@ -89,7 +93,7 @@ const mocks = vi.hoisted(() => {
         if (script.createResult === 'ok')
           return { data: { user: { id: 'new-auth-uuid' } }, error: null };
         if (script.createResult === 'conflict')
-          // Real GoTrue duplicate text — the 409 path must match this, not
+          // Real GoTrue duplicate text - the 409 path must match this, not
           // a paraphrase (regression: substring 'already exists' misses it).
           return {
             data: {},
@@ -97,6 +101,8 @@ const mocks = vi.hoisted(() => {
           };
         return { data: {}, error: new Error('signup disabled') };
       },
+      listUsers: async () => ({ data: { users: [] }, error: null }),
+      updateUserById: async () => ({ data: {}, error: null }),
     },
     otp: {
       signInWithOtp: async (input: unknown) => {
@@ -153,6 +159,13 @@ describe('POST /api/v1/auth/register', () => {
     vi.stubEnv('SUPABASE_URL', 'https://reg.test.supabase.co');
     vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'service');
     vi.stubEnv('VITE_SUPABASE_ANON_KEY', 'anon');
+    vi.stubEnv('EMAILJS_SERVICE_ID', 'service_test');
+    vi.stubEnv('EMAILJS_TEMPLATE_ID', 'template_test');
+    vi.stubEnv('EMAILJS_PUBLIC_KEY', 'public_test');
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response('OK', { status: 200 })),
+    );
     mocks.calls.length = 0;
     mocks.script.existingMembers = [];
     mocks.script.sponsors = [];
@@ -223,21 +236,22 @@ describe('POST /api/v1/auth/register', () => {
     expect(seen.status).toBe(201);
     expect(seen.body).toMatchObject({
       application: { email: 'new.applicant@example.com', status: 'PENDING', emailVerified: false },
+      emailSent: true,
     });
     const createCall = mocks.calls.find((c) => c.op === 'createUser')?.arg as Record<
       string,
       unknown
     >;
     expect(createCall).toMatchObject({ email: 'new.applicant@example.com', email_confirm: false });
-    // The email-verification OTP is dispatched after the application is filed.
-    const otpCall = mocks.calls.find((c) => c.op === 'signInWithOtp')?.arg as Record<
-      string,
-      unknown
-    >;
-    expect(otpCall).toMatchObject({
+    // The verification code is stored hashed (never plaintext) and emailed.
+    const otpStore = mocks.calls.find((c) => c.table === 'EmailVerification' && c.op === 'upsert')
+      ?.arg as Record<string, unknown>;
+    expect(otpStore).toMatchObject({
       email: 'new.applicant@example.com',
-      options: { shouldCreateUser: false },
+      user_id: 'new-auth-uuid',
+      attempts: 0,
     });
+    expect(String(otpStore.code_hash)).not.toMatch(/^\d{6}$/);
     const insert = mocks.calls.find((c) => c.table === 'Registration')?.arg as Record<
       string,
       unknown

@@ -8,7 +8,7 @@ import { registrationStore } from './registrationMockStore';
 /**
  * Canonical in-memory mock store for the voucher flow: "Create Voucher" makes
  * a definition (title + value); "Assign to Member" creates a unique member
- * voucher with its own expiry/validity. Mirrors the API contract — duplicates
+ * voucher with its own expiry/validity. Mirrors the API contract - duplicates
  * rejected, code generation, verify-only scan, full redemption.
  */
 
@@ -66,7 +66,7 @@ export function assignMockVoucher(input: {
   );
   if (duplicate) throw new Error('This member already has this voucher.');
   // Per-assignment rule wins; template rule next; platform default
-  // (VOUCHER_DEFAULT_EXPIRY_DAYS) last — mirrors POST /admin/vouchers/assign.
+  // (VOUCHER_DEFAULT_EXPIRY_DAYS) last - mirrors POST /admin/vouchers/assign.
   let defaultValidityDays: number | undefined;
   if (
     input.expiresAt === undefined &&

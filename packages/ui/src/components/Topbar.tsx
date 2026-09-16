@@ -10,7 +10,7 @@ export interface TopbarProps {
   actions?: ReactNode;
   /** Optional leading content for mobile (e.g., logo) when menu is hidden on mobile. */
   leading?: ReactNode;
-  /** When true, hide the menu button on mobile (<640px) — used when bottom nav provides drawer access. */
+  /** When true, hide the menu button on mobile (<640px) - used when bottom nav provides drawer access. */
   hideMenuOnMobile?: boolean;
   /**
    * Position of the menu button on mobile (<640px).

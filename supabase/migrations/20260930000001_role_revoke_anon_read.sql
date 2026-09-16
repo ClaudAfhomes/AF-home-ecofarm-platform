@@ -1,4 +1,4 @@
--- Phase 6 — Revoke direct Role reads for anon/authenticated.
+-- Phase 6 - Revoke direct Role reads for anon/authenticated.
 --
 -- No application code reads Role tables with the anon key anymore:
 -- verifyStaff resolves via service_role, the admin shell uses

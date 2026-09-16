@@ -12,7 +12,7 @@ export function useVoucherAssignments(templateId: string) {
   });
 }
 
-/** All member-scoped vouchers across definitions — backs per-definition counts. */
+/** All member-scoped vouchers across definitions - backs per-definition counts. */
 export function useAllVoucherAssignments() {
   return useQuery({
     queryKey: ['admin', 'vouchers', 'assignments'],

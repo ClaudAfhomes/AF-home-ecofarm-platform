@@ -58,3 +58,11 @@
   color: var(--color-text-primary);
   line-height: 1.6;
 }
+
+.proseBlock {
+  margin: 0 0 var(--space-3);
+}
+
+.proseBlock:last-child {
+  margin-bottom: 0;
+}

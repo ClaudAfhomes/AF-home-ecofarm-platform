@@ -16,12 +16,12 @@ export type CreateContentInput = {
   downloadUrl: string;
 };
 
-/** GET /admin/content — full library (mock server serves fixtures in dev/test). */
+/** GET /admin/content - full library (mock server serves fixtures in dev/test). */
 export function getContent(): Promise<ForwardableContent[]> {
   return requestList('/admin/content', forwardableContentSchema);
 }
 
-/** POST /admin/content — publish marketing content (id/share server-generated). */
+/** POST /admin/content - publish marketing content (id/share server-generated). */
 export function createContent(input: CreateContentInput): Promise<ForwardableContent> {
   const body: CreateContentItemRequest = {
     title: input.title,
@@ -37,9 +37,9 @@ export function createContent(input: CreateContentInput): Promise<ForwardableCon
 }
 
 /**
- * DELETE /admin/content/:id — permanently remove a marketing tool (row plus
+ * DELETE /admin/content/:id - permanently remove a marketing tool (row plus
  * its bucket object when the download URL lives in `marketing-tools`).
- * Irreversible — callers confirm first.
+ * Irreversible - callers confirm first.
  */
 export function deleteContentItem(
   id: string,
@@ -47,7 +47,7 @@ export function deleteContentItem(
   return request(`/admin/content/${id}`, deleteContentItemResponseSchema, { method: 'DELETE' });
 }
 
-/** PATCH /admin/content/:id — update title/description/kind and/or swap the file. */
+/** PATCH /admin/content/:id - update title/description/kind and/or swap the file. */
 export function updateContentItem(
   id: string,
   patch: UpdateContentItemRequest,

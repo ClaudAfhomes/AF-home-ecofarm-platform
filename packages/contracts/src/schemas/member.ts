@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 /**
- * Member account status — CONFIRMED by BR-AUTH-002 / DATABASE-DESIGN §members
+ * Member account status - CONFIRMED by BR-AUTH-002 / DATABASE-DESIGN §members
  * (one row per member account across registration attempts; never hard-deleted).
  * Registrations surface the same status lifecycle.
  */
@@ -10,10 +10,10 @@ export const memberStatusSchema = z.enum(['PENDING', 'APPROVED_ACTIVE', 'REJECTE
 export type MemberStatus = z.infer<typeof memberStatusSchema>;
 
 /**
- * Member account (registration queue item) — PROPOSED baseline. No SSOT defines
+ * Member account (registration queue item) - PROPOSED baseline. No SSOT defines
  * the API field list for a member/registration resource yet; `registeredAt` is
  * the account creation timestamp (ISO-8601). Replaced by the real contract when
- * the member API lands — the schema is the single client-side validation point.
+ * the member API lands - the schema is the single client-side validation point.
  */
 export const memberAccountSchema = z.object({
   id: z.string().min(1),
@@ -35,7 +35,7 @@ export const programRefSchema = z.object({
 export type ProgramRef = z.infer<typeof programRefSchema>;
 
 /**
- * Member profile — `GET /members/:id` (MEM own) / `PATCH /me` (API-SPECIFICATION
+ * Member profile - `GET /members/:id` (MEM own) / `PATCH /me` (API-SPECIFICATION
  * #8/#9, FR-MEM-001). Fields follow `members` (DATABASE-DESIGN §7.2). Only the
  * member's OWN profile is ever rendered (object-level, NFR-AUTHZ-002). Country
  * is immutable (BR-REG-010) and rendered read-only. Money/exact fields: none.
@@ -62,7 +62,7 @@ export const memberProfileSchema = z.object({
 
 export type MemberProfile = z.infer<typeof memberProfileSchema>;
 
-/** `PATCH /me` — mutable profile fields; country is never editable (BR-REG-010). */
+/** `PATCH /me` - mutable profile fields; country is never editable (BR-REG-010). */
 export const updateProfileRequestSchema = memberProfileSchema.pick({
   firstName: true,
   lastName: true,
@@ -76,7 +76,7 @@ export const updateProfileRequestSchema = memberProfileSchema.pick({
 export type UpdateProfileRequest = z.infer<typeof updateProfileRequestSchema>;
 
 /**
- * Qualification requirement checklist — `GET /me/qualification` (API-SPECIFICATION
+ * Qualification requirement checklist - `GET /me/qualification` (API-SPECIFICATION
  * #15, FR-REG-008, BR-QUAL-001). Server-authoritative: the UI renders exactly
  * what the API returns and never derives Active + Qualified client-side.
  */
@@ -106,7 +106,7 @@ export const referralCodeSchema = z.object({
 export type ReferralCode = z.infer<typeof referralCodeSchema>;
 
 /**
- * Permanent member purge — `DELETE /admin/members/:id` (super_admin only,
+ * Permanent member purge - `DELETE /admin/members/:id` (super_admin only,
  * owner-approved exception to the archive-only default). The reason is
  * mandatory and written to `AuditLog` (MEMBER_PURGED). Archive via
  * `POST /admin/members/:id/archive` remains the default lifecycle.
@@ -120,7 +120,7 @@ export type PurgeMemberRequest = z.infer<typeof purgeMemberRequestSchema>;
 /** Success payload for `DELETE /admin/members/:id`. */
 export const purgeMemberResponseSchema = z.object({
   purgedId: z.string().min(1),
-  /** False when the auth identity survived (retry exhausted) — caller must warn. */
+  /** False when the auth identity survived (retry exhausted) - caller must warn. */
   authRemoved: z.boolean(),
 });
 

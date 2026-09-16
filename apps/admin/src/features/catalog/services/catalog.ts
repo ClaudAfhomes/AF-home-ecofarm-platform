@@ -47,7 +47,7 @@ export type UpdateCategoryInput = {
   isFeatured?: boolean;
 };
 
-/** Property catalog item — transactional system-of-record (ID, category, price, status). */
+/** Property catalog item - transactional system-of-record (ID, category, price, status). */
 export const propertySchema = catalogPropertySchema;
 
 export type Property = CatalogProperty;
@@ -67,7 +67,7 @@ const categorySchema = z.object({
 const deleteResultSchema = z.object({ id: z.string(), deleted: z.boolean() });
 
 /**
- * Catalog service — pure API calls, no mock fallback. The backend is the
+ * Catalog service - pure API calls, no mock fallback. The backend is the
  * system of record; failures surface to the caller instead of substituting
  * mock data.
  */

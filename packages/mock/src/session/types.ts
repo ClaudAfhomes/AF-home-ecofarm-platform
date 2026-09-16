@@ -2,12 +2,12 @@ import type { MemberStatus, Role } from '@jad/contracts';
 
 /**
  * Mock session user. Mirrors the future `/auth/me` session resource shape
- * (PROPOSED — no SSOT field list yet). Never stored in browser storage; kept
+ * (PROPOSED - no SSOT field list yet). Never stored in browser storage; kept
  * in React context only (ARCH-DEC-007 session auth).
  *
  * `isQualified` is member eligibility (`members.is_qualified`, BR-QUAL-001) and
  * `status` is the member's membership status (BR-AUTH-002). Both apply to the
- * MEMBER role only — they are eligibility, not roles.
+ * MEMBER role only - they are eligibility, not roles.
  */
 export interface MockUser {
   id: string;

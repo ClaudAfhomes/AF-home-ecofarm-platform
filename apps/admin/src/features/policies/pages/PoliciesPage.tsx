@@ -16,7 +16,8 @@ import {
   TableHead,
   TableHeaderCell,
   TableRow,
-  useToast,
+  notifyError,
+  notifySuccess,
 } from '@jad/ui';
 import type { Policy } from '@jad/contracts';
 
@@ -63,11 +64,10 @@ function TableSkeleton() {
   );
 }
 
-/** Admin Policies — CRUD list for policies, guidelines, T&C (FR-ADM-004). */
+/** Admin Policies - CRUD list for policies, guidelines, T&C (FR-ADM-004). */
 export function PoliciesPage() {
   const { data, isPending, isError, error, refetch } = usePolicies();
   const deletePolicy = useDeletePolicy();
-  const { toast } = useToast();
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
@@ -101,13 +101,12 @@ export function PoliciesPage() {
     if (!deleteTarget) return;
     try {
       await deletePolicy.mutateAsync(deleteTarget.id);
-      toast({
+      notifySuccess({
         title: 'Policy deleted',
         message: `"${deleteTarget.title}" was permanently removed. Its uploaded PDF stays in storage.`,
-        tone: 'success',
       });
     } catch (e) {
-      toast({ title: 'Delete failed', message: (e as Error).message, tone: 'danger' });
+      notifyError({ title: 'Delete failed', message: (e as Error).message });
     } finally {
       setDeleteTarget(null);
     }
@@ -117,7 +116,7 @@ export function PoliciesPage() {
     <section>
       <PageHeader
         title="Policies"
-        description="Policies, program guidelines, and terms and conditions — each with its required PDF"
+        description="Policies, program guidelines, and terms and conditions - each with its required PDF"
         actions={<Button onClick={() => setShowCreate(true)}>New Policy</Button>}
       />
 
@@ -207,7 +206,7 @@ export function PoliciesPage() {
                       />
                     </TableCell>
                     <TableCell label="Summary">
-                      <span className={styles.description}>{row.content?.trim() || '—'}</span>
+                      <span className={styles.description}>{row.content?.trim() || '-'}</span>
                     </TableCell>
                     <TableCell label="Updated">
                       <span className={styles.meta}>{formatDate(row.updatedAt)}</span>

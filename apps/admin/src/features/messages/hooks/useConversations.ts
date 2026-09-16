@@ -8,7 +8,7 @@ import {
   sendStaffMessage,
 } from '../services/messages';
 
-/** `GET /admin/conversations` — inbox (FEAT-072). */
+/** `GET /admin/conversations` - inbox (FEAT-072). */
 export function useAdminConversations(options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ['admin', 'conversations'],
@@ -17,7 +17,7 @@ export function useAdminConversations(options?: { enabled?: boolean }) {
   });
 }
 
-/** `GET /admin/conversations/:memberId` — one thread, cursor-paginated. */
+/** `GET /admin/conversations/:memberId` - one thread, cursor-paginated. */
 export function useConversationThread(memberId: string) {
   return useInfiniteQuery({
     queryKey: ['admin', 'conversations', memberId],
@@ -28,7 +28,7 @@ export function useConversationThread(memberId: string) {
   });
 }
 
-/** `GET /admin/messages/summary` — inbox badge. */
+/** `GET /admin/messages/summary` - inbox badge. */
 export function useAdminMessagesSummary(options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ['admin', 'messages', 'summary'],
@@ -37,7 +37,7 @@ export function useAdminMessagesSummary(options?: { enabled?: boolean }) {
   });
 }
 
-/** `POST /admin/conversations/:memberId/messages` — staff reply. */
+/** `POST /admin/conversations/:memberId/messages` - staff reply. */
 export function useSendStaffMessage(memberId: string) {
   const queryClient = useQueryClient();
   return useMutation({
@@ -52,7 +52,7 @@ export function useSendStaffMessage(memberId: string) {
   });
 }
 
-/** `POST /admin/conversations/:memberId/read` — staff read watermark. */
+/** `POST /admin/conversations/:memberId/read` - staff read watermark. */
 export function useMarkConversationRead(memberId: string) {
   const queryClient = useQueryClient();
   return useMutation({

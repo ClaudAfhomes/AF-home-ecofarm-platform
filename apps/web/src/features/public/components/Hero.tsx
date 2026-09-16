@@ -9,7 +9,7 @@ export type HeroCta = CmsCtaLink;
 export type HeroVariant = 'home' | 'page';
 
 export interface HeroProps {
-  /** `home` — tall, dual CTAs. `page` — shorter, single CTA. */
+  /** `home` - tall, dual CTAs. `page` - shorter, single CTA. */
   variant?: HeroVariant;
   eyebrow?: string;
   title: string;
@@ -22,7 +22,7 @@ export interface HeroProps {
 /**
  * Shared full-bleed hero for every public landing page. One component, two
  * variants (`home` / `page`) that share the same background treatment, dark
- * scrim, typography, spacing, and CTA placement — variation comes from the
+ * scrim, typography, spacing, and CTA placement - variation comes from the
  * per-page image and copy, not from divergent markup. The image is the LCP
  * element (eager, high fetch priority); the scrim keeps text AA-readable.
  */

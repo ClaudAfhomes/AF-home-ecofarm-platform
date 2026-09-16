@@ -8,7 +8,7 @@ import { mapRegistrationRow } from '../../../../_lib/pipeline.js';
 import { methodNotAllowed, readJsonBody, requireService } from '../../../../_lib/rest.js';
 import { toErrorEnvelope } from '../../../../_lib/envelope.js';
 
-/** POST /admin/registrations/:id/reject — reject with mandatory reason (BR-REG-004). */
+/** POST /admin/registrations/:id/reject - reject with mandatory reason (BR-REG-004). */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
@@ -110,7 +110,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     targetName: `${row.firstName} ${row.lastName}`,
     detail: parsed.data.reason.trim(),
   });
-  // Return the full updated row — the client validates reject responses
+  // Return the full updated row - the client validates reject responses
   // against registrationSchema, so a partial shape would fail parsing
   // AFTER a successful reject.
   const { data: updated, error: readBackError } = await supabase

@@ -6,12 +6,12 @@ import { payoutMethodSchema } from './payout.js';
 /**
  * Withdrawal resources (API-SPECIFICATION §6.10, FEAT-048..050, FR-WDR-001..005).
  * Reservation: request ≤ Available Balance; funds reserved and not reusable
- * (BR-WDR-001/002). Rejected withdrawals are NOT editable/resubmittable — a new
- * request is required (BR-WDR-005). Final status model is TBD (OD-017/018) — do
+ * (BR-WDR-001/002). Rejected withdrawals are NOT editable/resubmittable - a new
+ * request is required (BR-WDR-005). Final status model is TBD (OD-017/018) - do
  * not add states beyond the confirmed vocabulary.
  */
 
-/** Withdrawal state machine — CONFIRMED (BUSINESS-RULES §5, DATABASE-DESIGN §7.20). */
+/** Withdrawal state machine - CONFIRMED (BUSINESS-RULES §5, DATABASE-DESIGN §7.20). */
 export const withdrawalStatusSchema = z.enum(['REQUESTED', 'RESERVED', 'COMPLETED', 'REJECTED']);
 
 export type WithdrawalStatus = z.infer<typeof withdrawalStatusSchema>;
@@ -31,7 +31,7 @@ export const withdrawalPayoutAccountSchema = z.object({
 
 export type WithdrawalPayoutAccount = z.infer<typeof withdrawalPayoutAccountSchema>;
 
-/** Withdrawal — `GET /me/withdrawals`, `GET /me/withdrawals/:id` (#55/#56). */
+/** Withdrawal - `GET /me/withdrawals`, `GET /me/withdrawals/:id` (#55/#56). */
 export const withdrawalSchema = z.object({
   id: z.string().min(1),
   amount: exactDecimalStringSchema,

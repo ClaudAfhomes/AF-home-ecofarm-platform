@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { photoSrcSet, photoUrl } from './images';
 
-describe('photoUrl — hybrid-aware', () => {
+describe('photoUrl - hybrid-aware', () => {
   it('builds Unsplash URL for existing photo-* ID', () => {
     expect(photoUrl('photo-1600585154340-be6161a56a0c', 900)).toBe(
       'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=900&q=80',

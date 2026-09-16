@@ -20,8 +20,8 @@ export interface AuthLayoutProps {
 /**
  * Editorial split shell for the auth screens (SCR-AUTH-001/002).
  *
- * Desktop (≥1024px): a sticky full-height brand panel — property imagery,
- * navy scrim, JA&D logo, editorial headline — beside the authentication form.
+ * Desktop (≥1024px): a sticky full-height brand panel - property imagery,
+ * navy scrim, JA&D logo, editorial headline - beside the authentication form.
  * Below 1024px the imagery is dropped (mobile prioritizes the form, per the
  * auth UX direction) and a slim deep-navy masthead carries the brand eyebrow.
  * The heading level-1 lives in the form panel; the brand headline is styled

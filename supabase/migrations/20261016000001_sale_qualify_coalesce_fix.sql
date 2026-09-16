@@ -4,7 +4,7 @@
 --   "sellerId" = coalesce((v_patch ->> 'sellerId'), "sellerId")
 -- but `->>` extracts jsonb as `text` while `"Sale"."sellerId"` is `uuid`.
 -- Postgres resolves COALESCE argument types statically at plan time, so every
--- invocation fails with `COALESCE types text and uuid cannot be matched` —
+-- invocation fails with `COALESCE types text and uuid cannot be matched` - 
 -- even an empty `{}` patch (the normal "confirm qualifying sale" case). This
 -- full re-create casts the jsonb value to uuid (jsonb cannot hold a uuid
 -- literal, so the cast is the authoritative form); `null` in the patch still
@@ -122,7 +122,7 @@ begin
   end if;
   insert into "AuditLog" (action, actor_id, actor_role, target_type, target_id, target_name, detail, created_at)
     values ('SALE_QUALIFIED', p_actor, p_role, 'Sale', p_id,
-            v_sale."propertyName" || ' — ' || v_sale."customerName",
+            v_sale."propertyName" || ' - ' || v_sale."customerName",
             'Qualified sale ' || p_id || '. ' || v_detail, v_now);
   select to_jsonb(s) into v_sale from "Sale" s where s.id = p_id;
   return jsonb_build_object('sale', v_sale);

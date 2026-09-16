@@ -1,12 +1,12 @@
-# JAD — API Specification SSOT (API-SPECIFICATION.md)
+# JAD - API Specification SSOT (API-SPECIFICATION.md)
 
 > **Authority:** Defines the REST API architecture, conventions, and endpoint inventory for the JA&D platform. Companion to `ARCHITECTURE.md` (modular Vercel Functions, backend handlers) and `TECH-STACK.md` (Vercel Functions, OpenAPI 3.1) as updated Q1 2026-08-30.
 >
-> **Status of endpoints:** The repository contains **no implementation**. Every endpoint below is **PLANNED** unless marked otherwise. No endpoint is invented without a feature/requirement justification (§6 traceability). Endpoints #84–#89 (§6.16) are **PROPOSED** additions from the Project 09 audit, closing evidence-backed gaps; they require approval before implementation.
+> **Status of endpoints:** The repository contains **no implementation**. Every endpoint below is **PLANNED** unless marked otherwise. No endpoint is invented without a feature/requirement justification (§6 traceability). Endpoints #84-#89 (§6.16) are **PROPOSED** additions from the Project 09 audit, closing evidence-backed gaps; they require approval before implementation.
 >
 > **Status vocabulary:** **CONFIRMED** (established requirement) · **PROPOSED** (recommended, not approved) · **REQUIRES APPROVAL** (material decision).
 >
-> **Version:** Project 09 — API & Integration Engineering (Audited Baseline v1.1). This version is the companion API contract to `INTEGRATION-SPECIFICATION.md`; integration concerns (external systems, reliability, webhooks/events, security) are owned there.
+> **Version:** Project 09 - API & Integration Engineering (Audited Baseline v1.1). This version is the companion API contract to `INTEGRATION-SPECIFICATION.md`; integration concerns (external systems, reliability, webhooks/events, security) are owned there.
 
 ---
 
@@ -26,7 +26,7 @@
 | `GET` | Read (no side effects) | 200 |
 | `POST` | Create / submit / action (state change) | 201 (create), 200 (action) |
 | `PATCH` | Partial update of mutable (non-financial) fields | 200 |
-| `PUT` | Not used by default (avoided for partial semantics) | — |
+| `PUT` | Not used by default (avoided for partial semantics) | - |
 | `DELETE` | Prohibited on financial records; allowed only on reversible, approved resources | 204 |
 
 | Code | Use |
@@ -43,12 +43,12 @@
 | 429 | Rate limited |
 | 500 | Server error (generic; no internals leaked) |
 
-**Important:** Business-eligibility failures return 403 (role/eligibility) or 422 (business rule) — never 401.
+**Important:** Business-eligibility failures return 403 (role/eligibility) or 422 (business rule) - never 401.
 
 ### 1.3 Validation
 - All request bodies validated against Zod schemas in `packages/contracts` (single source).
 - Validation happens in the presentation layer before any business logic.
-- Rejection of sales, members, and withdrawals requires a **mandatory reason** (BR-REG-004, BR-SAL-005, BR-WDR-004) — enforced at the API level.
+- Rejection of sales, members, and withdrawals requires a **mandatory reason** (BR-REG-004, BR-SAL-005, BR-WDR-004) - enforced at the API level.
 - Money/rates are exact decimals (`NUMERIC`); floats are rejected.
 
 ---
@@ -56,15 +56,15 @@
 ## 2. Authentication & Authorization
 
 ### 2.1 Authentication (Q1/Q3)
-- **Supabase Auth JWT** (PKCE, `Authorization: Bearer` or Supabase cookie) verified server-side per Q3 — supersedes `HttpOnly` session (ARCH-DEC-007 archived). `supabase.auth.signInWithPassword` in `supabase.ts:50-65` with `cookieStorage` cross-port `5173↔5174`.
+- **Supabase Auth JWT** (PKCE, `Authorization: Bearer` or Supabase cookie) verified server-side per Q3 - supersedes `HttpOnly` session (ARCH-DEC-007 archived). `supabase.auth.signInWithPassword` in `supabase.ts:50-65` with `cookieStorage` cross-port `5173↔5174`.
 - No new `HttpOnly` DB session for v1; `POST /auth/verify-email` remains the gate before approval (BR-AUTH-001).
-- Internal/service-to-service calls use `SUPABASE_SERVICE_ROLE_KEY` (bypasses RLS) — never user JWT for seed.
+- Internal/service-to-service calls use `SUPABASE_SERVICE_ROLE_KEY` (bypasses RLS) - never user JWT for seed.
 
 ### 2.2 Authorization
 - **RBAC (Vercel middleware + RLS)** enforces BUSINESS-RULES.md §3 for every endpoint.
 - **Object-level authorization (NFR-AUTHZ-002):** member-scoped endpoints verify the session user owns the resource (prevents IDOR/BOLA). Staff roles use staff-scoped paths; no staff role can act on a member's behalf through member endpoints.
 - **Business eligibility is separate from roles:** e.g., `POST /sales` requires role Member **and** status Active + Qualified (BR-SAL-001). Returns 422 `MEMBER_NOT_QUALIFIED` otherwise.
-- Role shorthand used below: `PUBLIC`, `AUTH` (any authenticated principal — member or staff), `MEM` (any authenticated member), `AQ` (Active + Qualified), `ADM` (Admin), `FIN` (Finance), `SUP` (Super Admin), `MRCH` (Merchant), `SYS` (internal service identity).
+- Role shorthand used below: `PUBLIC`, `AUTH` (any authenticated principal - member or staff), `MEM` (any authenticated member), `AQ` (Active + Qualified), `ADM` (Admin), `FIN` (Finance), `SUP` (Super Admin), `MRCH` (Merchant), `SYS` (internal service identity).
 - `SYS` is an **internal service identity**, not a database account role (the `accounts.role` CHECK holds `MEMBER, ADMIN, FINANCE, SUPER_ADMIN, MERCHANT`). Internal/service-to-service calls use a short-lived token from the secret manager, never user cookies.
 
 ---
@@ -115,7 +115,7 @@ All errors use one envelope:
 | Area | Convention |
 |---|---|
 | Admin lists | Page-based: `?page=1&pageSize=50` (default 50, max 100) |
-| Ledger / financial streams | Cursor-based: `?cursor=<opaque>&limit=50` — stable order (id asc) |
+| Ledger / financial streams | Cursor-based: `?cursor=<opaque>&limit=50` - stable order (id asc) |
 | Sorting | `?sort=field&order=asc\|desc`; **allowlisted per endpoint** (never arbitrary column names) |
 | Filtering | `?status=...`, `?q=...`; allowlisted keys per endpoint |
 | Meta | List responses: `{ "data": [...], "meta": { "pagination": {...} } }` |
@@ -135,7 +135,7 @@ All errors use one envelope:
 
 ### 5.3 Idempotency
 - `Idempotency-Key` header (UUID) **required** on: `POST /sales`, `POST /me/withdrawals`, `POST /vouchers/:id/redemptions`, `POST /financial-adjustments`.
-- Server stores key → response; retries return the stored response without re-applying side effects (prevents double redemption / double reservation — BI-007, BR-WDR-002).
+- Server stores key → response; retries return the stored response without re-applying side effects (prevents double redemption / double reservation - BI-007, BR-WDR-002).
 - Key TTL proposed: 24h (REQUIRES APPROVAL).
 
 ### 5.4 OpenAPI / Swagger
@@ -174,7 +174,7 @@ Legend: **M** method · **Auth** role shorthand · **Feature** FEAT ID · **Req*
 | 14 | GET | `/me/referral-code` | MEM | FEAT-019 | FR-REF-001 | Unique, immutable (BR-REF-004) |
 | 15 | GET | `/me/qualification` | MEM | FEAT-012 | FR-REG-008 | Eligibility status summary |
 
-### 6.3 Geolocation (FG-PROGRAMS — P11)
+### 6.3 Geolocation (FG-PROGRAMS - P11)
 
 | # | M | Path | Auth | Feature | Req | Notes |
 |---|---|---|---|---|---|---|
@@ -208,7 +208,7 @@ Legend: **M** method · **Auth** role shorthand · **Feature** FEAT ID · **Req*
 | # | M | Path | Auth | Feature | Req | Notes |
 |---|---|---|---|---|---|---|
 | 30 | POST | `/sales` | AQ | FEAT-027 | FR-SAL-001 | Submit; `Idempotency-Key` required; property from catalog |
-| 31 | GET | `/sales` | AQ (own)/ADM/FIN/SUP | FEAT-027 | FR-SAL-001 | Member sees own; staff see all (Finance works the sales queue — SCR-ADM-008) |
+| 31 | GET | `/sales` | AQ (own)/ADM/FIN/SUP | FEAT-027 | FR-SAL-001 | Member sees own; staff see all (Finance works the sales queue - SCR-ADM-008) |
 | 32 | GET | `/sales/:id` | AQ (own)/ADM/FIN/SUP | FEAT-027 | FR-SAL-001 | Object-level |
 | 33 | POST | `/sales/:id/approve` | ADM | FEAT-028 | FR-SAL-002 | Admin approval |
 | 34 | POST | `/sales/:id/reject` | ADM | FEAT-028 | FR-SAL-005 | `reason` mandatory |
@@ -268,7 +268,7 @@ Legend: **M** method · **Auth** role shorthand · **Feature** FEAT ID · **Req*
 >
 > | # | M | Path | Auth | Req | Notes |
 > |---|---|---|---|---|---|
-> | 60a | POST | `/admin/voucher-templates` | ADM/SUP | FR-VCH-001..003 | "Create Voucher" — definition (title + value); no member |
+> | 60a | POST | `/admin/voucher-templates` | ADM/SUP | FR-VCH-001..003 | "Create Voucher" - definition (title + value); no member |
 > | 60b | POST | `/admin/vouchers/assign` | ADM/SUP | FR-VCH-001..003 | Assign to a member with per-assignment `expiresAt`/`validityDays`; unique code; duplicate `(memberId, templateId)` → 409; audit `VOUCHER_ASSIGNED` |
 > | 60c | POST | `/admin/vouchers/scan` | ADM/SUP | FR-VCH-001..003 | Verify-only; 404 unknown code, 409 already-redeemed/expired |
 > | 60d | POST | `/admin/vouchers/:id/redeem` | ADM/SUP | FR-VCH-001..003 | Conditional UPDATE (ACTIVE only); remaining → `0.00`; `redeemedAt`/`redeemedBy`; audit `VOUCHER_REDEEMED` |
@@ -295,7 +295,7 @@ Legend: **M** method · **Auth** role shorthand · **Feature** FEAT ID · **Req*
 | 72 | POST | `/broadcasts` | ADM | FEAT-063 | FR-ADM-005 | Promotions/training/invites/announcements |
 | 73 | GET | `/me/broadcasts` | MEM | FEAT-063 | FR-ADM-005 | My notifications (incl. push dispatch) |
 
-### 6.12a Admin ↔ Member Messaging (FG-MESSAGING — FEAT-072, ADR-013)
+### 6.12a Admin ↔ Member Messaging (FG-MESSAGING - FEAT-072, ADR-013)
 
 | # | M | Path | Auth | Feature | Req | Notes |
 |---|---|---|---|---|---|---|
@@ -318,7 +318,7 @@ Legend: **M** method · **Auth** role shorthand · **Feature** FEAT ID · **Req*
 | 76 | GET | `/me/reports/total-earned` | MEM | FEAT-066 | FR-RPT-003 | **Gated OD-025; excludes pending funds** |
 | 77 | GET | `/me/genealogy` | MEM | FEAT-067 | FR-RPT-004 | Tree visualization; no MLM (BI-004) |
 
-### 6.14 Programs (FG-PROGRAMS — P11)
+### 6.14 Programs (FG-PROGRAMS - P11)
 
 | # | M | Path | Auth | Feature | Req | Notes |
 |---|---|---|---|---|---|---|
@@ -334,16 +334,16 @@ Legend: **M** method · **Auth** role shorthand · **Feature** FEAT ID · **Req*
 | 82 | GET | `/config` | SUP | FEAT-005 | FR-ADM-001 | Full parameter view |
 | 83 | PATCH | `/config` | SUP | FEAT-005 | FR-ADM-001 | Update rates/periods/limits (BR-CFG-001) |
 
-### 6.16 Additional Proposed Endpoints (Project 09 audit — evidence-backed gaps)
+### 6.16 Additional Proposed Endpoints (Project 09 audit - evidence-backed gaps)
 
-> Added to close gaps confirmed in the authoritative docs (UI-UX screen register, ARCHITECTURE §4.2, REQUIREMENTS, FEATURES, DATABASE-DESIGN). All are **PROPOSED** — they extend the planned contract and must be approved before implementation. Numbering continues from #83 to preserve the original inventory numbering referenced by UI-UX.md.
+> Added to close gaps confirmed in the authoritative docs (UI-UX screen register, ARCHITECTURE §4.2, REQUIREMENTS, FEATURES, DATABASE-DESIGN). All are **PROPOSED** - they extend the planned contract and must be approved before implementation. Numbering continues from #83 to preserve the original inventory numbering referenced by UI-UX.md.
 
 | # | M | Path | Auth | Feature | Req | Notes |
 |---|---|---|---|---|---|---|
 | 84 | GET | `/withdrawals/:id` | ADM/FIN/SUP | FEAT-048..050 | FR-WDR-001..005 | Staff withdrawal detail (SCR-ADM-012); object-level; completes the staff-scoped withdrawal path per §2.2 |
 | 85 | POST | `/me/media` | MEM | FEAT-010/060 | FR-REG-002, FR-MEM-001, FR-ADM-002 | Member uploads government ID document (FR-REG-002, FEAT-010) and optional profile photo (FR-MEM-001); `media_assets.media_type` includes `ID_DOCUMENT`/`PROFILE_PHOTO` (E-24); `POST /media` (#66) remains Admin-only |
 | 86 | GET | `/programs/:id/qualification-questions` | PUBLIC | FEAT-012 | FR-REG-003 | Registration question set per program (E-04, FK `program_id`); question content per program TBD (OD-002) |
-| 87 | GET | `/referral-codes/:code` | PUBLIC | FEAT-007 | FR-REG-010 | Referral-code introspect for optional registration code (ARCHITECTURE §4.2 auth module); returns validity only — no PII |
+| 87 | GET | `/referral-codes/:code` | PUBLIC | FEAT-007 | FR-REG-010 | Referral-code introspect for optional registration code (ARCHITECTURE §4.2 auth module); returns validity only - no PII |
 | 88 | GET | `/audit-log` | SUP | FEAT-004 | NFR-AUD-001, NFR-SEC-002 | Immutable audit trail browse (SCR-ADM-021); page-based; read-only; filter by entity/actor/action (I-21, I-22) |
 | 89 | POST | `/me/sales/:id/reopen-request` | MEM | FEAT-032 | FR-SAL-007 | Member requests reopen of a LOCKED sale (SCR-MEM-007); Admin/SUP decision via #37; audited |
 
@@ -391,7 +391,7 @@ Idempotency-Key: 6ba7b810-9dad-11d1-80b4-00c04fd430c8
 ```
 > Amount reserved and not reusable (BR-WDR-002). Rejected requests require a new request (BR-WDR-005).
 
-### 7.3 Voucher redemption (MRCH) — atomic
+### 7.3 Voucher redemption (MRCH) - atomic
 ```http
 POST /api/v1/vouchers/vch_003/redemptions
 Idempotency-Key: 66ba7b81-9dad-11d1-80b4-00c04fd430c9
@@ -454,4 +454,4 @@ Every endpoint maps to a confirmed feature/requirement:
 | §6.15 Config | FEAT-005 | FR-ADM-001 |
 | §6.16 Additional (PROPOSED) | FEAT-004, FEAT-007, FEAT-010, FEAT-012, FEAT-032, FEAT-048..050, FEAT-060 | FR-REG-002/003/010, FR-MEM-001, FR-ADM-002, FR-SAL-007, FR-WDR-001..005, NFR-AUD-001, NFR-SEC-002 (no new requirements) |
 
-**No endpoint is invented for unapproved functionality.** Gated endpoints (#21, #42, #76, #80 and any OD-gated detail) must not be implemented until the corresponding Owner decision is approved (OD-001..025). Endpoints #84–#89 (§6.16) are PROPOSED additions that close evidence-backed gaps; they must be approved before implementation.
+**No endpoint is invented for unapproved functionality.** Gated endpoints (#21, #42, #76, #80 and any OD-gated detail) must not be implemented until the corresponding Owner decision is approved (OD-001..025). Endpoints #84-#89 (§6.16) are PROPOSED additions that close evidence-backed gaps; they must be approved before implementation.

@@ -1,6 +1,6 @@
 import { useEffect, useState, type CSSProperties } from 'react';
 
-import { Button, Dialog, useToast } from '@jad/ui';
+import { Button, Dialog, notifySuccess } from '@jad/ui';
 import { CUSTOM_ROLE_FORBIDDEN_MODULES } from '@jad/contracts';
 import type { StaffModule } from '@jad/contracts';
 
@@ -27,7 +27,6 @@ const errorStyle: CSSProperties = {
 
 export function RoleFormDialog({ open, onClose }: Props) {
   const { user } = useSession();
-  const { toast } = useToast();
   const createMutation = useCreateRole();
   const isPending = createMutation.isPending;
 
@@ -61,7 +60,7 @@ export function RoleFormDialog({ open, onClose }: Props) {
         actor: user?.name ?? 'Unknown',
         actorRole: user?.roleId ? user.roleId.toUpperCase() : 'ADMIN',
       });
-      toast({ title: 'Role created', message: `${role.name} is ready to assign`, tone: 'success' });
+      notifySuccess({ title: 'Role created', message: `${role.name} is ready to assign` });
       onClose();
     } catch (err) {
       setErrors({ submit: (err as Error).message || 'Something went wrong. Please try again.' });

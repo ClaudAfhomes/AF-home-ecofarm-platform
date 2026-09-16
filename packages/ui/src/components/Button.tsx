@@ -1,5 +1,6 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
+import { Spinner } from './Spinner.js';
 import styles from './Button.module.css';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
@@ -30,11 +31,13 @@ export function Button({
       className={`${styles.button} ${styles[variant]}`}
       disabled={isDisabled}
       aria-disabled={isDisabled || undefined}
+      aria-busy={loading || undefined}
       {...rest}
     >
       {loading ? (
         <span className={styles.loadingLabel} role="status">
-          Loading…
+          <Spinner size="sm" />
+          <span>Loading…</span>
         </span>
       ) : (
         children

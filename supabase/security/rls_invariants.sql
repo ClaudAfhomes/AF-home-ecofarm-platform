@@ -1,8 +1,8 @@
--- RLS invariant audit (Phase 3B) — run read-only in the SQL editor / CI after
+-- RLS invariant audit (Phase 3B) - run read-only in the SQL editor / CI after
 -- every migration batch. Each query must return ZERO rows (empty = PASS).
 --
 -- Triage: any returned row is either a real finding (fix the policy/grant it
--- names, not this file) or a deliberately granted exception — document
+-- names, not this file) or a deliberately granted exception - document
 -- exceptions inline below with owner + date instead of deleting the check.
 --
 -- NOTE: pg_policies.roles is name[], so the literal must be cast (42883
@@ -43,7 +43,7 @@ where schemaname = 'storage'
 -- sale_qualify, …) must be service_role-only; any row naming one is a FAIL.
 -- Other rows are triage candidates, not automatic failures.
 -- Deliberate exception (owner, 2026-09-14, ADR-013): is_staff_user() is
--- EXECUTE-to-authenticated by design — a read-only, parameterless standing
+-- EXECUTE-to-authenticated by design - a read-only, parameterless standing
 -- check used only inside SELECT-only RLS policies on "Message" and
 -- "Conversation" (staff realtime). It writes nothing and reveals only the
 -- caller's own standing.

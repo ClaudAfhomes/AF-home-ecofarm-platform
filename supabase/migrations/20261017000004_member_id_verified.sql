@@ -3,7 +3,7 @@
 -- `governmentId` lives only on the Registration row, which approval deletes
 -- (approve.ts) without copying any ID flag onto Member. GET /me/qualification
 -- computes ID_VERIFIED from that deleted row, so it is permanently false for
--- every approved member — the status page shows 4/5 = 80% with "Government ID
+-- every approved member - the status page shows 4/5 = 80% with "Government ID
 -- verified" missing even though the ID was provided and manually verified.
 --
 -- Approval IS the manual ID gate (the application carried the required

@@ -41,7 +41,7 @@ describe('member MyGenealogyPage', () => {
       'href',
       '/member/referrals/earned',
     );
-    // Direct referrals are collapsed by default — grandchildren hidden
+    // Direct referrals are collapsed by default - grandchildren hidden
     expect(screen.queryByText('Nina Navarro')).not.toBeInTheDocument();
     expect(screen.queryByText('Kevin Kintanar')).not.toBeInTheDocument();
     // Juan (the network root) has no sponsor

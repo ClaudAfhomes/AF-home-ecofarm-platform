@@ -2,7 +2,7 @@ import type { Program, QualificationQuestion } from '../schemas/program.js';
 import type { Policy as PolicyType } from '../schemas/policy.js';
 
 /**
- * Reference-data seeds — single source for `supabase/seed.ts` AND the
+ * Reference-data seeds - single source for `supabase/seed.ts` AND the
  * parity specs that lock mock stores to seeded values (Phase B1).
  * Values mirror the long-standing mock fixtures verbatim; do not edit copy
  * here without updating the affected UI specs.
@@ -125,6 +125,7 @@ export const CONFIG_SEEDS: ConfigSeed[] = [
 export const POLICY_SEEDS: (PolicyType & { content: string })[] = [
   {
     id: 'pol-001',
+    slug: 'terms',
     title: 'Terms and Conditions',
     type: 'terms',
     content:
@@ -132,13 +133,14 @@ export const POLICY_SEEDS: (PolicyType & { content: string })[] = [
       '1. Acceptance of Terms\n' +
       'These terms govern your access to and use of the JA&D membership platform, including sales recording, referrals, commissions, and related services. By completing registration and verifying your email, you confirm that you are at least 18 years old, that the information you provide is accurate, and that you accept these terms in full. If you do not agree, please do not proceed with registration.\n\n' +
       '2. Member Obligations\n' +
-      'Members must provide accurate personal information, maintain the confidentiality of their account credentials, and comply with all applicable laws and JA&D program guidelines. Qualifying sales must be recorded accurately against catalog properties, and referral relationships are strictly single-level — only the direct referrer is recognized for referral purposes.\n\n' +
+      'Members must provide accurate personal information, maintain the confidentiality of their account credentials, and comply with all applicable laws and JA&D program guidelines. Qualifying sales must be recorded accurately against catalog properties, and referral relationships are strictly single-level - only the direct referrer is recognized for referral purposes.\n\n' +
       '3. No Purchase Requirement and Contact\n' +
       'Membership does not require the purchase of any product or property. All fees, commissions, and incentives are described in the official program guidelines. For questions about these terms, contact support@jad.example or refer to the official JA&D website.',
     updatedAt: '2026-08-18T10:00:00.000Z',
   },
   {
     id: 'pol-002',
+    slug: 'guidelines',
     title: 'Program Guidelines',
     type: 'guidelines',
     content:
@@ -153,6 +155,7 @@ export const POLICY_SEEDS: (PolicyType & { content: string })[] = [
   },
   {
     id: 'pol-003',
+    slug: 'privacy',
     title: 'Privacy Policy',
     type: 'privacy',
     content:

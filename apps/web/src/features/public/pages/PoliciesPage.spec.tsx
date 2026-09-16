@@ -8,6 +8,7 @@ const POLICIES = {
   data: [
     {
       id: 'pol-001',
+      slug: 'terms',
       title: 'Terms and Conditions (API)',
       type: 'terms',
       content: 'These are the terms and conditions of the JA&D program.',
@@ -15,6 +16,7 @@ const POLICIES = {
     },
     {
       id: 'pol-003',
+      slug: 'privacy',
       title: 'Privacy Policy (API)',
       type: 'privacy',
       content: 'This is the privacy policy.',
@@ -36,11 +38,11 @@ describe('public PoliciesPage', () => {
     expect(screen.queryByText('Program Guidelines')).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Terms and Conditions \(API\)/ })).toHaveAttribute(
       'href',
-      '/policies/pol-001',
+      '/policies/terms',
     );
     expect(screen.getByRole('link', { name: /Privacy Policy \(API\)/ })).toHaveAttribute(
       'href',
-      '/policies/pol-003',
+      '/policies/privacy',
     );
   });
 
@@ -53,7 +55,7 @@ describe('public PoliciesPage', () => {
     expect(screen.getByText('Privacy Policy')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /Program Guidelines/ })).toHaveAttribute(
       'href',
-      '/policies/pol-002',
+      '/policies/guidelines',
     );
   });
 });

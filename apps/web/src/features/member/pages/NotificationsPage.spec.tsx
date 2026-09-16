@@ -75,7 +75,7 @@ describe('member NotificationsPage', () => {
     renderMember(<NotificationsPage />, { user: MOCK_MEMBER });
 
     expect(await screen.findByText('Welcome to JA&D')).toBeInTheDocument();
-    // No separate View buttons — the card title itself opens the viewer
+    // No separate View buttons - the card title itself opens the viewer
     expect(screen.queryByRole('button', { name: 'View' })).not.toBeInTheDocument();
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 

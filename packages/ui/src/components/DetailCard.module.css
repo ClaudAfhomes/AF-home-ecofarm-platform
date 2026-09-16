@@ -1,4 +1,4 @@
-/* Shared detail layout — used by Admin detail pages (Registration, Sale, Member).
+/* Shared detail layout - used by Admin detail pages (Registration, Sale, Member).
    Keeps cards, grids and field rows consistent without per-page duplication. */
 
 .grid {

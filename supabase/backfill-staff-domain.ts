@@ -1,10 +1,10 @@
 /**
- * Phase 2 — Staff domain backfill (Member/Staff separation).
+ * Phase 2 - Staff domain backfill (Member/Staff separation).
  *
  * Creates one StaffUser per Member holding a staff-slug link, keyed by the
  * staffer's auth.users id (keeps one login identity per staffer, so session
  * matching and own-row RLS keep working). Staffers with no auth account are
- * reported and skipped — never invented. Creates one StaffAssignment per
+ * reported and skipped - never invented. Creates one StaffAssignment per
  * staff-slug link, and remaps historical staff attributions
  * (AuditLog.actor_id, Registration.reviewedBy, Member.archivedBy,
  * cms_contents.updated_by, SystemConfig.updated_by) from staffer member
@@ -55,7 +55,7 @@ function loadEnvFile(filePath: string): void {
       if (!(key in process.env) && value) process.env[key] = value;
     }
   } catch {
-    // missing file — fall through to whatever the environment provides
+    // missing file - fall through to whatever the environment provides
   }
 }
 
@@ -118,7 +118,7 @@ function serviceClient(): SupabaseClient {
 
 type Staffer = {
   memberId: string;
-  /** Auth user id — StaffUser.id keys off this (never the member uuid). Null when the staffer has no login identity. */
+  /** Auth user id - StaffUser.id keys off this (never the member uuid). Null when the staffer has no login identity. */
   authId: string | null;
   email: string;
   name: string;
@@ -225,7 +225,7 @@ async function main(): Promise<void> {
 
   if (mode === 'rollback') {
     if (!fs.existsSync(MAP_PATH)) {
-      console.error(`No rollback map at ${MAP_PATH} — nothing to undo. Aborting.`);
+      console.error(`No rollback map at ${MAP_PATH} - nothing to undo. Aborting.`);
       process.exit(1);
     }
     if (!allowed(ref)) process.exit(1);
@@ -256,7 +256,7 @@ async function main(): Promise<void> {
 
   if (mode === 'retire-rollback') {
     if (!fs.existsSync(RETIRE_PATH)) {
-      console.error(`No retire snapshot at ${RETIRE_PATH} — nothing to undo. Aborting.`);
+      console.error(`No retire snapshot at ${RETIRE_PATH} - nothing to undo. Aborting.`);
       process.exit(1);
     }
     if (!allowed(ref)) process.exit(1);
@@ -289,7 +289,7 @@ async function main(): Promise<void> {
     if (!allowed(ref)) process.exit(1);
     const ids = [...(await stafferMemberIds(supabase))];
     if (ids.length === 0) {
-      console.log('No staffer Member rows found — nothing to retire.');
+      console.log('No staffer Member rows found - nothing to retire.');
       return;
     }
     // Pre-verification: financial/graph ownership must be zero, no members
@@ -381,7 +381,7 @@ async function main(): Promise<void> {
   console.log(
     `Staffers found: ${staffers.length} (actionable: ${actionable.length}, skipped, no auth identity: ${skipped.length})`,
   );
-  for (const s of skipped) console.log(`  SKIP ${s.email} — no auth.users account`);
+  for (const s of skipped) console.log(`  SKIP ${s.email} - no auth.users account`);
   for (const s of actionable) {
     console.log(
       `  ${s.email} authId=${s.authId} slugs=[${s.slugs.join(',')}] => status=${staffStatusFor(s.accountStatus)}`,
@@ -423,7 +423,7 @@ async function main(): Promise<void> {
 
   if (mode === 'dry-run') {
     console.log(
-      `\nDRY-RUN — no changes made. Re-run with --execute plus DEV_RESET_ALLOW_REFS=${ref} to create staff identities and remap attributions.`,
+      `\nDRY-RUN - no changes made. Re-run with --execute plus DEV_RESET_ALLOW_REFS=${ref} to create staff identities and remap attributions.`,
     );
     return;
   }

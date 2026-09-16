@@ -31,7 +31,7 @@ const LOCKED_SALE = {
   id: 'sal-006',
   status: 'LOCKED',
   propertyId: 'prisma-celeste-building',
-  propertyName: 'Prisma Residences – Celeste Building Condo',
+  propertyName: 'Prisma Residences - Celeste Building Condo',
   propertyValue: '8300000.00',
   customerId: 'cus-001',
   customerName: 'Celine Cruz',
@@ -109,13 +109,8 @@ describe('member SaleDetailPage (SCR-MEM-007)', () => {
     const reopenButton = await screen.findByRole('button', { name: 'Request reopen' });
     await user.click(reopenButton);
 
-    expect(
-      (
-        await screen.findAllByText(
-          'Your request was recorded. JA&D staff will review the locked sale.',
-        )
-      ).length,
-    ).toBeGreaterThan(0);
+    expect(await screen.findByText('Request recorded')).toBeInTheDocument();
+    expect(await screen.findByText('JA&D staff will review the locked sale.')).toBeInTheDocument();
   });
 
   it('surfaces an error state when the sale endpoint fails', async () => {

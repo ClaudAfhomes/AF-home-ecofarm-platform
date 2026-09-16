@@ -33,7 +33,7 @@ export function slugsAllowed(slugs: string[], allowed: string[]): boolean {
 /**
  * True when a Supabase Auth admin error is a duplicate-identity conflict.
  * GoTrue's message is "A user with this email address has already been
- * registered" (NOT "already exists" — a substring guard on the latter misses
+ * registered" (NOT "already exists" - a substring guard on the latter misses
  * every real conflict and leaks the raw message as INTERNAL 500). Matches
  * status, code, and message broadly so wording drift can't reopen the hole.
  */
@@ -100,7 +100,7 @@ function userMatchesEmail(
  * Find an existing auth user by email or phone (orphan adoption after an
  * `isAuthConflict`). Emails compare case-insensitively (GoTrue stores them
  * lowercased) and fall back to identity emails; phones compare by digits
- * only. Paginates wide (perPage 1000) — the default 50-user page can miss
+ * only. Paginates wide (perPage 1000) - the default 50-user page can miss
  * the account and falsely report it unresolvable.
  */
 export async function findAuthUserId(
@@ -174,7 +174,7 @@ export type VerifyStaffDeps = {
 /**
  * Authenticated-member gate for `/me/*` endpoints: validates the caller JWT
  * and returns the auth user id (which equals `Member.id` per the auth
- * foundation). No role check — RLS scopes rows to self + broadcasts.
+ * foundation). No role check - RLS scopes rows to self + broadcasts.
  */
 export async function verifyUser(
   req: VercelRequest,
@@ -214,7 +214,7 @@ export type StaffStanding = { status: string | null; mustChangePassword: boolean
 /**
  * Own staff standing (status + temporary-password flag) for `verifyStaff`
  * enforcement. Defensive: a missing row/column (pre-migration) or a read
- * failure resolves to "unknown" and does NOT block — only an explicit
+ * failure resolves to "unknown" and does NOT block - only an explicit
  * DISABLED status or a true mustChangePassword flag denies. Same shape
  * always, never throws.
  */
@@ -249,7 +249,7 @@ export async function staffStanding(
 /**
  * Staff-domain role slugs: StaffAssignment (keyed by auth user id) → Role.
  * Preferred source (Phase 1 staff separation); empty when the caller holds
- * no staff assignment. Never throws — callers fall back to legacy links.
+ * no staff assignment. Never throws - callers fall back to legacy links.
  */
 export async function queryStaffSlugs(
   svc: { from: (table: string) => unknown },
@@ -336,7 +336,7 @@ export async function verifyStaff(
  * Governance endpoints stay slug-only (verifyStaff) so custom roles can
  * never escalate there.
  *
- * Behavior for system roles is identical to verifyStaff — the slug branch
+ * Behavior for system roles is identical to verifyStaff - the slug branch
  * is checked first, so allow-lists the UI matrix doesn't mirror (e.g.
  * finance on vouchers) keep working without matrix changes.
  */

@@ -33,7 +33,7 @@ describe('App routing', () => {
     });
 
     expect(
-      await screen.findByRole('heading', { name: 'Prisma Residences – Astra Building Condo' }),
+      await screen.findByRole('heading', { name: 'Prisma Residences - Astra Building Condo' }),
     ).toBeInTheDocument();
     expect(screen.getByText('₱5,300,000.00')).toBeInTheDocument();
   });

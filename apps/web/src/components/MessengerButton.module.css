@@ -1,5 +1,5 @@
 /*
- * Floating "Let's Talk" Messenger button — fixed to the bottom-left of the
+ * Floating "Let's Talk" Messenger button - fixed to the bottom-left of the
  * viewport on all public pages. Pill with a 56px touch target (>= 44px),
  * brand blue with a white glyph + label, elevation from the existing shadow
  * tokens. Focus ring uses the global :focus-visible contract (accent-strong
@@ -34,7 +34,7 @@
     transform var(--transition-fast);
 }
 
-/* White foreground in every link state — never inherit browser link colors. */
+/* White foreground in every link state - never inherit browser link colors. */
 .button:link,
 .button:visited,
 .button:hover,

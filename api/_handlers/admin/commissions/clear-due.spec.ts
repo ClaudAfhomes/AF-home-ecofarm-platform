@@ -5,7 +5,7 @@ import type { VercelRequest, VercelResponse } from '../../../_lib/http.js';
 import clearDueHandler from './clear-due.js';
 
 /**
- * POST /admin/commissions/clear-due — staff-triggered run of the atomic
+ * POST /admin/commissions/clear-due - staff-triggered run of the atomic
  * `commission_clear_batch` function (single tx per commission: AVAILABLE +
  * ledger + wallet). Supabase is fully mocked.
  */

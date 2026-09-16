@@ -1,7 +1,15 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 
-import { Button, ConfirmDialog, Dialog, ErrorState, PageHeader, Skeleton } from '@jad/ui';
+import {
+  Button,
+  ConfirmDialog,
+  Dialog,
+  ErrorState,
+  notifySuccess,
+  PageHeader,
+  Skeleton,
+} from '@jad/ui';
 import { formatMoney } from '@jad/shared';
 import {
   propertiesContentSchema,
@@ -24,7 +32,7 @@ import { CmsSectionCard } from '../components/CmsSectionCard';
 import { useCmsAccordion } from '../hooks/useCmsAccordion';
 import { usePropertiesCms, useUpdatePropertiesCms } from '../hooks/usePropertiesCms';
 // Catalog system-of-record for link-by-reference: CMS owns presentation,
-// the catalog owns identity/price/status/counts. Reads only — CMS never
+// the catalog owns identity/price/status/counts. Reads only - CMS never
 // writes catalog rows. Explicit links win; otherwise entries auto-match on
 // id/slug equality (see services/catalogLinks).
 import { useCategories as useCatalogCategories } from '../../catalog/hooks/useCategories';
@@ -146,7 +154,7 @@ export function CmsPropertiesPage() {
 
   // Link-by-reference resolution against the catalog system-of-record:
   // explicit links win, otherwise entries auto-match on id/slug equality.
-  // Dangling links (catalog item deleted) render as warnings — they never
+  // Dangling links (catalog item deleted) render as warnings - they never
   // block saving.
   const categoryLinkText = (cat: Pick<CmsPropertyCategory, 'slug' | 'catalogSlug'>): string => {
     const resolved = resolveCategoryLink(cat, catalogCategories);
@@ -255,8 +263,7 @@ export function CmsPropertiesPage() {
       await update.mutateAsync(draft);
       const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       setLastSaved(`just now at ${now}`);
-      setSaveMessage('All changes saved.');
-      setTimeout(() => setSaveMessage(null), 3000);
+      notifySuccess({ title: 'Changes saved' });
     } catch (e) {
       setSaveMessage(e instanceof Error ? e.message : 'Save failed');
     }
@@ -277,8 +284,8 @@ export function CmsPropertiesPage() {
       <PageHeader title="Properties CMS" description="Manage the public Properties page content." />
 
       {saveMessage ? (
-        <div className={styles.bannerSuccess} role="status" aria-live="polite">
-          <strong>All changes saved</strong>: {saveMessage}
+        <div className={styles.bannerError} role="alert">
+          {saveMessage}
         </div>
       ) : null}
 

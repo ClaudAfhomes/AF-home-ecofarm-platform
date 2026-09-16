@@ -9,7 +9,7 @@ import { MEMBER_STATUS_TONE, formatDate, memberStatusLabel } from '../lib/presen
 import styles from './DirectReferralsPage.module.css';
 
 /**
- * Direct Referrals (SCR-MEM-016, FR-RPT-001). The member's direct referrals —
+ * Direct Referrals (SCR-MEM-016, FR-RPT-001). The member's direct referrals -
  * strictly single-level (BR-REF-001/002); no deeper relationships or commissions
  * are shown or implied. Reporting only.
  */
@@ -66,7 +66,7 @@ export function DirectReferralsPage() {
       )}
 
       <p className={styles.note}>
-        Referrals are single-level only — commissions apply to members you directly referred
+        Referrals are single-level only - commissions apply to members you directly referred
         (BR-REF-002).
       </p>
     </section>

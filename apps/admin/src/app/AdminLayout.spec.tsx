@@ -55,7 +55,7 @@ describe('AdminLayout', () => {
   it('shows the session-resolved custom role name and nav without the role catalog', async () => {
     // Production shape for custom-role staff: the catalog fetch fails
     // (super_admin-only), so the shell renders the topbar label and
-    // navigation from the session-resolved roleName/roleModules alone —
+    // navigation from the session-resolved roleName/roleModules alone -
     // never the raw role id.
     renderWithProviders(<AdminLayout />, {
       user: {
@@ -97,19 +97,19 @@ describe('AdminLayout', () => {
     expect(category).toHaveAttribute('aria-expanded', 'false');
     expect(within(dialog).queryByRole('link', { name: 'Sales' })).not.toBeInTheDocument();
 
-    // Expand — drawer stays open
+    // Expand - drawer stays open
     await user.click(category);
     expect(category).toHaveAttribute('aria-expanded', 'true');
     expect(within(dialog).getByRole('link', { name: 'Sales' })).toBeInTheDocument();
     expect(screen.getByRole('dialog', { name: 'Admin navigation' })).toBeInTheDocument();
 
-    // Collapse — drawer stays open
+    // Collapse - drawer stays open
     await user.click(category);
     expect(category).toHaveAttribute('aria-expanded', 'false');
     expect(within(dialog).queryByRole('link', { name: 'Sales' })).not.toBeInTheDocument();
     expect(screen.getByRole('dialog', { name: 'Admin navigation' })).toBeInTheDocument();
 
-    // Expand again and select child link — navigates and closes drawer
+    // Expand again and select child link - navigates and closes drawer
     await user.click(category);
     expect(within(dialog).getByRole('link', { name: 'Sales' })).toBeInTheDocument();
     await user.click(within(dialog).getByRole('link', { name: 'Sales' }));

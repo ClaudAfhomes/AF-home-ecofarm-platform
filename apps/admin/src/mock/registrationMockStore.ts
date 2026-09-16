@@ -4,7 +4,7 @@ import type { MemberProfile } from '@jad/contracts';
 /**
  * Canonical in-memory mock store for Registration → Member → Archive flow.
  * Frontend-only, database-ready shape, deterministic IDs, no random.
- * Later replaced by Supabase/backend — UI calls repository methods, not this directly.
+ * Later replaced by Supabase/backend - UI calls repository methods, not this directly.
  */
 
 export type AdminMember = MemberProfile & {
@@ -21,7 +21,7 @@ export const TRANSITIONS = {
   MEMBER_TO_ARCHIVED: 'MEMBER→ARCHIVED',
 } as const;
 
-// Deterministic seed data — covers all acceptance criteria
+// Deterministic seed data - covers all acceptance criteria
 const now = '2026-08-18T09:12:00.000Z';
 
 export const initialRegistrations: Registration[] = [
@@ -241,7 +241,7 @@ export const initialRegistrations: Registration[] = [
   },
 ];
 
-// Initial members converted from approved registrations — single member
+// Initial members converted from approved registrations - single member
 // universe shared with the web/member mock store (mem-001 is Juan Dela Cruz
 // everywhere). Each member links the application it converted from.
 export const initialMembers: AdminMember[] = [
@@ -330,7 +330,7 @@ export const initialMembers: AdminMember[] = [
 export const initialArchived: ArchivedMember[] = [
   {
     id: 'arch-001',
-    // mem-012 was removed from the roster on archival — it must not collide
+    // mem-012 was removed from the roster on archival - it must not collide
     // with any active member id (asserted by the integrity spec).
     memberId: 'mem-012',
     // Archive snapshots the member row itself (approved applications leave

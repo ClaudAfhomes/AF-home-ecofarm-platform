@@ -10,7 +10,8 @@ import {
   PageHeader,
   Skeleton,
   StatusChip,
-  useToast,
+  notifySuccess,
+  notifyWarning,
 } from '@jad/ui';
 
 import { formatDate } from '../../../lib/format';
@@ -34,7 +35,6 @@ export function MemberDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { toast } = useToast();
   const { data, isPending, isError, error: fetchError } = useMember(id ?? '');
   const { data: application, isPending: applicationPending } = useMemberRegistration(
     data?.registrationId,
@@ -223,10 +223,9 @@ export function MemberDetailPage() {
       setSponsorCode('');
       await queryClient.invalidateQueries({ queryKey: ['admin', 'member', data.id] });
       await queryClient.invalidateQueries({ queryKey: ['admin', 'members'] });
-      toast({
+      notifySuccess({
         title: 'Sponsor linked',
         message: `${data.firstName} ${data.lastName} is now sponsored by ${code}.`,
-        tone: 'success',
       });
     } catch (e) {
       setSponsorError((e as Error).message);
@@ -243,10 +242,9 @@ export function MemberDetailPage() {
       await setMemberSponsor(data.id, null);
       await queryClient.invalidateQueries({ queryKey: ['admin', 'member', data.id] });
       await queryClient.invalidateQueries({ queryKey: ['admin', 'members'] });
-      toast({
+      notifySuccess({
         title: 'Sponsor unlinked',
         message: `${data.firstName} ${data.lastName} no longer has a sponsor.`,
-        tone: 'success',
       });
     } catch (e) {
       setSponsorError((e as Error).message);
@@ -260,10 +258,9 @@ export function MemberDetailPage() {
       await archiveMember(data.id);
       await queryClient.invalidateQueries({ queryKey: ['admin', 'members'] });
       await queryClient.invalidateQueries({ queryKey: ['admin', 'archived'] });
-      toast({
+      notifySuccess({
         title: 'Member archived',
         message: `${data.firstName} ${data.lastName} moved to archives`,
-        tone: 'success',
       });
       navigate('/admin/members');
     } catch (e) {
@@ -285,16 +282,14 @@ export function MemberDetailPage() {
       await queryClient.invalidateQueries({ queryKey: ['admin', 'members'] });
       await queryClient.invalidateQueries({ queryKey: ['admin', 'archived'] });
       if (result.authRemoved === false) {
-        toast({
-          title: 'Member deleted — auth account still exists',
+        notifyWarning({
+          title: 'Member deleted - auth account still exists',
           message: `${memberName} was removed, but their login is still active. Remove the auth user in Supabase Auth so the email can re-register cleanly.`,
-          tone: 'warning',
         });
       } else {
-        toast({
+        notifySuccess({
           title: 'Member permanently deleted',
           message: `${memberName} and all associated records were removed`,
-          tone: 'success',
         });
       }
       resetPurgeForm();
@@ -452,9 +447,9 @@ export function MemberDetailPage() {
               />
 
               <div className={styles.immutableField}>
-                <span className={styles.immutableLabel}>Country — immutable</span>
+                <span className={styles.immutableLabel}>Country - immutable</span>
                 <div className={styles.immutableValue}>
-                  {data.countryName} ({data.countryCode}) — cannot be changed
+                  {data.countryName} ({data.countryCode}) - cannot be changed
                 </div>
               </div>
               {error ? (
@@ -662,7 +657,7 @@ export function MemberDetailPage() {
                 margin: 0,
               }}
             >
-              Direct-created member — no application on file.
+              Direct-created member - no application on file.
             </p>
           ) : applicationPending ? (
             <p
@@ -682,7 +677,7 @@ export function MemberDetailPage() {
                 margin: 0,
               }}
             >
-              Approved — application {data.registrationId} was removed from the queue on approval.
+              Approved - application {data.registrationId} was removed from the queue on approval.
             </p>
           ) : (
             <dl className={styles.fieldGrid}>
@@ -694,7 +689,7 @@ export function MemberDetailPage() {
               </div>
               <div className={styles.field}>
                 <dt>Referral Code</dt>
-                <dd className={styles.mono}>{application.referralCode ?? '—'}</dd>
+                <dd className={styles.mono}>{application.referralCode ?? '-'}</dd>
               </div>
               <div className={styles.field}>
                 <dt>Submitted</dt>
@@ -705,7 +700,7 @@ export function MemberDetailPage() {
                   <dt>Reviewed</dt>
                   <dd>
                     {formatDate(application.reviewedAt)} ·{' '}
-                    <span className={styles.mono}>{application.reviewedBy ?? '—'}</span>
+                    <span className={styles.mono}>{application.reviewedBy ?? '-'}</span>
                   </dd>
                 </div>
               ) : null}
@@ -713,7 +708,7 @@ export function MemberDetailPage() {
                 <div className={styles.field}>
                   <dt>Rejection Note</dt>
                   <dd>
-                    {application.rejectionNote.reason} — {application.rejectionNote.requiredChanges}
+                    {application.rejectionNote.reason} - {application.rejectionNote.requiredChanges}
                   </dd>
                 </div>
               ) : null}
@@ -721,7 +716,7 @@ export function MemberDetailPage() {
                 <dt>Qualification Answers</dt>
                 <dd>
                   {application.qualificationAnswers.length === 0
-                    ? '—'
+                    ? '-'
                     : application.qualificationAnswers.map((qa) => (
                         <div key={qa.questionId}>
                           <span style={{ fontWeight: 600 }}>{qa.questionId}:</span> {qa.answer}
@@ -840,7 +835,7 @@ export function MemberDetailPage() {
           >
             <div style={{ display: 'grid', gap: 'var(--space-3)' }}>
               <p style={{ margin: 0, fontSize: 'var(--text-body-s)' }}>
-                This permanently deletes <strong>{memberName}</strong> and every associated record —
+                This permanently deletes <strong>{memberName}</strong> and every associated record -
                 wallet, ledger, commissions, sales, customers, withdrawals, payout accounts,
                 vouchers, and their login. <strong>This cannot be undone.</strong> Prefer{' '}
                 <strong>Archive</strong> unless the record must be destroyed (e.g. test data or a

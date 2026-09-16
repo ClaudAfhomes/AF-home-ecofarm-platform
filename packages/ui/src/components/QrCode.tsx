@@ -3,7 +3,7 @@ import type { CSSProperties, HTMLAttributes } from 'react';
 import QRCode from 'qrcode';
 
 /**
- * QR-code renderer — generates the matrix locally (no external service, no
+ * QR-code renderer - generates the matrix locally (no external service, no
  * privacy leak) and shows it as a data-URL image. Used for member voucher
  * codes that an admin scans at the point of redemption.
  */

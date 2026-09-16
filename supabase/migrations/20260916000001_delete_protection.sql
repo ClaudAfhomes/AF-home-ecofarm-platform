@@ -1,9 +1,9 @@
--- Phase 1B — Financial deletion protection (Database review F-04).
+-- Phase 1B - Financial deletion protection (Database review F-04).
 --
 -- Member.id references auth.users ON DELETE CASCADE, and the financial / CRM
 -- tables below cascade to Member. Combined with the admin "Delete member
 -- permanently" flow, one delete wiped Wallet, LedgerEntry, Commission,
--- MemberPayoutAccount, Sale, and Customer history — violating BR-LED / BI-005
+-- MemberPayoutAccount, Sale, and Customer history - violating BR-LED / BI-005
 -- (immutable ledger; deactivate, never delete).
 --
 -- Fix: money/CRM links become ON DELETE RESTRICT so a member with any

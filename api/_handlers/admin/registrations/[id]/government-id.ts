@@ -7,7 +7,7 @@ import { methodNotAllowed, requireService } from '../../../../_lib/rest.js';
 import { toErrorEnvelope } from '../../../../_lib/envelope.js';
 
 /**
- * GET /admin/registrations/:id/government-id — short-lived viewer URL for
+ * GET /admin/registrations/:id/government-id - short-lived viewer URL for
  * the applicant's ID document (super_admin, admin). The bucket is private;
  * this endpoint mints the signed URL server-side and audits every access
  * (PII). Rows captured before file upload return 404 with a clear message.
@@ -64,7 +64,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!storagePath) {
     const { error, status } = toErrorEnvelope(
       'NOT_FOUND',
-      'No file on record for this application — only metadata was captured.',
+      'No file on record for this application - only metadata was captured.',
       404,
     );
     res.status(status).json({ error });

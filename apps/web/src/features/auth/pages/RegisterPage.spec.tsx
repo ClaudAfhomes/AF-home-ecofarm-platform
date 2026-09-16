@@ -7,7 +7,7 @@ import { RegisterPage } from './RegisterPage';
 import { mockFetchRoutes, renderWithProviders } from '../../../test/utils';
 
 vi.mock('../hooks/useLocationVerification', () => {
-  // Stable reference across renders — mirrors the real hook (React Query keeps
+  // Stable reference across renders - mirrors the real hook (React Query keeps
   // `data` referentially stable), so sync effects in the form settle instead
   // of re-firing on every render.
   const stable = {
@@ -117,7 +117,7 @@ describe('RegisterPage', () => {
     expect(screen.getByText('Domestic')).toBeInTheDocument();
     expect(screen.getByRole('textbox', { name: 'Country' })).toBeInTheDocument();
     expect(screen.getByText('Philippines')).toBeInTheDocument();
-    // Cannot be manually changed — no selectOptions for Program/Country
+    // Cannot be manually changed - no selectOptions for Program/Country
     expect(screen.queryByRole('combobox', { name: 'Program' })).not.toBeInTheDocument();
     expect(screen.queryByRole('combobox', { name: 'Country' })).not.toBeInTheDocument();
     expect(screen.queryByText('Based on your detected location')).not.toBeInTheDocument();
@@ -158,10 +158,10 @@ describe('RegisterPage', () => {
     );
 
     expect(await screen.findByRole('heading', { name: 'Join JA&D' })).toBeInTheDocument();
-    // Read-only field shows the unavailable state, never the internal id —
+    // Read-only field shows the unavailable state, never the internal id -
     // even though location verification resolved programId prg-domestic.
     expect(
-      await screen.findByText('Program list unavailable — please try again shortly.'),
+      await screen.findByText('Program list unavailable - please try again shortly.'),
     ).toBeInTheDocument();
     expect(screen.queryByText('prg-domestic')).not.toBeInTheDocument();
 
@@ -191,7 +191,7 @@ describe('RegisterPage', () => {
 
     const continueButton = await screen.findByRole('button', { name: 'Continue' });
 
-    // Step 0 — program & profile — Program/Country are read-only from mocked location verification
+    // Step 0 - program & profile - Program/Country are read-only from mocked location verification
     expect(await screen.findByText('Domestic')).toBeInTheDocument();
     expect(await screen.findByText('Philippines')).toBeInTheDocument();
     expect(screen.queryByRole('combobox', { name: 'Program' })).not.toBeInTheDocument();
@@ -209,26 +209,26 @@ describe('RegisterPage', () => {
     await waitFor(() => expect(continueButton).toBeEnabled());
     await user.click(continueButton);
 
-    // Step 1 — qualification questions (loaded once a program is chosen).
+    // Step 1 - qualification questions (loaded once a program is chosen).
     expect(await screen.findByText(/Are you at least 18 years old/)).toBeInTheDocument();
     await user.selectOptions(screen.getByLabelText(/Are you at least 18 years old/), 'Yes');
     await user.click(screen.getByRole('button', { name: 'Continue' }));
 
-    // Step 2 — optional referral code (left blank).
+    // Step 2 - optional referral code (left blank).
     expect(await screen.findByRole('heading', { name: 'Referral code' })).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Continue' }));
 
-    // Step 3 — government ID (metadata only).
+    // Step 3 - government ID (metadata only).
     expect(await screen.findByRole('heading', { name: 'Government ID' })).toBeInTheDocument();
     const idFile = new File(['id-copy'], 'id-copy.pdf', { type: 'application/pdf' });
     fireEvent.change(screen.getByLabelText('Government ID copy'), {
       target: { files: [idFile] },
     });
-    // File bytes load async via FileReader — wait before continuing.
+    // File bytes load async via FileReader - wait before continuing.
     expect(await screen.findByText('id-copy.pdf')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'Continue' }));
 
-    // Step 4 — account.
+    // Step 4 - account.
     expect(await screen.findByText('Create your account')).toBeInTheDocument();
     await user.type(screen.getByLabelText('Email address'), 'ana.nueva@example.com');
     await user.type(screen.getByLabelText('Password'), 'password123');
@@ -236,7 +236,7 @@ describe('RegisterPage', () => {
     await user.click(screen.getByLabelText(/I agree to the JA/));
     await user.click(screen.getByRole('button', { name: 'Continue' }));
 
-    // Step 5 — review.
+    // Step 5 - review.
     expect(
       await screen.findByRole('heading', { name: 'Review your application' }),
     ).toBeInTheDocument();

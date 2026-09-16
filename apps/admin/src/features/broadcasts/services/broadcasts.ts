@@ -7,12 +7,12 @@ export type CreateBroadcastInput = {
   body?: string;
 };
 
-/** GET /admin/broadcasts — every broadcast announcement, newest first (SCR-ADM-016). */
+/** GET /admin/broadcasts - every broadcast announcement, newest first (SCR-ADM-016). */
 export function getAdminBroadcasts(): Promise<Notification[]> {
   return requestList('/admin/broadcasts', notificationSchema);
 }
 
-/** POST /broadcasts — announce to all members (FEAT-063, FR-ADM-005). */
+/** POST /broadcasts - announce to all members (FEAT-063, FR-ADM-005). */
 export function createBroadcast(input: CreateBroadcastInput): Promise<Notification> {
   const body: CreateBroadcastRequest = {
     title: input.title,

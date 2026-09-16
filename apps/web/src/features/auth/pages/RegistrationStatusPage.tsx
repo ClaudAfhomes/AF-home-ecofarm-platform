@@ -9,7 +9,7 @@ import styles from './RegistrationStatusPage.module.css';
 
 /**
  * Application status (SCR-AUTH-004). Reached after email verification:
- * the application is `Pending` — email verified, awaiting JA&D review.
+ * the application is `Pending` - email verified, awaiting JA&D review.
  * Nothing here invents approvals or timeframes (BR-AUTH-002 statuses only).
  */
 export function RegistrationStatusPage() {

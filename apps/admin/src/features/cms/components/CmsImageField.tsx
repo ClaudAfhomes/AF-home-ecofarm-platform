@@ -78,7 +78,7 @@ export function CmsImageField({
       try {
         URL.revokeObjectURL(lastObjectUrlRef.current);
       } catch {
-        /* ignore revoke failure — URL may already be revoked */
+        /* ignore revoke failure - URL may already be revoked */
       }
       lastObjectUrlRef.current = null;
     }
@@ -130,7 +130,7 @@ export function CmsImageField({
           const sess = await supabase?.auth.getSession();
           token = sess?.data?.session?.access_token ?? undefined;
         } catch {
-          /* ignore auth session fetch failure — proceed without token */
+          /* ignore auth session fetch failure - proceed without token */
         }
         // Request signed upload URL from Vercel (verified admin via service_role, no file data)
         const signRes = await fetch('/api/v1/cms/upload/sign', {
@@ -142,7 +142,7 @@ export function CmsImageField({
           body: JSON.stringify({ name: file.name, type: file.type, size: file.size }),
         });
         if (!signRes.ok) {
-          let msg = 'Upload failed — please try again.';
+          let msg = 'Upload failed - please try again.';
           try {
             const errJson = (await signRes.json()) as {
               error?: { code?: string; message?: string };
@@ -153,7 +153,7 @@ export function CmsImageField({
             else if (code === 'FORBIDDEN') msg = 'You do not have permission to upload images.';
             else if (code === 'VALIDATION_ERROR' && serverMsg) msg = serverMsg;
             else if (signRes.status >= 500)
-              msg = 'Upload failed due to a server issue — please try again.';
+              msg = 'Upload failed due to a server issue - please try again.';
           } catch {
             if (signRes.status === 401) msg = 'Please sign in again to upload images.';
             else if (signRes.status === 403) msg = 'You do not have permission to upload images.';
@@ -169,7 +169,7 @@ export function CmsImageField({
           const signedUrl = signJson.signedUrl;
           const publicUrl = signJson.publicUrl;
           if (!signedUrl || !publicUrl) {
-            uploadError = 'Upload failed — please try again.';
+            uploadError = 'Upload failed - please try again.';
           } else {
             // Direct PUT to Supabase Storage (bypasses Vercel, supports 20 MB)
             const putRes = await fetch(signedUrl, {
@@ -178,7 +178,7 @@ export function CmsImageField({
               body: file,
             });
             if (!putRes.ok) {
-              let msg = 'Upload failed — please try again.';
+              let msg = 'Upload failed - please try again.';
               try {
                 const txt = await putRes.text();
                 if (putRes.status === 413) msg = 'Image must be 20 MB or less.';
@@ -198,7 +198,7 @@ export function CmsImageField({
           }
         }
       } catch {
-        uploadError = 'Upload failed — please check your connection and try again.';
+        uploadError = 'Upload failed - please check your connection and try again.';
       }
       if (uploadError) {
         setFileError(uploadError);
@@ -249,11 +249,11 @@ export function CmsImageField({
     if (lastObjectUrlRef.current && value.id === lastObjectUrlRef.current) {
       revokeLastObjectUrl();
     } else if (isBlobId(value.id)) {
-      // Fallback: value is blob but not tracked (e.g., restored from storage after refresh — already revoked)
+      // Fallback: value is blob but not tracked (e.g., restored from storage after refresh - already revoked)
       try {
         URL.revokeObjectURL(value.id);
       } catch {
-        /* ignore revoke failure — blob may already be revoked */
+        /* ignore revoke failure - blob may already be revoked */
       }
     }
     setFileError(null);

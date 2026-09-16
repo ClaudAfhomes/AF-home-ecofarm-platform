@@ -6,7 +6,7 @@ export function getPayouts(): Promise<PayoutAccount[]> {
 }
 
 /**
- * `PATCH /admin/payouts/:id` — verify (CONFIRMED) or reject (REJECTED +
+ * `PATCH /admin/payouts/:id` - verify (CONFIRMED) or reject (REJECTED +
  * reason) a payout account (Phase B6, finance+).
  */
 export function reviewPayoutAccount(

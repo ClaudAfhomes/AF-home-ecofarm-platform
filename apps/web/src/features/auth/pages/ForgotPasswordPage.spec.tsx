@@ -47,15 +47,17 @@ describe('ForgotPasswordPage (SCR-AUTH-006)', () => {
     expect(screen.getByText('Enter a valid email address.')).toBeInTheDocument();
   });
 
-  it('shows the dev-only simulated notice when Supabase is not configured', async () => {
+  it('shows an error when password recovery is unavailable', async () => {
     const user = userEvent.setup();
     renderForgot();
 
     await user.type(screen.getByLabelText('Email address'), 'a@b.com');
     await user.click(screen.getByRole('button', { name: 'Send reset link' }));
 
-    expect(await screen.findByText('Check your email')).toBeInTheDocument();
-    expect(screen.getByText('Simulated email (dev-only)')).toBeInTheDocument();
+    expect(
+      await screen.findByText('Password reset is unavailable right now. Please try again later.'),
+    ).toBeInTheDocument();
+    expect(screen.queryByText('Check your email')).not.toBeInTheDocument();
     expect(mocks.resetPasswordForEmail).not.toHaveBeenCalled();
   });
 
@@ -71,7 +73,6 @@ describe('ForgotPasswordPage (SCR-AUTH-006)', () => {
     expect(mocks.resetPasswordForEmail).toHaveBeenCalledWith('a@b.com', {
       redirectTo: expect.stringContaining('/auth/reset-password'),
     });
-    expect(screen.queryByText('Simulated email (dev-only)')).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Back to login' })).toHaveAttribute('href', '/login');
   });
 });

@@ -18,7 +18,8 @@ import {
   TableHead,
   TableHeaderCell,
   TableRow,
-  useToast,
+  notifyError,
+  notifySuccess,
 } from '@jad/ui';
 
 import { formatMoney } from '@jad/shared';
@@ -73,10 +74,9 @@ function TableSkeleton() {
   );
 }
 
-/** Sales queue — all sales across the state machine (SCR-ADM-009). */
+/** Sales queue - all sales across the state machine (SCR-ADM-009). */
 export function SalesPage() {
   const navigate = useNavigate();
-  const { toast } = useToast();
   const { data, isPending, isError, error, refetch } = useSales();
   const deleteMut = useDeleteSale();
   const [page, setPage] = useState(1);
@@ -99,13 +99,13 @@ export function SalesPage() {
     if (!deleteTarget) return;
     try {
       await deleteMut.mutateAsync(deleteTarget.id);
-      toast({ title: 'Sale deleted', message: `${deleteTarget.name} removed`, tone: 'success' });
+      notifySuccess({ title: 'Sale deleted', message: `${deleteTarget.name} removed` });
       // Adjust page if we deleted the last item on the page
       const remaining = total - 1;
       const newPageCount = Math.max(1, Math.ceil(remaining / PAGE_SIZE));
       if (page > newPageCount) setPage(newPageCount);
     } catch (e) {
-      toast({ title: 'Delete failed', message: (e as Error).message, tone: 'danger' });
+      notifyError({ title: 'Delete failed', message: (e as Error).message });
     } finally {
       setDeleteTarget(null);
     }

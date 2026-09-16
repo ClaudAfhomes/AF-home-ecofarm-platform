@@ -50,7 +50,7 @@ function TableSkeleton() {
   );
 }
 
-/** Admin Broadcasts — announcement feed composer (SCR-ADM-016, FEAT-063, FR-ADM-005). */
+/** Admin Broadcasts - announcement feed composer (SCR-ADM-016, FEAT-063, FR-ADM-005). */
 export function BroadcastsPage() {
   const { data, isPending, isError, error, refetch } = useAdminBroadcasts();
   const [showCreate, setShowCreate] = useState(false);
@@ -140,7 +140,7 @@ export function BroadcastsPage() {
                   </TableCell>
                   <TableCell>
                     <span className={styles.messageCell} title={broadcast.body ?? undefined}>
-                      {broadcast.body ?? '—'}
+                      {broadcast.body ?? '-'}
                     </span>
                   </TableCell>
                   <TableCell>{formatDate(broadcast.createdAt)}</TableCell>

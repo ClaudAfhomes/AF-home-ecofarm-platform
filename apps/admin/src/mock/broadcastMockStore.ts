@@ -5,20 +5,20 @@ import type { Notification } from '@jad/contracts';
  * write through here so the mock list stays consistent across GET + create
  * within a dev/test session. Mirrors `GET /admin/broadcasts` +
  * `POST /broadcasts` (broadcast = Notification row, member audience).
- * Production reads/writes the real endpoints — this is a test double only.
+ * Production reads/writes the real endpoints - this is a test double only.
  */
 
 const SEED: Notification[] = [
   {
     id: 'ntf-broadcast-001',
     title: 'New properties in the catalog',
-    body: 'The Admin team has added new fixed-value units to the catalog — see the Properties page.',
+    body: 'The Admin team has added new fixed-value units to the catalog - see the Properties page.',
     createdAt: '2026-09-12T10:00:00.000Z',
   },
   {
     id: 'ntf-broadcast-002',
     title: 'Community announcement',
-    body: 'New marketing material and community update — find it in Marketing Tools.',
+    body: 'New marketing material and community update - find it in Marketing Tools.',
     createdAt: '2026-09-10T10:00:00.000Z',
   },
 ];

@@ -8,9 +8,9 @@ import { prefixedId } from '../../_lib/pipeline.js';
 import { methodNotAllowed, readJsonBody, requireService } from '../../_lib/rest.js';
 
 /**
- * GET /me/messages — own thread, cursor-paginated (newest first).
+ * GET /me/messages - own thread, cursor-paginated (newest first).
  * `?cursor=` last seen message id, `?limit=` clamped 1..100 (default 50).
- * POST /me/messages — send a message to the admin team (API-SPECIFICATION
+ * POST /me/messages - send a message to the admin team (API-SPECIFICATION
  * #90/#91, FEAT-072). The `message_after_insert` trigger maintains the
  * Conversation row atomically with the insert.
  */

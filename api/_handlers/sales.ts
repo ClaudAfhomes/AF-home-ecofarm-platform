@@ -201,7 +201,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     actorRole: 'user',
     targetType: 'Sale',
     targetId: sale.id,
-    targetName: `${sale.propertyName} — ${sale.customerName}`,
+    targetName: `${sale.propertyName} - ${sale.customerName}`,
     detail: `Submitted sale ${sale.id}`,
   });
   res.status(201).json(response);

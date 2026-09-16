@@ -8,14 +8,14 @@ import { useWallet } from '../hooks/useMember';
 import styles from './TotalEarnedPage.module.css';
 
 /**
- * Total Earned (SCR-MEM-019, FR-RPT-003) — final static content.
+ * Total Earned (SCR-MEM-019, FR-RPT-003) - final static content.
  *
  * Server-authoritative exact-decimal via `Wallet.totalEarned`
  * (`store.ts:1078 mem-001 → 240000.00`) rendered with `formatMoney` (`@jad/shared`,
  * `en-PH ₱`) in a `bg-surface-raised`/`border-strong` card (`tabular-nums`
  * `text-h2`). Ledger-defined, excludes pending (BR-RPT-003, BI-002). When the
  * dedicated `GET /me/reports/total-earned` (#76, OD-025) lands, swap
- * `useWallet` for `useTotalEarned` — no UI change needed.
+ * `useWallet` for `useTotalEarned` - no UI change needed.
  */
 export function TotalEarnedPage() {
   const walletQuery = useWallet();
@@ -24,7 +24,7 @@ export function TotalEarnedPage() {
     <section>
       <PageHeader
         title="Total Earned"
-        description="Your lifetime earnings — based on cleared commissions and referrals."
+        description="Your lifetime earnings - based on cleared commissions and referrals."
         actions={
           <div className={styles.headerActions}>
             <ButtonLink to="/member/commissions" variant="secondary">
@@ -72,7 +72,7 @@ export function TotalEarnedPage() {
         <div className={styles.figureCard} role="status" aria-label="Total earned">
           <Icon name="clock" size={24} className={styles.figureIcon} aria-hidden="true" />
           <p className={styles.figure} aria-hidden="true">
-            —
+            -
           </p>
           <p className={styles.figureLabel}>No earnings yet</p>
           <p className={styles.figureHint}>

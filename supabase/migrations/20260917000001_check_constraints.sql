@@ -1,4 +1,4 @@
--- Phase 2A — Vocabulary & money-format CHECK constraints (review F-05 / F-06).
+-- Phase 2A - Vocabulary & money-format CHECK constraints (review F-05 / F-06).
 --
 -- Statuses, entry types, directions, and content kinds were bare text enforced
 -- only at the Zod API edge. Money/rates were unconstrained text. These CHECKs
@@ -15,7 +15,7 @@
 --   union all select 'Voucher.status', count(*) from "Voucher" where status not in ('ACTIVE','FULLY_REDEEMED')
 --   union all select 'PayoutAccount.status', count(*) from "PayoutAccount" where status not in ('PENDING','ADMIN_REVIEW','CONFIRMED','REJECTED')
 --   union all select 'MemberPayoutAccount.status', count(*) from "MemberPayoutAccount" where status not in ('PENDING','ADMIN_REVIEW','CONFIRMED','REJECTED')
---   (legacy table; dropped by the 20260924 payout unification — skip if absent)
+--   (legacy table; dropped by the 20260924 payout unification - skip if absent)
 --   union all select 'Withdrawal.status', count(*) from "Withdrawal" where status not in ('REQUESTED','RESERVED','COMPLETED','REJECTED')
 --   union all select 'Commission.status', count(*) from "Commission" where status not in ('PENDING','AVAILABLE','CANCELLED','REVERSED')
 --   union all select 'ContentItem.kind', count(*) from "ContentItem" where kind not in ('DOCUMENT','IMAGE','VIDEO','PROMO')

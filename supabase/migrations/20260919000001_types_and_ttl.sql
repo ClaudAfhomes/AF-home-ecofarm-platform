@@ -1,4 +1,4 @@
--- Phase 2C/2D — Types, updated_at maintenance, idempotency TTL
+-- Phase 2C/2D - Types, updated_at maintenance, idempotency TTL
 -- (review F-19 / F-24 / F-16).
 --
 -- dateOfBirth was stored as free text and parsed in application code; it is
@@ -70,6 +70,6 @@ drop trigger if exists policy_set_updated_at on "Policy";
 create trigger policy_set_updated_at before update on "Policy"
   for each row execute function public.set_updated_at();
 
--- Idempotency TTL (SPEC §5.3 — 24h). NULL expiresAt = no expiry (legacy rows).
+-- Idempotency TTL (SPEC §5.3 - 24h). NULL expiresAt = no expiry (legacy rows).
 alter table "IdempotencyKey" add column if not exists "expiresAt" timestamp with time zone;
 create index if not exists "IdempotencyKey_expires_idx" on "IdempotencyKey"("expiresAt");

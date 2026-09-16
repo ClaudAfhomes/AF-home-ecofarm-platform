@@ -101,7 +101,7 @@ function toMergedRecords(
     recordKind: 'ADJUSTMENT' as const,
     id: r.id,
     action: r.entryType,
-    summary: `${r.memberName} — ${r.direction === 'CREDIT' ? '+' : '−'}${r.amount}`,
+    summary: `${r.memberName} - ${r.direction === 'CREDIT' ? '+' : '−'}${r.amount}`,
     detail: r.reason,
     by: r.createdBy,
     actorRole: ADJ_CREATEDBY_ROLE[r.createdBy] ?? 'ADMIN',
@@ -146,7 +146,7 @@ function TableSkeleton() {
   );
 }
 
-/** Audit Logs — combined read-only view of admin action history and ledger adjustments. */
+/** Audit Logs - combined read-only view of admin action history and ledger adjustments. */
 export function AuditPage() {
   const navigate = useNavigate();
   const {

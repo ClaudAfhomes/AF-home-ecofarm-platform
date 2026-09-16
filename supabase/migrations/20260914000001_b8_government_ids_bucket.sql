@@ -1,5 +1,5 @@
 -- Government ID storage (Phase B8+): private bucket for applicant ID
--- documents (PII — never the public marketing-tools bucket).
+-- documents (PII - never the public marketing-tools bucket).
 --
 -- Access model: reads go EXCLUSIVELY through short-lived signed URLs minted
 -- server-side (GET /admin/registrations/:id/government-id). Writes use the

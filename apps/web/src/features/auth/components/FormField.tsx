@@ -46,7 +46,7 @@ export interface FieldErrorProps {
   children: ReactNode;
 }
 
-/** Inline validation message — announced on appearance via `role="alert"`. */
+/** Inline validation message - announced on appearance via `role="alert"`. */
 export function FieldError({ id, children }: FieldErrorProps) {
   return (
     <p id={id} role="alert" className={styles.error}>

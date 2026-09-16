@@ -57,7 +57,7 @@ describe('MemberLayout', () => {
     const user = userEvent.setup();
     renderMember(<MemberLayout />, { route: '/member', user: MOCK_MEMBER });
 
-    // Open drawer via bottom nav More (mobile — hamburger is hidden, replaced by logo)
+    // Open drawer via bottom nav More (mobile - hamburger is hidden, replaced by logo)
     await user.click(screen.getByRole('button', { name: 'More' }));
     const dialog = await screen.findByRole('dialog', { name: 'Member navigation' });
     expect(dialog).toBeInTheDocument();
@@ -67,13 +67,13 @@ describe('MemberLayout', () => {
     expect(category).toHaveAttribute('aria-expanded', 'false');
     expect(within(dialog).queryByRole('link', { name: 'Sales' })).not.toBeInTheDocument();
 
-    // Expand — drawer stays open
+    // Expand - drawer stays open
     await user.click(category);
     expect(category).toHaveAttribute('aria-expanded', 'true');
     expect(within(dialog).getByRole('link', { name: 'Sales' })).toBeInTheDocument();
     expect(screen.getByRole('dialog', { name: 'Member navigation' })).toBeInTheDocument();
 
-    // Collapse — drawer stays open, other categories unaffected
+    // Collapse - drawer stays open, other categories unaffected
     await user.click(category);
     expect(category).toHaveAttribute('aria-expanded', 'false');
     expect(within(dialog).queryByRole('link', { name: 'Sales' })).not.toBeInTheDocument();
@@ -83,7 +83,7 @@ describe('MemberLayout', () => {
     );
     expect(screen.getByRole('dialog', { name: 'Member navigation' })).toBeInTheDocument();
 
-    // Expand again and select child link — navigates and closes drawer
+    // Expand again and select child link - navigates and closes drawer
     await user.click(category);
     expect(within(dialog).getByRole('link', { name: 'Sales' })).toBeInTheDocument();
     await user.click(within(dialog).getByRole('link', { name: 'Sales' }));

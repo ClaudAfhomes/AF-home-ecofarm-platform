@@ -44,7 +44,7 @@ function writeStoredUser(user: MockUser | null) {
  * status, `loginAs`/`logout`. In development the mock session is persisted to
  * `localStorage` (`STORAGE_KEY`) so a refresh on `/member` does not bounce to
  * `/login` (best-practice for dev stand-in; production uses HttpOnly cookies
- * and is tree-shaken). No credentials or tokens are written — only the mock
+ * and is tree-shaken). No credentials or tokens are written - only the mock
  * user id.
  *
  * F0 development stand-in; replaced by the real `/auth/me` session provider

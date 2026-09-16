@@ -32,7 +32,7 @@ export function formatBytes(bytes: number): string {
 
 /**
  * Build a specific message for a failed direct-to-Storage PUT. Supabase
- * answers with a JSON `{message}` (e.g. bucket MIME/size rejections) — pass
+ * answers with a JSON `{message}` (e.g. bucket MIME/size rejections) - pass
  * it through so a bucket misconfiguration is diagnosable instead of a dead
  * end; fall back to raw text, then the generic message.
  */
@@ -82,14 +82,14 @@ export async function uploadContentFile(
   kind: ContentKind,
 ): Promise<{ downloadUrl: string } | { error: string }> {
   const supabase = getSupabaseClient();
-  if (!supabase) return { error: 'Upload unavailable — please reload and try again.' };
+  if (!supabase) return { error: 'Upload unavailable - please reload and try again.' };
 
   let token: string | undefined;
   try {
     const sess = await supabase.auth.getSession();
     token = sess?.data?.session?.access_token ?? undefined;
   } catch {
-    /* proceed without token — sign endpoint handles missing auth */
+    /* proceed without token - sign endpoint handles missing auth */
   }
 
   let signRes: Response;

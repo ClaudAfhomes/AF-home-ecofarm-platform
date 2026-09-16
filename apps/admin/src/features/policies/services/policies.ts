@@ -13,20 +13,22 @@ const deleteResponseSchema = z.object({ id: z.string().min(1), deleted: z.boolea
 
 export type CreatePolicyInput = {
   title: string;
+  slug: string;
   type: string;
   content?: string;
   documentUrl: string;
 };
 
-/** GET /policies — full published list (public endpoint, admin shell reuse). */
+/** GET /policies - full published list (public endpoint, admin shell reuse). */
 export function getPolicies(): Promise<Policy[]> {
   return requestList('/policies', policySchema);
 }
 
-/** POST /policies — publish a policy with its required PDF (super_admin + admin). */
+/** POST /policies - publish a policy with its required PDF (super_admin + admin). */
 export function createPolicy(input: CreatePolicyInput): Promise<Policy> {
   const body: PolicyCreateRequest = {
     title: input.title,
+    slug: input.slug,
     type: input.type,
     ...(input.content !== undefined && { content: input.content }),
     documentUrl: input.documentUrl,
@@ -37,7 +39,7 @@ export function createPolicy(input: CreatePolicyInput): Promise<Policy> {
   });
 }
 
-/** PUT /policies/:id — update fields and/or swap the PDF. */
+/** PUT /policies/:id - update fields and/or swap the PDF. */
 export function updatePolicy(id: string, patch: PolicyUpdateRequest): Promise<Policy> {
   return request(`/policies/${id}`, policySchema, {
     method: 'PUT',
@@ -47,8 +49,8 @@ export function updatePolicy(id: string, patch: PolicyUpdateRequest): Promise<Po
 }
 
 /**
- * DELETE /policies/:id — permanently remove a policy. The stored PDF object
- * stays in `marketing-tools` (no orphan cleanup). Irreversible — callers
+ * DELETE /policies/:id - permanently remove a policy. The stored PDF object
+ * stays in `marketing-tools` (no orphan cleanup). Irreversible - callers
  * confirm first.
  */
 export function deletePolicy(id: string): Promise<{ id: string; deleted: boolean }> {

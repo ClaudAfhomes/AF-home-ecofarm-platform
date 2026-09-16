@@ -3,13 +3,13 @@
 -- Member submissions (pa-*) lived in MemberPayoutAccount while the admin
 -- queue (pac-*) lived in PayoutAccount, so member accounts never reached
 -- admin review and admin decisions never reached members. Both surfaces
--- already validate against the same payoutAccountSchema wire contract —
+-- already validate against the same payoutAccountSchema wire contract - 
 -- only storage was split.
 --
 -- This migration extends PayoutAccount with the member-owned columns,
 -- moves every pa-* row over (masking computed with the same rule as the
 -- API maskIdentifier helper), drops MemberPayoutAccount, and links
--- Withdrawal.payoutAccountId (closes F-12 — every legacy wdr-* reference
+-- Withdrawal.payoutAccountId (closes F-12 - every legacy wdr-* reference
 -- resolves in the unified table). Idempotent; no row is modified in place.
 -- Down: drop the FK, recreate MemberPayoutAccount, move pa-* rows back,
 -- drop the added columns.

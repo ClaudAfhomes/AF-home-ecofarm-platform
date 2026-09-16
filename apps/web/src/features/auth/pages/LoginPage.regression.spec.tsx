@@ -12,13 +12,13 @@ import { normalizeRole } from '@jad/contracts';
 // with mocked Supabase client, bypassing the MODE='test' guard). The important guarantee here is that mock auth still
 // works when Supabase is not configured, and that error handling does not silently swallow failures.
 
-describe('LoginPage regression – mock fallback preservation', () => {
+describe('LoginPage regression - mock fallback preservation', () => {
   afterEach(() => {
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
   });
 
-  it('Supabase NOT configured → mock authentication continues (existing behavior) – user', async () => {
+  it('Supabase NOT configured → mock authentication continues (existing behavior) - user', async () => {
     const SESSION_USER = {
       id: 'mem-001',
       name: 'Juan Dela Cruz',

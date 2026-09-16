@@ -4,11 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { getGlobalCmsPublic } from '@/lib/cms';
 import { CONTACT, LOGO, SITE } from '../features/public/content';
-import {
-  PRIVACY_POLICY_ID,
-  TERMS_POLICY_ID,
-  policyPath,
-} from '../features/public/content/policies';
+import { usePolicyLinks } from '../hooks/usePolicyLinks';
 import styles from './Footer.module.css';
 
 /**
@@ -30,6 +26,7 @@ export function Footer() {
   const logo = rawLogo as typeof LOGO;
   const logoSrc =
     (rawLogo as { src?: string; id?: string }).src ?? (rawLogo as { id?: string }).id ?? LOGO.src;
+  const policyLinks = usePolicyLinks();
   return (
     <footer className={styles.footer}>
       <div className={`container ${styles.inner}`}>
@@ -76,16 +73,20 @@ export function Footer() {
             © {new Date().getFullYear()} {siteName}. All rights reserved.
           </p>
           <ul className={styles.legalLinks} aria-label="Legal">
-            <li>
-              <Link className={styles.legalLink} to={policyPath(TERMS_POLICY_ID)}>
-                Terms
-              </Link>
-            </li>
-            <li>
-              <Link className={styles.legalLink} to={policyPath(PRIVACY_POLICY_ID)}>
-                Privacy Policy
-              </Link>
-            </li>
+            {policyLinks.terms ? (
+              <li>
+                <Link className={styles.legalLink} to={policyLinks.terms}>
+                  Terms
+                </Link>
+              </li>
+            ) : null}
+            {policyLinks.privacy ? (
+              <li>
+                <Link className={styles.legalLink} to={policyLinks.privacy}>
+                  Privacy Policy
+                </Link>
+              </li>
+            ) : null}
           </ul>
           <p className={styles.tagline}>{positioningLine}.</p>
         </div>

@@ -43,7 +43,7 @@ vi.mock('./supabase', async () => {
 
 /**
  * Layer the staff-session endpoint over real fetch: role slugs resolve
- * server-side (Phase 6 — the client never reads Role tables). Always wraps
+ * server-side (Phase 6 - the client never reads Role tables). Always wraps
  * the original fetch so stubs never chain across tests. The stub receives
  * the request init so tests can respond per-token (stale → 401).
  */
@@ -89,7 +89,7 @@ function sessionWithUser(id: string, email: string, accessToken = 'tok') {
   return { user: { id, email, user_metadata: {} }, access_token: accessToken };
 }
 
-describe('Admin SupabaseSessionProvider – server-side staff session (regression)', () => {
+describe('Admin SupabaseSessionProvider - server-side staff session (regression)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     seenTables.length = 0;
@@ -152,7 +152,7 @@ describe('Admin SupabaseSessionProvider – server-side staff session (regressio
   });
 
   it('slugs-only session falls back to the derived role id with no display name', async () => {
-    // beforeEach stub returns the slugs-only shape — the mock/legacy path.
+    // beforeEach stub returns the slugs-only shape - the mock/legacy path.
     mockGetSession.mockResolvedValue({
       data: { session: sessionWithUser('sup-001', 'superadmin@gmail.com') },
     });
@@ -249,7 +249,7 @@ describe('Admin SupabaseSessionProvider – server-side staff session (regressio
   });
 
   it('member lookup never touches the non-existent legacy members table (no PGRST205)', async () => {
-    // 0 rows on Member must resolve via maybeSingle — never fall back to the
+    // 0 rows on Member must resolve via maybeSingle - never fall back to the
     // phantom lowercase table whose PGRST205 leaks onto the login surface.
     mockGetSession.mockResolvedValue({
       data: { session: sessionWithUser('mem-001', 'juan@example.com') },
@@ -413,7 +413,7 @@ describe('Admin SupabaseSessionProvider – server-side staff session (regressio
     cb('TOKEN_REFRESHED', sessionWithUser('sup-001', 'superadmin@gmail.com', 'tok-stale'));
 
     await waitFor(() => expect(screen.getByTestId('sessionError')).toHaveTextContent('yes'));
-    // Preserved — never demoted to user while the failure is transient.
+    // Preserved - never demoted to user while the failure is transient.
     expect(screen.getByTestId('status')).toHaveTextContent('authenticated');
     expect(screen.getByTestId('role')).toHaveTextContent('admin');
     expect(screen.getByTestId('roleId')).toHaveTextContent('super_admin');
@@ -441,7 +441,7 @@ describe('Admin SupabaseSessionProvider – server-side staff session (regressio
     cb('TOKEN_REFRESHED', sessionWithUser('sup-001', 'superadmin@gmail.com', 'tok-stale'));
     await waitFor(() => expect(screen.getByTestId('sessionError')).toHaveTextContent('yes'));
 
-    // Backend healthy again — Retry (revalidate) clears the error in place.
+    // Backend healthy again - Retry (revalidate) clears the error in place.
     stubStaffSession();
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: 'Re-run session' }));

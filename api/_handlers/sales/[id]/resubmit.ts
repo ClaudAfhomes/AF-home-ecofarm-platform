@@ -7,7 +7,7 @@ import { applyResubmit, findCatalogPrice, mapSaleRow } from '../../../_lib/pipel
 import { methodNotAllowed, readJsonBody, requireService } from '../../../_lib/rest.js';
 import { toErrorEnvelope } from '../../../_lib/envelope.js';
 
-/** POST /sales/:id/resubmit — REJECTED-only, counts up, locks at max (BR-SAL-006). */
+/** POST /sales/:id/resubmit - REJECTED-only, counts up, locks at max (BR-SAL-006). */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
@@ -170,7 +170,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     actorRole: 'user',
     targetType: 'Sale',
     targetId: id,
-    targetName: `${property.name} — ${(customer as { name: string }).name}`,
+    targetName: `${property.name} - ${(customer as { name: string }).name}`,
     detail:
       outcome.status === 'LOCKED'
         ? 'Maximum resubmission attempts exceeded (BR-SAL-006)'

@@ -9,7 +9,7 @@ import type { MockUser } from './types';
  * ref. The member mock handlers read it to scope responses (NFR-AUTHZ-002).
  *
  * Mock-only plumbing: the real API reads the session cookie server-side. Never
- * used to store credentials or tokens — the session itself lives in context.
+ * used to store credentials or tokens - the session itself lives in context.
  */
 export const mockSessionRef: { current: MockUser | null } = { current: null };
 

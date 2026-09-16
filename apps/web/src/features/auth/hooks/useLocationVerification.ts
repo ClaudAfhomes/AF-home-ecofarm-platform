@@ -73,7 +73,7 @@ export function useLocationVerification(enabled = true): UseLocationVerification
       const err = e as GeolocationPositionError | Error;
       const code = (err as GeolocationPositionError).code;
       if (code === 1) {
-        // PERMISSION_DENIED — will fallback to IP via BE
+        // PERMISSION_DENIED - will fallback to IP via BE
         gpsStatus = 'permission-denied';
       } else if (code === 2) {
         gpsStatus = 'unavailable';
@@ -84,7 +84,7 @@ export function useLocationVerification(enabled = true): UseLocationVerification
       } else {
         gpsStatus = 'unavailable';
       }
-      // Do not return — proceed to IP fallback via BE
+      // Do not return - proceed to IP fallback via BE
     }
 
     // Reflect intermediate GPS status for UI if needed, but still verify via BE
@@ -109,7 +109,7 @@ export function useLocationVerification(enabled = true): UseLocationVerification
         return;
       }
 
-      // Handle accuracy/spoof failure — BE may return 422 with specific code, but if res indicates it, treat as accuracy-fail
+      // Handle accuracy/spoof failure - BE may return 422 with specific code, but if res indicates it, treat as accuracy-fail
       // For now, if BE returns success but missing programId/country, treat as failed
       if (!res.verifiedCountryCode || !res.programId) {
         setError('Location could not be verified.');
@@ -136,7 +136,7 @@ export function useLocationVerification(enabled = true): UseLocationVerification
         return;
       }
       // Backend not implemented (404) or network failure → verification failed
-      // Do not invent mapping — surface as failed with retry
+      // Do not invent mapping - surface as failed with retry
       setError(message);
       setStatus('failed');
     }

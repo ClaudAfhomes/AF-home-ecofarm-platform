@@ -5,7 +5,7 @@ import type { VercelRequest, VercelResponse } from '../_lib/http.js';
 import handler from './broadcasts.js';
 
 /**
- * POST /broadcasts — admin announcement to all members (FEAT-063). Broadcasts
+ * POST /broadcasts - admin announcement to all members (FEAT-063). Broadcasts
  * land as Notification rows with member_id NULL; per-member read state stays
  * in NotificationRead so the shared row is never marked read. Supabase is
  * fully mocked.

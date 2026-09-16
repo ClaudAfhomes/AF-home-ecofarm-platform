@@ -3,7 +3,6 @@ import { render, screen, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router';
 import { MOCK_SUPER_ADMIN } from '@jad/mock';
-import { ToastProvider } from '@jad/ui';
 
 import { SessionProvider } from '../lib/session';
 import { AdminLayout } from './AdminLayout';
@@ -18,18 +17,13 @@ describe('AdminLayout mustChangePassword', () => {
 
   function renderWithFlag(mustChangePassword: boolean) {
     return (
-      <ToastProvider>
-        <SessionProvider
-          initialUser={{ ...MOCK_SUPER_ADMIN, mustChangePassword }}
-          restoreDelayMs={0}
-        >
-          <QueryClientProvider client={client}>
-            <MemoryRouter initialEntries={['/admin']}>
-              <AdminLayout />
-            </MemoryRouter>
-          </QueryClientProvider>
-        </SessionProvider>
-      </ToastProvider>
+      <SessionProvider initialUser={{ ...MOCK_SUPER_ADMIN, mustChangePassword }} restoreDelayMs={0}>
+        <QueryClientProvider client={client}>
+          <MemoryRouter initialEntries={['/admin']}>
+            <AdminLayout />
+          </MemoryRouter>
+        </QueryClientProvider>
+      </SessionProvider>
     );
   }
 
@@ -62,7 +56,7 @@ describe('AdminLayout mustChangePassword', () => {
     await screen.findByAltText('JA&D');
     expect(screen.queryByRole('link', { name: 'Dashboard' })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Members' })).not.toBeInTheDocument();
-    // No spurious "unavailable" warning — the empty nav is intentional here.
+    // No spurious "unavailable" warning - the empty nav is intentional here.
     expect(screen.queryByText('Navigation unavailable')).not.toBeInTheDocument();
   });
 
@@ -85,15 +79,13 @@ describe('AdminLayout mustChangePassword', () => {
     // admin queries must wait for an authenticated session (otherwise they
     // 403 against verifyStaff before the flag is even known).
     render(
-      <ToastProvider>
-        <SessionProvider restoreDelayMs={1000}>
-          <QueryClientProvider client={client}>
-            <MemoryRouter initialEntries={['/admin']}>
-              <AdminLayout />
-            </MemoryRouter>
-          </QueryClientProvider>
-        </SessionProvider>
-      </ToastProvider>,
+      <SessionProvider restoreDelayMs={1000}>
+        <QueryClientProvider client={client}>
+          <MemoryRouter initialEntries={['/admin']}>
+            <AdminLayout />
+          </MemoryRouter>
+        </QueryClientProvider>
+      </SessionProvider>,
     );
     await screen.findByAltText('JA&D');
     await new Promise((r) => setTimeout(r, 100));

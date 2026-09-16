@@ -6,7 +6,6 @@ import styles from './MobileNavigation.module.css';
 
 export interface MobileNavigationProps {
   items: NavItem[];
-  /** Member auth actions (Login/Register) — rendered after the page links. */
   authItems?: NavItem[];
   open: boolean;
   onToggle: () => void;
@@ -17,13 +16,10 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   isActive ? `${styles.link} ${styles.active}` : styles.link;
 
 /**
- * Responsive primary navigation (UI-UX §4.6 / §11.3).
- *
- * A single `nav#primary-nav` is shared across breakpoints: collapsed below
- * 640px and driven by the `.navOpen` CSS-module class, always visible above
- * 640px regardless of toggle state. The toggle button exposes `aria-expanded`
- * and `aria-controls` for assistive tech. The `.navOpen` class is the contract
- * the regression tests assert (jsdom cannot compute stylesheet layout).
+ * Public primary navigation. One `<nav id="primary-nav">` serves every
+ * viewport: inline on desktop (≥1024px), and a fixed, scrollable slide-down
+ * panel below that (with a backdrop, Escape/outside-click close, body scroll
+ * lock in `Header`). Labels never force horizontal page overflow.
  */
 export function MobileNavigation({
   items,
@@ -42,8 +38,14 @@ export function MobileNavigation({
         aria-label={open ? 'Close navigation' : 'Open navigation'}
         onClick={onToggle}
       >
-        <span className={styles.toggleIcon} aria-hidden="true" />
+        <span
+          className={`${styles.toggleIcon} ${open ? styles.toggleIconOpen : ''}`}
+          aria-hidden="true"
+        />
       </button>
+
+      {open ? <div className={styles.backdrop} aria-hidden="true" onClick={onToggle} /> : null}
+
       <nav
         id="primary-nav"
         aria-label="Primary"
@@ -51,7 +53,7 @@ export function MobileNavigation({
       >
         <ul className={styles.list}>
           {items.map((item) => (
-            <li key={item.to}>
+            <li key={item.to} className={styles.item}>
               <PublicNavLink
                 to={item.to}
                 className={navLinkClass}

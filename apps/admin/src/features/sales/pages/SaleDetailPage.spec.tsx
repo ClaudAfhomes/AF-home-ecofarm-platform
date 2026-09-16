@@ -125,7 +125,7 @@ describe('SaleDetailPage transitions', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Approve' }));
 
     await screen.findByText('Cannot transition sale.');
-    // Still on the submitted step — nothing advanced locally.
+    // Still on the submitted step - nothing advanced locally.
     expect(screen.getByRole('button', { name: 'Approve sale' })).toBeInTheDocument();
   });
 

@@ -1,5 +1,5 @@
 /**
- * Supabase client — Phase 3: Storage (marketing-tools) + Realtime (admin).
+ * Supabase client - Phase 3: Storage (marketing-tools) + Realtime (admin).
  * Mirrors `apps/web/src/lib/supabase.ts`. Uses ESM `createClient` with cross-port
  * cookie storage in DEV so `5173` login session is visible on `5174/admin`.
  */
@@ -58,7 +58,7 @@ let refreshInflight: Promise<boolean> | null = null;
 
 /**
  * Attempt one token rotation after a 401 (expired access token, or a
- * cross-port refresh race between :5173 and :5174 sharing one cookie —
+ * cross-port refresh race between :5173 and :5174 sharing one cookie -
  * navigator.locks don't span origins, so rotations can collide). Memoized so
  * concurrent 401s share a single rotation instead of stampeding. Returns
  * true when a usable session exists afterwards.
@@ -91,7 +91,7 @@ export async function clearSession(): Promise<void> {
   try {
     await getSupabaseClient()?.auth.signOut();
   } catch {
-    // Session already dead — nothing left to clear.
+    // Session already dead - nothing left to clear.
   }
 }
 

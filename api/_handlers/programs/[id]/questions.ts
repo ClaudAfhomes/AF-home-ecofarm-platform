@@ -4,7 +4,7 @@ import { toErrorEnvelope } from '../../../_lib/envelope.js';
 import type { VercelRequest, VercelResponse } from '../../../_lib/http.js';
 import { methodNotAllowed, okList, requireService } from '../../../_lib/rest.js';
 
-/** GET /programs/:id/qualification-questions — public (API-SPECIFICATION #86). */
+/** GET /programs/:id/qualification-questions - public (API-SPECIFICATION #86). */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');

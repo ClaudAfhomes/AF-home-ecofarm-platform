@@ -1,4 +1,4 @@
-# JAD — Technical Architecture SSOT (ARCHITECTURE.md)
+# JAD - Technical Architecture SSOT (ARCHITECTURE.md)
 
 > **Authority:** This document is part of the **Technical Architecture SSOT** for the JA&D (JAD) system. It defines the target system architecture derived from the approved planning documents.
 >
@@ -6,7 +6,7 @@
 >
 > **Status vocabulary:** **CONFIRMED** = established by approved project documentation/session decisions. **PROPOSED** = recommended decision not yet formally approved. **ASSUMPTION** = necessary working assumption. **REQUIRES APPROVAL** = decision that materially affects architecture, security, cost, production, or long-term maintainability.
 >
-> **Version:** Project 03 — Architecture & System Design (Baseline v1.0)
+> **Version:** Project 03 - Architecture & System Design (Baseline v1.0)
 >
 > **Current verified state:** The repository contains **React SPAs (`apps/web`, `apps/admin`), shared packages (`packages/contracts`, `config`, `shared`, `ui`, `mock`), and a Supabase Postgres foundation (`supabase/migrations`). No dedicated backend exists yet; the target backend is **Vercel Functions / REST API + Supabase (Q1 2026-08-30)**. All implementation elements below are the **proposed target** for phases P1..P12 of ROADMAP.md.
 
@@ -37,12 +37,12 @@ Critical business properties that shape the architecture:
 
 ### 2.1 Recommendation: Modular Serverless via Vercel Functions (modular within functions)
 
-**CONFIRMED direction: TypeScript full-stack** (approved session decision). **CONFIRMED: Modular via Vercel Functions (ARCH-DEC-001 as updated Q1)** — the backend is a set of serverless `Vercel Functions / REST API` handlers (`api/**/*.ts`) sharing Supabase Postgres, plus shared services. Business logic remains server-side and modular (FG-aligned), but there is **no NestJS modular monolith process**. One Supabase `public` schema still provides the single ACID boundary; functions are stateless and share `packages/contracts` validation.
+**CONFIRMED direction: TypeScript full-stack** (approved session decision). **CONFIRMED: Modular via Vercel Functions (ARCH-DEC-001 as updated Q1)** - the backend is a set of serverless `Vercel Functions / REST API` handlers (`api/**/*.ts`) sharing Supabase Postgres, plus shared services. Business logic remains server-side and modular (FG-aligned), but there is **no NestJS modular monolith process**. One Supabase `public` schema still provides the single ACID boundary; functions are stateless and share `packages/contracts` validation.
 
 **Why this fits the requirements:**
 - **Single ACID boundary still via Supabase Postgres.** Financial correctness (BI-001, BI-002, BI-005, BI-007) is enforced in Postgres (RLS, constraints, transactions) even though compute is serverless.
 - **No requirement supports microservices or a NestJS monolith for v1.** ROADMAP §2 prefers the simplest architecture; Q1 chooses `Vercel Functions + Supabase` over NestJS to minimize ops for v1 while keeping the design modular enough for a dedicated backend later.
-- **Module boundaries still protect the domain.** Commission, eWallet, Voucher etc. remain logical modules (now `api/<domain>/` handlers + `lib/` services) communicating through shared services and `packages/contracts` — not each other's internals.
+- **Module boundaries still protect the domain.** Commission, eWallet, Voucher etc. remain logical modules (now `api/<domain>/` handlers + `lib/` services) communicating through shared services and `packages/contracts` - not each other's internals.
 - **Configurable business rules** (BR-CFG-001) live in `cms_contents` / `config` via Supabase, so Super Admin changes never require redeployment.
 
 **Explicitly excluded for v1:** NestJS/Express monolith, microservices, event-sourced ledger (ledger is append-only, not event-sourced), in-app payment processing (BR-BND-003).
@@ -59,7 +59,7 @@ Handler (validation + authZ + mapping)
    → Domain (business rules, invariants, calculations) → Persistence (Supabase client, RLS)
 ```
 
-- Handler validates input (Zod from `packages/contracts`) and maps HTTP semantics only — **no business logic**.
+- Handler validates input (Zod from `packages/contracts`) and maps HTTP semantics only - **no business logic**.
 - Service owns use cases, transaction boundaries, and cross-domain orchestration.
 - Domain owns business rules and calculations.
 - Persistence owns Supabase access; only service-called helpers touch the DB.
@@ -78,7 +78,7 @@ Handler (validation + authZ + mapping)
 | eWallet | Ledger, available balance, adjustments | External fund custody |
 | Payouts/withdrawals | Records, reservations, requests | Executing transfers (external platforms) |
 | Vouchers | Issuance (via signing service), online redemption, history | Payment/refund infrastructure |
-| Marketing | Media, policies, broadcasts | — |
+| Marketing | Media, policies, broadcasts | - |
 | Programs | Domestic/Abroad separation | Exact rule differences (OD-001..005) |
 | Payments | Recording of payment/payout info | Payment gateways, card processors, wallet APIs, POS (BR-BND-003) |
 | Signing | Verification of vouchers; request to CTO signing service | Master key custody (CTO-controlled external) |
@@ -99,7 +99,7 @@ Handler (validation + authZ + mapping)
 
 | Component | Purpose | Roles | Phase |
 |---|---|---|---|
-| **API** (Vercel Functions / REST API) | All business logic, authN/authZ, ledger, workflow orchestration (server-side) | — | P1..P12 |
+| **API** (Vercel Functions / REST API) | All business logic, authN/authZ, ledger, workflow orchestration (server-side) | - | P1..P12 |
 | **Member Web App** | Registration, qualification, profile, referral/genealogy, sales, wallet, withdrawals, vouchers | Member, Active + Qualified Member | P2..P10 |
 | **Admin / Back-Office App** | Verification, approvals, catalog, exceptions, config, content, reporting | Admin, Finance, Super Admin | P2..P11 |
 | **Merchant Redemption Portal** | Online voucher redemption | Merchant | P8 |
@@ -154,7 +154,7 @@ Handler (validation + authZ + mapping)
 ## 6. Module Boundaries & Rules
 
 - Modules communicate only through **application-layer use cases / shared contracts** (`packages/contracts`). Direct cross-module repository access is prohibited.
-- **Financial modules** (`commission`, `ewallet`, `withdrawal`, `payout`, `voucher`) may only mutate the ledger through the ledger's own application services — single writer for balance invariants.
+- **Financial modules** (`commission`, `ewallet`, `withdrawal`, `payout`, `voucher`) may only mutate the ledger through the ledger's own application services - single writer for balance invariants.
 - **Immutability**: financial records (commissions, ledger entries) are append-only; corrections are new transactions (BR-LED-002).
 - **Snapshot rule**: sales store the property value at transaction time (BR-PRP-004, BI-006).
 - **Program rule**: Domestic/Abroad operate as separate programs with independent configuration (BR-PRG-001/002); gated specifics pending OD-001..005.
@@ -164,7 +164,7 @@ Handler (validation + authZ + mapping)
 
 ## 7. Data Flow
 
-### 7.1 End-to-end money flow (MVP core — ROADMAP P1..P7)
+### 7.1 End-to-end money flow (MVP core - ROADMAP P1..P7)
 
 ```text
 Register → qualify (Active + Qualified)
@@ -211,11 +211,11 @@ Abroad registration → device location (primary) → IP fallback
 
 ## 9. Authentication / Authorization Architecture
 
-- **Authentication (CONFIRMED FR-AUTH-004; mechanism Q1/Q3):** Supabase Auth (JWT, PKCE, verified server-side per Q3). Vercel handlers verify `Authorization` / Supabase session and resolve `MemberRole→Role` (`normalizeRole`) — `admin` → `/admin`, `user` → `/member`. Email verification is a hard gate before approval (BR-AUTH-001). No DB HttpOnly session for v1 (ARCH-DEC-007 superseded).
+- **Authentication (CONFIRMED FR-AUTH-004; mechanism Q1/Q3):** Supabase Auth (JWT, PKCE, verified server-side per Q3). Vercel handlers verify `Authorization` / Supabase session and resolve `MemberRole→Role` (`normalizeRole`) - `admin` → `/admin`, `user` → `/member`. Email verification is a hard gate before approval (BR-AUTH-001). No DB HttpOnly session for v1 (ARCH-DEC-007 superseded).
 - **Authorization (PROPOSED):**
   - **Role-based access control** via Vercel middleware + RLS enforcing BUSINESS-RULES.md §3.
   - **Object-level authorization (NFR-AUTHZ-002):** every resource access verifies the principal owns the resource (or holds a staff role). Prevents IDOR/BOLA; RLS `auth.uid()=id` as defense-in-depth.
-  - **Business eligibility separate from roles** (e.g., "Member" role ≠ eligibility to submit sales; requires Active + Qualified status — BR-SAL-001).
+  - **Business eligibility separate from roles** (e.g., "Member" role ≠ eligibility to submit sales; requires Active + Qualified status - BR-SAL-001).
 - **Audit (CONFIRMED NFR-SEC-002, NFR-AUD-001):** all staff decisions and financial events write to the immutable `audit` store.
 
 ---
@@ -223,11 +223,11 @@ Abroad registration → device location (primary) → IP fallback
 ## 10. Scalability Strategy
 
 - **Stateless API tier:** horizontal scaling of the API behind a load balancer; session store centralized (DB-backed) or token-based where acceptable.
-- **Single source of truth database (PostgreSQL):** all financial invariants enforced at the database layer (constraints, checks, transactions) — correctness over sharding.
+- **Single source of truth database (PostgreSQL):** all financial invariants enforced at the database layer (constraints, checks, transactions) - correctness over sharding.
 - **Write paths are hot:** commission creation, redemption, withdrawals → controlled by transaction isolation + row locks, not by scaling shards.
 - **Read scaling:** reporting/genealogy reads can be served from the same DB with tuned indexes; read replicas only if data grows (deferred, not speculative).
 - **Jobs:** clearing scheduler runs as a worker process; horizontally scalable with lease-based single-writer semantics.
-- **Targets:** NFR-PERF-001 / NFR-SCAL-001 / NFR-AVAIL-001 / NFR-REL-001 have **no approved numbers** — targets are TBD (REQUIRES APPROVAL).
+- **Targets:** NFR-PERF-001 / NFR-SCAL-001 / NFR-AVAIL-001 / NFR-REL-001 have **no approved numbers** - targets are TBD (REQUIRES APPROVAL).
 
 ---
 
@@ -251,7 +251,7 @@ Abroad registration → device location (primary) → IP fallback
 
 ---
 
-## 13. Deployment Architecture (PROPOSED — Q1 Vercel + Supabase)
+## 13. Deployment Architecture (PROPOSED - Q1 Vercel + Supabase)
 
 ```text
 [CDN/Edge] → [Member Web App] [Admin App] on Vercel
@@ -264,7 +264,7 @@ Abroad registration → device location (primary) → IP fallback
                                           [CTO Signing Service (separate control plane)]
 ```
 
-- **Frontend + Functions on Vercel; managed Postgres/Auth/Storage on Supabase** (Q1). No `apps/api` Docker monolith for v1. Env/config via Vercel env + Supabase Dashboard; `VITE_SUPABASE_URL`/`ANON_KEY` (`VITE_`) + server `DATABASE_URL`/`SERVICE_ROLE_KEY` never `VITE_`. **Deployment provider/region is Vercel + Supabase** — still REQUIRES APPROVAL for region.
+- **Frontend + Functions on Vercel; managed Postgres/Auth/Storage on Supabase** (Q1). No `apps/api` Docker monolith for v1. Env/config via Vercel env + Supabase Dashboard; `VITE_SUPABASE_URL`/`ANON_KEY` (`VITE_`) + server `DATABASE_URL`/`SERVICE_ROLE_KEY` never `VITE_`. **Deployment provider/region is Vercel + Supabase** - still REQUIRES APPROVAL for region.
 - The **CTO Signing Service** is deployed in a separate control plane with no network path from application servers to the master key (BI-008).
 - Modular for future dedicated backend: Vercel handlers are `api/<domain>/[id].ts` + shared `lib/` services.
 
@@ -274,11 +274,11 @@ Abroad registration → device location (primary) → IP fallback
 
 Derived strictly from the approved SSOT:
 
-1. **Single-level referral only** — no multi-level commission anywhere (BR-REF-002, BI-004).
-2. **Immutable financial records** — no edit/delete; corrections are new transactions (BR-LED-001/002, BI-005).
+1. **Single-level referral only** - no multi-level commission anywhere (BR-REF-002, BI-004).
+2. **Immutable financial records** - no edit/delete; corrections are new transactions (BR-LED-001/002, BI-005).
 3. **Available Balance never negative** (BR-WAL-002, BI-001).
 4. **Pending commissions never available/withdrawable** (BR-COM-006, BI-002).
-5. **No money movement inside JAD** — payment execution is external (BR-BND-001..003).
+5. **No money movement inside JAD** - payment execution is external (BR-BND-001..003).
 6. **No payment gateway / card / wallet-API / POS** (BR-BND-003; ROADMAP §3.2).
 7. **Master signing key never in app infrastructure** (BR-SEC-002, BI-008).
 8. **Property values from Admin catalog, snapshotted** (BR-PRP-003/004, BI-006).
@@ -290,14 +290,14 @@ Derived strictly from the approved SSOT:
 
 ## 15. Architectural Principles
 
-1. **Correctness over distribution** — single transactional boundary; avoid premature microservices.
-2. **Immutability-first for financial data** — append-only ledger; reversal via new transactions.
-3. **Single writer for balance** — ledger services are the only path that mutates balances.
-4. **Security-by-design** — server-side authorization on every request; least privilege; secrets out of code.
-5. **Trust boundaries explicit** — especially the CTO signing boundary (never weakened).
-6. **Simplest architecture that satisfies approved requirements** — no speculative infrastructure.
+1. **Correctness over distribution** - single transactional boundary; avoid premature microservices.
+2. **Immutability-first for financial data** - append-only ledger; reversal via new transactions.
+3. **Single writer for balance** - ledger services are the only path that mutates balances.
+4. **Security-by-design** - server-side authorization on every request; least privilege; secrets out of code.
+5. **Trust boundaries explicit** - especially the CTO signing boundary (never weakened).
+6. **Simplest architecture that satisfies approved requirements** - no speculative infrastructure.
 7. **Module boundaries mirror feature groups** (FG-*) for traceability and incremental delivery.
-8. **Domain free of framework dependencies** — testability and durability of business rules.
+8. **Domain free of framework dependencies** - testability and durability of business rules.
 
 ---
 
@@ -307,13 +307,13 @@ Derived strictly from the approved SSOT:
 |---|---|---|---|---|---|---|
 | ARCH-DEC-001 | Backend decomposition | Modular Monolith / Microservices / Serverless | **Modular via Vercel Functions (Q1)** supersedes monolith; modular for future dedicated backend | Avoids NestJS monolith for v1, keeps single Postgres ACID boundary | Functions per domain, shared services | **CONFIRMED (Q1)** |
 | ARCH-DEC-002 | API framework | Vercel Functions / Express / Fastify / minimal Node | **Vercel Functions (Q1 2026-08-30)** supersedes NestJS; see ADR-002b | Serverless handlers + Supabase, minimal ops for v1 | Framework lock-in via Vercel | **CONFIRMED (Q1)** |
-| ARCH-DEC-003 | Database | PostgreSQL / MySQL / SQL Server / Mongo | **PostgreSQL** | Relational ACID needed for ledger; Mongo lacks join/constraint rigor for finances | — | **CONFIRMED** |
-| ARCH-DEC-004 | ORM / data access | Prisma / Drizzle / TypeORM / raw SQL | **Supabase JS + RLS + raw SQL for ledger writes (Drizzle optional for future)** | Supabase client for CMS reads/writes; row locks via SQL when needed | — | **CONFIRMED (Q1)** |
+| ARCH-DEC-003 | Database | PostgreSQL / MySQL / SQL Server / Mongo | **PostgreSQL** | Relational ACID needed for ledger; Mongo lacks join/constraint rigor for finances | - | **CONFIRMED** |
+| ARCH-DEC-004 | ORM / data access | Prisma / Drizzle / TypeORM / raw SQL | **Supabase JS + RLS + raw SQL for ledger writes (Drizzle optional for future)** | Supabase client for CMS reads/writes; row locks via SQL when needed | - | **CONFIRMED (Q1)** |
 | ARCH-DEC-005 | Member client delivery | Responsive web (browser geolocation) / native mobile / PWA | **Responsive web app first**; native revisited post-MVP | Native gives best GPS; web is cheaper and matches TypeScript-only constraint | Abroad GPS accuracy dependent on OD-014 | **CONFIRMED** (native mobile = ARCH-DEC-006) |
 | ARCH-DEC-006 | CTO signing service mechanism | Cloud KMS / HSM / air-gapped signer | **Cloud KMS or HSM-based dedicated service** | Must guarantee BI-008; mechanism must be CTO-chosen | Hard security boundary | **REQUIRES APPROVAL (CTO)** |
 | ARCH-DEC-007 | Authentication mechanism | Session cookies / JWT / hybrid | **Supabase Auth JWT verified server-side (Q1/Q3)** supersedes HttpOnly | JWT via PKCE cookie 5173↔5174; service verifies `MemberRole` | RLS `auth.uid()=id` | **CONFIRMED (Q1/Q3)** |
-| ARCH-DEC-008 | Deployment/infrastructure | Provider, region, container orchestration, DB hosting | **Vercel (Functions + web/admin) + Supabase (Postgres/Auth/Storage)** per Q1 | Provider Vercel+Supabase | — | **REQUIRES APPROVAL** |
-| ARCH-DEC-009 | NFR numerical targets | — | **TBD** | No approved targets (NFR-AVAIL/PERF/SCAL/REL) | — | **REQUIRES APPROVAL** |
+| ARCH-DEC-008 | Deployment/infrastructure | Provider, region, container orchestration, DB hosting | **Vercel (Functions + web/admin) + Supabase (Postgres/Auth/Storage)** per Q1 | Provider Vercel+Supabase | - | **REQUIRES APPROVAL** |
+| ARCH-DEC-009 | NFR numerical targets | - | **TBD** | No approved targets (NFR-AVAIL/PERF/SCAL/REL) | - | **REQUIRES APPROVAL** |
 
 ---
 
@@ -321,7 +321,7 @@ Derived strictly from the approved SSOT:
 
 | Planning doc | Mapping to architecture |
 |---|---|
-| REQUIREMENTS.md (FR/NFR) | §4 modules; §7 data flows; §9 authZ; §10–12 NFR handling |
+| REQUIREMENTS.md (FR/NFR) | §4 modules; §7 data flows; §9 authZ; §10-12 NFR handling |
 | BUSINESS-RULES.md (BR/BI) | §2.1; §6 boundaries; §14 constraints; §15 principles |
 | FEATURES.md (FEAT-*) | §4.2 modules mirror feature groups (FG-*) |
 | ROADMAP.md (P1..P12) | §4.1 component phases; §13 deployment; §16 decisions gate phases |

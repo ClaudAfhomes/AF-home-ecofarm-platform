@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router';
 
 import type { PayoutAccountStatus } from '@jad/contracts';
@@ -10,6 +10,7 @@ import {
   Dialog,
   EmptyState,
   ErrorState,
+  notifySuccess,
   PageHeader,
   Skeleton,
   StatusChip,
@@ -45,6 +46,7 @@ export function PayoutAccountsPage() {
     mutationFn: setPrimaryPayoutAccount,
     onSuccess: () => {
       setMutationError(undefined);
+      notifySuccess({ title: 'Primary payout account updated' });
       void queryClient.invalidateQueries({ queryKey: ['member', 'payout-accounts'] });
     },
   });
@@ -59,13 +61,18 @@ export function PayoutAccountsPage() {
   };
 
   const location = useLocation();
-  const [showAdded] = useState(
-    () => !!(location.state as { justAdded?: boolean } | null)?.justAdded,
-  );
+  const addedNotified = useRef(false);
 
   useEffect(() => {
     const state = location.state as { justAdded?: boolean } | null;
     if (state?.justAdded) {
+      if (!addedNotified.current) {
+        addedNotified.current = true;
+        notifySuccess({
+          title: 'Payout account added',
+          message: 'Your payout account is pending verification - typically 24-48h.',
+        });
+      }
       window.history.replaceState({}, '', location.pathname);
     }
   }, [location.state, location.pathname]);
@@ -80,6 +87,7 @@ export function PayoutAccountsPage() {
     onSuccess: () => {
       setMutationError(undefined);
       setDeleteTargetId(null);
+      notifySuccess({ title: 'Payout account removed' });
       void queryClient.invalidateQueries({ queryKey: ['member', 'payout-accounts'] });
     },
   });
@@ -135,18 +143,11 @@ export function PayoutAccountsPage() {
         </Alert>
       ) : null}
 
-      {showAdded ? (
-        <Alert variant="success" title="Payout account added">
-          Your payout account is pending verification — typically 24–48h. List shows status per
-          account.
-        </Alert>
-      ) : null}
-
       {pendingCount + reviewCount > 0 ? (
         <div className={styles.verificationAlert}>
           <Alert variant="info" title="Verification pending">
             {pendingCount + reviewCount} payout account{pendingCount + reviewCount === 1 ? '' : 's'}{' '}
-            pending verification — typically 24–48h. Verified accounts are required for withdrawals.
+            pending verification - typically 24-48h. Verified accounts are required for withdrawals.
           </Alert>
         </div>
       ) : null}

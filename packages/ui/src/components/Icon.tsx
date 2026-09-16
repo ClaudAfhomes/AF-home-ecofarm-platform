@@ -228,7 +228,7 @@ export interface IconProps extends SVGProps<SVGSVGElement> {
   size?: number;
 }
 
-/** Presentational inline SVG icon (decorative — `aria-hidden`, no alt). */
+/** Presentational inline SVG icon (decorative - `aria-hidden`, no alt). */
 export function Icon({ name, size = 20, ...rest }: IconProps) {
   return (
     <svg

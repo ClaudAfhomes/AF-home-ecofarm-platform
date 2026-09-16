@@ -1,4 +1,4 @@
-# F2-A Delivery Report — Member Financial UI (Mock-Backed)
+# F2-A Delivery Report - Member Financial UI (Mock-Backed)
 
 Phase F2-A delivers the Member Financial suite (SCR-MEM-008..015) as frontend-only screens backed by the API-shaped mock. All rules come from the SSOT docs; nothing here moves real money or changes the backend/DB.
 
@@ -19,20 +19,20 @@ Phase F2-A delivers the Member Financial suite (SCR-MEM-008..015) as frontend-on
 
 ## Contracts (@jad/contracts)
 
-- `commission.ts` — `commissionSchema` + status/type enums (`PENDING|AVAILABLE|CANCELLED|REVERSED`; `DIRECT_COMMISSION|DIRECT_REFERRAL|GROUP_INCENTIVE`). `GROUP_INCENTIVE` kept in type union but flagged OD-gated; mock never produces it.
-- `payout.ts` — `payoutAccountSchema` with `accountIdentifierMasked` (raw value never leaves the server), status enum (`PENDING|ADMIN_REVIEW|CONFIRMED`), `createPayoutAccountRequestSchema`, `setPrimaryPayoutAccountRequestSchema` (`{isPrimary: true}` literal).
-- `withdrawal.ts` — `withdrawalSchema` with embedded masked payout summary, optional `rejectionReason`/`externalReference`, status enum (`REQUESTED|RESERVED|COMPLETED|REJECTED`, no added states), `createWithdrawalRequestSchema`.
-- `ewallet.ts` — added optional server-computed `balanceAfter` to `ledgerEntrySchema` (client never derives balances, BI-001).
+- `commission.ts` - `commissionSchema` + status/type enums (`PENDING|AVAILABLE|CANCELLED|REVERSED`; `DIRECT_COMMISSION|DIRECT_REFERRAL|GROUP_INCENTIVE`). `GROUP_INCENTIVE` kept in type union but flagged OD-gated; mock never produces it.
+- `payout.ts` - `payoutAccountSchema` with `accountIdentifierMasked` (raw value never leaves the server), status enum (`PENDING|ADMIN_REVIEW|CONFIRMED`), `createPayoutAccountRequestSchema`, `setPrimaryPayoutAccountRequestSchema` (`{isPrimary: true}` literal).
+- `withdrawal.ts` - `withdrawalSchema` with embedded masked payout summary, optional `rejectionReason`/`externalReference`, status enum (`REQUESTED|RESERVED|COMPLETED|REJECTED`, no added states), `createWithdrawalRequestSchema`.
+- `ewallet.ts` - added optional server-computed `balanceAfter` to `ledgerEntrySchema` (client never derives balances, BI-001).
 
 ## Shared (@jad/shared)
 
-`money.ts` + tests: `compareMoney`, `addMoney`, `subtractMoney` built on BigInt cents — exact-decimal strings in, exact-decimal strings out, no float arithmetic.
+`money.ts` + tests: `compareMoney`, `addMoney`, `subtractMoney` built on BigInt cents - exact-decimal strings in, exact-decimal strings out, no float arithmetic.
 
 ## Mock API (apps/web mock)
 
-- Seed for `mem-001` is coherent end-to-end: wallet `140000.00` available / `636000.00` pending; 6 commissions (AVAILABLE ×2, PENDING ×2, REVERSED, CANCELLED); 4 payout accounts (2 CONFIRMED incl. Primary, PENDING, ADMIN_REVIEW); 3 withdrawals (COMPLETED with reference, REJECTED with reason, RESERVED); 10 ledger entries whose running balance lands exactly on the wallet available (WITHDRAWAL_COMPLETION does not change the balance — reservation already deducted).
+- Seed for `mem-001` is coherent end-to-end: wallet `140000.00` available / `636000.00` pending; 6 commissions (AVAILABLE ×2, PENDING ×2, REVERSED, CANCELLED); 4 payout accounts (2 CONFIRMED incl. Primary, PENDING, ADMIN_REVIEW); 3 withdrawals (COMPLETED with reference, REJECTED with reason, RESERVED); 10 ledger entries whose running balance lands exactly on the wallet available (WITHDRAWAL_COMPLETION does not change the balance - reservation already deducted).
 - Handlers: `GET /me/commissions` (joins sale property name, newest first), `GET/POST /me/payout-accounts`, `PATCH /me/payout-accounts/:id` (Set Primary, single Primary invariant), `POST /me/withdrawals` (Idempotency-Key required ⇒ 400; unverified account ⇒ 422 `PAYOUT_ACCOUNT_UNVERIFIED`; amount > available ⇒ 409 `INSUFFICIENT_BALANCE`; creates RESERVED + deducts wallet + appends WITHDRAWAL_RESERVATION; replays the stored response on a repeated key), `GET /me/withdrawals`, `GET /me/withdrawals/:id` (object-level 404), cursor-paginated `GET /me/ledger` with allowlisted `?type=` filter and server-computed `balanceAfter`.
-- Fixed the mock server route matcher to compare pathnames only (query strings no longer break suffix/prefix matching) — a latent issue for any query-parameter endpoint; the web test `mockFetchRoutes` util was aligned the same way.
+- Fixed the mock server route matcher to compare pathnames only (query strings no longer break suffix/prefix matching) - a latent issue for any query-parameter endpoint; the web test `mockFetchRoutes` util was aligned the same way.
 
 ## Client layers
 
@@ -49,15 +49,15 @@ Phase F2-A delivers the Member Financial suite (SCR-MEM-008..015) as frontend-on
 
 ## Assumptions & deviations (need Owner sign-off)
 
-1. **Payout method set is PROPOSED** — `TRADITIONAL_BANK | DIGITAL_BANK | GCASH | OTHER` is a mock candidate set; the final supported methods are BLOCKED on **OD-016** (FEAT-047).
-2. **Contract additions are PROPOSED** — `ledgerEntrySchema.balanceAfter` (server-computed running balance), `meta.pagination.nextCursor`, and `commission.salePropertyName` (server-side join for display) were added to make the screens feasible; they must be confirmed with the real API contract.
-3. **`WITHDRAWAL_COMPLETION` balance semantics** — treated as informational (no running-balance change) because the reservation already deducted the funds (BR-WDR-002/003). Final withdrawal model is TBD (OD-017/018); no extra statuses were invented.
-4. **No client-side authority** — the UI never derives balances; the 409/422 handling relies on the server being authoritative, and the client pre-checks only for UX.
+1. **Payout method set is PROPOSED** - `TRADITIONAL_BANK | DIGITAL_BANK | GCASH | OTHER` is a mock candidate set; the final supported methods are BLOCKED on **OD-016** (FEAT-047).
+2. **Contract additions are PROPOSED** - `ledgerEntrySchema.balanceAfter` (server-computed running balance), `meta.pagination.nextCursor`, and `commission.salePropertyName` (server-side join for display) were added to make the screens feasible; they must be confirmed with the real API contract.
+3. **`WITHDRAWAL_COMPLETION` balance semantics** - treated as informational (no running-balance change) because the reservation already deducted the funds (BR-WDR-002/003). Final withdrawal model is TBD (OD-017/018); no extra statuses were invented.
+4. **No client-side authority** - the UI never derives balances; the 409/422 handling relies on the server being authoritative, and the client pre-checks only for UX.
 5. **Ledger filter is server-side** and allowlisted; `?type=` filtering resets the cursor stream (no client-side filtering of loaded pages, which would be misleading).
 
 ## Gaps / out of scope (F2-B+)
 
-- Group Incentive commissions (OD-gated, BR-COM-008) — union type present but never produced.
+- Group Incentive commissions (OD-gated, BR-COM-008) - union type present but never produced.
 - Payout method catalog (OD-016), withdrawal final state machine (OD-017/018).
 - Ledger export (REQUIRES APPROVAL per SCR-MEM-009), jump-to-sale/commission deep links beyond the commission list link.
 - Real backend / DB / payment gateway integration.

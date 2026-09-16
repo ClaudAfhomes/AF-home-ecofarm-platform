@@ -1,7 +1,7 @@
 # ADR-003: PostgreSQL as System of Record
 
 ## Status
-**Accepted** (established by approved SSOT material — ARCHITECTURE.md §16, ARCH-DEC-003: **CONFIRMED**; TECH-STACK.md §5).
+**Accepted** (established by approved SSOT material - ARCHITECTURE.md §16, ARCH-DEC-003: **CONFIRMED**; TECH-STACK.md §5).
 
 ## Context
 The platform is financial-grade: eWallet ledger, commission lifecycle, voucher redemption, and withdrawal records must satisfy invariants BI-001..BI-010, which the Database SSOT requires to be enforced **at the database layer** (DATABASE-DESIGN §12.6; AC-04). Money must be represented as exact-decimal `NUMERIC`, never floating point (BR-WAL-002; ADR-009).
@@ -10,10 +10,10 @@ The platform is financial-grade: eWallet ledger, commission lifecycle, voucher r
 Choose the system-of-record database that provides relational ACID transactions, strong constraint enforcement, and exact-decimal numeric support for the financial domain.
 
 ## Options Considered
-- **PostgreSQL** — relational, ACID, rich constraint support (CHECK/UNIQUE/FK), `NUMERIC`, `citext`.
-- **MySQL** — relational alternative.
-- **SQL Server** — commercial relational option.
-- **MongoDB / NoSQL** — document store.
+- **PostgreSQL** - relational, ACID, rich constraint support (CHECK/UNIQUE/FK), `NUMERIC`, `citext`.
+- **MySQL** - relational alternative.
+- **SQL Server** - commercial relational option.
+- **MongoDB / NoSQL** - document store.
 
 ## Decision
 Use **PostgreSQL** as the platform's system of record (ARCH-DEC-003; TECH-STACK §5). Single database; single public schema; DB-enforced invariants per DATABASE-DESIGN §12.6.
@@ -26,7 +26,7 @@ Use **PostgreSQL** as the platform's system of record (ARCH-DEC-003; TECH-STACK 
 
 ## Trade-offs
 - Relational modeling overhead vs. document flexibility.
-- Horizontal scale is harder than sharded NoSQL; the project chooses **correctness over distribution** (ARCH-DEC-001, ARCHITECTURE §12) — managed PostgreSQL is the target.
+- Horizontal scale is harder than sharded NoSQL; the project chooses **correctness over distribution** (ARCH-DEC-001, ARCHITECTURE §12) - managed PostgreSQL is the target.
 
 ## Consequences
 - Managed PostgreSQL hosting is a **REQUIRES APPROVAL** decision (ARCH-DEC-008; ADR-012).

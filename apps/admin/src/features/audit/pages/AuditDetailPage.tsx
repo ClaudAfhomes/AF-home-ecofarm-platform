@@ -22,7 +22,7 @@ const ADJUSTMENT_TYPE_TONE: Record<string, StatusTone> = {
   WITHDRAWAL_REVERSAL: 'danger',
 };
 
-/** Audit detail — read-only detail view for an audit entry or ledger adjustment. */
+/** Audit detail - read-only detail view for an audit entry or ledger adjustment. */
 export function AuditDetailPage() {
   const { id } = useParams<{ id: string }>();
   const {

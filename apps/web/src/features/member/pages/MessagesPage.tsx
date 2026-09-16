@@ -19,7 +19,7 @@ import styles from './MessagesPage.module.css';
 
 const dayOf = (iso: string): string => new Date(iso).toDateString();
 
-/** Day divider label for the thread — Today / Yesterday / full date. */
+/** Day divider label for the thread - Today / Yesterday / full date. */
 function dayLabel(iso: string, now: Date): string {
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return formatDate(iso);
@@ -130,7 +130,7 @@ export function MessagesPage() {
           <div className={styles.identity}>
             <h2 className={styles.identityName}>JA&D Admin Team</h2>
             <p className={styles.identityNote}>
-              Support from the JA&D admin team — replies arrive right here.
+              Support from the JA&D admin team - replies arrive right here.
             </p>
           </div>
         </header>
@@ -171,7 +171,7 @@ export function MessagesPage() {
                 <div className={styles.empty}>
                   <EmptyState
                     title="No messages yet"
-                    description="Ask the JA&D admin team anything — they will reply right here."
+                    description="Ask the JA&D admin team anything - they will reply right here."
                   />
                 </div>
               ) : (

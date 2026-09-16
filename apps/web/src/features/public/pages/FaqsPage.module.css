@@ -43,7 +43,7 @@
   }
 }
 
-/* Oversized serif question mark — quiet editorial detail behind the statement. */
+/* Oversized serif question mark - quiet editorial detail behind the statement. */
 .mark {
   position: absolute;
   top: calc(-1 * var(--space-8));

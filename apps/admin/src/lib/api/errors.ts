@@ -29,7 +29,7 @@ export class ApiError extends Error {
 
 /**
  * The server responded, but the payload did not match the contract schema.
- * Surfaces as a generic, recoverable error state (UI-UX §10 "Error") — the
+ * Surfaces as a generic, recoverable error state (UI-UX §10 "Error") - the
  * client never silently coerces mismatched data.
  */
 export class ApiParseError extends Error {
@@ -84,7 +84,7 @@ export function toApiError(body: unknown, status: number): ApiError {
  * else. Used by hooks feeding role-shared pages (the Audit page merges a
  * super_admin-only adjustments feed; merchant roles read vouchers) so a
  * role-denied feed degrades to "not visible to this role" instead of
- * breaking the page — without substituting mock data.
+ * breaking the page - without substituting mock data.
  */
 export async function emptyOnForbidden<T>(load: () => Promise<T[]>): Promise<T[]> {
   try {

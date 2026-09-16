@@ -5,7 +5,7 @@ import type { VercelRequest, VercelResponse } from '../../_lib/http.js';
 import roleById from './roles/[id].js';
 
 /**
- * PATCH /admin/roles/:id — governance modules (staff/audit/config/programs)
+ * PATCH /admin/roles/:id - governance modules (staff/audit/config/programs)
  * are rejected when the target is a custom role; system roles keep their
  * full matrix. The service fake serves both the auth chains and findRole's
  * maybeSingle lookup.

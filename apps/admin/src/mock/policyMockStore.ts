@@ -5,11 +5,12 @@ import type { Policy } from '@jad/contracts';
  * `Policy` seed rows (pol-001..003, members pull the same source via
  * `GET /policies`). Mutations write through here so the mock list stays
  * consistent across GET + create/update/delete within a dev/test session.
- * Production reads/writes the real endpoint — this is a test double only.
+ * Production reads/writes the real endpoint - this is a test double only.
  */
 export const MOCK_POLICIES: Policy[] = [
   {
     id: 'pol-001',
+    slug: 'terms',
     title: 'Terms and Conditions',
     type: 'terms',
     content:
@@ -18,6 +19,7 @@ export const MOCK_POLICIES: Policy[] = [
   },
   {
     id: 'pol-002',
+    slug: 'guidelines',
     title: 'Program Guidelines',
     type: 'guidelines',
     content: 'These guidelines describe how qualifying sales and referrals work.',
@@ -25,6 +27,7 @@ export const MOCK_POLICIES: Policy[] = [
   },
   {
     id: 'pol-003',
+    slug: 'privacy',
     title: 'Privacy Policy',
     type: 'privacy',
     content:
@@ -47,17 +50,24 @@ export function resetPolicyStore(): void {
 
 export function createStorePolicy(input: {
   title: string;
+  slug: string;
   type: string;
   content?: string;
   documentUrl: string;
 }): Policy {
   const title = input.title.trim();
   if (!title) throw new Error('A title is required.');
+  const slug = input.slug.trim();
+  if (!slug) throw new Error('A URL slug is required.');
+  if (policyStore.items.some((p) => p.slug === slug)) {
+    throw new Error('That URL slug is already in use.');
+  }
   const type = input.type.trim();
   if (!type) throw new Error('A type is required.');
   if (!input.documentUrl) throw new Error('A PDF upload is required.');
   const item: Policy = {
     id: `pol-mock-${Date.now().toString(36)}-${policySeq++}`,
+    slug,
     title,
     type,
     ...(input.content?.trim() && { content: input.content.trim() }),
@@ -70,10 +80,17 @@ export function createStorePolicy(input: {
 
 export function updateStorePolicy(
   id: string,
-  patch: { title?: string; type?: string; content?: string; documentUrl?: string },
+  patch: { title?: string; slug?: string; type?: string; content?: string; documentUrl?: string },
 ): Policy | undefined {
   const item = policyStore.items.find((p) => p.id === id);
   if (!item) return undefined;
+  if (typeof patch.slug === 'string' && patch.slug.trim()) {
+    const slug = patch.slug.trim();
+    if (policyStore.items.some((p) => p.id !== id && p.slug === slug)) {
+      throw new Error('That URL slug is already in use.');
+    }
+    item.slug = slug;
+  }
   if (typeof patch.title === 'string' && patch.title.trim()) item.title = patch.title.trim();
   if (typeof patch.type === 'string' && patch.type.trim()) item.type = patch.type.trim();
   if (typeof patch.content === 'string') item.content = patch.content.trim() || undefined;

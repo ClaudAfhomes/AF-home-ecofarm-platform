@@ -1,6 +1,6 @@
 import { useEffect, useState, type CSSProperties } from 'react';
 
-import { Button, Dialog, Select, useToast } from '@jad/ui';
+import { Button, Dialog, notifySuccess, Select } from '@jad/ui';
 import { systemRoleRecords } from '@jad/contracts';
 
 import { useSession } from '../../../lib/session';
@@ -37,7 +37,6 @@ const hintStyle: CSSProperties = {
 
 export function StaffFormDialog({ open, onClose }: Props) {
   const { user } = useSession();
-  const { toast } = useToast();
   const { data: roles } = useRoles();
   const createMutation = useCreateStaff();
   const isPending = createMutation.isPending;
@@ -92,10 +91,9 @@ export function StaffFormDialog({ open, onClose }: Props) {
         actor: user?.name ?? 'Unknown',
         actorRole: user?.roleId ? user.roleId.toUpperCase() : 'ADMIN',
       });
-      toast({
+      notifySuccess({
         title: 'Staff member created',
         message: `${member.name} added with an ACTIVE status`,
-        tone: 'success',
       });
       onClose();
     } catch (err) {

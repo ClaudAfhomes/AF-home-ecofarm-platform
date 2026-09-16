@@ -24,7 +24,7 @@ export interface TextFieldProps {
  * Text/email/tel input for the auth forms. Renders inside `FormField` with the
  * shared input styling, `aria-invalid`/`aria-describedby` wiring, and
  * `autoComplete` semantics (autocomplete attributes for identity fields
- * respecting privacy — NFR-CONF-001, DESIGN-SYSTEM §6.2).
+ * respecting privacy - NFR-CONF-001, DESIGN-SYSTEM §6.2).
  */
 export function TextField({
   id,

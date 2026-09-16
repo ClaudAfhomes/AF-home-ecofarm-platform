@@ -20,7 +20,7 @@ import { SITE } from './site';
 
 /**
  * CMS ↔ static fallback parity (Phase 4 consistency pass, Q6).
- * The seeds are the DB source; the static files are the silent fallback —
+ * The seeds are the DB source; the static files are the silent fallback -
  * their values must match field-for-field or users see different content
  * depending on fetch success.
  */

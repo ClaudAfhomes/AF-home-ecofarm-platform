@@ -13,7 +13,7 @@ import {
 import { methodNotAllowed, okList, readJsonBody, requireService } from '../../_lib/rest.js';
 import { toErrorEnvelope } from '../../_lib/envelope.js';
 
-/** GET /admin/sales — queue (super_admin, admin, finance). */
+/** GET /admin/sales - queue (super_admin, admin, finance). */
 export async function listSales(req: VercelRequest, res: VercelResponse) {
   const auth = await verifyStaffModule(req, 'sales', FINANCE_VIEW);
   if ('error' in auth) {
@@ -36,7 +36,7 @@ export async function listSales(req: VercelRequest, res: VercelResponse) {
   okList(res, rows.filter(isValidSaleRow));
 }
 
-/** POST /admin/sales — staff-created sale (super_admin, admin). */
+/** POST /admin/sales - staff-created sale (super_admin, admin). */
 export async function createSale(req: VercelRequest, res: VercelResponse) {
   const auth = await verifyStaffModule(req, 'sales', ADMIN_STAFF);
   if ('error' in auth) {
@@ -132,7 +132,7 @@ export async function createSale(req: VercelRequest, res: VercelResponse) {
     actorRole: auth.slugs[0] ?? 'admin',
     targetType: 'Sale',
     targetId: sale.id,
-    targetName: `${propertyName} — ${customerName}`,
+    targetName: `${propertyName} - ${customerName}`,
     detail: `Recorded sale ${sale.id}`,
   });
   const parsed = saleSchema.safeParse(mapSaleRow(sale as Record<string, unknown>));

@@ -11,7 +11,7 @@ import { validateCreateTemplate } from '../../_lib/cutover.js';
 import { methodNotAllowed, okList, readJsonBody, requireService } from '../../_lib/rest.js';
 import { toErrorEnvelope } from '../../_lib/envelope.js';
 
-/** GET /admin/voucher-templates — voucher types (super_admin, admin, finance). Read-only in B5. */
+/** GET /admin/voucher-templates - voucher types (super_admin, admin, finance). Read-only in B5. */
 export async function listVoucherTemplates(req: VercelRequest, res: VercelResponse) {
   const auth = await verifyStaffModule(req, 'vouchers', FINANCE_VIEW);
   if ('error' in auth) {
@@ -36,7 +36,7 @@ export async function listVoucherTemplates(req: VercelRequest, res: VercelRespon
   okList(res, rows.filter(isValidVoucherTemplateRow));
 }
 
-/** POST /admin/voucher-templates — create a template (super_admin, admin). */
+/** POST /admin/voucher-templates - create a template (super_admin, admin). */
 export async function createVoucherTemplate(req: VercelRequest, res: VercelResponse) {
   const auth = await verifyStaffModule(req, 'vouchers', ADMIN_STAFF);
   if ('error' in auth) {

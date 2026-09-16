@@ -3,7 +3,7 @@
  * F0/F1: intercepts `fetch` and returns contract-shaped JSON (or an error
  * envelope) for configured paths. Routes match by URL suffix because the client
  * prefixes `VITE_API_BASE_URL` (default `/api/v1`). Replaced by the real API in
- * production — the app's service functions and components are untouched.
+ * production - the app's service functions and components are untouched.
  *
  * F1 extension: routes may declare a `method` (matched exactly, case-insensitive)
  * and a `handler` that receives the parsed request context (method, headers,
@@ -111,16 +111,16 @@ export function createMockServer(routes: MockRoute[], defaultLatencyMs = 120): M
     const headers = lowerHeaders(init);
     const body = parseBody(init);
 
-    // Route matching is against the pathname only — query strings (cursor,
+    // Route matching is against the pathname only - query strings (cursor,
     // filters) are part of the request, not the route identity. Suffix routes
     // match when the pathname ends with the route path (the client prefixes
     // `VITE_API_BASE_URL`, e.g. `/api/v1`). Prefix routes match dynamic
     // segments anywhere in the pathname so the base prefix is transparent.
     const pathOnly = new URL(url, 'http://mock.local').pathname;
 
-    // Dev passthrough for real location verification — GPS → Nominatim backend
+    // Dev passthrough for real location verification - GPS → Nominatim backend
     // Browser dev should hit the real handler via Vite proxy → localhost:3000 (Nominatim).
-    // Fixture mock in handlers.ts is fallback for isolated tests only — do NOT use in browser dev.
+    // Fixture mock in handlers.ts is fallback for isolated tests only - do NOT use in browser dev.
     // Vitest tests stub fetch via mockFetchRoutes/vi.stubGlobal, so they don't need this passthrough.
     const isVitest =
       typeof process !== 'undefined' &&
@@ -150,7 +150,7 @@ export function createMockServer(routes: MockRoute[], defaultLatencyMs = 120): M
     }
 
     if (!route) {
-      // Bypass for real CMS API — let it reach Vercel/Supabase instead of mock 404
+      // Bypass for real CMS API - let it reach Vercel/Supabase instead of mock 404
       if (pathOnly.startsWith('/api/v1/cms/')) {
         return originalFetch(input as RequestInfo, init);
       }

@@ -6,7 +6,7 @@ import { isValidWalletRow, zeroWallet } from '../../_lib/money.js';
 import { methodNotAllowed, requireService } from '../../_lib/rest.js';
 import { toErrorEnvelope } from '../../_lib/envelope.js';
 
-/** GET /me/wallet — own eWallet summary, server-authoritative (never negative, BI-001). */
+/** GET /me/wallet - own eWallet summary, server-authoritative (never negative, BI-001). */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');

@@ -10,6 +10,8 @@ import {
   policyStore,
   updateStorePolicy,
 } from './policyMockStore';
+import { inquiryStore, updateStoreInquiry } from './inquiryMockStore';
+import { createStoreProgram, programStore, updateStoreProgram } from './programMockStore';
 
 import {
   MOCK_SALES,
@@ -18,7 +20,6 @@ import {
   MOCK_PROPERTIES,
   MOCK_ADJUSTMENTS,
   MOCK_AUDIT,
-  MOCK_PROGRAMS,
   MOCK_MEMBERS,
 } from './data';
 import {
@@ -84,7 +85,7 @@ function fail(message: string) {
 /**
  * Admin mock API (API-shaped, F0). Each handler returns contract-valid JSON
  * exactly as the real endpoint would. Detail routes use `match:'prefix'` with
- * regex id extraction from the URL — the mock server passes `MockRequestContext`
+ * regex id extraction from the URL - the mock server passes `MockRequestContext`
  * (not a `params` object) to response/handler functions.
  */
 export const adminMockHandlers: MockRoute[] = [
@@ -202,7 +203,7 @@ export const adminMockHandlers: MockRoute[] = [
   },
   {
     // Merged category view mirroring GET /admin/property-categories
-    // (test double only — production reads the real endpoint).
+    // (test double only - production reads the real endpoint).
     path: '/admin/property-categories',
     response: () => {
       const data = CMS_PROPERTIES_SEED.categories.map((cat) => ({
@@ -238,7 +239,7 @@ export const adminMockHandlers: MockRoute[] = [
     },
   },
   {
-    // Voucher definitions — "Create Voucher" list + create (title + value).
+    // Voucher definitions - "Create Voucher" list + create (title + value).
     path: '/admin/voucher-templates',
     handler: (ctx: MockRequestContext) => {
       if (ctx.method === 'POST') {
@@ -450,6 +451,7 @@ export const adminMockHandlers: MockRoute[] = [
       try {
         const item = createStorePolicy({
           title: String(input.title ?? ''),
+          slug: String(input.slug ?? ''),
           type: String(input.type ?? ''),
           content: typeof input.content === 'string' ? input.content : undefined,
           documentUrl: String(input.documentUrl ?? ''),
@@ -484,6 +486,7 @@ export const adminMockHandlers: MockRoute[] = [
       const item = id
         ? updateStorePolicy(id, {
             ...(typeof patch.title === 'string' && { title: patch.title }),
+            ...(typeof patch.slug === 'string' && { slug: patch.slug }),
             ...(typeof patch.type === 'string' && { type: patch.type }),
             ...(typeof patch.content === 'string' && { content: patch.content }),
             ...(typeof patch.documentUrl === 'string' && { documentUrl: patch.documentUrl }),
@@ -501,6 +504,35 @@ export const adminMockHandlers: MockRoute[] = [
       const id = idFromPath(ctx.url, /\/policies\/([^/?#]+)/);
       if (!id || !deleteStorePolicy(id)) return notFound('Policy');
       return { body: { id, deleted: true }, status: 200 };
+    },
+  },
+  {
+    path: '/admin/inquiries',
+    response: () => {
+      const data = inquiryStore.items;
+      return {
+        data,
+        meta: {
+          page: 1,
+          pageSize: data.length,
+          total: data.length,
+        },
+      };
+    },
+  },
+  {
+    path: '/admin/inquiries/',
+    method: 'PATCH',
+    match: 'prefix',
+    handler: (ctx: MockRequestContext) => {
+      const id = idFromPath(ctx.url, /\/inquiries\/([^/?#]+)/);
+      const status = (ctx.body as Record<string, unknown> | null)?.status;
+      const item =
+        id && (status === 'NEW' || status === 'READ' || status === 'ARCHIVED')
+          ? updateStoreInquiry(id, status)
+          : undefined;
+      if (!item) return notFound('Inquiry');
+      return { body: item, status: 200 };
     },
   },
   {
@@ -545,14 +577,70 @@ export const adminMockHandlers: MockRoute[] = [
     },
   },
   {
+    path: '/admin/programs',
+    method: 'POST',
+    handler: (ctx: MockRequestContext) => {
+      const input = (ctx.body ?? {}) as Record<string, unknown>;
+      try {
+        const item = createStoreProgram({
+          code: String(input.code ?? ''),
+          name: String(input.name ?? ''),
+          description: typeof input.description === 'string' ? input.description : undefined,
+          isActive: typeof input.isActive === 'boolean' ? input.isActive : true,
+        });
+        return { body: item, status: 201 };
+      } catch (e) {
+        return fail((e as Error).message);
+      }
+    },
+  },
+  {
+    path: '/admin/programs',
+    response: () => {
+      const data = programStore.items;
+      return {
+        data,
+        meta: { page: 1, pageSize: data.length, total: data.length },
+      };
+    },
+  },
+  {
+    path: '/admin/programs/',
+    method: 'PATCH',
+    match: 'prefix',
+    handler: (ctx: MockRequestContext) => {
+      const id = idFromPath(ctx.url, /\/admin\/programs\/([^/?#]+)/);
+      const patch = (ctx.body ?? {}) as Record<string, unknown>;
+      let item;
+      try {
+        item = id
+          ? updateStoreProgram(id, {
+              ...(typeof patch.code === 'string' && { code: patch.code }),
+              ...(typeof patch.name === 'string' && { name: patch.name }),
+              ...(typeof patch.description === 'string' && { description: patch.description }),
+              ...(typeof patch.isActive === 'boolean' && { isActive: patch.isActive }),
+            })
+          : undefined;
+      } catch (e) {
+        return fail((e as Error).message);
+      }
+      if (!item) return notFound('Program');
+      return { body: item, status: 200 };
+    },
+  },
+  {
     path: '/programs',
-    response: {
-      data: MOCK_PROGRAMS,
-      meta: {
-        page: 1,
-        pageSize: 10,
-        total: MOCK_PROGRAMS.length,
-      },
+    response: () => {
+      // Public list: active programs only (mirrors the API handler).
+      const data = programStore.items.filter((program) => program.isActive);
+      return {
+        data,
+        meta: {
+          page: 1,
+          pageSize: 10,
+          total: data.length,
+        },
+      };
     },
   },
   {
@@ -754,7 +842,7 @@ export const adminMockHandlers: MockRoute[] = [
     },
   },
   {
-    // PATCH /admin/session — update the signed-in staff display name. The
+    // PATCH /admin/session - update the signed-in staff display name. The
     // mock has no session identity, so it applies to the first roster member
     // (tests render that principal); production resolves the caller server-side.
     path: '/admin/session',
@@ -780,7 +868,7 @@ export const adminMockHandlers: MockRoute[] = [
     },
   },
   {
-    // POST /admin/session/password — change own staff password. Use
+    // POST /admin/session/password - change own staff password. Use
     // currentPassword 'wrong-current' to simulate a rejection in tests.
     path: '/admin/session/password',
     method: 'POST',

@@ -29,6 +29,7 @@ const POLICIES = {
   data: [
     {
       id: 'pol-001',
+      slug: 'terms',
       title: 'Terms and Conditions',
       type: 'terms',
       updatedAt: '2026-07-01T10:00:00.000Z',
@@ -36,6 +37,7 @@ const POLICIES = {
     },
     {
       id: 'pol-002',
+      slug: 'guidelines',
       title: 'Program Guidelines',
       type: 'guidelines',
       updatedAt: '2026-07-15T10:00:00.000Z',
@@ -48,7 +50,7 @@ const POLICIES = {
 describe('member PolicyDetailPage', () => {
   it('renders policy content as plain text (no raw HTML, SCR-MEM-023)', async () => {
     mockFetchRoutes({ '/policies': POLICIES });
-    renderAt('/member/policies/pol-001');
+    renderAt('/member/policies/terms');
 
     expect(
       await screen.findByRole('heading', { name: 'Terms and Conditions' }),
@@ -61,7 +63,7 @@ describe('member PolicyDetailPage', () => {
       '/member/policies',
     );
     expect(document.querySelector('[data-testid]')).toBeNull();
-    // Breadcrumbs — Dashboard > Resources > Policies > Title
+    // Breadcrumbs - Dashboard > Resources > Policies > Title
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
     expect(screen.getByText('Resources')).toBeInTheDocument();
     expect(screen.getAllByText('Policies').length).toBeGreaterThanOrEqual(1);
@@ -70,7 +72,7 @@ describe('member PolicyDetailPage', () => {
 
   it('renders a not-found state for an unknown policy id', async () => {
     mockFetchRoutes({ '/policies': POLICIES });
-    renderAt('/member/policies/pol-999');
+    renderAt('/member/policies/does-not-exist');
 
     expect(await screen.findAllByText('Policy not found')).toHaveLength(2);
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
@@ -93,7 +95,7 @@ describe('member PolicyDetailPage', () => {
         meta: {},
       },
     });
-    renderAt('/member/policies/pol-001');
+    renderAt('/member/policies/terms');
 
     expect(
       await screen.findByRole('heading', { name: 'Terms and Conditions' }),

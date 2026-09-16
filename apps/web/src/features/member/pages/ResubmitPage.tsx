@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router';
 
 import { useSession } from '../../../lib/session';
-import { PageHeader, Skeleton } from '@jad/ui';
+import { notifySuccess, PageHeader, Skeleton } from '@jad/ui';
 
 import { Alert } from '../../../components/Alert';
 import { RegistrationForm } from '../../auth/components/RegistrationForm';
@@ -13,7 +13,7 @@ import { getProfile } from '../services/member';
 import styles from './ResubmitPage.module.css';
 
 /**
- * Resubmit application (SCR-AUTH-005, FR-REG-005) — for REJECTED members only.
+ * Resubmit application (SCR-AUTH-005, FR-REG-005) - for REJECTED members only.
  * Corrects the flagged details (profile, qualification, ID) and returns the
  * application to `Pending` via `POST /me/resubmit` (unlimited resubmissions,
  * BR-REG-005). Reuses the shared multi-step RegistrationForm.
@@ -88,9 +88,6 @@ export function ResubmitPage() {
           title="Application resubmitted"
           description="Thank you for correcting your application."
         />
-        <Alert variant="success" title="Resubmitted for review">
-          Your corrected application is now Pending and will be reviewed by JA&amp;D.
-        </Alert>
         <div className={styles.actionRow}>
           <Link className={styles.dashboardLink} to="/member">
             Back to dashboard
@@ -112,6 +109,10 @@ export function ResubmitPage() {
           initialDraft={initialDraft}
           submit={async (payload) => {
             await resubmitApplication(payload);
+            notifySuccess({
+              title: 'Resubmitted for review',
+              message: 'Your corrected application is now Pending and will be reviewed by JA&D.',
+            });
             setSubmitted(true);
           }}
         />

@@ -4,7 +4,7 @@ import { idDocumentSchema, qualificationAnswerSchema } from './auth.js';
 import { memberProfileSchema } from './member.js';
 
 /**
- * Rejection note — structured per Business Flow (BR-REG-004).
+ * Rejection note - structured per Business Flow (BR-REG-004).
  * `reason` = why rejected, `requiredChanges` = what applicant must edit/correct.
  * Kept structured, not a single unstructured string.
  */
@@ -16,7 +16,7 @@ export const rejectionNoteSchema = z.object({
 export type RejectionNote = z.infer<typeof rejectionNoteSchema>;
 
 /**
- * Registration lifecycle statuses — PENDING | REJECTED only. Approval moves
+ * Registration lifecycle statuses - PENDING | REJECTED only. Approval moves
  * the application to the Member domain (the Registration row is deleted on
  * approve), so APPROVED_ACTIVE never lives in Registration.
  */
@@ -25,7 +25,7 @@ export const registrationStatusSchema = z.enum(['PENDING', 'REJECTED']);
 export type RegistrationStatus = z.infer<typeof registrationStatusSchema>;
 
 /**
- * Canonical mock registration entity — database-ready, ID + ISO country, no display-name duplication.
+ * Canonical mock registration entity - database-ready, ID + ISO country, no display-name duplication.
  * Governed by BR-AUTH-002 / BR-REG-004 / BR-REG-010.
  */
 export const registrationSchema = z.object({
@@ -61,7 +61,7 @@ export const registrationSchema = z.object({
 export type Registration = z.infer<typeof registrationSchema>;
 
 /**
- * Account status for member lifecycle — ACTIVE / INACTIVE.
+ * Account status for member lifecycle - ACTIVE / INACTIVE.
  * Distinct from membership status (PENDING/APPROVED_ACTIVE/REJECTED).
  * Deactivation MUST NOT delete (BR-LED/BI-005).
  */
@@ -69,7 +69,7 @@ export const accountStatusSchema = z.enum(['ACTIVE', 'INACTIVE']);
 export type AccountStatus = z.infer<typeof accountStatusSchema>;
 
 /**
- * Archived member record — preserves original member + audit trail.
+ * Archived member record - preserves original member + audit trail.
  * Never hard-delete (Delete = Archive). The snapshot is the member row
  * itself (archive snapshots members); a registration-shaped snapshot is
  * accepted for legacy rows.

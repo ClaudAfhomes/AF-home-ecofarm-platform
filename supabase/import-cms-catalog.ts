@@ -5,11 +5,11 @@
  * row while `cms_contents.properties` (the preserved core) kept the live
  * categories + listings. `GET /admin/properties` reads the `Property` table
  * only, and `GET /admin/property-categories` renders DB keys merged with CMS
- * presentation — so both admin/properties tabs read 0/0 despite healthy CMS
+ * presentation - so both admin/properties tabs read 0/0 despite healthy CMS
  * JSON. This script re-inserts the missing DB keys FROM the live CMS JSON
  * (never the reverse; CMS content is untouched).
  *
- * Mapping (DB key columns only — presentation stays in JSON):
+ * Mapping (DB key columns only - presentation stays in JSON):
  *   CMS category {slug, title}            -> PropertyCategory{slug, title}
  *   CMS property {id, name, categoryId}   -> Property{id, name, categorySlug}
  *   CMS price kept only when exact-decimal (^\d+(\.\d{1,2})?$), else null
@@ -47,7 +47,7 @@ function loadEnvFile(path: string): void {
       if (!(key in process.env) && value) process.env[key] = value;
     }
   } catch {
-    // missing file — fall through to whatever the environment provides
+    // missing file - fall through to whatever the environment provides
   }
 }
 
@@ -176,18 +176,18 @@ async function main(): Promise<void> {
   );
 
   console.log(`\nPlanned category upserts (${categoryUpserts.length}):`);
-  for (const c of categoryUpserts) console.log(`  + ${c.slug} — ${c.title}`);
+  for (const c of categoryUpserts) console.log(`  + ${c.slug} - ${c.title}`);
   for (const s of categorySkips) console.log(`  SKIP ${s}`);
   console.log(`Planned property upserts (${propertyUpserts.length}):`);
   for (const p of propertyUpserts) {
-    console.log(`  + ${p.id} — ${p.name} [${p.categorySlug}] price=${p.price ?? '(null)'}`);
+    console.log(`  + ${p.id} - ${p.name} [${p.categorySlug}] price=${p.price ?? '(null)'}`);
   }
   for (const s of propertySkips) console.log(`  SKIP ${s}`);
   for (const w of priceWarnings) console.log(`  WARN ${w}`);
 
   if (mode === 'dry-run') {
     console.log(
-      '\nDRY-RUN — no changes made. Re-run with --execute plus DEV_RESET_ALLOW_REFS=' + ref,
+      '\nDRY-RUN - no changes made. Re-run with --execute plus DEV_RESET_ALLOW_REFS=' + ref,
     );
     return;
   }
@@ -233,7 +233,7 @@ async function main(): Promise<void> {
     (afterCategories ?? 0) < categoryUpserts.length ||
     (afterProperties ?? 0) < propertyUpserts.length
   ) {
-    console.error('Verification FAILED — inspect output above.');
+    console.error('Verification FAILED - inspect output above.');
     process.exit(2);
   }
   console.log(

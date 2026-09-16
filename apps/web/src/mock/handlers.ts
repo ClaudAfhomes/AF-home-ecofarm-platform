@@ -247,7 +247,7 @@ function voucherIdFromPath(ctx: MockRequestContext): string | undefined {
   return match ? match[1] : undefined;
 }
 
-/** F2-B: direct referral projection (single-level — BR-REF-001/002). */
+/** F2-B: direct referral projection (single-level - BR-REF-001/002). */
 function toDirectReferral(member: MockMember): DirectReferral {
   return {
     id: member.id,
@@ -258,7 +258,7 @@ function toDirectReferral(member: MockMember): DirectReferral {
   };
 }
 
-/** F2-B: recursive genealogy tree — visualization only, never commission (BI-004). */
+/** F2-B: recursive genealogy tree - visualization only, never commission (BI-004). */
 function buildGenealogyNode(store: MockStore, member: MockMember): GenealogyNode {
   const children = store.members
     .filter((candidate) => candidate.sponsorId === member.id)
@@ -274,7 +274,7 @@ function buildGenealogyNode(store: MockStore, member: MockMember): GenealogyNode
   };
 }
 
-/** F2-B: upline chain — topmost reachable ancestor → direct sponsor (cycle-guarded). */
+/** F2-B: upline chain - topmost reachable ancestor → direct sponsor (cycle-guarded). */
 function buildAncestorChain(store: MockStore, member: MockMember): GenealogyNode[] {
   const chain: GenealogyNode[] = [];
   const visited = new Set<string>([member.id]);
@@ -296,7 +296,7 @@ function buildAncestorChain(store: MockStore, member: MockMember): GenealogyNode
   return chain;
 }
 
-/** F2-B: descendant set of a member (the member's network, reporting only — BR-RPT-002). */
+/** F2-B: descendant set of a member (the member's network, reporting only - BR-RPT-002). */
 function networkDescendants(store: MockStore, memberId: string): MockMember[] {
   const result: MockMember[] = [];
   const visit = (parentId: string) => {
@@ -311,7 +311,7 @@ function networkDescendants(store: MockStore, memberId: string): MockMember[] {
   return result;
 }
 
-/** F2-B: network summary — reporting concept only, no MLM implication (BI-004). */
+/** F2-B: network summary - reporting concept only, no MLM implication (BI-004). */
 function toGroupNetwork(store: MockStore, member: MockMember): GroupNetwork {
   const descendants = networkDescendants(store, member.id);
   return {
@@ -323,7 +323,7 @@ function toGroupNetwork(store: MockStore, member: MockMember): GroupNetwork {
   };
 }
 
-/** F2-B: voucher projection — values are server-authoritative exact-decimal strings. */
+/** F2-B: voucher projection - values are server-authoritative exact-decimal strings. */
 function toVoucher(voucher: MockVoucher): Voucher {
   return {
     id: voucher.id,
@@ -607,7 +607,7 @@ export function memberMockHandlers(store: MockStore): MockRoute[] {
           if (typeof bodyDev === 'string' && /^[A-Za-z]{2}$/.test(bodyDev.trim())) {
             return bodyDev.trim().toUpperCase();
           }
-          // 2) Vite env var — VITE_DEV_LOCATION_COUNTRY (DEV ONLY)
+          // 2) Vite env var - VITE_DEV_LOCATION_COUNTRY (DEV ONLY)
           try {
             const viteEnv = (import.meta as unknown as { env?: Record<string, string> }).env;
             const envVal = viteEnv?.VITE_DEV_LOCATION_COUNTRY ?? viteEnv?.DEV_LOCATION_COUNTRY;
@@ -654,7 +654,7 @@ export function memberMockHandlers(store: MockStore): MockRoute[] {
             accuracy: typeof body.accuracy === 'number' ? body.accuracy : undefined,
           });
         }
-        // IP fallback — use ONLY existing Vercel header, never PH default
+        // IP fallback - use ONLY existing Vercel header, never PH default
         const raw = (ctx.header('x-vercel-ip-country') ?? '').trim().toUpperCase();
         if (raw && /^[A-Z]{2}$/.test(raw)) {
           const { programId, programCode } = mapCountryToProgram(raw);
@@ -772,7 +772,7 @@ export function memberMockHandlers(store: MockStore): MockRoute[] {
           .filter((entry) => entry.memberId === member.id)
           .sort((a, b) => a.id.localeCompare(b.id));
 
-        // Filter by type/status — allowlisted keys only (SCR-MEM-009).
+        // Filter by type/status - allowlisted keys only (SCR-MEM-009).
         const allowedTypes = [
           'DIRECT_COMMISSION',
           'DIRECT_REFERRAL',
@@ -806,7 +806,7 @@ export function memberMockHandlers(store: MockStore): MockRoute[] {
           };
         });
 
-        // Apply the allowlisted type filter AFTER balance computation — running
+        // Apply the allowlisted type filter AFTER balance computation - running
         // balance is computed over the full append-only ledger, then filtered.
         if (typeFilter) {
           if (!allowedTypes.includes(typeFilter)) {
@@ -903,7 +903,7 @@ export function memberMockHandlers(store: MockStore): MockRoute[] {
       handler: () => {
         const member = currentMember(store);
         if (!member) return unauthorized();
-        // Own rows + broadcasts (memberId null), newest first — mirrors the
+        // Own rows + broadcasts (memberId null), newest first - mirrors the
         // real endpoint (member_id.is.null OR member_id.eq.<uid>).
         const items = store.notifications
           .filter(
@@ -1327,7 +1327,7 @@ export function memberMockHandlers(store: MockStore): MockRoute[] {
         store.nextWithdrawalId += 1;
         store.withdrawals.push(withdrawal);
 
-        // Reserve funds immediately — exact-decimal, never negative (BR-WDR-002, BI-001).
+        // Reserve funds immediately - exact-decimal, never negative (BR-WDR-002, BI-001).
         wallet.availableBalance = subtractMoney(wallet.availableBalance, amount);
         store.ledger.push({
           id: `led-${String(store.nextLedgerId).padStart(3, '0')}`,

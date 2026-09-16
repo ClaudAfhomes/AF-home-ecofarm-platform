@@ -75,7 +75,7 @@ function CopyLinkButton({ url }: CopyLinkButtonProps) {
 
 /**
  * Marketing Tools (SCR-MEM-022, FR-ADM-003). Admin-uploaded marketing assets
- * (BR-MKT-002) — posters, flyers, images, PDFs, and videos. Every item with a
+ * (BR-MKT-002) - posters, flyers, images, PDFs, and videos. Every item with a
  * downloadUrl is both viewable (View → Dialog) and downloadable (Download).
  * News/announcements live in Notifications, not here. All share/download URLs
  * are server-provided; external links use rel noopener. No raw HTML.
@@ -106,7 +106,7 @@ export function ContentLibraryPage() {
     <section>
       <PageHeader
         title="Marketing Tools"
-        description="Ready-to-share posters, flyers, images, PDFs, and videos — preview before you share or download."
+        description="Ready-to-share posters, flyers, images, PDFs, and videos - preview before you share or download."
         actions={
           <div className={styles.headerActions}>
             <ButtonLink to="/member/vouchers" variant="secondary">

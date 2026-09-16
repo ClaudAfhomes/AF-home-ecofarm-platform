@@ -18,7 +18,7 @@ export function buildContentShare(title: string, downloadUrl: string) {
   };
 }
 
-/** GET /admin/content — full library incl. unpublished (super_admin + admin). */
+/** GET /admin/content - full library incl. unpublished (super_admin + admin). */
 export async function listAdminContent(req: VercelRequest, res: VercelResponse) {
   const auth = await verifyStaffModule(req, 'marketing_tools', ['super_admin', 'admin']);
   if ('error' in auth) {
@@ -41,7 +41,7 @@ export async function listAdminContent(req: VercelRequest, res: VercelResponse) 
   okList(res, rows.filter(isValidContentItemRow));
 }
 
-/** POST /admin/content — publish marketing content (super_admin + admin, FR-ADM-003). */
+/** POST /admin/content - publish marketing content (super_admin + admin, FR-ADM-003). */
 export async function createAdminContent(req: VercelRequest, res: VercelResponse) {
   const auth = await verifyStaffModule(req, 'marketing_tools', ['super_admin', 'admin']);
   if ('error' in auth) {
@@ -104,7 +104,7 @@ export async function createAdminContent(req: VercelRequest, res: VercelResponse
   res.status(201).json(validated.data);
 }
 
-/** GET + POST /admin/content — full library and publish (super_admin + admin). */
+/** GET + POST /admin/content - full library and publish (super_admin + admin). */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');

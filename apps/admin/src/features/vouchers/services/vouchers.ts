@@ -16,7 +16,7 @@ export type CreateVoucherInput = { title: string; originalValue: string };
 export type AssignVoucherInput = AssignVoucherRequest;
 
 /**
- * Voucher service — "Create Voucher" makes a definition (title + value); a
+ * Voucher service - "Create Voucher" makes a definition (title + value); a
  * member is assigned to it afterwards with per-assignment expiry/validity.
  * The backend is the system of record; failures surface to the caller.
  */
@@ -31,7 +31,7 @@ export function getVoucherTemplate(id: string): Promise<VoucherTemplate> {
   return request(`/admin/voucher-templates/${id}`, voucherTemplateSchema);
 }
 
-/** POST /admin/voucher-templates — create a voucher definition (title + value). */
+/** POST /admin/voucher-templates - create a voucher definition (title + value). */
 export function createVoucher(input: CreateVoucherInput): Promise<VoucherTemplate> {
   return request('/admin/voucher-templates', voucherTemplateSchema, {
     method: 'POST',
@@ -52,7 +52,7 @@ export function getAllVoucherAssignments(): Promise<VoucherAssignment[]> {
   return requestList('/admin/vouchers', voucherAssignmentSchema);
 }
 
-/** POST /admin/vouchers/assign — assign a definition to a member with expiry/validity. */
+/** POST /admin/vouchers/assign - assign a definition to a member with expiry/validity. */
 export function assignVoucher(input: AssignVoucherInput): Promise<VoucherAssignment> {
   const body: Record<string, unknown> = { templateId: input.templateId, memberId: input.memberId };
   if (input.expiresAt !== undefined) body.expiresAt = input.expiresAt;
@@ -63,7 +63,7 @@ export function assignVoucher(input: AssignVoucherInput): Promise<VoucherAssignm
   });
 }
 
-/** POST /admin/vouchers/scan — resolve a QR code (verify-only). */
+/** POST /admin/vouchers/scan - resolve a QR code (verify-only). */
 export function scanVoucher(code: string): Promise<VoucherAssignment> {
   return request('/admin/vouchers/scan', voucherAssignmentSchema, {
     method: 'POST',
@@ -71,7 +71,7 @@ export function scanVoucher(code: string): Promise<VoucherAssignment> {
   });
 }
 
-/** POST /admin/vouchers/:id/redeem — confirm a scan, redeem in full. */
+/** POST /admin/vouchers/:id/redeem - confirm a scan, redeem in full. */
 export function redeemVoucher(id: string): Promise<VoucherAssignment> {
   return request(`/admin/vouchers/${id}/redeem`, voucherAssignmentSchema, {
     method: 'POST',
@@ -79,7 +79,7 @@ export function redeemVoucher(id: string): Promise<VoucherAssignment> {
   });
 }
 
-/** DELETE /admin/vouchers/:id — revoke/unassign one member voucher. */
+/** DELETE /admin/vouchers/:id - revoke/unassign one member voucher. */
 export async function deleteVoucher(id: string): Promise<boolean> {
   await request(`/admin/vouchers/${id}`, deleteResultSchema, { method: 'DELETE' });
   return true;

@@ -10,7 +10,7 @@ import { prefixedId } from '../../../../_lib/pipeline.js';
 import { methodNotAllowed, readJsonBody, requireService } from '../../../../_lib/rest.js';
 
 /**
- * POST /admin/conversations/:memberId/messages — staff reply in a member's
+ * POST /admin/conversations/:memberId/messages - staff reply in a member's
  * thread (API-SPECIFICATION #92). 404s unknown members. Audited
  * (MESSAGE_SENT, NFR-SEC-002); audit failure never breaks the reply itself.
  */

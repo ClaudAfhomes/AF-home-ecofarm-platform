@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { downloadQrImage, QrCode } from '../index';
 
 /**
- * QrCode renders the matrix as a data-URL image locally — no external
+ * QrCode renders the matrix as a data-URL image locally - no external
  * service. Generation is async (qrcode lib), so the img src resolves after
  * the promise. The download helper writes a PNG from the generated matrix.
  */

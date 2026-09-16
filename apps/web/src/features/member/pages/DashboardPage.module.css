@@ -1,5 +1,5 @@
 /*
- * Member dashboard (SCR-MEM-001) — Financial summary + activity/relationship.
+ * Member dashboard (SCR-MEM-001) - Financial summary + activity/relationship.
  */
 
 .statusBanner {
@@ -81,7 +81,7 @@
   }
 }
 
-/* ── Financial summary — 4 dashboard cards ────────────────────────────── */
+/* ── Financial summary - 4 dashboard cards ────────────────────────────── */
 
 .financialGrid {
   display: grid;
@@ -307,7 +307,14 @@
   line-height: 1.2;
 }
 
-/* ── Lower section — Recent Sales + Genealogy ─────────────────────────── */
+.quickMetaSkeleton {
+  display: inline-block;
+  width: 72px;
+  height: 12px;
+  vertical-align: middle;
+}
+
+/* ── Lower section - Recent Sales + Genealogy ─────────────────────────── */
 
 .lowerSection {
   margin-top: var(--space-6);
@@ -430,7 +437,7 @@
   gap: var(--space-3);
 }
 
-/* Legacy — kept for backwards compat if referenced */
+/* Legacy - kept for backwards compat if referenced */
 .grid {
   display: grid;
   gap: var(--space-4);

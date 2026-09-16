@@ -11,7 +11,7 @@ export interface PropertyGalleryProps {
 
 /**
  * Detail-page gallery. Shows a large hero image with thumbnail buttons to
- * switch photos. Imagery is stock/representative — captioned as such — and the
+ * switch photos. Imagery is stock/representative - captioned as such - and the
  * thumbnails are real buttons (keyboard accessible, visible focus, aria-pressed
  * state) rather than clickable divs.
  */

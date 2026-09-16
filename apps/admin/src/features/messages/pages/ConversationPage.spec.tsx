@@ -37,7 +37,7 @@ describe('admin ConversationPage', () => {
       await screen.findByText('Hello, I have a question about my commission.'),
     ).toBeInTheDocument();
     expect(
-      screen.getByText('Hi Juan! Happy to help — what would you like to know?'),
+      screen.getByText('Hi Juan! Happy to help - what would you like to know?'),
     ).toBeInTheDocument();
     // Sender name appears in the breadcrumb and the member bubble.
     expect(screen.getAllByText('Juan Dela Cruz').length).toBeGreaterThanOrEqual(1);

@@ -34,7 +34,7 @@ describe('PropertiesPage', () => {
 
     // One featured property per category (first record in each).
     expect(
-      screen.getByRole('heading', { name: 'Prisma Residences – Celeste Building Condo' }),
+      screen.getByRole('heading', { name: 'Prisma Residences - Celeste Building Condo' }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole('heading', { name: '250 SQM Farm Lot with Hotspring' }),

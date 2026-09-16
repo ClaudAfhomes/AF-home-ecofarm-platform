@@ -88,7 +88,7 @@ export function RegistrationsPage() {
           <p role="status" className={styles.noticeBanner}>
             {hiddenInvalid} application{hiddenInvalid === 1 ? '' : 's'} could not be displayed
             because some stored details are incomplete. The dashboard count includes{' '}
-            {hiddenInvalid === 1 ? 'it' : 'them'} — check the server logs for
+            {hiddenInvalid === 1 ? 'it' : 'them'} - check the server logs for
             {` "[registrations] dropping invalid row"`} and re-save the application.
           </p>
         ) : null}
@@ -234,7 +234,7 @@ export function RegistrationsPage() {
                           color: 'var(--color-text-secondary)',
                         }}
                       >
-                        {row.referralCode ?? '—'}
+                        {row.referralCode ?? '-'}
                       </span>
                     </TableCell>
                     <TableCell label="Submitted">{formatDate(row.submittedAt)}</TableCell>

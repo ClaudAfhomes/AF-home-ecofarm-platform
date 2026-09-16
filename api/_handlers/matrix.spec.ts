@@ -66,6 +66,10 @@ import voucherById from './admin/vouchers/[id].js';
 import createProperty from './admin/properties.js';
 import listCategories from './admin/property-categories.js';
 import categoryBySlug from './admin/property-categories/[slug].js';
+import listInquiries from './admin/inquiries.js';
+import inquiryById from './admin/inquiries/[id].js';
+import listAdminPrograms from './admin/programs.js';
+import programById from './admin/programs/[id].js';
 
 /**
  * Auth-presence matrix (Phase B3): every governed endpoint must reject
@@ -426,7 +430,27 @@ const CASES: { name: string; handler: Handler; req: VercelRequest }[] = [
   {
     name: 'DELETE /admin/property-categories/:slug',
     handler: categoryBySlug,
-    req: { method: 'DELETE', query: { slug: 'x' }, headers: {} },
+    req: { method: 'DELETE', query: { slug: 'x' }, headers: {}, body: {} },
+  },
+  {
+    name: 'GET /admin/inquiries',
+    handler: listInquiries,
+    req: { method: 'GET', query: {}, headers: {}, body: {} },
+  },
+  {
+    name: 'PATCH /admin/inquiries/:id',
+    handler: inquiryById,
+    req: { method: 'PATCH', query: { id: 'inq-1' }, headers: {}, body: {} },
+  },
+  {
+    name: 'GET /admin/programs',
+    handler: listAdminPrograms,
+    req: { method: 'GET', query: {}, headers: {}, body: {} },
+  },
+  {
+    name: 'PATCH /admin/programs/:id',
+    handler: programById,
+    req: { method: 'PATCH', query: { id: 'prg-domestic' }, headers: {}, body: {} },
   },
 ];
 

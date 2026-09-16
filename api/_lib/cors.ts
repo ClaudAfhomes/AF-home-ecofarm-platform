@@ -18,7 +18,7 @@ function allowedOrigins(): Set<string> {
  * CORS for the same-origin deployment. Only the app's own origins (from
  * `VITE_WEB_URL` / `VITE_ADMIN_URL`, plus localhost dev) receive CORS headers;
  * any other origin gets none, so the browser blocks cross-origin reads of the
- * response. Never sends `Access-Control-Allow-Origin: *` — with header-based
+ * response. Never sends `Access-Control-Allow-Origin: *` - with header-based
  * auth there is no legitimate cross-origin caller to wildcard-open.
  */
 export function setCors(

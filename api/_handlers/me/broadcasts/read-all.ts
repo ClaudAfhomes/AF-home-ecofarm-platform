@@ -6,7 +6,7 @@ import type { VercelRequest, VercelResponse } from '../../../_lib/http.js';
 import { methodNotAllowed, requireService } from '../../../_lib/rest.js';
 
 /**
- * POST /me/broadcasts/read-all — read receipts for every visible unread
+ * POST /me/broadcasts/read-all - read receipts for every visible unread
  * notification (own + broadcasts). Idempotent: already-read rows are
  * skipped, so re-calling returns `{ updated: 0 }`.
  */
@@ -55,7 +55,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   );
   const now = new Date().toISOString();
   // Only genuinely unread rows (no receipt AND no legacy row read_at,
-  // matching the GET merge) — otherwise the count would claim work the
+  // matching the GET merge) - otherwise the count would claim work the
   // client already renders as read.
   const pending = (
     ((visible as { id?: unknown; read_at?: unknown }[] | null) ?? []) as {

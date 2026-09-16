@@ -1,10 +1,10 @@
--- Phase 3B — privilege-level hardening (belt-and-braces beyond RLS).
+-- Phase 3B - privilege-level hardening (belt-and-braces beyond RLS).
 --
 -- Policies already forbid authenticated writes on Member/MemberRole; these
 -- revokes remove the underlying table privileges too, so even a future policy
 -- mistake cannot grant write access (RLS only filters rows for roles that
 -- hold the privilege). service_role keeps full access.
--- Idempotent. Down (rollback only — not recommended): grant insert, update,
+-- Idempotent. Down (rollback only - not recommended): grant insert, update,
 -- delete on the affected tables to authenticated.
 
 revoke insert, update, delete, truncate on "Member" from authenticated, anon;

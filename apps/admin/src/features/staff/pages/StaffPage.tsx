@@ -67,7 +67,7 @@ function TableSkeleton() {
   );
 }
 
-/** Staff directory — read-only roster with role/status management on detail. */
+/** Staff directory - read-only roster with role/status management on detail. */
 export function StaffPage() {
   const navigate = useNavigate();
   const { data, isPending, isError, error, refetch } = useStaff();

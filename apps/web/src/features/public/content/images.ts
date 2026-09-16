@@ -84,7 +84,7 @@ export const CATEGORY_IMAGES = {
 
 /**
  * Gallery images for each property listing, keyed by property id. All are
- * representative stock imagery of the *type* of property — never a claim that a
+ * representative stock imagery of the *type* of property - never a claim that a
  * specific unit is exactly represented. The first image is the card/detail hero.
  * Mountain View placeholders are staged in 4 + 2 slots to match the six legacy
  * flyers; swap in the real flyer files when they are available.
@@ -173,12 +173,12 @@ export const ABOUT_IMAGES = {
 } satisfies Record<string, Photo>;
 
 /**
- * Hero imagery for every public landing page — centralized so the full set can
+ * Hero imagery for every public landing page - centralized so the full set can
  * be swapped for approved real-property photography in one place. Each page
  * gets its own relevant image while keeping a consistent JA&D visual identity.
  */
 export const HERO_IMAGES = {
-  /** Home — hero stays on the existing `IMAGES.hero`. */
+  /** Home - hero stays on the existing `IMAGES.hero`. */
   home: IMAGES.hero,
   about: {
     id: 'photo-1512917774080-9991f1c4c750',

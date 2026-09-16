@@ -1,6 +1,6 @@
 /**
  * Per-endpoint staff role matrix (Phase B3). Single testable source for who
- * may call what — handlers reference these constants instead of inline
+ * may call what - handlers reference these constants instead of inline
  * literals. Mirrors docs/architecture/API-SPECIFICATION.md §6 inventory.
  */
 

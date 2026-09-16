@@ -21,7 +21,7 @@ const TONE_ICON: Record<StatusTone, IconName> = {
 
 /**
  * Compact status indicator. Always conveys state with text + icon + color,
- * never color alone (DESIGN-SYSTEM §1.1). Presentational — the status
+ * never color alone (DESIGN-SYSTEM §1.1). Presentational - the status
  * vocabulary comes from the API/contracts, never invented in the UI.
  */
 export function StatusChip({ label, tone = 'neutral', icon }: StatusChipProps) {

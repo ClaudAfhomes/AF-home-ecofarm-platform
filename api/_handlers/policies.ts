@@ -8,13 +8,13 @@ import type { VercelRequest, VercelResponse } from '../_lib/http.js';
 import { prefixedId } from '../_lib/pipeline.js';
 import { methodNotAllowed, okList, readJsonBody, requireService } from '../_lib/rest.js';
 
-/** GET /policies — public list (API-SPECIFICATION #69). */
+/** GET /policies - public list (API-SPECIFICATION #69). */
 async function listPolicies(req: VercelRequest, res: VercelResponse) {
   const supabase = requireService(res);
   if (!supabase) return;
   const { data, error } = await supabase
     .from('Policy')
-    .select('id, type, title, content, document_url, updated_at')
+    .select('id, slug, type, title, content, document_url, updated_at')
     .order('id');
   if (error) {
     const { error: env, status } = toErrorEnvelope('INTERNAL', error.message, 500);
@@ -23,6 +23,7 @@ async function listPolicies(req: VercelRequest, res: VercelResponse) {
   }
   const rows = (((data as unknown[]) ?? []) as Record<string, unknown>[]).map((row) => ({
     id: row.id,
+    slug: row.slug,
     type: row.type,
     title: row.title,
     content: row.content,
@@ -35,7 +36,7 @@ async function listPolicies(req: VercelRequest, res: VercelResponse) {
   );
 }
 
-/** POST /policies — admin policy create (FR-ADM-004). The PDF is required. */
+/** POST /policies - admin policy create (FR-ADM-004). The PDF is required. */
 async function createPolicy(req: VercelRequest, res: VercelResponse) {
   const auth = await verifyStaffModule(req, 'policies', ADMIN_STAFF);
   if ('error' in auth) {
@@ -64,6 +65,7 @@ async function createPolicy(req: VercelRequest, res: VercelResponse) {
   if (!supabase) return;
   const row = {
     id: prefixedId('pol'),
+    slug: parsed.data.slug,
     title: parsed.data.title,
     type: parsed.data.type,
     content: parsed.data.content?.trim() ? parsed.data.content.trim() : null,
@@ -71,16 +73,21 @@ async function createPolicy(req: VercelRequest, res: VercelResponse) {
   };
   const { data, error } = await supabase.from('Policy').insert(row).select().single();
   if (error || !data) {
+    // A duplicate slug is a user-fixable conflict, not a server error.
+    const conflict = /duplicate key|unique constraint/i.test(error?.message ?? '');
     const { error: env, status } = toErrorEnvelope(
-      'INTERNAL',
-      error?.message ?? 'Failed to save policy',
-      500,
+      conflict ? 'CONFLICT' : 'INTERNAL',
+      conflict
+        ? 'That URL slug is already in use. Choose another.'
+        : (error?.message ?? 'Failed to save policy'),
+      conflict ? 409 : 500,
     );
     res.status(status).json({ error: env });
     return;
   }
   const created = data as {
     id: string;
+    slug: string;
     type: string;
     title: string;
     content: unknown;
@@ -89,6 +96,7 @@ async function createPolicy(req: VercelRequest, res: VercelResponse) {
   };
   const mapped = {
     id: created.id,
+    slug: created.slug,
     type: created.type,
     title: created.title,
     content: created.content,
@@ -117,7 +125,7 @@ async function createPolicy(req: VercelRequest, res: VercelResponse) {
   res.status(201).json(validated.data);
 }
 
-/** GET + POST /policies — public list, admin create. */
+/** GET + POST /policies - public list, admin create. */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');

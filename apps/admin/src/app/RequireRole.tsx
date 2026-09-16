@@ -2,7 +2,7 @@ import { useEffect, type ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router';
 
 import { useSession } from '../lib/session';
-import { Button, Forbidden, Skeleton } from '@jad/ui';
+import { Button, Forbidden, Skeleton, Spinner } from '@jad/ui';
 
 import {
   canAccess,
@@ -42,7 +42,8 @@ function RedirectToWebLogin() {
 
 function LoadingState() {
   return (
-    <div className={styles.loading} role="status">
+    <div className={styles.loading} role="status" aria-live="polite" aria-busy="true">
+      <Spinner className={styles.loadingSpinner} />
       <Skeleton />
       <Skeleton />
       <Skeleton />
@@ -53,13 +54,13 @@ function LoadingState() {
 /**
  * Route guard. Authenticated staff with an entry in the nav registry render the
  * page; authenticated staff without access see Forbidden; unauthenticated
- * visitors also see Forbidden (the real backend enforces authorization —
+ * visitors also see Forbidden (the real backend enforces authorization -
  * FRONTEND-ARCHITECTURE; visibility is never authorization). Unknown paths pass
  * through so the NotFound route handles them.
  *
  * When the session carries a role-resolution error (transient /admin/session
  * failure, e.g. an expired token after idle), the denial offers Retry instead
- * of stranding the user — a refresh is no longer required to recover.
+ * of stranding the user - a refresh is no longer required to recover.
  */
 export function RequireRole({ children }: { children: ReactNode }) {
   const { status, user, role, roleId, sessionError, revalidate, mustChangePassword } = useSession();
@@ -67,7 +68,7 @@ export function RequireRole({ children }: { children: ReactNode }) {
   // (the role catalog is super_admin-only); they win over fetched records.
   const sessionModules = user?.roleModules;
   // During a forced password change the roles endpoint is blocked by design
-  // (verifyStaff rejects mustChangePassword) and module RBAC is irrelevant —
+  // (verifyStaff rejects mustChangePassword) and module RBAC is irrelevant -
   // the redirect below pins the user to My Account. Never wait on role
   // records in that state, or the page sits in the loading skeleton.
   // Unauthenticated sessions never fetch either (the flag is unknown).

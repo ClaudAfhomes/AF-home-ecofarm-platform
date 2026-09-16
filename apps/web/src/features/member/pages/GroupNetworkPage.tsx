@@ -8,7 +8,7 @@ import styles from './GroupNetworkPage.module.css';
 const numberFmt = new Intl.NumberFormat('en-PH');
 
 /**
- * Group Network (SCR-MEM-017, FR-RPT-002). Reporting/network summary ONLY —
+ * Group Network (SCR-MEM-017, FR-RPT-002). Reporting/network summary ONLY -
  * never implies or computes multi-level commission entitlement (BI-004,
  * BR-RPT-002). All counts are server-provided.
  */

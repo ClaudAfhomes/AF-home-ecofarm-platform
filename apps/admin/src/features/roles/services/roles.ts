@@ -5,7 +5,7 @@ import { roleRecordSchema, type RoleRecord, type StaffModule } from '@jad/contra
 import { request, requestList } from '../../../lib/api/client';
 import type { StaffAuditActor } from '../../staff/services/staff';
 
-/** Role directory — REST over api/v1 (Phase B4 cutover). */
+/** Role directory - REST over api/v1 (Phase B4 cutover). */
 export function getRoles(): Promise<RoleRecord[]> {
   return requestList('/admin/roles', roleRecordSchema);
 }

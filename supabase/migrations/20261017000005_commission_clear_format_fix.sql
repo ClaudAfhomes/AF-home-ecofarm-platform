@@ -3,7 +3,7 @@
 -- `to_char(x, 'FM99999999999999999999.00')` renders zero as `.00` (FM strips
 -- the leading blank). `.00` violates the exact-decimal shape
 -- (`^[0-9]+(\.[0-9]{1,2})?$`) enforced by the wallet CHECKs and the
--- `commissionClearBatchSchema` contract — so a batch clearing nothing 500s
+-- `commissionClearBatchSchema` contract - so a batch clearing nothing 500s
 -- on response validation, and clearing a member's last PENDING commission
 -- would fail the wallet_pending_check on write.
 --
@@ -64,7 +64,7 @@ begin
     where "memberId" = v_c."memberId";
   insert into "AuditLog" (action, actor_id, actor_role, target_type, target_id, target_name, detail, created_at)
     values ('COMMISSION_CLEARED', p_actor, p_role, 'Commission', p_id,
-            v_c."commissionType" || ' — ' || v_c.amount,
+            v_c."commissionType" || ' - ' || v_c.amount,
             'Cleared commission ' || p_id || ' (' || v_c.amount || ').', v_now);
   return jsonb_build_object('status', 'AVAILABLE', 'clearedAt', v_now, 'amount', v_c.amount);
 end;

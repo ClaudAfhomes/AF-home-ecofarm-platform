@@ -97,7 +97,7 @@ export function AdminLayout() {
   useEffect(() => {
     if (roleUnresolved) {
       console.warn(
-        '[AdminLayout] staff role unresolved — sidebar hidden (roleId=%s, roleRecords=%s)',
+        '[AdminLayout] staff role unresolved - sidebar hidden (roleId=%s, roleRecords=%s)',
         String(roleId ?? null),
         roles === undefined ? 'loading' : String(roles.length),
       );
@@ -151,7 +151,7 @@ export function AdminLayout() {
               <p className={styles.roleNoticeTitle}>Navigation unavailable</p>
               <p className={styles.roleNoticeText}>
                 Your staff role could not be resolved, so navigation links are hidden. Try reloading
-                — if this persists, an administrator needs to check your role assignment.
+                - if this persists, an administrator needs to check your role assignment.
               </p>
               <button
                 type="button"

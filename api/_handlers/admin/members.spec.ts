@@ -460,7 +460,7 @@ describe('DELETE /admin/members/:id permanent purge (super_admin only)', () => {
     await memberById(deleteReq({ reason: 'cleanup' }), res);
     expect(seen.status).toBe(200);
     expect(seen.body).toEqual({ purgedId: 'mem-uuid-1', authRemoved: false });
-    // One retry before giving up — the Member row is already gone.
+    // One retry before giving up - the Member row is already gone.
     expect(mocks.calls.filter((c) => c.table === 'auth.users').length).toBe(2);
     const audit = mocks.calls.find((c) => c.table === 'AuditLog')?.arg as Record<string, unknown>;
     expect(String(audit.detail)).toContain('auth user removal failed');

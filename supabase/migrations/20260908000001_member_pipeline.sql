@@ -1,6 +1,6 @@
 -- Member pipeline tables (Phase B3): registrations queue, customers,
 -- sales with resubmission/lock lifecycle, plus Member profile columns.
--- Idempotent. All service_role-only RLS — every read/write proxies through
+-- Idempotent. All service_role-only RLS - every read/write proxies through
 -- api/v1 Functions, which enforce JWT auth, ownership, and role matrix.
 -- SSOT: saleSchema / registration schemas in @jad/contracts.
 
@@ -121,6 +121,6 @@ end $$;
 -- Member-category roles (single MEMBER category; assigned via MemberRole).
 -- Staff roles live in 20260904000001_staff_roles.sql; both share the Role table.
 insert into "Role"(slug, name, description) values
-  ('member_basic', 'Member', 'Base member — single category default'),
+  ('member_basic', 'Member', 'Base member - single category default'),
   ('member_qualified', 'Qualified', 'Qualified member')
 on conflict (slug) do nothing;

@@ -28,7 +28,7 @@ function getWithdrawalStepIndex(status: string): number {
 
 /**
  * Withdrawal detail (SCR-MEM-014, FR-WDR-001..005). One of the member's own
- * withdrawal requests. Rejected requests are NOT editable or resubmittable —
+ * withdrawal requests. Rejected requests are NOT editable or resubmittable -
  * a new request is required (BR-WDR-005).
  */
 export function WithdrawalDetailPage() {
@@ -221,7 +221,7 @@ export function WithdrawalDetailPage() {
           </ol>
         ) : (
           <p className={styles.statusNote}>
-            This withdrawal was rejected — funds were released back to your Available Balance.
+            This withdrawal was rejected - funds were released back to your Available Balance.
           </p>
         )}
         <Link className={styles.ledgerLink} to="/member/ewallet/ledger?type=WITHDRAWAL_RESERVATION">
@@ -241,7 +241,7 @@ export function WithdrawalDetailPage() {
             Request a new withdrawal
           </ButtonLink>
           <p className={styles.note}>
-            Rejected withdrawals cannot be edited or resubmitted — please file a new request
+            Rejected withdrawals cannot be edited or resubmitted - please file a new request
             (BR-WDR-005).
           </p>
         </div>

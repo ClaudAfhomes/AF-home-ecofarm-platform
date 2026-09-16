@@ -1,4 +1,4 @@
--- Phase D follow-up — purge releases the member's application rows.
+-- Phase D follow-up - purge releases the member's application rows.
 --
 -- Owner-approved (purge-everything): a purged email must be reusable for a
 -- fresh re-registration. "Registration" carries a unique index on email (B8)
@@ -6,7 +6,7 @@
 -- and the base purge left the stale application behind. POST /auth/register
 -- then replays that non-PENDING row as 409 "already exists" forever, and the
 -- surviving auth identity stays login-capable. This revision deletes the
--- member's own application rows (email match, lowercased on both sides —
+-- member's own application rows (email match, lowercased on both sides - 
 -- registration intake stores emails lowercased) as part of the same single
 -- transaction, and reports the count in the returned snapshot for audit.
 -- Application rows of OTHER emails are untouched.

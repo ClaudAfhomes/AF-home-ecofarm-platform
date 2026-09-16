@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 /**
- * Forwardable content kind — PROPOSED. Managed marketing material (BR-MKT-001).
+ * Forwardable content kind - PROPOSED. Managed marketing material (BR-MKT-001).
  * The vocabulary is a free-string baseline (no SSOT enumeration); kept narrow so
  * the client can present each kind without inventing labels.
  */
@@ -10,10 +10,10 @@ export const contentKindSchema = z.enum(['DOCUMENT', 'IMAGE', 'VIDEO', 'PROMO'])
 export type ContentKind = z.infer<typeof contentKindSchema>;
 
 /**
- * Forwardable content — `GET /content/forwardable` (API-SPECIFICATION #68,
+ * Forwardable content - `GET /content/forwardable` (API-SPECIFICATION #68,
  * FEAT-061, FR-ADM-003, SCR-MEM-022). Members may forward permitted content via
  * Facebook Messenger and Viber and download permitted materials (BR-MKT-002).
- * Share/download URLs are SERVER-PROVIDED — the client never guesses external
+ * Share/download URLs are SERVER-PROVIDED - the client never guesses external
  * URLs. All link rendering is declarative React with automatic escaping; no raw
  * HTML (SECURITY.md §security-design). Shape is PROPOSED.
  */
@@ -24,7 +24,7 @@ export const forwardableContentSchema = z.object({
   kind: contentKindSchema,
   /** Server-provided download target (present when downloadable, BR-MKT-002). */
   downloadUrl: z.string().optional(),
-  /** Server-provided share targets — Messenger / Viber / copyable link. */
+  /** Server-provided share targets - Messenger / Viber / copyable link. */
   share: z
     .object({
       messengerUrl: z.string().optional(),
@@ -38,10 +38,10 @@ export const forwardableContentSchema = z.object({
 export type ForwardableContent = z.infer<typeof forwardableContentSchema>;
 
 /**
- * Create marketing content — `POST /admin/content` (FR-ADM-003).
+ * Create marketing content - `POST /admin/content` (FR-ADM-003).
  * The id/createdAt are server-generated; `published` defaults to true so
  * newly created content is immediately visible to members via
- * `GET /content/forwardable`. `share` may be omitted — the server fills
+ * `GET /content/forwardable`. `share` may be omitted - the server fills
  * server-provided share targets from the download URL.
  */
 export const createContentItemRequestSchema = z.object({
@@ -62,7 +62,7 @@ export const createContentItemRequestSchema = z.object({
 export type CreateContentItemRequest = z.infer<typeof createContentItemRequestSchema>;
 
 /**
- * Update marketing content — `PATCH /admin/content/:id` (FR-ADM-003).
+ * Update marketing content - `PATCH /admin/content/:id` (FR-ADM-003).
  * All-optional (partial) over the editable surface: title, description,
  * kind, downloadUrl. Empty patch is rejected by the handler ("Nothing to
  * update."). A new downloadUrl swaps the file: the server rebuilds
@@ -84,11 +84,11 @@ export const updateContentItemRequestSchema = createContentItemRequestSchema
 export type UpdateContentItemRequest = z.infer<typeof updateContentItemRequestSchema>;
 
 /**
- * Delete marketing content — `DELETE /admin/content/:id` (FR-ADM-003).
+ * Delete marketing content - `DELETE /admin/content/:id` (FR-ADM-003).
  * Removes the `ContentItem` row and, when the download URL points inside
  * the `marketing-tools` Storage bucket, the uploaded object as well.
  * `fileRemoved` is false when there was no bucket object to remove (external
- * URL) or the storage removal failed — the row delete still succeeds.
+ * URL) or the storage removal failed - the row delete still succeeds.
  */
 export const deleteContentItemResponseSchema = z.object({
   id: z.string().min(1),
@@ -99,7 +99,7 @@ export const deleteContentItemResponseSchema = z.object({
 export type DeleteContentItemResponse = z.infer<typeof deleteContentItemResponseSchema>;
 
 /**
- * Signed-upload request — `POST /cms/upload/sign` (FR-ADM-003 upload step).
+ * Signed-upload request - `POST /cms/upload/sign` (FR-ADM-003 upload step).
  * `kind` selects the allowlist + size cap; legacy CMS image callers omit it
  * and get the IMAGE rules (backward compatible).
  */

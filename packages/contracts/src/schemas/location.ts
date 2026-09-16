@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
 /**
- * Location verification — BE authoritative.
+ * Location verification - BE authoritative.
  * POST /registration/location-verify (API-SPECIFICATION #16, FEAT-014/015, BR-GEO-001..004).
- * GPS primary, IP fallback, PH-block. Accuracy/anti-spoof thresholds are TBD (OD-014/015) — not enforced for MVP.
+ * GPS primary, IP fallback, PH-block. Accuracy/anti-spoof thresholds are TBD (OD-014/015) - not enforced for MVP.
  *
  * Frontend must NOT trust GPS alone; BE verifies and maps to program.
  * Mapping Philippines → Domestic else Abroad is isolated in one BE service (see api/v1/registration/location-verify.ts).

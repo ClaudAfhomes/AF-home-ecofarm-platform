@@ -6,7 +6,7 @@ import type { VercelRequest, VercelResponse } from '../../../_lib/http.js';
 import { methodNotAllowed, requireService } from '../../../_lib/rest.js';
 
 /**
- * POST /me/messages/read — mark own thread read (API-SPECIFICATION #92).
+ * POST /me/messages/read - mark own thread read (API-SPECIFICATION #92).
  * Upserts the Conversation watermark (memberLastReadAt=now, memberUnread=0);
  * idempotent, works before any message exists.
  */

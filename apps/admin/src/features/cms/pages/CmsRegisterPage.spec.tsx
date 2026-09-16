@@ -18,7 +18,7 @@ function renderRegister(route = '/admin/cms/register', user = MOCK_SUPER_ADMIN) 
   return renderWithProviders(<CmsRegisterPage />, { route, user });
 }
 
-describe('CmsRegisterPage — Register CMS module', () => {
+describe('CmsRegisterPage - Register CMS module', () => {
   let server: ReturnType<typeof installMockApi>;
 
   beforeEach(() => {

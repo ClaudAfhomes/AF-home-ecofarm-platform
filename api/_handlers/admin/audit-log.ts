@@ -6,7 +6,7 @@ import type { VercelRequest, VercelResponse } from '../../_lib/http.js';
 import { methodNotAllowed, okList, requireService } from '../../_lib/rest.js';
 import { toErrorEnvelope } from '../../_lib/envelope.js';
 
-/** GET /admin/audit-log — newest first, capped page size (super_admin only). */
+/** GET /admin/audit-log - newest first, capped page size (super_admin only). */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');

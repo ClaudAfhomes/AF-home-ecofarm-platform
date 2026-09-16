@@ -2,7 +2,7 @@
  * Shared content types for the JAD public website.
  *
  * All copy below is the polished, owner-presentable marketing baseline. It is
- * authored to stay within the approved business positioning — no figures,
+ * authored to stay within the approved business positioning - no figures,
  * availability, or financial outcomes are claimed.
  */
 
@@ -48,7 +48,7 @@ export interface Pillar {
  * A property category presented on the site.
  *
  * `slug` is the URL segment (e.g. `tenanted-condo-resales`); properties
- * reference it via `Property.categoryId`. This is the single source of truth —
+ * reference it via `Property.categoryId`. This is the single source of truth -
  * the UI derives category listings from it rather than duplicating records.
  */
 export interface PropertyCategory {

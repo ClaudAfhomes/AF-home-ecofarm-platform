@@ -4,7 +4,7 @@ import { isValidVoucherRow, mapVoucherRow } from '../../_lib/pipeline.js';
 import { methodNotAllowed, okList, requireService } from '../../_lib/rest.js';
 import { toErrorEnvelope } from '../../_lib/envelope.js';
 
-/** GET /me/vouchers — own vouchers, newest first. */
+/** GET /me/vouchers - own vouchers, newest first. */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');

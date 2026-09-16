@@ -18,9 +18,9 @@ export const HOME = {
   },
   value: {
     eyebrow: 'The JA&D difference',
-    title: 'Good value for money — handled with diligence.',
+    title: 'Good value for money - handled with diligence.',
     paragraphs: [
-      'We find property that already works: titled units and lots with clean documents and, where possible, a tenant already in place under a live lease. The new owner becomes the landlord and collects rent directly under the existing lease — we never pool funds or manage money.',
+      'We find property that already works: titled units and lots with clean documents and, where possible, a tenant already in place under a live lease. The new owner becomes the landlord and collects rent directly under the existing lease - we never pool funds or manage money.',
       'From first conversation to closing, our role is advisory. We bridge sellers and buyers, verify the paperwork, and stay with you until every document and step is complete and correct.',
     ],
     image: IMAGES.value,
@@ -33,16 +33,16 @@ export const HOME = {
   featured: {
     eyebrow: 'What we represent',
     title: 'A glimpse of what we bring to the table.',
-    lead: 'The types of property we specialize in — each opportunity is presented individually, with full documentation.',
+    lead: 'The types of property we specialize in - each opportunity is presented individually, with full documentation.',
     cta: { label: 'View Property Categories', to: '/properties' },
   },
   approach: {
     eyebrow: 'The brokerage approach',
-    title: 'From first conversation to closing — transparent at every step.',
+    title: 'From first conversation to closing - transparent at every step.',
     steps: [
       {
         title: 'Understand your goal',
-        body: 'We listen first — whether you are buying, selling, or exploring what income-oriented property can mean for you.',
+        body: 'We listen first - whether you are buying, selling, or exploring what income-oriented property can mean for you.',
       },
       {
         title: 'Present the right opportunity',
@@ -54,7 +54,7 @@ export const HOME = {
       },
       {
         title: 'Close with confidence',
-        body: 'We coordinate the transfer so the buyer receives complete, correct documents — and ownership begins properly.',
+        body: 'We coordinate the transfer so the buyer receives complete, correct documents - and ownership begins properly.',
       },
       {
         title: 'Support beyond closing',
@@ -76,11 +76,11 @@ export const HOME = {
       },
       {
         title: 'Complete documentation',
-        body: 'Every transaction is supported by complete, correct documents — verified and explained to you.',
+        body: 'Every transaction is supported by complete, correct documents - verified and explained to you.',
       },
       {
         title: 'Honest, professional advice',
-        body: 'We help you understand what a property is and is not — so you can decide with confidence.',
+        body: 'We help you understand what a property is and is not - so you can decide with confidence.',
       },
     ] satisfies Pillar[],
   },
@@ -93,7 +93,7 @@ export const HOME = {
   },
   ctaBand: {
     title: 'Ready to explore what property can do for you?',
-    lead: 'Have a property opportunity or looking for the right property? Talk with JA&D Realty Services — we will guide you through every step.',
+    lead: 'Have a property opportunity or looking for the right property? Talk with JA&D Realty Services - we will guide you through every step.',
     primaryCta: { label: 'Talk to Us', to: '/contact' },
     secondaryCta: { label: 'Read the FAQs', to: '/faqs' },
   },

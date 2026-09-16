@@ -4,7 +4,7 @@ import { memberProfileSchema } from './member.js';
 import { accountStatusSchema } from './registration.js';
 
 /**
- * Admin dashboard queue counts — PROPOSED baseline (UI-UX §4.1 "Dashboard
+ * Admin dashboard queue counts - PROPOSED baseline (UI-UX §4.1 "Dashboard
  * (queues)"). Counts of actionable pending items for the documented queues
  * (Registrations, Sales, Withdrawals) plus the total non-archived member
  * count. Mock-only for F0; replaced by the real admin queue endpoints. Counts
@@ -20,7 +20,7 @@ export const adminQueuesSchema = z.object({
 export type AdminQueues = z.infer<typeof adminQueuesSchema>;
 
 /**
- * Admin member view — member profile plus back-office lifecycle fields.
+ * Admin member view - member profile plus back-office lifecycle fields.
  * Served by `GET /admin/members[/:id]`; `registrationId` is absent for
  * directly-created members.
  */
@@ -28,7 +28,7 @@ export const adminMemberSchema = memberProfileSchema.extend({
   accountStatus: accountStatusSchema,
   registeredAt: z.string(),
   registrationId: z.string().optional(),
-  /** Sponsor link (B7) — uuid of the sponsoring member, absent when unlinked. */
+  /** Sponsor link (B7) - uuid of the sponsoring member, absent when unlinked. */
   sponsorId: z.string().optional(),
   /** Sponsor's referral code + name for display (resolved server-side on detail reads). */
   sponsorReferralCode: z.string().optional(),

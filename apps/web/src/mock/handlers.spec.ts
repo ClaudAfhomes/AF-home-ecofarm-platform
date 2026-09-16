@@ -270,7 +270,7 @@ describe('F1 member mock API', () => {
       expect(commissions).toHaveLength(6);
       expect(commissions[0]).toMatchObject({
         commissionType: 'DIRECT_COMMISSION',
-        salePropertyName: 'Prisma Residences – Astra Building Condo',
+        salePropertyName: 'Prisma Residences - Astra Building Condo',
         status: 'PENDING',
       });
       expect(commissions[1]).toMatchObject({
@@ -505,7 +505,7 @@ describe('F1 member mock API', () => {
       expect(referrals[3]!.status).toBe('PENDING');
     });
 
-    it('computes the group network summary — reporting only, never MLM (SCR-MEM-017)', async () => {
+    it('computes the group network summary - reporting only, never MLM (SCR-MEM-017)', async () => {
       setMockSessionUser(MOCK_MEMBER);
       const network = await getGroupNetwork();
       expect(network).toEqual({
@@ -527,7 +527,7 @@ describe('F1 member mock API', () => {
       expect(genealogy.root.children[1]!.children).toHaveLength(0);
       expect(genealogy.root.children[2]!.children.map((node) => node.id)).toEqual(['mem-008']);
       expect(genealogy.root.children[3]!.children).toHaveLength(0);
-      // Juan is the network root — no sponsor, empty upline.
+      // Juan is the network root - no sponsor, empty upline.
       expect(genealogy.sponsor).toBeNull();
       expect(genealogy.ancestors).toEqual([]);
     });
@@ -646,7 +646,7 @@ describe('F1 member mock API', () => {
 
     it('404s a foreign member-scoped notification on mark-read', async () => {
       setMockSessionUser(MOCK_MEMBER_NOT_QUALIFIED);
-      // ntf-002 belongs to mem-001 — not visible to another member.
+      // ntf-002 belongs to mem-001 - not visible to another member.
       await expect(markNotificationRead('ntf-002')).rejects.toMatchObject({
         code: 'NOT_FOUND',
         status: 404,

@@ -65,7 +65,7 @@
   text-align: right;
 }
 
-/* Small viewports: rows collapse to stacked cards (UI-UX §11) — key fields
+/* Small viewports: rows collapse to stacked cards (UI-UX §11) - key fields
     first; labels from the cell `label` prop; never hide money values. */
 @media (max-width: 639px) {
   .table {

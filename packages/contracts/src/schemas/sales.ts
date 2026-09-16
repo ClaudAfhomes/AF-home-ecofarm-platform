@@ -8,7 +8,7 @@ import { exactDecimalStringSchema } from './money.js';
  * changes (BI-006); money stays exact-decimal strings.
  */
 
-/** Sale state machine — CONFIRMED (BUSINESS-RULES §5, DATABASE-DESIGN §7.13). */
+/** Sale state machine - CONFIRMED (BUSINESS-RULES §5, DATABASE-DESIGN §7.13). */
 export const saleStatusSchema = z.enum([
   'SUBMITTED',
   'ADMIN_APPROVED',
@@ -20,7 +20,7 @@ export const saleStatusSchema = z.enum([
 
 export type SaleStatus = z.infer<typeof saleStatusSchema>;
 
-/** Non-member customer record — `GET/POST /customers` (API-SPECIFICATION #23..25, FR-CUS-001/002). */
+/** Non-member customer record - `GET/POST /customers` (API-SPECIFICATION #23..25, FR-CUS-001/002). */
 export const customerSchema = z.object({
   id: z.string().min(1),
   fullName: z.string().min(1),
@@ -38,7 +38,7 @@ export const createCustomerRequestSchema = z.object({
 
 export type CreateCustomerRequest = z.infer<typeof createCustomerRequestSchema>;
 
-/** Sale — `GET /sales`, `GET /sales/:id` (API-SPECIFICATION #31/#32; AQ own). */
+/** Sale - `GET /sales`, `GET /sales/:id` (API-SPECIFICATION #31/#32; AQ own). */
 export const saleSchema = z.object({
   id: z.string().min(1),
   status: saleStatusSchema,
@@ -58,7 +58,7 @@ export const saleSchema = z.object({
   /**
    * Optional snapshot of the member who referred this customer, chosen from
    * the seller's direct referrals or typed free-form at submission
-   * (SCR-MEM-006). Informational only — has no commission effect
+   * (SCR-MEM-006). Informational only - has no commission effect
    * (BR-REF-001/002).
    */
   referrerName: z.string().optional(),
@@ -87,18 +87,18 @@ export const submitSaleRequestSchema = z.object({
 
 export type SubmitSaleRequest = z.infer<typeof submitSaleRequestSchema>;
 
-/** `POST /sales` response — the created sale in `Submitted` (API-SPECIFICATION §7.1). */
+/** `POST /sales` response - the created sale in `Submitted` (API-SPECIFICATION §7.1). */
 export const submitSaleResponseSchema = saleSchema;
 
 export type SubmitSaleResponse = z.infer<typeof submitSaleResponseSchema>;
 
-/** `POST /sales/:id/resubmit` — corrected sale re-enters approval (FR-SAL-005, #36). */
+/** `POST /sales/:id/resubmit` - corrected sale re-enters approval (FR-SAL-005, #36). */
 export const resubmitSaleRequestSchema = submitSaleRequestSchema;
 
 export type ResubmitSaleRequest = z.infer<typeof resubmitSaleRequestSchema>;
 
 /**
- * `POST /me/sales/:id/reopen-request` response — the member's request that a
+ * `POST /me/sales/:id/reopen-request` response - the member's request that a
  * LOCKED sale be reopened by Admin/Super Admin review (FR-SAL-007, #89
  * PROPOSED). Recorded and audited; the decision is staff-side.
  */

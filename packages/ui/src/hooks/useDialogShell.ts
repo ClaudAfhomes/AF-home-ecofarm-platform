@@ -62,7 +62,7 @@ export function useDialogShell({
   }, [open, panelRef, restoreFocus, lockScroll]);
 
   // Mirror the latest onClose so the keydown listener stays fresh without
-  // resubscribing (and re-running focus logic) on every parent re-render —
+  // resubscribing (and re-running focus logic) on every parent re-render -
   // consumers pass inline `onClose` closures with unstable identity.
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;

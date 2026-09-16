@@ -25,7 +25,7 @@ describe('RegistrationsPage', () => {
 
     const caption = await screen.findByText(/registrations page 1 of 1/);
     expect(caption).toBeInTheDocument();
-    // Pagination is rendered below table (max 10 rows per page) — visible even for single page
+    // Pagination is rendered below table (max 10 rows per page) - visible even for single page
     expect(screen.getByRole('navigation', { name: 'Pagination' })).toBeInTheDocument();
   });
 

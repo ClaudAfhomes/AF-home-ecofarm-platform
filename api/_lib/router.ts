@@ -1,5 +1,5 @@
 /**
- * Shared API router — single source of the URL→handler table.
+ * Shared API router - single source of the URL→handler table.
  *
  * Both `api/dev-server.ts` (local) and the single Vercel catch-all function
  * `api/v1/[...slug].ts` dispatch through `routeRequest`, so every endpoint is
@@ -8,7 +8,7 @@
  * functions; they are bundled into the catch-all instead).
  *
  * A new handler must be added as a lazy branch here (`lazy(() => import(...))`)
- * — `api/_lib/route-coverage.ts` fails CI if one is forgotten. Handlers are
+ * - `api/_lib/route-coverage.ts` fails CI if one is forgotten. Handlers are
  * loaded on first use (cold-start win); shared libs stay imported eagerly.
  */
 import type { VercelRequest, VercelResponse } from './http.js';
@@ -18,7 +18,7 @@ type HandlerFn = (req: VercelRequest, res: VercelResponse) => Promise<void> | vo
 export type RouteMatch = { handler: HandlerFn; routeKey: string | null };
 
 /**
- * Lazy handler loader — defers a handler module's evaluation until its first
+ * Lazy handler loader - defers a handler module's evaluation until its first
  * request (per-route code splitting). Big cold-start win for the monolith:
  * only the matched handler (plus shared libs) is evaluated per boot instead
  * of all ~90 modules. Cached per instance; each route gets its own loader.
@@ -76,6 +76,9 @@ export function selectHandler(
       routeKey: 'auth/verify-email/resend',
     };
   }
+  if (pathname === '/api/v1/contact' || pathname === '/api/contact') {
+    return { handler: lazy(() => import('../_handlers/contact.js')), routeKey: 'contact' };
+  }
   if (pathname === '/api/v1/cms/upload/sign' || pathname === '/api/cms/upload/sign') {
     return {
       handler: lazy(() => import('../_handlers/cms/upload/sign.js')),
@@ -87,6 +90,25 @@ export function selectHandler(
   }
   if (pathname === '/api/v1/programs' || pathname === '/api/programs') {
     return { handler: lazy(() => import('../_handlers/programs.js')), routeKey: 'programs' };
+  }
+  if (pathname === '/api/v1/admin/programs' || pathname === '/api/admin/programs') {
+    return {
+      handler: lazy(() => import('../_handlers/admin/programs.js')),
+      routeKey: 'admin/programs',
+    };
+  }
+  if (
+    pathname.startsWith('/api/v1/admin/programs/') ||
+    pathname.startsWith('/api/admin/programs/')
+  ) {
+    const m = pathname.match(/\/admin\/programs\/([^/]+)$/);
+    if (m) {
+      query.id = decodeURIComponent(m[1] ?? '');
+      return {
+        handler: lazy(() => import('../_handlers/admin/programs/[id].js')),
+        routeKey: 'admin/programs/[id]',
+      };
+    }
   }
   if (pathname === '/api/v1/config/public' || pathname === '/api/config/public') {
     return {
@@ -334,6 +356,25 @@ export function selectHandler(
       handler: lazy(() => import('../_handlers/admin/queues.js')),
       routeKey: 'admin/queues',
     };
+  }
+  if (pathname === '/api/v1/admin/inquiries' || pathname === '/api/admin/inquiries') {
+    return {
+      handler: lazy(() => import('../_handlers/admin/inquiries.js')),
+      routeKey: 'admin/inquiries',
+    };
+  }
+  if (
+    pathname.startsWith('/api/v1/admin/inquiries/') ||
+    pathname.startsWith('/api/admin/inquiries/')
+  ) {
+    const m = pathname.match(/\/inquiries\/([^/]+)$/);
+    if (m) {
+      query.id = decodeURIComponent(m[1] ?? '');
+      return {
+        handler: lazy(() => import('../_handlers/admin/inquiries/[id].js')),
+        routeKey: 'admin/inquiries/[id]',
+      };
+    }
   }
   if (pathname === '/api/v1/admin/withdrawals' || pathname === '/api/admin/withdrawals') {
     return {
@@ -739,7 +780,7 @@ export function resolveRequestUrl(req: RoutableRequest): string {
 /**
  * Dispatch a request to the matching handler. Returns `true` when a handler
  * matched (its response is already written via `res`), `false` when no route
- * exists — the caller is responsible for the 404.
+ * exists - the caller is responsible for the 404.
  */
 export async function routeRequest(
   req: VercelRequest & { url?: string },
@@ -759,7 +800,7 @@ export async function routeRequest(
     try {
       res.status(500).json({ error: { code: 'INTERNAL', message: 'Internal server error' } });
     } catch {
-      // Response already sent — nothing more we can do.
+      // Response already sent - nothing more we can do.
     }
   }
   return true;

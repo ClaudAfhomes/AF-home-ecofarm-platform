@@ -12,7 +12,7 @@ import { Button } from '../../../components/Button';
 import { apiErrorMessage } from '../../../lib/api/errorMessage';
 import { usePrograms } from '../../public/hooks/usePrograms';
 import { usePublicConfig } from '../../public/hooks/usePublicConfig';
-import { PRIVACY_POLICY_ID, TERMS_POLICY_ID, policyPath } from '../../public/content/policies';
+import { PRIVACY_POLICY_SLUG, TERMS_POLICY_SLUG, policyPath } from '../../public/content/policies';
 import { getQualificationQuestions } from '../services/auth';
 import { usePersistedDraft, clearPersistedDraft } from '../hooks/usePersistedDraft';
 import { useLocationVerification } from '../hooks/useLocationVerification';
@@ -42,7 +42,7 @@ export type RegistrationMode = 'create' | 'resubmit';
 export interface RegistrationFormProps {
   submit: (payload: RegisterRequest | Partial<RegisterRequest>) => Promise<void>;
   mode?: RegistrationMode;
-  /** Prefill (member resubmit) — profile + referral code from the member record. */
+  /** Prefill (member resubmit) - profile + referral code from the member record. */
   initialDraft?: Partial<RegistrationDraft>;
 }
 
@@ -140,7 +140,7 @@ export function RegistrationForm({ submit, mode = 'create', initialDraft }: Regi
   const programs = usePrograms();
   const config = usePublicConfig();
   // Loaded-but-empty program list (e.g. reference data not yet seeded):
-  // internal ids must never leak into visible copy — both display sites and
+  // internal ids must never leak into visible copy - both display sites and
   // step-0 validation use this flag instead of falling back to the raw id.
   const programsUnavailable =
     !programs.isLoading && !programs.isError && (programs.data ?? []).length === 0;
@@ -171,7 +171,7 @@ export function RegistrationForm({ submit, mode = 'create', initialDraft }: Regi
     }
   }, [genders, draft.gender]);
 
-  // Location verification — BE authoritative for Program/Country (read-only)
+  // Location verification - BE authoritative for Program/Country (read-only)
   const locationVerification = useLocationVerification(mode === 'create');
 
   // Sync verified program/country into draft when verification succeeds
@@ -200,7 +200,7 @@ export function RegistrationForm({ submit, mode = 'create', initialDraft }: Regi
 
   // Always start at top of form when step changes (Continue / Back / Edit)
   useEffect(() => {
-    // Defer to next frame so new step content is rendered — instant, no transition
+    // Defer to next frame so new step content is rendered - instant, no transition
     const id = requestAnimationFrame(() => {
       try {
         formRef.current?.scrollIntoView({ behavior: 'auto', block: 'start' });
@@ -241,7 +241,7 @@ export function RegistrationForm({ submit, mode = 'create', initialDraft }: Regi
       case 0: {
         const base = validateProgramProfile(draft, minAge);
         // Without a program catalog the application cannot succeed
-        // server-side — block here with a clear message instead of letting a
+        // server-side - block here with a clear message instead of letting a
         // raw id through to submit.
         if (programsUnavailable) {
           return {
@@ -261,7 +261,7 @@ export function RegistrationForm({ submit, mode = 'create', initialDraft }: Regi
         // In create mode step 4 is Account; in resubmit mode step 4 is Review (no validation)
         return mode === 'resubmit' ? {} : validateAccount(draft);
       default:
-        // Review step — previously validated steps guarantee validity
+        // Review step - previously validated steps guarantee validity
         return {};
     }
   };
@@ -381,13 +381,13 @@ export function RegistrationForm({ submit, mode = 'create', initialDraft }: Regi
   }));
 
   // Resolved program label for the two read-only display sites below. Never
-  // falls back to the raw program id — an unresolved id renders as an
+  // falls back to the raw program id - an unresolved id renders as an
   // explicit unavailable/unknown state instead of leaking internals.
   const programDisplayName = (() => {
     const match = programOptions.find((p) => p.value === draft.programId)?.label;
     if (match) return match;
-    if (programsUnavailable) return 'Program list unavailable — please try again shortly.';
-    return '—';
+    if (programsUnavailable) return 'Program list unavailable - please try again shortly.';
+    return '-';
   })();
 
   return (
@@ -428,14 +428,14 @@ export function RegistrationForm({ submit, mode = 'create', initialDraft }: Regi
               </Alert>
             ) : null}
             {locationVerification.status === 'permission-denied' ? (
-              <Alert variant="info" title="Location permission denied — using IP fallback">
+              <Alert variant="info" title="Location permission denied - using IP fallback">
                 Your location permission was denied. We are verifying your location via IP address
                 as an approved fallback.
               </Alert>
             ) : null}
             {locationVerification.status === 'unavailable' ||
             locationVerification.status === 'timeout' ? (
-              <Alert variant="info" title="GPS unavailable — using IP fallback">
+              <Alert variant="info" title="GPS unavailable - using IP fallback">
                 Your device location is unavailable. Verifying via IP address instead.
               </Alert>
             ) : null}
@@ -553,7 +553,6 @@ export function RegistrationForm({ submit, mode = 'create', initialDraft }: Regi
                 onChange={(value) => update('nameSuffix', value)}
                 options={NAME_SUFFIX_OPTIONS}
                 error={errors.nameSuffix}
-                placeholder="—"
                 hint="Optional"
               />
             </div>
@@ -605,7 +604,7 @@ export function RegistrationForm({ submit, mode = 'create', initialDraft }: Regi
                   >
                     {(() => {
                       const name = countries.find((c) => c.code === draft.countryCode)?.name;
-                      return name ?? (draft.countryCode ? draft.countryCode : '—');
+                      return name ?? (draft.countryCode ? draft.countryCode : '-');
                     })()}
                   </div>
                 )}
@@ -644,7 +643,7 @@ export function RegistrationForm({ submit, mode = 'create', initialDraft }: Regi
             <h2 className={styles.stepTitle}>Qualification</h2>
             <p className={styles.stepLead}>
               Confirm you meet the membership qualification requirements. (Question content is
-              provisional — awaiting final JA&amp;D approval.)
+              provisional - awaiting final JA&amp;D approval.)
             </p>
             {questionsQuery.isLoading ? (
               <div
@@ -657,7 +656,7 @@ export function RegistrationForm({ submit, mode = 'create', initialDraft }: Regi
               </div>
             ) : questions.length === 0 ? (
               <p className={styles.reviewEmpty}>
-                No additional questions for this program — you may continue.
+                No additional questions for this program - you may continue.
               </p>
             ) : (
               <fieldset className={styles.questions}>
@@ -702,7 +701,7 @@ export function RegistrationForm({ submit, mode = 'create', initialDraft }: Regi
               name="referralCode"
               label="Sponsor / referral code"
               optional
-              hint="Optional — leave blank if you were not referred by a member. The code is validated against active members."
+              hint="Optional - leave blank if you were not referred by a member. The code is validated against active members."
               value={draft.referralCode}
               onChange={(value) => update('referralCode', value)}
               error={errors.referralCode}
@@ -720,13 +719,12 @@ export function RegistrationForm({ submit, mode = 'create', initialDraft }: Regi
             <h2 className={styles.stepTitle}>Government ID</h2>
             <p className={styles.stepLead}>
               Attach a clear copy of a valid government-issued ID. JA&amp;D reviews documents
-              manually; for this frontend preview only the file metadata is captured — nothing is
-              uploaded.
+              manually, and your file is uploaded securely and used only to verify your identity.
             </p>
             <Control
               id="reg-idDocument"
               label="Government ID copy"
-              hint={`JPG, PNG, WebP or PDF — max ${(MAX_FILE_BYTES / 1024 / 1024).toFixed(0)} MB`}
+              hint={`JPG, PNG, WebP or PDF - max ${(MAX_FILE_BYTES / 1024 / 1024).toFixed(0)} MB`}
               error={errors.idDocument}
             >
               <div
@@ -791,7 +789,7 @@ export function RegistrationForm({ submit, mode = 'create', initialDraft }: Regi
                       <strong>Drop file or click to browse</strong>
                     </span>
                     <span className={styles.fileHint}>
-                      JPG, PNG, WebP or PDF — max {(MAX_FILE_BYTES / 1024 / 1024).toFixed(0)} MB
+                      JPG, PNG, WebP or PDF - max {(MAX_FILE_BYTES / 1024 / 1024).toFixed(0)} MB
                     </span>
                   </div>
                 )}
@@ -879,11 +877,11 @@ export function RegistrationForm({ submit, mode = 'create', initialDraft }: Regi
                 />
                 <span>
                   I agree to the{' '}
-                  <Link to={policyPath(TERMS_POLICY_ID)} className={styles.consentLink}>
+                  <Link to={policyPath(TERMS_POLICY_SLUG)} className={styles.consentLink}>
                     JA&amp;D member terms
                   </Link>{' '}
                   and{' '}
-                  <Link to={policyPath(PRIVACY_POLICY_ID)} className={styles.consentLink}>
+                  <Link to={policyPath(PRIVACY_POLICY_SLUG)} className={styles.consentLink}>
                     privacy policy
                   </Link>
                   .
@@ -917,19 +915,19 @@ export function RegistrationForm({ submit, mode = 'create', initialDraft }: Regi
                     <dd>
                       {[draft.firstName, draft.middleInitial, draft.lastName, draft.nameSuffix]
                         .filter(Boolean)
-                        .join(' ') || '—'}
+                        .join(' ') || '-'}
                     </dd>
                   </div>
                   <div className={styles.reviewRow}>
                     <dt>Date of birth</dt>
-                    <dd>{draft.dateOfBirth || '—'}</dd>
+                    <dd>{draft.dateOfBirth || '-'}</dd>
                   </div>
                   <div className={styles.reviewRow}>
                     <dt>Gender</dt>
                     <dd>
                       {draft.gender === 'Others'
                         ? draft.genderOther?.trim() || 'Others'
-                        : draft.gender || '—'}
+                        : draft.gender || '-'}
                     </dd>
                   </div>
                   <div className={styles.reviewRow}>
@@ -937,16 +935,16 @@ export function RegistrationForm({ submit, mode = 'create', initialDraft }: Regi
                     <dd>
                       {countries.find((c) => c.code === draft.countryCode)?.name ??
                         draft.countryCode ??
-                        '—'}
+                        '-'}
                     </dd>
                   </div>
                   <div className={styles.reviewRow}>
                     <dt>Phone</dt>
-                    <dd>{draft.phone || '—'}</dd>
+                    <dd>{draft.phone || '-'}</dd>
                   </div>
                   <div className={styles.reviewRow}>
                     <dt>Address</dt>
-                    <dd>{draft.address?.trim() || '—'}</dd>
+                    <dd>{draft.address?.trim() || '-'}</dd>
                   </div>
                   <div className={styles.reviewRow}>
                     <dt>Program</dt>
@@ -969,7 +967,7 @@ export function RegistrationForm({ submit, mode = 'create', initialDraft }: Regi
                     {questions.map((q) => (
                       <div key={q.id} className={styles.reviewRow}>
                         <dt>{q.questionText}</dt>
-                        <dd>{draft.answers[q.id]?.trim() || '—'}</dd>
+                        <dd>{draft.answers[q.id]?.trim() || '-'}</dd>
                       </div>
                     ))}
                   </dl>
@@ -1004,7 +1002,7 @@ export function RegistrationForm({ submit, mode = 'create', initialDraft }: Regi
                     <dd className={styles.reviewFile}>
                       {draft.idDocument
                         ? `${draft.idDocument.fileName} · ${(draft.idDocument.sizeBytes / 1024 / 1024).toFixed(2)} MB`
-                        : '—'}
+                        : '-'}
                     </dd>
                   </div>
                 </dl>
@@ -1021,7 +1019,7 @@ export function RegistrationForm({ submit, mode = 'create', initialDraft }: Regi
                   <dl className={styles.reviewList}>
                     <div className={styles.reviewRow}>
                       <dt>Email</dt>
-                      <dd>{draft.email || '—'}</dd>
+                      <dd>{draft.email || '-'}</dd>
                     </div>
                     <div className={styles.reviewRow}>
                       <dt>Password</dt>

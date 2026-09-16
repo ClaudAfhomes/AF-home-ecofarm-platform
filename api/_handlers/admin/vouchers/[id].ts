@@ -8,7 +8,7 @@ import { toErrorEnvelope } from '../../../_lib/envelope.js';
 
 /**
  * GET /admin/vouchers/:id (super_admin, admin, finance).
- * DELETE (super_admin, admin) — unassign, audited.
+ * DELETE (super_admin, admin) - unassign, audited.
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -75,7 +75,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     actorRole: auth.slugs[0] ?? 'admin',
     targetType: 'Voucher',
     targetId: id,
-    targetName: `${String(current.title ?? id)} — ${String(current.memberName ?? '')}`,
+    targetName: `${String(current.title ?? id)} - ${String(current.memberName ?? '')}`,
     detail: `Unassigned voucher ${id}`,
   });
   res.status(200).json({ id, deleted: true });

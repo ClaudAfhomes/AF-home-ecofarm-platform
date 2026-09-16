@@ -20,7 +20,7 @@ function toLeafNode(row: MemberRow): GenealogyNode {
   };
 }
 
-/** GET /me/genealogy — referral tree visualization + the member's upline chain. */
+/** GET /me/genealogy - referral tree visualization + the member's upline chain. */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');

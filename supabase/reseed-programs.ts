@@ -6,7 +6,7 @@
  * `ProgramQuestion` (4 rows). The register page (`GET /programs`) then
  * renders an empty program list and leaks the raw program id
  * (`prg-domestic`) through its label fallback. This script restores exactly
- * the canonical seeds — same source + shapes `supabase/seed.ts` uses
+ * the canonical seeds - same source + shapes `supabase/seed.ts` uses
  * (`packages/contracts/src/seeds/reference.ts`), so parity holds.
  *
  * Idempotent: plain upserts on `id`; safe to re-run.
@@ -37,7 +37,7 @@ function loadEnvFile(path: string): void {
       if (!(key in process.env) && value) process.env[key] = value;
     }
   } catch {
-    // missing file — fall through to whatever the environment provides
+    // missing file - fall through to whatever the environment provides
   }
 }
 
@@ -95,7 +95,7 @@ async function main(): Promise<void> {
 
   if (mode === 'dry-run') {
     console.log(
-      '\nDRY-RUN — no changes made. Re-run with --execute plus DEV_RESET_ALLOW_REFS=' + ref,
+      '\nDRY-RUN - no changes made. Re-run with --execute plus DEV_RESET_ALLOW_REFS=' + ref,
     );
     return;
   }
@@ -146,7 +146,7 @@ async function main(): Promise<void> {
       `ProgramQuestion=${questionsAfter ?? 0} (expected ${questionCount})`,
   );
   if (programAfter !== programs.length || questionsAfter !== questionCount) {
-    console.error('Verification FAILED — inspect output above.');
+    console.error('Verification FAILED - inspect output above.');
     process.exit(2);
   }
   console.log('Reseed complete.');

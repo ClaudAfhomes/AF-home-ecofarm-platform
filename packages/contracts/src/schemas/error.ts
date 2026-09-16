@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 /**
- * API error envelope — CONFIRMED by API-SPECIFICATION.md §3.
+ * API error envelope - CONFIRMED by API-SPECIFICATION.md §3.
  * Shape is authoritative; codes are the stable set listed in §3.
  */
 export const errorEnvelopeSchema = z.object({

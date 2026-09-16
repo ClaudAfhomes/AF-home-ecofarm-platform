@@ -12,7 +12,7 @@ import { methodNotAllowed, readJsonBody, requireService } from '../../../_lib/re
 import { toErrorEnvelope } from '../../../_lib/envelope.js';
 
 /**
- * POST /admin/vouchers/assign — assign a voucher (definition) to a member
+ * POST /admin/vouchers/assign - assign a voucher (definition) to a member
  * (super_admin, admin). The expiry rule is set per assignment (fixed date wins
  * over validityDays; falls back to the template rule, then to the platform
  * default `VOUCHER_DEFAULT_EXPIRY_DAYS` from SystemConfig).

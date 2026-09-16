@@ -332,7 +332,7 @@ describe('RequireRole', () => {
 
   it('redirects unauthenticated visitors to VITE_WEB_URL/login (not Forbidden, not 404)', async () => {
     const { getValidatedWebLoginUrl } = await import('./RequireRole');
-    // validated VITE_WEB_URL/login (default http://localhost:5173/login) — uses VITE_WEB_URL, not hardcoded
+    // validated VITE_WEB_URL/login (default http://localhost:5173/login) - uses VITE_WEB_URL, not hardcoded
     const target = getValidatedWebLoginUrl();
     expect(target).toMatch(/\/login$/);
     expect(target).toContain('5173');

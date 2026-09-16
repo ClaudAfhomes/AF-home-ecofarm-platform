@@ -147,7 +147,7 @@ export function VoucherCreateDialog({ open, onClose }: VoucherCreateDialogProps)
             </span>
           ) : (
             <span style={{ fontSize: 'var(--text-caption)', color: 'var(--color-text-muted)' }}>
-              Assign members to this voucher afterwards — each assignment gets a unique code and QR
+              Assign members to this voucher afterwards - each assignment gets a unique code and QR
               with its own expiry.
             </span>
           )}

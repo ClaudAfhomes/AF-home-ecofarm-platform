@@ -18,7 +18,7 @@ import styles from './PropertiesPage.module.css';
  *
  * Entry point into the browsing experience: intro, category cards (each
  * linking to its category listing), and featured sample properties. All records
- * derive from the static catalog — nothing is duplicated and nothing is a live
+ * derive from the static catalog - nothing is duplicated and nothing is a live
  * listing.
  */
 export function PropertiesPage() {

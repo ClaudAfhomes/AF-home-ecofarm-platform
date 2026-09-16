@@ -18,7 +18,7 @@ function validEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-/** GET /admin/staff — directory. POST — create staff + auth account + audit. */
+/** GET /admin/staff - directory. POST - create staff + auth account + audit. */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
@@ -156,7 +156,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
   let authId = (created.data as { user?: { id: string } } | null)?.user?.id ?? null;
   // Duplicate identity (orphaned auth row): adopt the existing account AND
-  // reset its password to the super-admin-provided temporary password — the
+  // reset its password to the super-admin-provided temporary password - the
   // orphan's stored credential is unknown, so without this the new staff
   // could never sign in with the password they were given.
   if (!authId) {

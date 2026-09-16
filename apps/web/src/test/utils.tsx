@@ -14,15 +14,20 @@ import { SessionProvider, type SessionUser } from '../lib/session';
  */
 export function renderWithProviders(
   ui: ReactElement,
-  { route = '/', initialUser }: { route?: string; initialUser?: SessionUser } = {},
+  {
+    route = '/',
+    routeState,
+    initialUser,
+  }: { route?: string; routeState?: unknown; initialUser?: SessionUser } = {},
 ) {
   const client = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   });
+  const initialEntry = routeState !== undefined ? { pathname: route, state: routeState } : route;
   const result = render(
     <SessionProvider initialUser={initialUser} restoreDelayMs={0}>
       <QueryClientProvider client={client}>
-        <MemoryRouter initialEntries={[route]}>{ui}</MemoryRouter>
+        <MemoryRouter initialEntries={[initialEntry]}>{ui}</MemoryRouter>
       </QueryClientProvider>
     </SessionProvider>,
   );

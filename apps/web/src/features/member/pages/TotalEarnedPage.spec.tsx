@@ -23,7 +23,7 @@ describe('member TotalEarnedPage', () => {
   it('shows final static total-earned content (SCR-MEM-019)', async () => {
     renderMember(<TotalEarnedPage />, { user: MOCK_MEMBER });
 
-    // Final static figure — no dev preview markers
+    // Final static figure - no dev preview markers
     expect(await screen.findByRole('status', { name: 'Total earned' })).toBeInTheDocument();
     expect(screen.getByText('₱240,000.00')).toBeInTheDocument();
     expect(screen.getByText('Lifetime earnings')).toBeInTheDocument();
@@ -45,7 +45,7 @@ describe('member TotalEarnedPage', () => {
       '/member/commissions',
     );
 
-    // Breadcrumbs, timeframe, header actions — referrals family ring
+    // Breadcrumbs, timeframe, header actions - referrals family ring
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
     expect(screen.getByText('Referrals')).toBeInTheDocument();
     expect(screen.getAllByText('Total Earned')).toHaveLength(2);

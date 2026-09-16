@@ -19,7 +19,7 @@ describe('PropertyDetailPage', () => {
     renderDetail('/properties/tenanted-condo-resales/prisma-astra-1br');
 
     const heading = screen.getByRole('heading', {
-      name: 'Prisma Residences – Astra Building Condo',
+      name: 'Prisma Residences - Astra Building Condo',
     });
     expect(heading).toBeInTheDocument();
     expect(screen.getAllByText('Pasig City').length).toBeGreaterThan(0);
@@ -59,13 +59,13 @@ describe('PropertyDetailPage', () => {
     expect(grid).not.toBeNull();
     // Sibling properties in the same category (first 3, current excluded).
     expect(
-      within(grid!).getByRole('heading', { name: 'Levina Place – 2BR Condo' }),
+      within(grid!).getByRole('heading', { name: 'Levina Place - 2BR Condo' }),
     ).toBeInTheDocument();
     expect(
-      within(grid!).getByRole('heading', { name: 'Prisma Residences – Celeste Building Condo' }),
+      within(grid!).getByRole('heading', { name: 'Prisma Residences - Celeste Building Condo' }),
     ).toBeInTheDocument();
     expect(
-      within(grid!).getByRole('heading', { name: 'Prisma Residences – Astra Building Condo' }),
+      within(grid!).getByRole('heading', { name: 'Prisma Residences - Astra Building Condo' }),
     ).toBeInTheDocument();
     expect(
       within(grid!).queryByRole('heading', { name: '2-Storey House' }),

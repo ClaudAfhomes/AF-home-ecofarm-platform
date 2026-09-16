@@ -16,7 +16,7 @@ export interface AppShellProps {
   /** Page content rendered inside `<main>`. */
   children: ReactNode;
   /**
-   * Mobile bottom navigation (Member app) — optional. May be a render function
+   * Mobile bottom navigation (Member app) - optional. May be a render function
    * receiving the drawer `open` callback so a "More" affordance can open the
    * full navigation drawer (UI-UX §4.6).
    */
@@ -24,7 +24,7 @@ export interface AppShellProps {
   menuLabel?: string;
   mainId?: string;
   mainAriaLabel?: string;
-  /** When true, hide the topbar hamburger on mobile (<640px) — used when bottom nav provides access. */
+  /** When true, hide the topbar hamburger on mobile (<640px) - used when bottom nav provides access. */
   hideMenuOnMobile?: boolean;
   /** Leading content for the topbar on mobile when menu is hidden (e.g., logo). */
   topbarLeading?: ReactNode;

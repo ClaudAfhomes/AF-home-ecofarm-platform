@@ -50,7 +50,7 @@ describe('BroadcastsPage', () => {
     await sendViaDialog(user, 'Sunday maintenance');
     expect(await screen.findByText(/Showing 3 of 3 broadcasts/)).toBeInTheDocument();
     expect(screen.getByText('Sunday maintenance')).toBeInTheDocument();
-    expect(screen.getByText(/now in every member's feed/)).toBeInTheDocument();
+    expect(await screen.findByText(/now in every member's feed/)).toBeInTheDocument();
   });
 
   it('blocks sending without a title', async () => {

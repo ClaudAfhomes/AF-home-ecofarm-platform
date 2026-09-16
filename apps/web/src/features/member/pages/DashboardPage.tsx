@@ -95,7 +95,7 @@ export function DashboardPage() {
     () => (salesQuery.data ?? []).slice(0, RECENT_SALES_LIMIT),
     [salesQuery.data],
   );
-  // Pending Commissions = PENDING-status commissions in clearing — NOT the
+  // Pending Commissions = PENDING-status commissions in clearing - NOT the
   // wallet's pendingAmount (reserved withdrawal funds). Exact-decimal sum.
   const pendingCommissions = useMemo(
     () => sumPendingCommissions(commissionsQuery.data),
@@ -115,7 +115,7 @@ export function DashboardPage() {
         <div className={`${styles.statusBanner} ${BANNER_TONE.PENDING}`}>
           <StatusChip label={memberStatusLabel('PENDING')} tone={MEMBER_STATUS_TONE.PENDING} />
           <p>
-            Your application is Pending — email verification and JA&amp;D review come before your
+            Your application is Pending - email verification and JA&amp;D review come before your
             account becomes active.
           </p>
         </div>
@@ -143,7 +143,7 @@ export function DashboardPage() {
         </div>
       ) : null}
 
-      {/* Membership summary — kept for account-status visibility and test compat */}
+      {/* Membership summary - kept for account-status visibility and test compat */}
       {status ? (
         <div className={styles.membershipBar}>
           <StatusChip label={memberStatusLabel(status)} tone={MEMBER_STATUS_TONE[status]} />
@@ -159,7 +159,7 @@ export function DashboardPage() {
         </div>
       ) : null}
 
-      {/* ── SECTION 1 — FINANCIAL SUMMARY (4 cards) ─────────────────────── */}
+      {/* ── SECTION 1 - FINANCIAL SUMMARY (4 cards) ─────────────────────── */}
       <section aria-label="Financial summary">
         {walletQuery.isLoading ? (
           <div className={styles.financialGrid}>
@@ -172,7 +172,7 @@ export function DashboardPage() {
           <ErrorState error={walletQuery.error} title="Could not load your wallet summary" />
         ) : (
           <div className={styles.financialGrid}>
-            {/* 1 — Available Balance */}
+            {/* 1 - Available Balance */}
             <div className={styles.financialCard}>
               <div className={styles.financialTop}>
                 <span className={styles.financialLabel}>Available Balance</span>
@@ -187,7 +187,7 @@ export function DashboardPage() {
               <span className={styles.financialHint}>Ready to withdraw</span>
             </div>
 
-            {/* 2 — Pending Commissions */}
+            {/* 2 - Pending Commissions */}
             <div className={styles.financialCard}>
               <div className={styles.financialTop}>
                 <span className={styles.financialLabel}>Pending Commissions</span>
@@ -204,7 +204,7 @@ export function DashboardPage() {
               </span>
             </div>
 
-            {/* 3 — Total Withdrawals */}
+            {/* 3 - Total Withdrawals */}
             <div className={styles.financialCard}>
               <div className={styles.financialTop}>
                 <span className={styles.financialLabel}>Total Withdrawals</span>
@@ -221,7 +221,7 @@ export function DashboardPage() {
               <span className={styles.financialHint}>Completed &amp; reserved</span>
             </div>
 
-            {/* 4 — Total Earned */}
+            {/* 4 - Total Earned */}
             <div className={styles.financialCard}>
               <div className={styles.financialTop}>
                 <span className={styles.financialLabel}>Total Earned</span>
@@ -250,7 +250,11 @@ export function DashboardPage() {
           <span className={styles.quickText}>
             <span className={styles.quickLabel}>Sales</span>
             <span className={styles.quickMeta}>
-              {salesQuery.isLoading ? '—' : `${salesQuery.data?.length ?? 0} records`}
+              {salesQuery.isLoading ? (
+                <Skeleton className={styles.quickMetaSkeleton} />
+              ) : (
+                `${salesQuery.data?.length ?? 0} records`
+              )}
             </span>
           </span>
         </Link>
@@ -261,7 +265,11 @@ export function DashboardPage() {
           <span className={styles.quickText}>
             <span className={styles.quickLabel}>Commissions</span>
             <span className={styles.quickMeta}>
-              {commissionsQuery.isLoading ? '—' : `${commissionsQuery.data?.length ?? 0} records`}
+              {commissionsQuery.isLoading ? (
+                <Skeleton className={styles.quickMetaSkeleton} />
+              ) : (
+                `${commissionsQuery.data?.length ?? 0} records`
+              )}
             </span>
           </span>
         </Link>
@@ -281,16 +289,20 @@ export function DashboardPage() {
           <span className={styles.quickText}>
             <span className={styles.quickLabel}>Payouts</span>
             <span className={styles.quickMeta}>
-              {payoutsQuery.isLoading ? '—' : `${payoutsQuery.data?.length ?? 0} accounts`}
+              {payoutsQuery.isLoading ? (
+                <Skeleton className={styles.quickMetaSkeleton} />
+              ) : (
+                `${payoutsQuery.data?.length ?? 0} accounts`
+              )}
             </span>
           </span>
         </Link>
       </nav>
 
-      {/* ── SECTION 2 — ACTIVITY / RELATIONSHIP (2-col) ─────────────────── */}
+      {/* ── SECTION 2 - ACTIVITY / RELATIONSHIP (2-col) ─────────────────── */}
       <div className={styles.lowerSection}>
         <div className={styles.lowerGrid}>
-          {/* LEFT — Recent Sales Table */}
+          {/* LEFT - Recent Sales Table */}
           <section className={styles.sectionCard} aria-label="Recent sales">
             <div className={styles.sectionHeader}>
               <h2 className={styles.sectionTitle}>Recent Sales</h2>
@@ -302,7 +314,12 @@ export function DashboardPage() {
             </div>
             <div className={styles.sectionBody}>
               {salesQuery.isLoading ? (
-                <div className={styles.loadingWrap} role="status">
+                <div
+                  className={styles.loadingWrap}
+                  role="status"
+                  aria-live="polite"
+                  aria-busy="true"
+                >
                   <Skeleton style={{ height: 44 }} />
                   <Skeleton style={{ height: 44 }} />
                   <Skeleton style={{ height: 44 }} />
@@ -370,7 +387,7 @@ export function DashboardPage() {
             </div>
           </section>
 
-          {/* RIGHT — Genealogy Table */}
+          {/* RIGHT - Genealogy Table */}
           <section className={styles.sectionCard} aria-label="Genealogy">
             <div className={styles.sectionHeader}>
               <h2 className={styles.sectionTitle}>Genealogy</h2>
@@ -380,7 +397,12 @@ export function DashboardPage() {
             </div>
             <div className={styles.sectionBody}>
               {genealogyQuery.isLoading ? (
-                <div className={styles.loadingWrap} role="status">
+                <div
+                  className={styles.loadingWrap}
+                  role="status"
+                  aria-live="polite"
+                  aria-busy="true"
+                >
                   <Skeleton style={{ height: 44 }} />
                   <Skeleton style={{ height: 44 }} />
                   <Skeleton style={{ height: 44 }} />

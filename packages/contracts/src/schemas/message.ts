@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
 /**
- * Admin↔member messaging — one conversation thread per member
- * (API-SPECIFICATION #90–#94, FEAT-072, ADR-013). Text-only v1; the UI
+ * Admin↔member messaging - one conversation thread per member
+ * (API-SPECIFICATION #90-#94, FEAT-072, ADR-013). Text-only v1; the UI
  * renders `body` as plain text (React-escaped), never as HTML.
  */
 export const messageSenderTypeSchema = z.enum(['MEMBER', 'STAFF']);
@@ -20,7 +20,7 @@ export const messageSchema = z.object({
 
 export type Message = z.infer<typeof messageSchema>;
 
-/** GET /me/messages/summary — member thread badge (unread staff replies). */
+/** GET /me/messages/summary - member thread badge (unread staff replies). */
 export const conversationSummarySchema = z.object({
   unreadCount: z.number().int().min(0),
   lastMessageAt: z.string().optional(),
@@ -28,7 +28,7 @@ export const conversationSummarySchema = z.object({
 
 export type ConversationSummary = z.infer<typeof conversationSummarySchema>;
 
-/** GET /admin/conversations — one inbox row per member with a thread. */
+/** GET /admin/conversations - one inbox row per member with a thread. */
 export const adminConversationSchema = z.object({
   memberId: z.string().min(1),
   memberName: z.string().min(1),
@@ -40,7 +40,7 @@ export const adminConversationSchema = z.object({
 
 export type AdminConversation = z.infer<typeof adminConversationSchema>;
 
-/** GET /admin/messages/summary — admin inbox badge. */
+/** GET /admin/messages/summary - admin inbox badge. */
 export const adminMessagesSummarySchema = z.object({
   unreadCount: z.number().int().min(0),
   unreadConversations: z.number().int().min(0),

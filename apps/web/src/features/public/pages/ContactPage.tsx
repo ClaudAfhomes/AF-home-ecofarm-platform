@@ -1,11 +1,14 @@
-import { useState, type ReactNode } from 'react';
+import { useState, type FormEvent, type ReactNode } from 'react';
 
 import { CTASection } from '../components/CTASection';
 import { Hero } from '../components/Hero';
 import { useQuery } from '@tanstack/react-query';
 import { getContactCmsPublic } from '@/lib/cms';
+import { submitContact } from '@/lib/api/endpoints';
 import { CONTACT } from '../content';
 import type { ContactMethod } from '../content/contact';
+import { Alert } from '../../../components/Alert';
+import { apiErrorMessage } from '../../../lib/api/errorMessage';
 import styles from './ContactPage.module.css';
 
 const MESSENGER_ICON = (
@@ -88,9 +91,9 @@ const METHOD_ICONS: Record<ContactMethod['icon'], ReactNode> = {
 /**
  * Public Contact page. Contact details follow the legacy website supplied by
  * the project owner. Messenger is the primary channel (real external link);
- * the form is presentational: it does not submit anywhere yet (no backend
- * endpoint exists in scope) and shows a graceful acknowledgment instead of
- * faking a send.
+ * the form posts to `POST /api/v1/contact` and the inquiry lands in the
+ * admin Inquiries queue - the acknowledgement below renders only after a
+ * real 201, never as a fake send.
  */
 export function ContactPage() {
   const { data: cms } = useQuery({
@@ -99,7 +102,57 @@ export function ContactPage() {
     staleTime: 0,
   });
   const content = (cms ?? CONTACT) as typeof CONTACT;
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
+  // Honeypot - bots fill it, humans never see it (off-screen, untabbable).
+  const [company, setCompany] = useState('');
+  const [errors, setErrors] = useState<{ name?: string; email?: string; message?: string }>({});
+  const [serverError, setServerError] = useState<string | undefined>();
+  const [submitting, setSubmitting] = useState(false);
   const [acknowledged, setAcknowledged] = useState(false);
+
+  const setField = (field: 'name' | 'email' | 'message', value: string) => {
+    if (field === 'name') setName(value);
+    else if (field === 'email') setEmail(value);
+    else setMessage(value);
+    setErrors((current) => ({ ...current, [field]: undefined }));
+    setServerError(undefined);
+  };
+
+  const validate = (): boolean => {
+    const next: { name?: string; email?: string; message?: string } = {};
+    if (!name.trim()) next.name = 'Enter your name.';
+    if (!email.trim()) next.email = 'Enter your email address.';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      next.email = 'Enter a valid email address.';
+    }
+    if (message.trim().length < 10) {
+      next.message = 'Tell us a little more (at least 10 characters).';
+    }
+    setErrors(next);
+    return Object.keys(next).length === 0;
+  };
+
+  const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (submitting || !validate()) return;
+    setSubmitting(true);
+    setServerError(undefined);
+    try {
+      await submitContact({
+        name: name.trim(),
+        email: email.trim(),
+        message: message.trim(),
+        company,
+      });
+      setAcknowledged(true);
+    } catch (error) {
+      setServerError(apiErrorMessage(error, 'We could not send your message. Please try again.'));
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <div className={styles.page}>
@@ -171,28 +224,90 @@ export function ContactPage() {
               <form
                 className={styles.form}
                 aria-describedby="contact-form-note"
-                onSubmit={(event) => {
-                  event.preventDefault();
-                  setAcknowledged(true);
-                }}
+                onSubmit={onSubmit}
+                noValidate
               >
+                {serverError ? (
+                  <Alert variant="danger" title="We could not send your message">
+                    {serverError}
+                  </Alert>
+                ) : null}
                 <div className={styles.field}>
                   <label htmlFor="contact-name">Name</label>
-                  <input id="contact-name" name="name" type="text" autoComplete="name" />
+                  <input
+                    id="contact-name"
+                    name="name"
+                    type="text"
+                    autoComplete="name"
+                    required
+                    value={name}
+                    onChange={(event) => setField('name', event.target.value)}
+                    aria-invalid={errors.name ? true : undefined}
+                    aria-describedby={errors.name ? 'contact-name-error' : undefined}
+                    className={errors.name ? styles.inputInvalid : undefined}
+                  />
+                  {errors.name ? (
+                    <p id="contact-name-error" className={styles.fieldError}>
+                      {errors.name}
+                    </p>
+                  ) : null}
                 </div>
                 <div className={styles.field}>
                   <label htmlFor="contact-email">Email</label>
-                  <input id="contact-email" name="email" type="email" autoComplete="email" />
+                  <input
+                    id="contact-email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    required
+                    value={email}
+                    onChange={(event) => setField('email', event.target.value)}
+                    aria-invalid={errors.email ? true : undefined}
+                    aria-describedby={errors.email ? 'contact-email-error' : undefined}
+                    className={errors.email ? styles.inputInvalid : undefined}
+                  />
+                  {errors.email ? (
+                    <p id="contact-email-error" className={styles.fieldError}>
+                      {errors.email}
+                    </p>
+                  ) : null}
                 </div>
                 <div className={styles.field}>
                   <label htmlFor="contact-message">Message</label>
-                  <textarea id="contact-message" name="message" rows={5} />
+                  <textarea
+                    id="contact-message"
+                    name="message"
+                    rows={5}
+                    required
+                    value={message}
+                    onChange={(event) => setField('message', event.target.value)}
+                    aria-invalid={errors.message ? true : undefined}
+                    aria-describedby={errors.message ? 'contact-message-error' : undefined}
+                    className={errors.message ? styles.inputInvalid : undefined}
+                  />
+                  {errors.message ? (
+                    <p id="contact-message-error" className={styles.fieldError}>
+                      {errors.message}
+                    </p>
+                  ) : null}
+                </div>
+                <div className={styles.honeypot} aria-hidden="true">
+                  <label htmlFor="contact-company">Company</label>
+                  <input
+                    id="contact-company"
+                    name="company"
+                    type="text"
+                    autoComplete="off"
+                    tabIndex={-1}
+                    value={company}
+                    onChange={(event) => setCompany(event.target.value)}
+                  />
                 </div>
                 <p id="contact-form-note" className={styles.formNote}>
                   {content.form.note}
                 </p>
-                <button type="submit" className={styles.submit}>
-                  {content.form.submitLabel}
+                <button type="submit" className={styles.submit} disabled={submitting}>
+                  {submitting ? 'Sending…' : content.form.submitLabel}
                 </button>
               </form>
             )}

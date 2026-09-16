@@ -7,7 +7,7 @@ import { validateCreateProperty } from '../../_lib/cutover.js';
 import { methodNotAllowed, okList, readJsonBody, requireService } from '../../_lib/rest.js';
 import { toErrorEnvelope } from '../../_lib/envelope.js';
 
-/** GET /admin/properties — transactional catalog list (super_admin, admin). */
+/** GET /admin/properties - transactional catalog list (super_admin, admin). */
 export async function listProperties(req: VercelRequest, res: VercelResponse) {
   const auth = await verifyStaffModule(req, 'properties', ADMIN_STAFF);
   if ('error' in auth) {
@@ -30,7 +30,7 @@ export async function listProperties(req: VercelRequest, res: VercelResponse) {
   okList(res, rows.filter(isValidPropertyRow));
 }
 
-/** POST /admin/properties — create a listing (super_admin, admin). */
+/** POST /admin/properties - create a listing (super_admin, admin). */
 export async function createProperty(req: VercelRequest, res: VercelResponse) {
   const auth = await verifyStaffModule(req, 'properties', ADMIN_STAFF);
   if ('error' in auth) {

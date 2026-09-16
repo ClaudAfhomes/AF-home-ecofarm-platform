@@ -18,7 +18,7 @@ function renderLogin(route = '/admin/cms/login', user = MOCK_SUPER_ADMIN) {
   return renderWithProviders(<CmsLoginPage />, { route, user });
 }
 
-describe('CmsLoginPage — Login CMS module', () => {
+describe('CmsLoginPage - Login CMS module', () => {
   let server: ReturnType<typeof installMockApi>;
 
   beforeEach(() => {

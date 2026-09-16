@@ -1,4 +1,4 @@
--- Phase B8+ — Atomic sale qualification with commission generation.
+-- Phase B8+ - Atomic sale qualification with commission generation.
 --
 -- The QUALIFYING_SALE transition previously flipped status only; no
 -- Commission rows were ever created, so the member "Pending Commissions"
@@ -15,7 +15,7 @@
 -- - Direct commission always goes to the seller; referral commission goes to
 --   the seller's sponsor when one is linked, skipped silently otherwise
 --   (noted in the audit detail).
--- - Commissions are created PENDING with no ledger or wallet movement —
+-- - Commissions are created PENDING with no ledger or wallet movement - 
 --   clearing (PENDING → AVAILABLE) has no mechanism yet and stays a
 --   follow-up; the member card sums PENDING rows.
 -- Down: drop function public.sale_qualify(text, uuid, text, jsonb).
@@ -101,7 +101,7 @@ begin
   end if;
   insert into "AuditLog" (action, actor_id, actor_role, target_type, target_id, target_name, detail, created_at)
     values ('SALE_QUALIFIED', p_actor, p_role, 'Sale', p_id,
-            v_sale."propertyName" || ' — ' || v_sale."customerName",
+            v_sale."propertyName" || ' - ' || v_sale."customerName",
             'Qualified sale ' || p_id || '. ' || v_detail, v_now);
   select to_jsonb(s) into v_sale from "Sale" s where s.id = p_id;
   return jsonb_build_object('sale', v_sale);

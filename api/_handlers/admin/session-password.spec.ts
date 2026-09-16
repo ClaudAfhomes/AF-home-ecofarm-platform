@@ -5,7 +5,7 @@ import type { VercelRequest, VercelResponse } from '../../_lib/http.js';
 import passwordHandler from './session/password.js';
 
 /**
- * POST /admin/session/password — change own staff password. Red: the handler
+ * POST /admin/session/password - change own staff password. Red: the handler
  * file does not exist yet.
  */
 const mocks = vi.hoisted(() => {

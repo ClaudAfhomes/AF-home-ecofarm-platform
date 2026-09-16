@@ -158,7 +158,7 @@ export function updateRole(
 const GOVERNANCE_MODULES: StaffModule[] = ['staff', 'audit', 'config'];
 
 /**
- * Delete a role (super admins only — enforced by callers). Blocked while
+ * Delete a role (super admins only - enforced by callers). Blocked while
  * members hold it (reassign first) and when it is the last role granting
  * a governance module.
  */
@@ -178,7 +178,7 @@ export function deleteRole(id: string): void {
   );
   if (sole.length > 0) {
     throw new Error(
-      `Cannot delete this role — it is the last role granting ${sole.map((m) => STAFF_MODULE_LABEL[m]).join(', ')}.`,
+      `Cannot delete this role - it is the last role granting ${sole.map((m) => STAFF_MODULE_LABEL[m]).join(', ')}.`,
     );
   }
   staffStore.roles = staffStore.roles.filter((r) => r.id !== id);

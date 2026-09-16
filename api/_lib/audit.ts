@@ -1,7 +1,7 @@
 /**
  * Server-side audit writer for api/ mutating handlers.
  * Appends to the `AuditLog` table (see supabase/migrations/*_audit_log.sql).
- * Never throws — audit failure must not break the request it records; errors
+ * Never throws - audit failure must not break the request it records; errors
  * are logged server-side only.
  */
 export type AuditEntry = {
@@ -15,7 +15,7 @@ export type AuditEntry = {
 };
 
 /**
- * Minimal table handle — structurally satisfied by both the real Supabase
+ * Minimal table handle - structurally satisfied by both the real Supabase
  * client and unit-test fakes.
  */
 export type AuditTable = {

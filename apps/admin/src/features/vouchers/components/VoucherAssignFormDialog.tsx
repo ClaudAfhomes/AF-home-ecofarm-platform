@@ -27,7 +27,7 @@ export function VoucherAssignFormDialog({
   const [submitError, setSubmitError] = useState<string | undefined>();
 
   // Only ACTIVE members not already holding this voucher (the API enforces the
-  // same rule via the (memberId, templateId) unique index — this is UX only).
+  // same rule via the (memberId, templateId) unique index - this is UX only).
   const eligibleMembers = useMemo(() => {
     const assignedIds = new Set((assigned ?? []).map((a) => a.memberId));
     return (members ?? []).filter((m) => m.accountStatus === 'ACTIVE' && !assignedIds.has(m.id));

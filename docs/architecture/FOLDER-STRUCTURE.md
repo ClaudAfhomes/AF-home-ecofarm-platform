@@ -1,10 +1,10 @@
-# JAD — Repository & Folder Structure SSOT (FOLDER-STRUCTURE.md)
+# JAD - Repository & Folder Structure SSOT (FOLDER-STRUCTURE.md)
 
 > **Authority:** Defines the intended repository organization for the JA&D platform, aligned with `ARCHITECTURE.md` (modular Vercel Functions, FG-aligned domains) and `TECH-STACK.md` (pnpm monorepo, React + Vercel + Supabase) as updated **Q1 2026-08-30** (Supabase + Vercel Functions, supersedes NestJS).
 >
-> **Status of this structure:** **PROPOSED future structure** — the repository currently contains `apps/web`, `apps/admin`, `packages/*`, `supabase/migrations` and `docs/`. No dedicated backend exists yet; the target backend is **Vercel Functions** per Q1. Migration to this layout occurs when implementation begins (ROADMAP P1).
+> **Status of this structure:** **PROPOSED future structure** - the repository currently contains `apps/web`, `apps/admin`, `packages/*`, `supabase/migrations` and `docs/`. No dedicated backend exists yet; the target backend is **Vercel Functions** per Q1. Migration to this layout occurs when implementation begins (ROADMAP P1).
 >
-> **Version:** Project 03 — Architecture & System Design (Baseline v1.0, updated Q1 2026-08-30 for Vercel Functions)
+> **Version:** Project 03 - Architecture & System Design (Baseline v1.0, updated Q1 2026-08-30 for Vercel Functions)
 
 ---
 
@@ -20,12 +20,12 @@ jad-realty/
 ├── apps/
 │   ├── web/            # Member-facing web app (React + Vite, :5173)
 │   ├── admin/          # Admin / back-office app (React + Vite, :5174)
-│   └── merchant/       # Merchant redemption portal (React + Vite) — future
+│   └── merchant/       # Merchant redemption portal (React + Vite) - future
 ├── supabase/
 │   ├── migrations/     # versioned SQL (cms_contents, auth foundation)
 │   └── seed.ts         # upserts cms_contents 8 keys + Member/Role
 ├── packages/
-│   ├── contracts/      # Shared DTOs, Zod schemas (cms.ts), OpenAPI types, enums — single source
+│   ├── contracts/      # Shared DTOs, Zod schemas (cms.ts), OpenAPI types, enums - single source
 │   ├── config/         # Environment config schema + shared runtime config types
 │   └── shared/         # Utilities, money math, invariants, constants
 ├── vercel.json         # Functions + rewrites (if needed)
@@ -39,14 +39,14 @@ jad-realty/
 └── README.md
 ```
 
-> `docs/` already exists and is the documentation SSOT location — unchanged.
+> `docs/` already exists and is the documentation SSOT location - unchanged.
 
 ---
 
-## 2. Backend Structure — Vercel Functions (Q1)
+## 2. Backend Structure - Vercel Functions (Q1)
 
 ```text
-api/  (Vercel Functions — or apps/api/api/ if keeping workspace)
+api/  (Vercel Functions - or apps/api/api/ if keeping workspace)
 ├── cms/
 │   ├── [key].ts        # Vercel handler: GET public / PUT admin (Supabase JWT + Zod)
 │   └── upload.ts       # POST admin image upload → marketing-tools
@@ -55,10 +55,10 @@ api/  (Vercel Functions — or apps/api/api/ if keeping workspace)
 │   └── validation.ts   # Zod via @jad/contracts per cms key
 └── vercel.json (optional)
 
-# Legacy NestJS structure below is superseded — preserved for migration reference only
-# apps/api/src/ (NestJS) — archived
+# Legacy NestJS structure below is superseded - preserved for migration reference only
+# apps/api/src/ (NestJS) - archived
 # ├── src/
-# │   ├── main.ts                 # Bootstrap (NestJS — superseded)
+# │   ├── main.ts                 # Bootstrap (NestJS - superseded)
 # │   ├── app.module.ts           # Root module (superseded)
 │   ├── common/                 # Cross-cutting (no business logic)
 │   │   ├── guards/             # AuthN, RBAC, ownership/object-level guards
@@ -83,7 +83,7 @@ api/  (Vercel Functions — or apps/api/api/ if keeping workspace)
 └── tsconfig.json
 ```
 
-### 2.1 Feature modules (`src/modules/`) — mirror FG-* and ARCHITECTURE §4.2
+### 2.1 Feature modules (`src/modules/`) - mirror FG-* and ARCHITECTURE §4.2
 
 ```text
 src/modules/
@@ -98,15 +98,15 @@ src/modules/
 ├── payout/        # FEAT-044..047       (FG-PAYOUT)
 ├── withdrawal/    # FEAT-048..051       (FG-WDR)
 ├── voucher/       # FEAT-052..058       (FG-VOUCHER)
-├── signing/       # FEAT-059            (FG-SECURITY) — client to CTO service
+├── signing/       # FEAT-059            (FG-SECURITY) - client to CTO service
 ├── content/       # FEAT-060..063       (FG-CONTENT)
 ├── reporting/     # FEAT-064..067       (FG-REPORTING)
 ├── programs/      # FEAT-068, 069       (FG-PROGRAMS)
-├── config/        # FEAT-005            (FG-CONFIG) — dynamic business parameters (BR-CFG-001)
+├── config/        # FEAT-005            (FG-CONFIG) - dynamic business parameters (BR-CFG-001)
 └── audit/         # FEAT-004            (FG-PLATFORM)
 ```
 
-### 2.2 Per-module layout (hexagonal — ARCHITECTURE §2.2)
+### 2.2 Per-module layout (hexagonal - ARCHITECTURE §2.2)
 
 ```text
 sales/
@@ -130,7 +130,7 @@ sales/
 - Controllers contain **no business logic**.
 - Domain files depend on nothing framework/DB-specific.
 - Repositories are the only DB access point within a module.
-- Modules never import another module's repository or domain internals — only its application services/contracts (ARCHITECTURE §6).
+- Modules never import another module's repository or domain internals - only its application services/contracts (ARCHITECTURE §6).
 
 ---
 
@@ -200,7 +200,7 @@ infra/
 │   ├── merchant.Dockerfile
 │   └── worker.Dockerfile
 ├── docker-compose.yml        # local dev: api, db (postgres), worker, web, admin, merchant
-└── ci/                       # CI/CD pipeline definitions (provider OPEN — ARCH-DEC-008)
+└── ci/                       # CI/CD pipeline definitions (provider OPEN - ARCH-DEC-008)
 ```
 
 ---
@@ -226,7 +226,7 @@ infra/
 
 - Environment templates: `.env.example` at each app root + root. **Secrets never committed** (NFR-SEC-001, security-by-design).
 - Runtime env schema: `packages/config/src`.
-- Business parameters (BR-CFG-001): stored in DB via `config` module — **not** in env/code.
+- Business parameters (BR-CFG-001): stored in DB via `config` module - **not** in env/code.
 - Deployment/CI config: `infra/`.
 
 ---
@@ -242,13 +242,13 @@ infra/
 ## 9. Rules Against Inappropriate Structures
 
 1. **No business logic in controllers or React components.**
-2. **No cross-module repository/domain imports** in `apps/api` — modules communicate via application services/contracts.
-3. **No financial table UPDATE/DELETE** — ledger/commission data is append-only (BI-005); enforced by module rules and DB roles.
+2. **No cross-module repository/domain imports** in `apps/api` - modules communicate via application services/contracts.
+3. **No financial table UPDATE/DELETE** - ledger/commission data is append-only (BI-005); enforced by module rules and DB roles.
 4. **No secrets, credentials, or `.env` files committed.**
 5. **No framework-dependent code in `packages/shared` or domain layers.**
-6. **No duplicate DTO/status definitions** — everything shared lives in `packages/contracts`.
+6. **No duplicate DTO/status definitions** - everything shared lives in `packages/contracts`.
 7. **No speculative folders** (e.g., no `microservices/`, no separate app for functionality that belongs in an existing module).
-8. **Status enums must match BUSINESS-RULES.md §5** — no invented states.
+8. **Status enums must match BUSINESS-RULES.md §5** - no invented states.
 
 ---
 

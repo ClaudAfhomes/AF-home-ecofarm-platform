@@ -10,7 +10,8 @@ import {
   Select,
   Skeleton,
   StatusChip,
-  useToast,
+  notifyError,
+  notifySuccess,
 } from '@jad/ui';
 import { systemRoleRecords } from '@jad/contracts';
 
@@ -26,12 +27,11 @@ import { STAFF_STATUS_LABEL, STAFF_STATUS_TONE, roleLabelFor, roleToneFor } from
 import { guardRoleChange, guardStaffDelete, guardStatusChange } from '../guards';
 import styles from './StaffDetail.module.css';
 
-/** Staff detail — view identity, assign role, enable/disable (all audited). */
+/** Staff detail - view identity, assign role, enable/disable (all audited). */
 export function StaffDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useSession();
-  const { toast } = useToast();
   const { data, isPending, isError, error } = useStaffMember(id!);
   const { data: roster } = useStaff();
   const { data: roles } = useRoles();
@@ -74,13 +74,12 @@ export function StaffDetailPage() {
         actorRole,
       });
       setRoleDraft(null);
-      toast({
+      notifySuccess({
         title: 'Role updated',
         message: `${data.name} is now ${roleLabelFor(records, selectedRole)}`,
-        tone: 'success',
       });
     } catch (e) {
-      toast({ title: 'Update failed', message: (e as Error).message, tone: 'danger' });
+      notifyError({ title: 'Update failed', message: (e as Error).message });
     }
   };
 
@@ -89,14 +88,13 @@ export function StaffDetailPage() {
     try {
       await deleteStaff.mutateAsync({ id: data.id, actor: actorName, actorRole });
       setShowDeleteConfirm(false);
-      toast({
+      notifySuccess({
         title: 'Staff deleted',
         message: `${data.name} was permanently removed`,
-        tone: 'success',
       });
       navigate('/admin/staff');
     } catch (e) {
-      toast({ title: 'Delete failed', message: (e as Error).message, tone: 'danger' });
+      notifyError({ title: 'Delete failed', message: (e as Error).message });
     }
   };
 
@@ -106,13 +104,12 @@ export function StaffDetailPage() {
     try {
       await setStatus.mutateAsync({ id: data.id, status: next, actor: actorName, actorRole });
       setShowStatusConfirm(false);
-      toast({
+      notifySuccess({
         title: next === 'ACTIVE' ? 'Staff enabled' : 'Staff disabled',
         message: `${data.name} is now ${next === 'ACTIVE' ? 'active' : 'disabled'}`,
-        tone: 'success',
       });
     } catch (e) {
-      toast({ title: 'Update failed', message: (e as Error).message, tone: 'danger' });
+      notifyError({ title: 'Update failed', message: (e as Error).message });
     }
   };
 

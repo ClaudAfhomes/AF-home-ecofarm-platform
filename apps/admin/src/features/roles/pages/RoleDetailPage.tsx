@@ -9,7 +9,8 @@ import {
   PageHeader,
   Skeleton,
   StatusChip,
-  useToast,
+  notifyError,
+  notifySuccess,
 } from '@jad/ui';
 import { CUSTOM_ROLE_FORBIDDEN_MODULES, STAFF_MODULE_LABEL } from '@jad/contracts';
 import type { StaffModule } from '@jad/contracts';
@@ -31,12 +32,11 @@ function sameModules(a: StaffModule[], b: StaffModule[]): boolean {
   return b.every((m) => set.has(m));
 }
 
-/** Role detail — rename, edit permissions, inspect members, delete custom roles. */
+/** Role detail - rename, edit permissions, inspect members, delete custom roles. */
 export function RoleDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user } = useSession();
-  const { toast } = useToast();
   const { data, isPending, isError, error } = useRole(id!);
   const { data: staff } = useStaff();
   const { data: allRoles } = useRoles();
@@ -83,7 +83,7 @@ export function RoleDetailPage() {
         actorRole,
       });
       setNameDraft(null);
-      toast({ title: 'Role renamed', message: `Role is now ${nameValue.trim()}`, tone: 'success' });
+      notifySuccess({ title: 'Role renamed', message: `Role is now ${nameValue.trim()}` });
     } catch (e) {
       setNameError((e as Error).message);
     }
@@ -115,16 +115,15 @@ export function RoleDetailPage() {
         actorRole,
       });
       setPermDraft(null);
-      toast({
+      notifySuccess({
         title: 'Permissions updated',
         message:
           diff.length > 0
             ? diff.join('; ')
             : `${data.name} now grants ${effectivePermissions.length} modules`,
-        tone: 'success',
       });
     } catch (e) {
-      toast({ title: 'Update failed', message: (e as Error).message, tone: 'danger' });
+      notifyError({ title: 'Update failed', message: (e as Error).message });
     }
   };
 
@@ -133,10 +132,10 @@ export function RoleDetailPage() {
     try {
       await deleteRole.mutateAsync({ id: data.id, actor: actorName, actorRole });
       setShowDeleteConfirm(false);
-      toast({ title: 'Role deleted', message: `${data.name} was removed`, tone: 'success' });
+      notifySuccess({ title: 'Role deleted', message: `${data.name} was removed` });
       navigate('/admin/roles');
     } catch (e) {
-      toast({ title: 'Delete failed', message: (e as Error).message, tone: 'danger' });
+      notifyError({ title: 'Delete failed', message: (e as Error).message });
     }
   };
 

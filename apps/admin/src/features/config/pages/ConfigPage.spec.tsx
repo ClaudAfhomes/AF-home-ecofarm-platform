@@ -1,10 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { screen, fireEvent, waitFor } from '@testing-library/react';
+import { screen, fireEvent, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MOCK_ADMIN, MOCK_STAFF_ADMIN } from '@jad/mock';
 
 import { installMockApi, renderWithProviders } from '../../../test/utils';
 import { resetConfigStore } from '../../../mock/configMockStore';
+import { resetProgramStore } from '../../../mock/programMockStore';
 import { ConfigPage } from './ConfigPage';
 
 describe('ConfigPage', () => {
@@ -12,6 +13,7 @@ describe('ConfigPage', () => {
 
   beforeEach(() => {
     resetConfigStore();
+    resetProgramStore();
     server = installMockApi();
     server.install();
   });
@@ -62,6 +64,36 @@ describe('ConfigPage', () => {
     expect(screen.getByText(/Overseas Filipino Workers/)).toBeInTheDocument();
   });
 
+  it('creates and retires a program as super_admin', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<ConfigPage />, { user: MOCK_ADMIN });
+    await screen.findByText('Domestic Program');
+
+    await user.click(screen.getByRole('button', { name: 'New program' }));
+    const dialog = await screen.findByRole('dialog');
+    await user.type(within(dialog).getByLabelText('Program code'), 'STUDENT');
+    await user.type(within(dialog).getByLabelText('Program name'), 'Student Program');
+    await user.click(within(dialog).getByRole('button', { name: 'Create' }));
+
+    expect(await screen.findByText('Student Program')).toBeInTheDocument();
+
+    // Retire it - the row stays visible to super_admin, marked inactive.
+    const card = screen.getByText('Student Program').closest('[class*="programCard"]');
+    await user.click(within(card as HTMLElement).getByRole('button', { name: 'Edit' }));
+    const editDialog = await screen.findByRole('dialog');
+    await user.click(within(editDialog).getByRole('checkbox'));
+    await user.click(within(editDialog).getByRole('button', { name: 'Save' }));
+
+    expect(await screen.findByText(/Inactive - hidden from the public site/)).toBeInTheDocument();
+  });
+
+  it('hides program editing from non-super-admin staff', async () => {
+    renderWithProviders(<ConfigPage />, { user: MOCK_STAFF_ADMIN });
+    await screen.findByText('Domestic Program');
+    expect(screen.queryByRole('button', { name: 'New program' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Edit' })).not.toBeInTheDocument();
+  });
+
   it('saves via PATCH and persists after refetch', async () => {
     const user = userEvent.setup();
     const first = renderWithProviders(<ConfigPage />, { user: MOCK_ADMIN });
@@ -80,7 +112,7 @@ describe('ConfigPage', () => {
     expect(await screen.findByText('10.00%')).toBeInTheDocument();
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 
-    // A fresh mount refetches from the server — the edit must survive
+    // A fresh mount refetches from the server - the edit must survive
     // navigation instead of living in local component state.
     first.unmount();
     renderWithProviders(<ConfigPage />, { user: MOCK_ADMIN });

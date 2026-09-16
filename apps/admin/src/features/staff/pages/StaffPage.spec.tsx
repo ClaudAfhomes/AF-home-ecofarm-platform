@@ -41,7 +41,7 @@ describe('StaffPage', () => {
   it('shows role and status chips with footer count', async () => {
     renderWithProviders(<StaffPage />, { user: MOCK_SUPER_ADMIN });
     await screen.findByText('Saul Super');
-    // Role/status labels also appear as filter options — assert chip + option.
+    // Role/status labels also appear as filter options - assert chip + option.
     expect(screen.getAllByText('Super Admin').length).toBeGreaterThanOrEqual(2);
     expect(screen.getAllByText('Admin').length).toBeGreaterThanOrEqual(2);
     expect(screen.getAllByText('Disabled').length).toBeGreaterThanOrEqual(2);

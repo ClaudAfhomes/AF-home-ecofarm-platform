@@ -1,7 +1,7 @@
 -- Registration lifecycle: PENDING | REJECTED only (owner-approved).
 --
 -- Approval moves the application to the Member domain and deletes the
--- Registration row (see approve handler) — APPROVED_ACTIVE lives on Member,
+-- Registration row (see approve handler) - APPROVED_ACTIVE lives on Member,
 -- never in Registration. Legacy APPROVED_ACTIVE rows (incl. ones orphaned by
 -- pre-fix purges, whose members are gone) are removed here so they can no
 -- longer resurface in the queue or block re-registration via the B8 email
@@ -17,7 +17,7 @@
 --   alter table "Registration" drop constraint if exists registration_status_check;
 --   alter table "Registration" add constraint registration_status_check
 --     check (status in ('PENDING','APPROVED_ACTIVE','REJECTED'));
---   (deleted APPROVED_ACTIVE rows are NOT restored — re-register if needed.)
+--   (deleted APPROVED_ACTIVE rows are NOT restored - re-register if needed.)
 
 -- Backfill first: remove every consumed application (member owns identity).
 delete from "Registration" where status = 'APPROVED_ACTIVE';

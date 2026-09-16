@@ -3,15 +3,15 @@
 -- Commissions are issued PENDING by `sale_qualify` but nothing ever cleared
 -- them: no endpoint, no scheduler, no wallet movement. Members see PENDING
 -- rows in the commissions list and the dashboard Pending card, but the
--- amounts never reach the wallet, ledger, or Total Earned — while the member
+-- amounts never reach the wallet, ledger, or Total Earned - while the member
 -- UI copy still promises "Clears to Available after 7-day clearing period".
 --
 -- This adds the missing mechanism, following the atomic money-function
 -- pattern (withdraw_reserve/withdrawal_complete): SECURITY DEFINER, single
 -- transaction, row-lock the wallet, validate state, write ledger + wallet +
 -- audit in one unit, errors RETURNED (never raised) as {error:{...}}.
---   commission_clear(p_id, p_actor, p_role) — clear one PENDING commission.
---   commission_clear_batch(p_window_days, p_actor, p_role) — clear every
+--   commission_clear(p_id, p_actor, p_role) - clear one PENDING commission.
+--   commission_clear_batch(p_window_days, p_actor, p_role) - clear every
 --     PENDING commission at/older than the window (SystemConfig
 --     COMMISSION_CLEARING_DAYS, default 7; explicit arg wins).
 -- Wallet.pendingAmount is RECOMPUTED from remaining PENDING rows (self-healing:
@@ -77,7 +77,7 @@ begin
     where "memberId" = v_c."memberId";
   insert into "AuditLog" (action, actor_id, actor_role, target_type, target_id, target_name, detail, created_at)
     values ('COMMISSION_CLEARED', p_actor, p_role, 'Commission', p_id,
-            v_c."commissionType" || ' — ' || v_c.amount,
+            v_c."commissionType" || ' - ' || v_c.amount,
             'Cleared commission ' || p_id || ' (' || v_c.amount || ').', v_now);
   return jsonb_build_object('status', 'AVAILABLE', 'clearedAt', v_now, 'amount', v_c.amount);
 end;

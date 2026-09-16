@@ -7,7 +7,7 @@ import { methodNotAllowed, readJsonBody, requireService } from '../../../_lib/re
 import { toErrorEnvelope } from '../../../_lib/envelope.js';
 
 /**
- * PATCH /me/payout-accounts/:id — designate the single primary
+ * PATCH /me/payout-accounts/:id - designate the single primary
  * (CONFIRMED-only, BR-PAY-006). DELETE removes PENDING non-primary accounts
  * (typo remediation).
  */

@@ -4,7 +4,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { getSupabaseClient, isSupabaseConfigured } from '../../../lib/supabase';
 
 /**
- * Member messaging Realtime — subscribes to `Message` INSERTs for the
+ * Member messaging Realtime - subscribes to `Message` INSERTs for the
  * member's own thread and invalidates the thread + summary queries.
  *
  * Mirrors `useNotificationsRealtime`: the API stays the authoritative read

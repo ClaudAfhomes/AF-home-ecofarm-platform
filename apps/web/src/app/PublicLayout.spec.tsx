@@ -103,6 +103,21 @@ describe('PublicLayout', () => {
     );
   });
 
+  it('closes the mobile menu on Escape', async () => {
+    const user = userEvent.setup();
+    renderWithProviders(<PublicLayout />);
+
+    await user.click(screen.getByRole('button', { name: 'Open navigation' }));
+    expect(primaryNav()).toHaveClass(NAV_OPEN_RE);
+
+    await user.keyboard('{Escape}');
+    expect(primaryNav()).not.toHaveClass(NAV_OPEN_RE);
+    expect(screen.getByRole('button', { name: 'Open navigation' })).toHaveAttribute(
+      'aria-expanded',
+      'false',
+    );
+  });
+
   it('marks the active navigation link with aria-current after opening the menu', async () => {
     const user = userEvent.setup();
     renderWithProviders(<PublicLayout />, { route: '/about' });

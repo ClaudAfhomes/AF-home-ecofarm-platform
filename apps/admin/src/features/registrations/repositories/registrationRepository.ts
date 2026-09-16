@@ -6,7 +6,7 @@ import type { Registration, RejectionNote } from '@jad/contracts';
 import { request, requestList, requestListEnvelope } from '../../../lib/api/client';
 
 /**
- * Registration repository — REST over api/v1 (Phase B3 cutover).
+ * Registration repository - REST over api/v1 (Phase B3 cutover).
  * Centralizes state transitions: PENDING -> MEMBER (row deleted on approve),
  * PENDING -> REJECTED.
  */
@@ -15,7 +15,7 @@ export async function getRegistrations(): Promise<Registration[]> {
 }
 
 /**
- * Queue page fetch — same endpoint, but preserves `meta.invalid` (rows the
+ * Queue page fetch - same endpoint, but preserves `meta.invalid` (rows the
  * server dropped during validation) so the page can banner hidden work
  * instead of claiming "Queue is clear" while the dashboard card shows a
  * pending count. Goes through the shared client so the request carries the
@@ -62,7 +62,7 @@ export async function rejectRegistration(id: string, note: RejectionNote): Promi
 
 /**
  * Short-lived viewer URL for the applicant's ID document. Throws when no
- * file is on record (rows captured before file upload) — callers show the
+ * file is on record (rows captured before file upload) - callers show the
  * "no file" state instead of a button.
  */
 export async function getGovernmentIdUrl(id: string): Promise<string> {

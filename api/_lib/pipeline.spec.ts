@@ -134,7 +134,7 @@ describe('sale/customer row mapping', () => {
 
   it('maps DB rows and tolerates missing phones', () => {
     expect(isValidCustomerRow({ id: 'c', name: 'C', phone: '123' })).toBe(true);
-    expect(mapCustomerRow({ id: 'c', name: 'C' }).phone).toBe('—');
+    expect(mapCustomerRow({ id: 'c', name: 'C' }).phone).toBe('-');
     expect(isValidCustomerRow({ id: 'c' })).toBe(false);
   });
 

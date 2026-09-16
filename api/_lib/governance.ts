@@ -1,7 +1,7 @@
 /**
  * Server-side RBAC governance guards (Phase B4). Mirrors
  * apps/admin/src/features/{roles,staff}/guards.ts so the API enforces what
- * the UI previews — frontend visibility is never authorization.
+ * the UI previews - frontend visibility is never authorization.
  */
 export type GovRole = { id: string; permissions: string[] };
 export type GovMember = { id: string; status: string; roleId: string };
@@ -45,7 +45,7 @@ export function guardRolePermissions(
   if (removed.length > 0) {
     return {
       ok: false,
-      reason: `Cannot revoke ${removed.join(', ')} — this is the last role granting ${removed.length === 1 ? 'it' : 'them'}. Grant ${removed.length === 1 ? 'it' : 'them'} to another role first.`,
+      reason: `Cannot revoke ${removed.join(', ')} - this is the last role granting ${removed.length === 1 ? 'it' : 'them'}. Grant ${removed.length === 1 ? 'it' : 'them'} to another role first.`,
     };
   }
   return { ok: true };
@@ -71,7 +71,7 @@ export function guardRoleDeleteServer(
   if (sole.length > 0) {
     return {
       ok: false,
-      reason: `Cannot delete this role — it is the last role granting ${sole.join(', ')}.`,
+      reason: `Cannot delete this role - it is the last role granting ${sole.join(', ')}.`,
     };
   }
   return { ok: true };

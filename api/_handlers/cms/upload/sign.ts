@@ -9,13 +9,13 @@ import type { VercelRequest, VercelResponse } from '../../../_lib/http.js';
 import { serviceClient } from '../../../_lib/rest.js';
 
 /**
- * Per-kind upload rules — mirrors the admin dialog's `KIND_ACCEPT` /
+ * Per-kind upload rules - mirrors the admin dialog's `KIND_ACCEPT` /
  * `KIND_MAX_SIZE` maps (ContentPage). `kind` omitted = IMAGE (legacy CMS
  * image callers send name/type/size only).
  *
  * These caps must stay within the `marketing-tools` bucket's
  * `file_size_limit` / `allowed_mime_types` (see migration
- * 20260926000001_marketing_tools_bucket_limits.sql) — otherwise signing
+ * 20260926000001_marketing_tools_bucket_limits.sql) - otherwise signing
  * succeeds here but Supabase rejects the direct PUT.
  */
 const KIND_UPLOAD_RULES: Record<

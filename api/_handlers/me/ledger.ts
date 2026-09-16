@@ -10,7 +10,7 @@ import { methodNotAllowed, requireService } from '../../_lib/rest.js';
 import { toErrorEnvelope } from '../../_lib/envelope.js';
 
 /**
- * GET /me/ledger — own append-only ledger, cursor-paginated (id asc).
+ * GET /me/ledger - own append-only ledger, cursor-paginated (id asc).
  * `?type=` allowlisted; `?limit=` clamped 1..100 (default 50). Running
  * Available Balance is computed server-side over the FULL ledger first, then
  * filtered, then paginated (mirrors the member mock; SCR-MEM-009).

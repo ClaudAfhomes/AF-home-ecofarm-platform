@@ -6,7 +6,7 @@ import { mapSaleRow } from '../../_lib/pipeline.js';
 import { methodNotAllowed, requireService } from '../../_lib/rest.js';
 import { toErrorEnvelope } from '../../_lib/envelope.js';
 
-/** GET /sales/:id — own sale only (404 otherwise, hides existence). */
+/** GET /sales/:id - own sale only (404 otherwise, hides existence). */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');

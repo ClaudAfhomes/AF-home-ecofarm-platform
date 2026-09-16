@@ -13,7 +13,7 @@
 -- Dashboard → Storage → marketing-tools → Configuration.
 --
 -- NOTE: does not take effect until applied to the target project. Until then,
--- video/document PUTs keep failing at Supabase with 400 — see Dashboard.
+-- video/document PUTs keep failing at Supabase with 400 - see Dashboard.
 
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values (

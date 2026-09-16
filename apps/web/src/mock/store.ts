@@ -12,13 +12,13 @@ import type {
 import { MOCK_MARKETING_CONTENT } from '@jad/mock';
 
 /**
- * F1 member/API mock store — the in-memory "backend" behind the dev mock
+ * F1 member/API mock store - the in-memory "backend" behind the dev mock
  * server. Stands in for `apps/api` (not built yet); replaced entirely when the
  * real API lands. All identities are fictional (no real PII).
  *
  * The property seed mirrors the PUBLIC catalog content (`features/public/
  * content/properties.ts`) so the member sales feature and the marketing site
- * share ONE property source (CMS/content reuse — never a second catalog).
+ * share ONE property source (CMS/content reuse - never a second catalog).
  * Only fixed-price units are submittable (eligible properties per program are
  * OD-003-gated; the mock offers the fixed-value catalog units).
  *
@@ -76,9 +76,9 @@ export interface MockMember {
 export interface MockProperty {
   id: string;
   name: string;
-  /** Transactional price — exact-decimal string; optional when no published price (CMS price). */
+  /** Transactional price - exact-decimal string; optional when no published price (CMS price). */
   price?: string;
-  /** Legacy alias for price — keep for handler compatibility (same value as price when defined). */
+  /** Legacy alias for price - keep for handler compatibility (same value as price when defined). */
   value: string;
   categoryId: string;
   status: 'ACTIVE' | 'INACTIVE';
@@ -148,7 +148,7 @@ export interface MockPayoutAccount {
   memberId: string;
   method: PayoutMethod;
   accountName: string;
-  /** SENSITIVE — only the masked form is ever returned to the client (DATABASE-DESIGN §8.3). */
+  /** SENSITIVE - only the masked form is ever returned to the client (DATABASE-DESIGN §8.3). */
   accountIdentifier: string;
   status: PayoutAccountStatus;
   isPrimary: boolean;
@@ -170,7 +170,7 @@ export interface MockWithdrawal {
   createdAt: string;
 }
 
-/** Server-side mask of a payout account identifier (SECURITY.md — sensitive on read). */
+/** Server-side mask of a payout account identifier (SECURITY.md - sensitive on read). */
 export function maskIdentifier(identifier: string): string {
   const trimmed = identifier.trim();
   if (trimmed.length <= 4) return '\u2022\u2022\u2022\u2022';
@@ -227,6 +227,7 @@ export interface MockContentItem {
 
 export interface MockPolicy {
   id: string;
+  slug: string;
   title: string;
   type: string;
   content?: string;
@@ -257,7 +258,7 @@ export interface MockStore {
   vouchers: MockVoucher[];
   contentItems: MockContentItem[];
   policies: MockPolicy[];
-  /** Server-side Idempotency-Key store (API-SPECIFICATION §5.3) — key → cached response. */
+  /** Server-side Idempotency-Key store (API-SPECIFICATION §5.3) - key → cached response. */
   idempotency: Record<string, unknown>;
   nextCustomerId: number;
   nextSaleId: number;
@@ -289,7 +290,7 @@ function iso(daysAgo = 0, hour = 10): string {
   return d.toISOString();
 }
 
-/** Factory — a fresh store per `createMemberMockServer()` call so state never leaks across installs/tests. */
+/** Factory - a fresh store per `createMemberMockServer()` call so state never leaks across installs/tests. */
 export function createMockStore(): MockStore {
   const programId = 'prg-domestic';
 
@@ -395,10 +396,10 @@ export function createMockStore(): MockStore {
     qualificationMet: false,
     programId,
     rejectionReason:
-      'Government ID was not legible — please upload a clearer copy of a valid government-issued ID.',
+      'Government ID was not legible - please upload a clearer copy of a valid government-issued ID.',
   });
 
-  // F2-B: deeper network seeds — direct referrals of mem-001 (and one level
+  // F2-B: deeper network seeds - direct referrals of mem-001 (and one level
   // deeper) so Direct Referrals / Group Network / My Genealogy have data. These
   // relationships are STRICTLY single-level for commissions (BR-REF-001/002);
   // deeper tree edges exist only for the network/genealogy REPORTING views
@@ -491,10 +492,10 @@ export function createMockStore(): MockStore {
     qualificationMet: false,
     programId,
     rejectionReason:
-      'The uploaded ID did not match the declared details — please verify and resubmit.',
+      'The uploaded ID did not match the declared details - please verify and resubmit.',
   });
 
-  // Transactional catalog — single source of truth with CMS (same 10 IDs as CMS_PROPERTIES_SEED / public PROPERTY_RECORDS).
+  // Transactional catalog - single source of truth with CMS (same 10 IDs as CMS_PROPERTIES_SEED / public PROPERTY_RECORDS).
   // Catalog owns: ID, category, price, status. CMS owns presentation (descriptions, highlights, gallery).
   const properties: MockProperty[] = [
     {
@@ -523,7 +524,7 @@ export function createMockStore(): MockStore {
     },
     {
       id: 'prisma-celeste-8-6m',
-      name: 'Prisma Residences – Celeste Building Condo',
+      name: 'Prisma Residences - Celeste Building Condo',
       value: '8600000.00',
       price: '8600000.00',
       categoryId: 'tenanted-condo-resales',
@@ -531,7 +532,7 @@ export function createMockStore(): MockStore {
     },
     {
       id: 'prisma-celeste-8-3m',
-      name: 'Prisma Residences – Celeste Building Condo',
+      name: 'Prisma Residences - Celeste Building Condo',
       value: '8300000.00',
       price: '8300000.00',
       categoryId: 'tenanted-condo-resales',
@@ -539,7 +540,7 @@ export function createMockStore(): MockStore {
     },
     {
       id: 'prisma-astra-1br',
-      name: 'Prisma Residences – Astra Building Condo',
+      name: 'Prisma Residences - Astra Building Condo',
       value: '5300000.00',
       price: '5300000.00',
       categoryId: 'tenanted-condo-resales',
@@ -547,7 +548,7 @@ export function createMockStore(): MockStore {
     },
     {
       id: 'levina-place-2br',
-      name: 'Levina Place – 2BR Condo',
+      name: 'Levina Place - 2BR Condo',
       value: '5500000.00',
       price: '5500000.00',
       categoryId: 'tenanted-condo-resales',
@@ -614,7 +615,7 @@ export function createMockStore(): MockStore {
     sale({
       status: 'ADMIN_APPROVED',
       propertyId: 'prisma-celeste-8-6m',
-      propertyName: 'Prisma Residences – Celeste Building Condo',
+      propertyName: 'Prisma Residences - Celeste Building Condo',
       propertyValue: '8600000.00',
       customerId: 'cus-001',
       customerName: 'Ramon Reyes',
@@ -625,7 +626,7 @@ export function createMockStore(): MockStore {
     sale({
       status: 'PAYMENT_VERIFIED',
       propertyId: 'levina-place-2br',
-      propertyName: 'Levina Place – 2BR Condo',
+      propertyName: 'Levina Place - 2BR Condo',
       propertyValue: '5500000.00',
       customerId: 'cus-002',
       customerName: 'Celine Cruz',
@@ -656,12 +657,12 @@ export function createMockStore(): MockStore {
       resubmissionCount: 1,
       id: 'sal-005',
       rejectionReason:
-        'Customer phone number could not be verified — please update the customer contact.',
+        'Customer phone number could not be verified - please update the customer contact.',
     }),
     sale({
       status: 'LOCKED',
       propertyId: 'prisma-celeste-8-3m',
-      propertyName: 'Prisma Residences – Celeste Building Condo',
+      propertyName: 'Prisma Residences - Celeste Building Condo',
       propertyValue: '8300000.00',
       customerId: 'cus-002',
       customerName: 'Celine Cruz',
@@ -680,7 +681,7 @@ export function createMockStore(): MockStore {
       resubmissionCount: 3,
       id: 'sal-010',
       rejectionReason:
-        'Duplicate submission — this sale was rejected after repeated resubmissions.',
+        'Duplicate submission - this sale was rejected after repeated resubmissions.',
     }),
   ];
 
@@ -688,7 +689,7 @@ export function createMockStore(): MockStore {
   const sal007: MockSale = sale({
     status: 'QUALIFYING_SALE',
     propertyId: 'prisma-astra-1br',
-    propertyName: 'Prisma Residences – Astra Building Condo',
+    propertyName: 'Prisma Residences - Astra Building Condo',
     propertyValue: '5300000.00',
     customerId: 'cus-002',
     customerName: 'Celine Cruz',
@@ -747,14 +748,14 @@ export function createMockStore(): MockStore {
       id: 'ntf-broadcast-001',
       memberId: null,
       title: 'New properties in the catalog',
-      body: 'The Admin team has added new fixed-value units to the catalog — see the Properties page.',
+      body: 'The Admin team has added new fixed-value units to the catalog - see the Properties page.',
       createdAt: iso(2),
     },
     {
       id: 'ntf-broadcast-002',
       memberId: null,
       title: 'Community announcement',
-      body: 'New marketing material and community update — find it in Marketing Tools or check the community links.',
+      body: 'New marketing material and community update - find it in Marketing Tools or check the community links.',
       createdAt: iso(6),
     },
     {
@@ -783,14 +784,14 @@ export function createMockStore(): MockStore {
       id: 'ntf-004',
       memberId: 'mem-001',
       title: 'New: Join the JA&D Community',
-      body: 'New marketing material and community update — find it in Marketing Tools or check the community links.',
+      body: 'New marketing material and community update - find it in Marketing Tools or check the community links.',
       createdAt: iso(5),
     },
     {
       id: 'ntf-005',
       memberId: 'mem-001',
       title: 'Payout account rejected',
-      body: 'Your payout account (Traditional bank • •••• 7777) was rejected — Account name does not match bank record — please verify the account name and resubmit. You can add a new payout account with the correct details.',
+      body: 'Your payout account (Traditional bank • •••• 7777) was rejected - Account name does not match bank record - please verify the account name and resubmit. You can add a new payout account with the correct details.',
       createdAt: iso(1),
     },
   ];
@@ -809,7 +810,7 @@ export function createMockStore(): MockStore {
       memberId: 'mem-001',
       senderType: 'STAFF',
       senderName: 'Ada Admin',
-      body: 'Hi Juan! Happy to help — what would you like to know?',
+      body: 'Hi Juan! Happy to help - what would you like to know?',
       createdAt: iso(2),
     },
   ];
@@ -897,7 +898,7 @@ export function createMockStore(): MockStore {
     },
   ];
 
-  // Commissions (mem-001) — created PENDING on qualification (BR-COM-005),
+  // Commissions (mem-001) - created PENDING on qualification (BR-COM-005),
   // become AVAILABLE after clearing, or CANCELLED/REVERSED per BR-CAN-001/002.
   const commissions: MockCommission[] = [
     {
@@ -973,7 +974,7 @@ export function createMockStore(): MockStore {
     },
   ];
 
-  // Payout accounts (mem-001) — lifecycle Pending → Admin Review → Confirmed (BR-PAY-004).
+  // Payout accounts (mem-001) - lifecycle Pending → Admin Review → Confirmed (BR-PAY-004).
   // REJECTED is a frontend mock extension for the Approve/Reject workflow (requires Owner confirmation).
   const payoutAccounts: MockPayoutAccount[] = [
     {
@@ -1026,11 +1027,11 @@ export function createMockStore(): MockStore {
       isPrimary: false,
       createdAt: iso(1),
       rejectionReason:
-        'Account name does not match bank record — please verify the account name and resubmit.',
+        'Account name does not match bank record - please verify the account name and resubmit.',
     },
   ];
 
-  // Withdrawals (mem-001) — reservation deducts; rejection releases (BR-WDR-002/004).
+  // Withdrawals (mem-001) - reservation deducts; rejection releases (BR-WDR-002/004).
   const withdrawals: MockWithdrawal[] = [
     {
       id: 'wdr-001',
@@ -1066,10 +1067,10 @@ export function createMockStore(): MockStore {
     },
   ];
 
-  // F2-B: vouchers (mem-001) — own vouchers only (object-level, NFR-AUTHZ-002).
+  // F2-B: vouchers (mem-001) - own vouchers only (object-level, NFR-AUTHZ-002).
   // Values are exact-decimal strings; `remainingValue` is server-computed
   // (BR-VCH-002: Original − Redeemed = Remaining). Only ACTIVE / FULLY_REDEEMED
-  // exist — transfer/revoke/expiry are BLOCKED on OD-019..023 (BR-VCH-007).
+  // exist - transfer/revoke/expiry are BLOCKED on OD-019..023 (BR-VCH-007).
   const vouchers: MockVoucher[] = [
     {
       id: 'vch-001',
@@ -1111,10 +1112,11 @@ export function createMockStore(): MockStore {
   const contentItems: MockContentItem[] = MOCK_MARKETING_CONTENT;
 
   // F2-B: policies / program guidelines / T&C (FR-ADM-004, BR-NOT-001). Content
-  // is plain text — the UI renders it safely (no raw HTML, SECURITY.md).
+  // is plain text - the UI renders it safely (no raw HTML, SECURITY.md).
   const policies: MockPolicy[] = [
     {
       id: 'pol-001',
+      slug: 'terms',
       title: 'Terms and Conditions',
       type: 'terms',
       content:
@@ -1122,13 +1124,14 @@ export function createMockStore(): MockStore {
         '1. Acceptance of Terms\n' +
         'These terms govern your access to and use of the JA&D membership platform, including sales recording, referrals, commissions, and related services. By completing registration and verifying your email, you confirm that you are at least 18 years old, that the information you provide is accurate, and that you accept these terms in full. If you do not agree, please do not proceed with registration.\n\n' +
         '2. Member Obligations\n' +
-        'Members must provide accurate personal information, maintain the confidentiality of their account credentials, and comply with all applicable laws and JA&D program guidelines. Qualifying sales must be recorded accurately against catalog properties, and referral relationships are strictly single-level — only the direct referrer is recognized for referral purposes.\n\n' +
+        'Members must provide accurate personal information, maintain the confidentiality of their account credentials, and comply with all applicable laws and JA&D program guidelines. Qualifying sales must be recorded accurately against catalog properties, and referral relationships are strictly single-level - only the direct referrer is recognized for referral purposes.\n\n' +
         '3. No Purchase Requirement and Contact\n' +
         'Membership does not require the purchase of any product or property. All fees, commissions, and incentives are described in the official program guidelines. For questions about these terms, contact support@jad.example or refer to the official JA&D website.',
       updatedAt: iso(60),
     },
     {
       id: 'pol-002',
+      slug: 'guidelines',
       title: 'Program Guidelines',
       type: 'guidelines',
       content:
@@ -1143,6 +1146,7 @@ export function createMockStore(): MockStore {
     },
     {
       id: 'pol-003',
+      slug: 'privacy',
       title: 'Privacy Policy',
       type: 'privacy',
       content:
@@ -1161,7 +1165,7 @@ export function createMockStore(): MockStore {
     minAge: 18,
     genders: ['Male', 'Female', 'Others'],
     withdrawalLimits: { min: '100.00', max: '50000.00' },
-    // ISO 3166-1 alpha-2 master — mirrors supabase/migrations/20260831000004_countries.sql
+    // ISO 3166-1 alpha-2 master - mirrors supabase/migrations/20260831000004_countries.sql
     // Do NOT use for coordinate detection; provider resolves country, this is identity/reference only.
     countries: [
       { code: 'AF', name: 'Afghanistan' },

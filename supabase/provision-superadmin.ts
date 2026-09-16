@@ -5,7 +5,7 @@
  * catalog and all seed auth users while preserving `cms_contents` +
  * `SystemConfig`).
  *
- * Steps (idempotent — safe to re-run):
+ * Steps (idempotent - safe to re-run):
  *   1. Rebuild the canonical Role catalog (7 slugs: super_admin, admin,
  *      finance, merchant [staff] + user, member_basic, member_qualified
  *      [member]). Values mirror `20260904000001_staff_roles.sql`,
@@ -50,7 +50,7 @@ function loadEnvFile(path: string): void {
       if (!(key in process.env) && value) process.env[key] = value;
     }
   } catch {
-    // missing file — fall through to whatever the environment provides
+    // missing file - fall through to whatever the environment provides
   }
 }
 
@@ -63,13 +63,13 @@ const ROLE_SEEDS: { slug: string; name: string; description: string; domain: str
   {
     slug: 'super_admin',
     name: 'Super Admin',
-    description: 'Platform super user — full governance (BUSINESS-RULES #3)',
+    description: 'Platform super user - full governance (BUSINESS-RULES #3)',
     domain: 'staff',
   },
   {
     slug: 'admin',
     name: 'Admin',
-    description: 'Admin dashboard — Phase 1',
+    description: 'Admin dashboard - Phase 1',
     domain: 'staff',
   },
   {
@@ -87,13 +87,13 @@ const ROLE_SEEDS: { slug: string; name: string; description: string; domain: str
   {
     slug: 'user',
     name: 'User',
-    description: 'User dashboard — Phase 1',
+    description: 'User dashboard - Phase 1',
     domain: 'member',
   },
   {
     slug: 'member_basic',
     name: 'Member',
-    description: 'Base member — single category default',
+    description: 'Base member - single category default',
     domain: 'member',
   },
   {
@@ -162,7 +162,7 @@ async function main(): Promise<void> {
 
   console.log(`Target project ref: ${ref}`);
   console.log(`Mode: ${mode}`);
-  console.log(`Super-admin: ${email} (${name}) — staff-only identity (no Member row)`);
+  console.log(`Super-admin: ${email} (${name}) - staff-only identity (no Member row)`);
 
   const supabase = serviceClient();
 
@@ -171,7 +171,7 @@ async function main(): Promise<void> {
   const have = new Set(((existingRoles as { slug: string }[] | null) ?? []).map((r) => r.slug));
   const missingRoles = ROLE_SEEDS.filter((r) => !have.has(r.slug));
   console.log(
-    `Roles present: ${have.size > 0 ? [...have].sort().join(', ') : '(none)'}; to upsert: ${missingRoles.length > 0 ? missingRoles.map((r) => r.slug).join(', ') : '(all present — re-upsert for convergence)'}`,
+    `Roles present: ${have.size > 0 ? [...have].sort().join(', ') : '(none)'}; to upsert: ${missingRoles.length > 0 ? missingRoles.map((r) => r.slug).join(', ') : '(all present - re-upsert for convergence)'}`,
   );
 
   const { data: listed } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1000 });
@@ -179,12 +179,12 @@ async function main(): Promise<void> {
     (u) => u.email?.toLowerCase() === email.toLowerCase(),
   );
   console.log(
-    `Auth user ${email}: ${existingAuth ? `exists (${existingAuth.id}) — password will be rotated` : 'absent — will be created'}`,
+    `Auth user ${email}: ${existingAuth ? `exists (${existingAuth.id}) - password will be rotated` : 'absent - will be created'}`,
   );
 
   if (mode === 'dry-run') {
     console.log(
-      '\nDRY-RUN — no changes made. Re-run with --execute plus DEV_RESET_ALLOW_REFS=' + ref,
+      '\nDRY-RUN - no changes made. Re-run with --execute plus DEV_RESET_ALLOW_REFS=' + ref,
     );
     return;
   }
@@ -283,7 +283,7 @@ async function main(): Promise<void> {
     .maybeSingle();
   if (strayMember) {
     console.error(
-      'INVARIANT VIOLATION: super-admin holds a Member row — staff/member separation broken.',
+      'INVARIANT VIOLATION: super-admin holds a Member row - staff/member separation broken.',
     );
     process.exit(2);
   }

@@ -5,7 +5,7 @@ import type { ChangeStaffPasswordRequest, UpdateStaffProfileRequest } from '@jad
 
 import { request } from '../../../lib/api/client';
 
-/** PATCH /admin/session — update own display name (My Account). */
+/** PATCH /admin/session - update own display name (My Account). */
 export function updateStaffProfile(input: UpdateStaffProfileRequest) {
   return request('/admin/session', staffSessionSchema, {
     method: 'PATCH',
@@ -16,7 +16,7 @@ export function updateStaffProfile(input: UpdateStaffProfileRequest) {
 
 const changedSchema = z.object({ changed: z.boolean() });
 
-/** POST /admin/session/password — change own password (current verified server-side). */
+/** POST /admin/session/password - change own password (current verified server-side). */
 export function changeStaffPassword(input: ChangeStaffPasswordRequest) {
   return request('/admin/session/password', changedSchema, {
     method: 'POST',

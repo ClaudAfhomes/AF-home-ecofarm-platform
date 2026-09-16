@@ -49,7 +49,7 @@ describe('CatalogPage', () => {
     renderWithProviders(<CatalogPage />, { user: MOCK_ADMIN });
     expect(await screen.findByText('250 SQM Farm Lot with Hotspring')).toBeInTheDocument();
     expect(
-      screen.getAllByText('Prisma Residences – Celeste Building Condo').length,
+      screen.getAllByText('Prisma Residences - Celeste Building Condo').length,
     ).toBeGreaterThanOrEqual(1);
     expect(screen.getByText('Mountain View Leisure Community')).toBeInTheDocument();
   });
@@ -94,7 +94,7 @@ describe('CatalogPage', () => {
 
     expect(screen.queryByText('250 SQM Farm Lot with Hotspring')).not.toBeInTheDocument();
     expect(
-      screen.getAllByText('Prisma Residences – Celeste Building Condo').length,
+      screen.getAllByText('Prisma Residences - Celeste Building Condo').length,
     ).toBeGreaterThanOrEqual(1);
   });
 
@@ -232,7 +232,7 @@ describe('CatalogPage', () => {
   });
 
   it('auto-matches CMS entries to catalog rows by id without manual links', async () => {
-    // Seed ids coincide with mock catalog ids — no explicit links needed.
+    // Seed ids coincide with mock catalog ids - no explicit links needed.
     mockUsePropertiesCms.mockReturnValue({
       data: CMS_PROPERTIES_SEED,
       isPending: false,

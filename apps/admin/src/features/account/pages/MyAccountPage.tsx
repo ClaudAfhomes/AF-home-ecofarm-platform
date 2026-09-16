@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { Breadcrumbs, Button, PageHeader, StatusChip, useToast } from '@jad/ui';
+import { Breadcrumbs, Button, notifySuccess, PageHeader, StatusChip } from '@jad/ui';
 import { roleNameFor } from '@jad/contracts';
 
 import { useSession } from '../../../lib/session';
@@ -10,7 +10,7 @@ import { useChangeStaffPassword } from '../hooks/useChangeStaffPassword';
 import styles from './MyAccountPage.module.css';
 
 /**
- * My Account (/admin/profile) — the signed-in staff member views identity,
+ * My Account (/admin/profile) - the signed-in staff member views identity,
  * edits their display name, and changes their password. Email and role are
  * read-only (auth identity / governance-controlled). When the account runs on
  * a super-admin-set temporary password, a banner directs them to set their
@@ -26,7 +26,6 @@ export function MyAccountPage() {
   });
   const updateProfile = useUpdateStaffProfile();
   const changePassword = useChangeStaffPassword();
-  const { toast } = useToast();
 
   const [name, setName] = useState(user?.name ?? '');
   const [nameError, setNameError] = useState<string | undefined>();
@@ -50,7 +49,7 @@ export function MyAccountPage() {
     setSavingName(true);
     try {
       await updateProfile.mutateAsync({ name: trimmed });
-      toast({ title: 'Profile updated', message: 'Your display name was saved.', tone: 'success' });
+      notifySuccess({ title: 'Profile updated', message: 'Your display name was saved.' });
       await revalidate();
     } catch (e) {
       setNameError((e as Error).message || 'We could not save your name. Please try again.');
@@ -76,10 +75,9 @@ export function MyAccountPage() {
     setSavingPassword(true);
     try {
       await changePassword.mutateAsync({ currentPassword, newPassword });
-      toast({
+      notifySuccess({
         title: 'Password changed',
         message: 'Use your new password next time you sign in.',
-        tone: 'success',
       });
       setCurrentPassword('');
       setNewPassword('');
@@ -103,7 +101,7 @@ export function MyAccountPage() {
         <div className={styles.banner} role="alert">
           <strong className={styles.bannerTitle}>Set a new password to continue.</strong>
           <span className={styles.bannerText}>
-            Your account is using a temporary password. Choose your own below — the rest of the
+            Your account is using a temporary password. Choose your own below - the rest of the
             admin panel unlocks once it is changed.
           </span>
         </div>

@@ -76,7 +76,7 @@ function TableSkeleton() {
   );
 }
 
-/** Adjustments list — read-only view of ledger adjustments. PROPOSED shape. */
+/** Adjustments list - read-only view of ledger adjustments. PROPOSED shape. */
 export function AdjustmentsPage() {
   const { data, isPending, isError, error, refetch } = useAdjustments();
   const [page, setPage] = useState(1);
@@ -105,7 +105,7 @@ export function AdjustmentsPage() {
           <div className="table-scroll">
             <Table>
               <TableCaption>
-                {total} adjustment{total === 1 ? '' : 's'} — page {page} of {pageCount}
+                {total} adjustment{total === 1 ? '' : 's'} - page {page} of {pageCount}
               </TableCaption>
               <TableHead>
                 <TableRow>

@@ -9,7 +9,7 @@ import { methodNotAllowed, readJsonBody, requireService } from '../../../_lib/re
 import { toErrorEnvelope } from '../../../_lib/envelope.js';
 
 /**
- * POST /admin/vouchers/scan — resolve a voucher from its QR payload (the
+ * POST /admin/vouchers/scan - resolve a voucher from its QR payload (the
  * unique code) for an admin storefront scan. Verify-only: no state changes
  * here. Already-redeemed and expired vouchers are rejected so the scanner can
  * surface them before the admin confirms a redemption.

@@ -9,7 +9,7 @@ describe('Header', () => {
   it('renders the brand logo linking home', () => {
     renderWithProviders(<Header />);
 
-    expect(screen.getByRole('link', { name: 'JA&D Realty Services — home' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'JA&D Realty Services - home' })).toHaveAttribute(
       'href',
       '/',
     );

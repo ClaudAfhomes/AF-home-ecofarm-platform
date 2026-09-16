@@ -7,7 +7,7 @@ import { toErrorEnvelope } from '../../../_lib/envelope.js';
 import { changeStaffPasswordRequestSchema } from '@jad/contracts';
 
 /**
- * POST /admin/session/password — the signed-in staff member changes their
+ * POST /admin/session/password - the signed-in staff member changes their
  * own password (My Account, forced first-login change).
  * Verifies the current password via a fresh anon sign-in (Supabase does not
  * require it by default), applies the new one with the admin API, clears the

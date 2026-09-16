@@ -1,10 +1,10 @@
 /**
  * Frontend-only form validation for the auth preview screens (SCR-AUTH-001/002).
  *
- * UX validation only — the client is never the security boundary
+ * UX validation only - the client is never the security boundary
  * (FRONTEND-ARCHITECTURE §8). No credentials are stored or logged anywhere.
  * Rules stay within documented requirements; the 8-character password minimum
- * is an ASSUMPTION (credential policy is TBD — REQUIREMENTS ASSUMPTION 1).
+ * is an ASSUMPTION (credential policy is TBD - REQUIREMENTS ASSUMPTION 1).
  */
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -51,7 +51,7 @@ export function validateLogin(values: LoginValues): LoginErrors {
   return errors;
 }
 
-/** First field with an error, in display order — for focus management. */
+/** First field with an error, in display order - for focus management. */
 export function firstInvalidField<T extends string>(
   errors: Partial<Record<T, string>>,
   order: readonly T[],

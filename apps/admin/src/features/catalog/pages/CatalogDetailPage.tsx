@@ -81,7 +81,7 @@ export function CatalogDetailPage() {
               </div>
               <div className={styles.field}>
                 <dt>Price</dt>
-                <dd className={styles.money}>{data.price ? formatMoney(data.price) : '—'}</dd>
+                <dd className={styles.money}>{data.price ? formatMoney(data.price) : '-'}</dd>
               </div>
               <div className={styles.field}>
                 <dt>Status</dt>
@@ -100,7 +100,7 @@ export function CatalogDetailPage() {
                   </div>
                   <div className={styles.field}>
                     <dt>Area</dt>
-                    <dd>{areaFact?.value ?? '—'}</dd>
+                    <dd>{areaFact?.value ?? '-'}</dd>
                   </div>
                 </>
               )}

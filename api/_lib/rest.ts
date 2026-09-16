@@ -10,11 +10,11 @@ import type { VercelResponse } from './http.js';
  * service-role client acquisition, and small error shortcuts.
  *
  * Clients are cached per Vercel instance (keyed by the resolved key) instead
- * of rebuilt on every request — supabase-js re-initializes its realtime/
+ * of rebuilt on every request - supabase-js re-initializes its realtime/
  * storage machinery on each `createClient`, which is pure overhead here.
  *
  * The cache variables are typed from the `createClient(...)` call (via the
- * unannotated factory) so the client keeps its exact inferred type — the same
+ * unannotated factory) so the client keeps its exact inferred type - the same
  * inference the pre-cache code relied on.
  */
 

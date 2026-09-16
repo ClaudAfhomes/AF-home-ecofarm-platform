@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import { Button, ConfirmDialog, ErrorState, PageHeader, Skeleton } from '@jad/ui';
+import { Button, ConfirmDialog, ErrorState, notifySuccess, PageHeader, Skeleton } from '@jad/ui';
 import { homepageContentSchema, type HomepageContent } from '@jad/contracts';
 
 import { CmsAccordionControls } from '../components/CmsAccordionControls';
@@ -202,8 +202,7 @@ export function CmsHomepagePage() {
       await update.mutateAsync(draft);
       const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       setLastSaved(`just now at ${now}`);
-      setSaveMessage('All changes saved.');
-      setTimeout(() => setSaveMessage(null), 3000);
+      notifySuccess({ title: 'Changes saved' });
     } catch (e) {
       setSaveMessage(e instanceof Error ? e.message : 'Save failed');
     }
@@ -224,13 +223,7 @@ export function CmsHomepagePage() {
       <PageHeader title="Homepage CMS" description="Manage the public homepage content." />
 
       {saveMessage ? (
-        <div
-          className={
-            saveMessage.includes('All changes saved') ? styles.bannerSuccess : styles.bannerError
-          }
-          role={saveMessage.includes('All changes saved') ? 'status' : 'alert'}
-          aria-live="polite"
-        >
+        <div className={styles.bannerError} role="alert">
           {saveMessage}
         </div>
       ) : null}

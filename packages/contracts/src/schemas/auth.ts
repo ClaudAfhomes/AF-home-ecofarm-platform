@@ -4,14 +4,14 @@ import { memberStatusSchema } from './member.js';
 import { roleSchema } from './role.js';
 
 /**
- * Session principal — `GET /auth/me` + `POST /auth/login` (API-SPECIFICATION
+ * Session principal - `GET /auth/me` + `POST /auth/login` (API-SPECIFICATION
  * #3/#6, FR-AUTH-004). No SSOT defines the exact session field list yet; this
  * is the PROPOSED baseline carried by the mock session (ARCH-DEC-007:
  * HttpOnly-cookie session; the client never stores credentials or tokens).
  *
  * `isQualified` is member eligibility (`members.is_qualified`, BR-QUAL-001) and
  * `status` is the member's membership status (BR-AUTH-002). Both apply to the
- * MEMBER role only — they are eligibility, not roles.
+ * MEMBER role only - they are eligibility, not roles.
  */
 export const sessionUserSchema = z.object({
   id: z.string().min(1),
@@ -24,7 +24,7 @@ export const sessionUserSchema = z.object({
 
 export type SessionUser = z.infer<typeof sessionUserSchema>;
 
-/** `POST /auth/login` request — identifier accepts email or phone (FR-AUTH-004). */
+/** `POST /auth/login` request - identifier accepts email or phone (FR-AUTH-004). */
 export const loginRequestSchema = z.object({
   identifier: z.string().min(1),
   password: z.string().min(1),
@@ -32,7 +32,7 @@ export const loginRequestSchema = z.object({
 
 export type LoginRequest = z.infer<typeof loginRequestSchema>;
 
-/** `POST /auth/login` response — the established session principal. */
+/** `POST /auth/login` response - the established session principal. */
 export const loginResponseSchema = z.object({
   user: sessionUserSchema,
 });
@@ -48,9 +48,9 @@ export const qualificationAnswerSchema = z.object({
 export type QualificationAnswer = z.infer<typeof qualificationAnswerSchema>;
 
 /**
- * Government ID submission — captured at registration (FR-REG-002, FEAT-010).
+ * Government ID submission - captured at registration (FR-REG-002, FEAT-010).
  * `data` carries transient base64 file bytes on submit only (never persisted,
- * never returned by readers — stripped server-side before storage).
+ * never returned by readers - stripped server-side before storage).
  * `storagePath` is the private-bucket key set server-side after upload.
  */
 export const idDocumentSchema = z.object({
@@ -104,14 +104,21 @@ export const registrationApplicationSchema = z.object({
 
 export type RegistrationApplication = z.infer<typeof registrationApplicationSchema>;
 
-/** `POST /auth/register` response — application created in `Pending`. */
+/** `POST /auth/register` response - application created in `Pending`. */
 export const registerResponseSchema = z.object({
   application: registrationApplicationSchema,
+  /**
+   * Whether the verification code email was accepted for delivery
+   * (EmailJS). False when the email service is unconfigured or the send
+   * failed - the applicant can re-request via
+   * `POST /auth/verify-email/resend`.
+   */
+  emailSent: z.boolean().optional(),
 });
 
 export type RegisterResponse = z.infer<typeof registerResponseSchema>;
 
-/** `POST /auth/verify-email` request — one-time verification code (FEAT-009). */
+/** `POST /auth/verify-email` request - one-time verification code (FEAT-009). */
 export const verifyEmailRequestSchema = z.object({
   email: z.string().email(),
   code: z.string().min(1),
@@ -119,14 +126,14 @@ export const verifyEmailRequestSchema = z.object({
 
 export type VerifyEmailRequest = z.infer<typeof verifyEmailRequestSchema>;
 
-/** `POST /auth/verify-email/resend` request — re-issue the one-time code (FEAT-009). */
+/** `POST /auth/verify-email/resend` request - re-issue the one-time code (FEAT-009). */
 export const resendVerificationRequestSchema = z.object({
   email: z.string().email(),
 });
 
 export type ResendVerificationRequest = z.infer<typeof resendVerificationRequestSchema>;
 
-/** `POST /auth/verify-email` response — email now verified (BR-AUTH-001). */
+/** `POST /auth/verify-email` response - email now verified (BR-AUTH-001). */
 export const verifyEmailResponseSchema = z.object({
   email: z.string().email(),
   verifiedAt: z.string(),
@@ -135,19 +142,21 @@ export const verifyEmailResponseSchema = z.object({
 export type VerifyEmailResponse = z.infer<typeof verifyEmailResponseSchema>;
 
 /**
- * `POST /auth/verify-email/resend` response — MOCK-ONLY simulation. The real
+ * `POST /auth/verify-email/resend` response - MOCK-ONLY simulation. The real
  * API emails a code and returns no code; this mock surfaces the "email" the
  * applicant would receive so the frontend-only demo is usable. `devOnlyCode`
- * is never present in the real contract — consumers treat it as dev tooling.
+ * is never present in the real contract - consumers treat it as dev tooling.
  */
 export const resendVerificationResponseSchema = z.object({
   email: z.string().email(),
   devOnlyCode: z.string().optional(),
+  /** Seconds until another resend is allowed (present when a live code exists). */
+  retryAfterSeconds: z.number().int().positive().optional(),
 });
 
 export type ResendVerificationResponse = z.infer<typeof resendVerificationResponseSchema>;
 
-/** `POST /me/resubmit` request — corrected registration data (FR-REG-005, #13). */
+/** `POST /me/resubmit` request - corrected registration data (FR-REG-005, #13). */
 export const resubmitRequestSchema = registerRequestSchema.partial();
 
 export type ResubmitRequest = z.infer<typeof resubmitRequestSchema>;

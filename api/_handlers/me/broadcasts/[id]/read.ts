@@ -6,7 +6,7 @@ import type { VercelRequest, VercelResponse } from '../../../../_lib/http.js';
 import { methodNotAllowed, requireService } from '../../../../_lib/rest.js';
 
 /**
- * POST /me/broadcasts/:id/read — per-member read receipt for one visible
+ * POST /me/broadcasts/:id/read - per-member read receipt for one visible
  * notification (own row or broadcast). Idempotent: re-marking returns the
  * existing receipt. Broadcast rows are shared, so per-member state lives in
  * NotificationRead (never on the broadcast row itself).
@@ -42,7 +42,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const supabase = requireService(res);
   if (!supabase) return;
   // Visibility gate: the notification must be own or a broadcast (404
-  // otherwise — a foreign member-scoped row is never leaked).
+  // otherwise - a foreign member-scoped row is never leaked).
   const { data: visible, error: visibleError } = await supabase
     .from('Notification')
     .select('id')

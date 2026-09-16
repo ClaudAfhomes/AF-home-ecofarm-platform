@@ -9,7 +9,7 @@ import { methodNotAllowed, readJsonBody, requireService } from '../../_lib/rest.
 
 const updateSchema = policyUpdateSchema;
 
-/** PUT + DELETE /policies/:id — admin policy edit/delete (FR-ADM-004). */
+/** PUT + DELETE /policies/:id - admin policy edit/delete (FR-ADM-004). */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'PUT,DELETE,OPTIONS');
@@ -88,6 +88,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
   const patch: Record<string, unknown> = { updated_at: new Date().toISOString() };
   if (parsed.data.title !== undefined) patch.title = parsed.data.title;
+  if (parsed.data.slug !== undefined) patch.slug = parsed.data.slug;
   if (parsed.data.type !== undefined) patch.type = parsed.data.type;
   if (parsed.data.content !== undefined) patch.content = parsed.data.content;
   if (parsed.data.documentUrl !== undefined) patch.document_url = parsed.data.documentUrl;
@@ -98,7 +99,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     .select()
     .single();
   if (error) {
-    const { error: env, status } = toErrorEnvelope('INTERNAL', error.message, 500);
+    const conflict = /duplicate key|unique constraint/i.test(error.message);
+    const { error: env, status } = toErrorEnvelope(
+      conflict ? 'CONFLICT' : 'INTERNAL',
+      conflict ? 'That URL slug is already in use. Choose another.' : error.message,
+      conflict ? 409 : 500,
+    );
     res.status(status).json({ error: env });
     return;
   }
@@ -109,6 +115,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
   const row = data as {
     id: string;
+    slug: string;
     type: string;
     title: string;
     content: unknown;
@@ -128,6 +135,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   });
   res.status(200).json({
     id: row.id,
+    slug: row.slug,
     type: row.type,
     title: row.title,
     content: row.content,

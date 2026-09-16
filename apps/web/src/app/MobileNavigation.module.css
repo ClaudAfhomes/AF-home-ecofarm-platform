@@ -1,7 +1,9 @@
-/* Mobile-first: nav is collapsed below 640px and opened via the `.navOpen`
-   class (UI-UX §11.3). Closed = display:none so links are not keyboard-reachable.
-   The header is a dark brand-navy surface, so all nav styling uses the
-   light-on-dark tokens to keep the white JA&D logo and links readable. */
+/*
+ * Public primary nav. Below 1024px the nav is a fixed, scrollable panel
+ * (slides under the sticky header) with a backdrop; at ≥1024px it becomes an
+ * inline row. One element, one id - see MobileNavigation.tsx.
+ */
+
 .toggle {
   display: inline-flex;
   align-items: center;
@@ -26,6 +28,7 @@
   height: 2px;
   border-radius: 1px;
   background-color: var(--color-on-dark);
+  transition: background-color var(--transition-fast);
 }
 
 .toggleIcon::before,
@@ -37,6 +40,7 @@
   height: 2px;
   border-radius: 1px;
   background-color: var(--color-on-dark);
+  transition: transform var(--transition-fast);
 }
 
 .toggleIcon::before {
@@ -47,13 +51,56 @@
   top: 6px;
 }
 
+/* Open → X */
+.toggleIconOpen {
+  background-color: transparent;
+}
+
+.toggleIconOpen::before {
+  transform: translateY(6px) rotate(45deg);
+}
+
+.toggleIconOpen::after {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+/* Mobile backdrop behind the open panel (no-op on desktop). */
+.backdrop {
+  position: fixed;
+  inset: var(--header-height) 0 0 0;
+  z-index: 14;
+  background-color: var(--color-overlay);
+}
+
 .nav {
-  width: 100%;
   display: none;
 }
 
 .navOpen {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: var(--header-height);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 15;
+  overflow-y: auto;
+  padding: var(--space-4);
+  background-color: var(--color-brand-deep);
+  box-shadow: var(--shadow-lg);
+  animation: nav-drop var(--transition-fast) ease;
+}
+
+@keyframes nav-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .list {
@@ -61,13 +108,16 @@
   flex-direction: column;
   gap: var(--space-1);
   list-style: none;
-  margin: var(--space-3) 0 0;
+  margin: 0;
   padding: 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.item {
+  min-width: 0;
 }
 
 .link {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   min-height: 44px;
   padding: var(--space-2) var(--space-3);
@@ -75,13 +125,12 @@
   text-decoration: none;
   font-weight: 500;
   color: var(--color-on-dark);
+  overflow-wrap: anywhere;
   transition:
     background-color var(--transition-fast),
     color var(--transition-fast);
 }
 
-/* `a.link:visited`/`a.active:visited` (0,2,1) beat the global `a:visited`
-   (0,1,1) so visited nav links keep their white label. */
 a.link:visited,
 a.active:visited {
   color: var(--color-on-dark);
@@ -98,14 +147,12 @@ a.active:visited {
   background-color: rgba(255, 255, 255, 0.12);
 }
 
-/* Member auth actions (Login/Register): full-width rows in the collapsed menu,
-   compact inline buttons on desktop. Both keep the light-on-dark chrome. */
 .authGroup {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  margin-top: var(--space-3);
-  padding-top: var(--space-3);
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
   border-top: 1px solid rgba(255, 255, 255, 0.14);
 }
 
@@ -113,25 +160,43 @@ a.active:visited {
   width: 100%;
 }
 
-/* Desktop: persistent inline nav (DESIGN-SYSTEM §5 `sm` breakpoint, UI-UX §11.1). */
-@media (min-width: 640px) {
-  .toggle {
+/* Desktop / large tablet: inline row. */
+@media (min-width: 1024px) {
+  .toggle,
+  .backdrop {
     display: none;
   }
 
   .nav,
   .navOpen {
     display: flex;
+    flex-direction: row;
     align-items: center;
     gap: var(--space-3);
-    width: auto;
+    position: static;
+    overflow: visible;
+    padding: 0;
+    background-color: transparent;
+    box-shadow: none;
+    animation: none;
+    min-width: 0;
+    flex: 1 1 auto;
+    justify-content: flex-end;
   }
 
   .list {
     flex-direction: row;
+    flex-wrap: nowrap;
     gap: var(--space-2);
-    margin: 0;
-    border-top: 0;
+    align-items: center;
+    min-width: 0;
+  }
+
+  .link {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 22ch;
   }
 
   .authGroup {
@@ -142,6 +207,7 @@ a.active:visited {
     padding-top: 0;
     border-top: 0;
     margin-left: var(--space-2);
+    flex: 0 0 auto;
   }
 
   .authLink {

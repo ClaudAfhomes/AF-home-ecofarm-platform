@@ -13,7 +13,7 @@ function renderCms(route = '/admin/cms/contact', user = MOCK_SUPER_ADMIN) {
   return renderWithProviders(<CmsContactPage />, { route, user });
 }
 
-describe('CmsContactPage — Phase 8 Contact CMS', () => {
+describe('CmsContactPage - Phase 8 Contact CMS', () => {
   let server: ReturnType<typeof installMockApi>;
 
   beforeEach(() => {

@@ -10,9 +10,9 @@ import { methodNotAllowed, readJsonBody, serviceClient } from '../../../../_lib/
 import { toErrorEnvelope } from '../../../../_lib/envelope.js';
 
 /**
- * POST /admin/registrations/:id/approve — approve an application: provisions
+ * POST /admin/registrations/:id/approve - approve an application: provisions
  * the auth account + Member row + basic role, deletes the Registration row
- * (registrations are PENDING | REJECTED only — the member owns the identity
+ * (registrations are PENDING | REJECTED only - the member owns the identity
  * from here), and audits. Only PENDING applications convert (409 otherwise).
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -113,7 +113,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Sponsors must be ACTIVE + Qualified (BR-REF-003, mirrors
     // POST /auth/register). An intake-valid code that no longer resolves
     // (sponsor deactivated/disqualified in the meantime) rejects approval
-    // instead of silently creating a sponsorless member — a new applicant is
+    // instead of silently creating a sponsorless member - a new applicant is
     // never an existing Member, so self-referral is impossible here.
     if (sponsor && sponsor.accountStatus === 'ACTIVE' && sponsor.isQualified === true) {
       sponsorId = sponsor.id;
@@ -128,11 +128,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
   }
-  // Provision the auth account (random unusable password — member sets their own via recovery).
+  // Provision the auth account (random unusable password - member sets their own via recovery).
   // Registration identity is phone-based (the Registration table has no
   // email column); email is used when present (forward-compat). Normalized
   // to lowercase to match how Supabase Auth stores emails (GoTrue lowercases)
-  // — otherwise adoption after a createUser conflict misses on exact match.
+  // - otherwise adoption after a createUser conflict misses on exact match.
   const email = String((row.email as string | undefined) ?? '')
     .trim()
     .toLowerCase();
@@ -140,7 +140,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!email && !phone) {
     const { error, status } = toErrorEnvelope(
       'VALIDATION_ERROR',
-      'Registration has neither email nor phone — cannot provision an auth account.',
+      'Registration has neither email nor phone - cannot provision an auth account.',
       422,
     );
     res.status(status).json({ error });
@@ -166,7 +166,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
   if (!memberAuthId) {
     // The identity exists in Auth (createUser conflicted) but could not be
-    // resolved — surface an actionable conflict instead of a raw INTERNAL.
+    // resolved - surface an actionable conflict instead of a raw INTERNAL.
     const { error, status } = toErrorEnvelope(
       'AUTH_IDENTITY_UNRESOLVABLE',
       'An auth account already exists for this email but could not be matched. Reconcile the identity in Supabase Auth (or remove the stray account) and retry.',
@@ -175,10 +175,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.status(status).json({ error });
     return;
   }
-  // Public intake (/auth/register) creates accounts UNCONFIRMED — email
+  // Public intake (/auth/register) creates accounts UNCONFIRMED - email
   // verification lands with the email.js integration. Approval is therefore
   // the authoritative activation gate: confirm the identity here on BOTH
-  // paths — fresh creates (harmless no-op) and the adoption path (existing
+  // paths - fresh creates (harmless no-op) and the adoption path (existing
   // user from /register, which previously stayed unconfirmed forever and
   // blocked sign-in with "Email not confirmed"). Runs before any Member
   // write so a failure cannot strand an approved-but-unconfirmed account.
@@ -201,7 +201,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Active + Qualified on approval (BR-REG-007 / BR-QUAL-001): the
     // application carried the required qualification answers + government
     // ID (BR-REG-003), identity is confirmed above, and this admin action
-    // is the approval gate — all documented qualification gates are met.
+    // is the approval gate - all documented qualification gates are met.
     isQualified: true,
     firstName: row.firstName,
     lastName: row.lastName,
@@ -216,7 +216,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     sponsorId,
     // Approval is the manual government-ID gate (BR-REG-003): the
     // application carried the required ID and identity is confirmed above.
-    // Persist it — the Registration row (and its governmentId) is deleted
+    // Persist it - the Registration row (and its governmentId) is deleted
     // below, and GET /me/qualification reads this flag.
     idVerified: true,
     accountStatus: 'ACTIVE',
@@ -230,7 +230,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     .from('Member')
     .upsert(buildMemberRow(memberReferralCode), { onConflict: 'id' });
   // Concurrent-approval race (or a code outside the pre-check window):
-  // the partial UNIQUE index remains the source of truth — regenerate once
+  // the partial UNIQUE index remains the source of truth - regenerate once
   // and retry before surfacing a safe conflict.
   if (memberResult.error && isReferralCodeConflict(memberResult.error)) {
     existingCodes = [...existingCodes, memberReferralCode];
@@ -243,7 +243,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (isReferralCodeConflict(memberResult.error)) {
       const { error, status } = toErrorEnvelope(
         'CONFLICT',
-        'Referral code collision — retry approval.',
+        'Referral code collision - retry approval.',
         409,
       );
       res.status(status).json({ error });

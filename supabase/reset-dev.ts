@@ -3,7 +3,7 @@
  *
  * Context: `Member` rows own financial history through `ON DELETE RESTRICT`
  * FKs (`LedgerEntry`, `Commission`, `Wallet`, `Sale`, `Customer`,
- * `PayoutAccount` — see `supabase/migrations/20260916000001_delete_protection.sql`
+ * `PayoutAccount` - see `supabase/migrations/20260916000001_delete_protection.sql`
  * and `AGENTS.md` "No hard member deletion"). Deleting members piecemeal is
  * therefore blocked BY DESIGN (archive via `POST /admin/members/:id/archive`
  * is the sanctioned lifecycle) and would orphan genealogy links, SET NULL
@@ -11,7 +11,7 @@
  * whole seed-managed graph instead of fighting the constraints.
  *
  * How it works: service-role REST (PostgREST) ordered DELETEs, leaf tables
- * first so every FK — including the RESTRICTs — stays enforced the whole
+ * first so every FK - including the RESTRICTs - stays enforced the whole
  * time. Constraints are never disabled, dropped, or altered. The run is
  * idempotent: re-running deletes whatever remains (0-row deletes succeed).
  *
@@ -47,7 +47,7 @@ function loadEnvFile(path: string): void {
       if (!(key in process.env) && value) process.env[key] = value;
     }
   } catch {
-    // missing file — fall through to whatever the environment provides
+    // missing file - fall through to whatever the environment provides
   }
 }
 
@@ -88,7 +88,7 @@ const DELETE_ORDER: { table: string; column: string }[] = [
 // Auth accounts created by the seed. Only these are ever deleted.
 const SEED_AUTH_EMAILS = ['admin@jad.local', 'user@jad.local', 'ramon.reyes@example.com'] as const;
 
-// Sentinel values no real row carries — match-all delete without disabling
+// Sentinel values no real row carries - match-all delete without disabling
 // anything. UUID PK/FK columns get the nil UUID; text PKs get the string
 // sentinel. Every column in DELETE_ORDER must be classified here: a text
 // sentinel sent to a uuid column aborts the whole run (same defect that
@@ -161,7 +161,7 @@ async function deleteAll(
       return { exists: false, deleted: 0 };
     }
     throw new Error(
-      `delete ${table} failed (constraints enforced — resolve manually, then re-run): ${error.message}`,
+      `delete ${table} failed (constraints enforced - resolve manually, then re-run): ${error.message}`,
     );
   }
   return { exists: true, deleted: count ?? 0 };
@@ -176,7 +176,7 @@ async function seedAuthPresent(supabase: SupabaseClient): Promise<string[]> {
     }
   } catch {
     // lookup failure → unknown; never delete on uncertainty (handled in execute)
-    throw new Error('auth user lookup failed — aborting rather than guessing.');
+    throw new Error('auth user lookup failed - aborting rather than guessing.');
   }
   return present;
 }
@@ -290,7 +290,7 @@ async function main(): Promise<void> {
 
   if (mode === 'dry-run') {
     console.log(
-      `\nDRY-RUN — no changes made. Re-run with --execute plus DEV_RESET_ALLOW_REFS=${ref} to delete these rows and the seed auth accounts, then run \`pnpm seed\`.`,
+      `\nDRY-RUN - no changes made. Re-run with --execute plus DEV_RESET_ALLOW_REFS=${ref} to delete these rows and the seed auth accounts, then run \`pnpm seed\`.`,
     );
     return;
   }
@@ -298,13 +298,13 @@ async function main(): Promise<void> {
   if (!allowed.includes(ref)) {
     console.error(
       `Refusing: project ref "${ref}" is not listed in DEV_RESET_ALLOW_REFS. ` +
-        `This script only runs against explicitly allowlisted LOCAL/DEV projects — never production. Aborting with no changes.`,
+        `This script only runs against explicitly allowlisted LOCAL/DEV projects - never production. Aborting with no changes.`,
     );
     process.exit(1);
   }
 
   // --execute (guard passed): leaf-first deletes, every FK enforced.
-  // Idempotent — re-running deletes whatever remains.
+  // Idempotent - re-running deletes whatever remains.
   let deletedTotal = 0;
   for (const t of DELETE_ORDER) {
     const { exists, deleted } = await deleteAll(supabase, t.table, t.column);
@@ -326,7 +326,7 @@ async function main(): Promise<void> {
   );
   if (orphans.length > 0 || remaining.length > 0) {
     for (const o of orphans.slice(0, 20)) console.log(`  orphan ${o}`);
-    console.error('Verification FAILED — inspect output above.');
+    console.error('Verification FAILED - inspect output above.');
     process.exit(2);
   }
   console.log(

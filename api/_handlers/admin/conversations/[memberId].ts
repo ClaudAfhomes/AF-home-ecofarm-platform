@@ -6,7 +6,7 @@ import { isValidMessageRow, mapMessageRow, paginateByCursor } from '../../../_li
 import { methodNotAllowed, requireService } from '../../../_lib/rest.js';
 
 /**
- * GET /admin/conversations/:memberId — one member's thread for staff
+ * GET /admin/conversations/:memberId - one member's thread for staff
  * (API-SPECIFICATION #91). Cursor-paginated (newest first). 404s when the
  * member has no thread and 404s unknown members (staff 404-hide convention).
  */

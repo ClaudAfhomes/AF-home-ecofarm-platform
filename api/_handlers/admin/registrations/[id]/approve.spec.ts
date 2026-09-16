@@ -5,7 +5,7 @@ import type { VercelRequest, VercelResponse } from '../../../../_lib/http.js';
 import approveHandler from './approve.js';
 
 /**
- * POST /admin/registrations/:id/approve — approval moves the application to
+ * POST /admin/registrations/:id/approve - approval moves the application to
  * the Member domain: the Registration row is DELETED (registrations are
  * PENDING | REJECTED only; APPROVED_ACTIVE lives on Member).
  */
@@ -25,7 +25,7 @@ const mocks = vi.hoisted(() => {
     b.eq = () => b;
     b.in = async (key: string) => {
       // Staff gate (queryStaffSlugs) looks up Role by id; approval grants
-      // member roles looked up by slug — same table, different query.
+      // member roles looked up by slug - same table, different query.
       if (table === 'Role' && key === 'id') return { data: [{ slug: 'super_admin' }], error: null };
       if (table === 'Role' && key === 'slug')
         return {

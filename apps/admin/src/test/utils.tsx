@@ -3,8 +3,6 @@ import { render } from '@testing-library/react';
 import type { ReactElement } from 'react';
 import { MemoryRouter } from 'react-router';
 
-import { ToastProvider } from '@jad/ui';
-
 import { SessionProvider, type SessionUser } from '../lib/session';
 import { adminMockHandlers } from '../mock/handlers';
 import { createMockServer } from '@jad/mock';
@@ -25,13 +23,11 @@ export function renderWithProviders(
     defaultOptions: { queries: { retry: false } },
   });
   const result = render(
-    <ToastProvider>
-      <SessionProvider initialUser={user} restoreDelayMs={0} onRevalidate={onRevalidate}>
-        <QueryClientProvider client={client}>
-          <MemoryRouter initialEntries={[route]}>{ui}</MemoryRouter>
-        </QueryClientProvider>
-      </SessionProvider>
-    </ToastProvider>,
+    <SessionProvider initialUser={user} restoreDelayMs={0} onRevalidate={onRevalidate}>
+      <QueryClientProvider client={client}>
+        <MemoryRouter initialEntries={[route]}>{ui}</MemoryRouter>
+      </QueryClientProvider>
+    </SessionProvider>,
   );
   return { ...result, client };
 }

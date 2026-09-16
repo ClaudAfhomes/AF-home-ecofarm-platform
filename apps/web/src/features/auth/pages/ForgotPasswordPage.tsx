@@ -16,10 +16,10 @@ import styles from './ForgotPasswordPage.module.css';
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /**
- * Forgot password (SCR-AUTH-006) — requests a Supabase Auth password-reset
+ * Forgot password (SCR-AUTH-006) - requests a Supabase Auth password-reset
  * email. The email link opens `/auth/reset-password` (PKCE recovery session).
  * When Supabase is unconfigured (mock/dev), the submit simulates success with
- * a clearly-labeled dev-only notice — never a fake email.
+ * a clearly-labeled dev-only notice - never a fake email.
  */
 export function ForgotPasswordPage() {
   const { data: globalCms } = useQuery({
@@ -34,7 +34,6 @@ export function ForgotPasswordPage() {
   const [serverError, setServerError] = useState<string | undefined>();
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
-  const [simulated, setSimulated] = useState(false);
 
   const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -55,8 +54,7 @@ export function ForgotPasswordPage() {
     try {
       const client = getSupabaseClient();
       if (!client) {
-        setSimulated(true);
-        setSent(true);
+        setServerError('Password reset is unavailable right now. Please try again later.');
         setSubmitting(false);
         return;
       }
@@ -92,11 +90,6 @@ export function ForgotPasswordPage() {
     >
       {sent ? (
         <div className={styles.resultPanel}>
-          {simulated ? (
-            <Alert variant="info" title={page.simulatedEmail.title}>
-              {page.simulatedEmail.message}
-            </Alert>
-          ) : null}
           <div className={styles.successBlock}>
             <h2 className={styles.successTitle}>{page.successTitle}</h2>
             <p className={styles.successMessage}>{page.successMessage}</p>

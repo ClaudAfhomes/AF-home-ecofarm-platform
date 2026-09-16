@@ -28,7 +28,7 @@ import {
   sendMessage,
 } from '../services/member';
 
-/** `GET /members/:id` — the signed-in member's profile (SCR-MEM-002). */
+/** `GET /members/:id` - the signed-in member's profile (SCR-MEM-002). */
 export function useMemberProfile() {
   const { user } = useSession();
   return useQuery({
@@ -38,7 +38,7 @@ export function useMemberProfile() {
   });
 }
 
-/** `GET /me/wallet` — eWallet summary (SCR-MEM-001). */
+/** `GET /me/wallet` - eWallet summary (SCR-MEM-001). */
 export function useWallet() {
   const { user } = useSession();
   return useQuery({
@@ -48,7 +48,7 @@ export function useWallet() {
   });
 }
 
-/** `GET /me/ledger` — append-only ledger, cursor-paginated (SCR-MEM-009, API-SPECIFICATION §4). */
+/** `GET /me/ledger` - append-only ledger, cursor-paginated (SCR-MEM-009, API-SPECIFICATION §4). */
 export function useLedgerPage(type: string) {
   const { user } = useSession();
   return useInfiniteQuery({
@@ -60,7 +60,7 @@ export function useLedgerPage(type: string) {
   });
 }
 
-/** `GET /me/commissions` — own commissions (SCR-MEM-015). */
+/** `GET /me/commissions` - own commissions (SCR-MEM-015). */
 export function useCommissions() {
   const { user } = useSession();
   return useQuery({
@@ -70,7 +70,7 @@ export function useCommissions() {
   });
 }
 
-/** `GET /me/payout-accounts` — own payout accounts (SCR-MEM-010). */
+/** `GET /me/payout-accounts` - own payout accounts (SCR-MEM-010). */
 export function usePayoutAccounts() {
   const { user } = useSession();
   return useQuery({
@@ -80,7 +80,7 @@ export function usePayoutAccounts() {
   });
 }
 
-/** `GET /me/withdrawals` — own withdrawals (SCR-MEM-013). */
+/** `GET /me/withdrawals` - own withdrawals (SCR-MEM-013). */
 export function useWithdrawals() {
   const { user } = useSession();
   return useQuery({
@@ -90,7 +90,7 @@ export function useWithdrawals() {
   });
 }
 
-/** `GET /me/withdrawals/:id` — one withdrawal (SCR-MEM-014). */
+/** `GET /me/withdrawals/:id` - one withdrawal (SCR-MEM-014). */
 export function useWithdrawal(withdrawalId: string) {
   return useQuery({
     queryKey: ['member', 'withdrawals', withdrawalId],
@@ -99,7 +99,7 @@ export function useWithdrawal(withdrawalId: string) {
   });
 }
 
-/** `GET /me/qualification` — server-authoritative checklist (SCR-MEM-004). */
+/** `GET /me/qualification` - server-authoritative checklist (SCR-MEM-004). */
 export function useQualification() {
   const { user } = useSession();
   return useQuery({
@@ -109,7 +109,7 @@ export function useQualification() {
   });
 }
 
-/** `GET /me/referral-code` — immutable referral code (SCR-MEM-003). */
+/** `GET /me/referral-code` - immutable referral code (SCR-MEM-003). */
 export function useReferralCode() {
   const { user } = useSession();
   return useQuery({
@@ -119,7 +119,7 @@ export function useReferralCode() {
   });
 }
 
-/** `GET /me/broadcasts` — member notification feed (SCR-MEM-024). API is
+/** `GET /me/broadcasts` - member notification feed (SCR-MEM-024). API is
  * the only read path (no direct Supabase table reads); live inserts arrive
  * via `useNotificationsRealtime`, mounted once in `MemberLayout`. */
 export function useBroadcasts() {
@@ -131,7 +131,7 @@ export function useBroadcasts() {
   });
 }
 
-/** `GET /me/messages` — own admin thread, cursor-paginated (FEAT-072). */
+/** `GET /me/messages` - own admin thread, cursor-paginated (FEAT-072). */
 export function useMessagesPage() {
   const { user } = useSession();
   return useInfiniteQuery({
@@ -143,7 +143,7 @@ export function useMessagesPage() {
   });
 }
 
-/** `GET /me/messages/summary` — thread badge (unread staff replies). */
+/** `GET /me/messages/summary` - thread badge (unread staff replies). */
 export function useMessagesSummary() {
   const { user } = useSession();
   return useQuery({
@@ -153,7 +153,7 @@ export function useMessagesSummary() {
   });
 }
 
-/** `POST /me/messages` + `POST /me/messages/read` — send and mark-read. */
+/** `POST /me/messages` + `POST /me/messages/read` - send and mark-read. */
 export function useSendMessage() {
   const { user } = useSession();
   const queryClient = useQueryClient();
@@ -181,7 +181,7 @@ export function useMarkMessagesRead() {
   });
 }
 
-/** `GET /customers` — the member's own customer records (SCR-MEM-006). */
+/** `GET /customers` - the member's own customer records (SCR-MEM-006). */
 export function useCustomers() {
   const { user } = useSession();
   return useQuery({
@@ -191,7 +191,7 @@ export function useCustomers() {
   });
 }
 
-/** `GET /sales` — the member's own sales (SCR-MEM-005). */
+/** `GET /sales` - the member's own sales (SCR-MEM-005). */
 export function useSales() {
   const { user } = useSession();
   return useQuery({
@@ -201,7 +201,7 @@ export function useSales() {
   });
 }
 
-/** `GET /sales/:id` — one of the member's own sales (SCR-MEM-007). */
+/** `GET /sales/:id` - one of the member's own sales (SCR-MEM-007). */
 export function useSale(saleId: string) {
   return useQuery({
     queryKey: ['member', 'sales', saleId],
@@ -210,7 +210,7 @@ export function useSale(saleId: string) {
   });
 }
 
-/** `GET /me/direct-referrals` — direct referrals (SCR-MEM-016, reporting only). */
+/** `GET /me/direct-referrals` - direct referrals (SCR-MEM-016, reporting only). */
 export function useDirectReferrals() {
   const { user } = useSession();
   return useQuery({
@@ -220,7 +220,7 @@ export function useDirectReferrals() {
   });
 }
 
-/** `GET /me/reports/group-network` — network summary (SCR-MEM-017, reporting only). */
+/** `GET /me/reports/group-network` - network summary (SCR-MEM-017, reporting only). */
 export function useGroupNetwork() {
   const { user } = useSession();
   return useQuery({
@@ -230,7 +230,7 @@ export function useGroupNetwork() {
   });
 }
 
-/** `GET /me/genealogy` — referral tree (SCR-MEM-018, no MLM). */
+/** `GET /me/genealogy` - referral tree (SCR-MEM-018, no MLM). */
 export function useGenealogy() {
   const { user } = useSession();
   return useQuery({
@@ -240,7 +240,7 @@ export function useGenealogy() {
   });
 }
 
-/** `GET /me/vouchers` — own vouchers (SCR-MEM-020). */
+/** `GET /me/vouchers` - own vouchers (SCR-MEM-020). */
 export function useVouchers() {
   const { user } = useSession();
   return useQuery({
@@ -250,7 +250,7 @@ export function useVouchers() {
   });
 }
 
-/** `GET /vouchers/:id` — one of the member's own vouchers (SCR-MEM-021). */
+/** `GET /vouchers/:id` - one of the member's own vouchers (SCR-MEM-021). */
 export function useVoucher(voucherId: string) {
   return useQuery({
     queryKey: ['member', 'vouchers', voucherId],
@@ -259,7 +259,7 @@ export function useVoucher(voucherId: string) {
   });
 }
 
-/** `GET /content/forwardable` — content library (SCR-MEM-022, FR-ADM-003). */
+/** `GET /content/forwardable` - content library (SCR-MEM-022, FR-ADM-003). */
 export function useContentLibrary() {
   return useQuery({
     queryKey: ['member', 'content-library'],

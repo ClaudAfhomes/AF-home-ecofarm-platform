@@ -13,7 +13,7 @@ function renderCms(route = '/admin/cms/faqs', user = MOCK_SUPER_ADMIN) {
   return renderWithProviders(<CmsFaqsPage />, { route, user });
 }
 
-describe('CmsFaqsPage — Phase 4 FAQ CMS', () => {
+describe('CmsFaqsPage - Phase 4 FAQ CMS', () => {
   let server: ReturnType<typeof installMockApi>;
 
   beforeEach(() => {
@@ -129,7 +129,7 @@ describe('CmsFaqsPage — Phase 4 FAQ CMS', () => {
     expect(seed.eyebrow).toBe('FAQs');
     expect(seed.title).toBe('Frequently asked questions');
     expect(seed.hero.lead).toBe(
-      'Concise, plain-language answers to the questions buyers and sellers ask us most — before you talk to us.',
+      'Concise, plain-language answers to the questions buyers and sellers ask us most - before you talk to us.',
     );
     expect(seed.hero.primaryCta).toEqual({ label: 'Talk to Us', to: '/contact' });
     expect(seed.intro.statement).toBe('Questions answered clearly.');
@@ -308,7 +308,7 @@ describe('CmsFaqsPage — Phase 4 FAQ CMS', () => {
     expect(screen.getByRole('link', { name: /Page Header/ })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: /FAQs/ })).toBeInTheDocument();
 
-    // FAQs collapsed initially — question text not visible
+    // FAQs collapsed initially - question text not visible
     expect(
       screen.queryByText('What does JA&D Realty Services specialize in?'),
     ).not.toBeInTheDocument();

@@ -29,11 +29,11 @@ interface AuthLike {
 }
 
 /**
- * Reset password (SCR-AUTH-006) — the recovery-link landing page. Supabase
+ * Reset password (SCR-AUTH-006) - the recovery-link landing page. Supabase
  * Auth exchanges the PKCE code on load (`detectSessionInUrl`); when a session
  * is present the user sets a new password via `updateUser`, then the recovery
  * session is signed out. Unconfigured Supabase (mock/dev) shows the invalid/
- * expired state — recovery is not simulated.
+ * expired state - recovery is not simulated.
  */
 export function ResetPasswordPage() {
   const { data: globalCms } = useQuery({
@@ -103,7 +103,7 @@ export function ResetPasswordPage() {
         return;
       }
       await client.auth.signOut().catch(() => {
-        // best-effort — the recovery session is cleared below anyway
+        // best-effort - the recovery session is cleared below anyway
       });
       setPhase('done');
       setSubmitting(false);

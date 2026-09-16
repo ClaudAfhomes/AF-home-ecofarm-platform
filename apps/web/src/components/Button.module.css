@@ -51,7 +51,7 @@
   background-color: var(--color-brand-primary-hover);
 }
 
-/* Secondary — supporting action. Solid deep-navy surface with white text and a
+/* Secondary - supporting action. Solid deep-navy surface with white text and a
    white border (white on #142B47 ≈ 14.3:1, WCAG-2.1 AAA) so the label stays
    white and clearly readable on light surfaces while remaining distinct from
    `primary`. On dark/hero surfaces use `outlineLight` instead.
@@ -68,7 +68,7 @@
   border-color: var(--color-on-dark);
 }
 
-/* Same `a:visited` guard as `.primary` above — keep white labels on visited
+/* Same `a:visited` guard as `.primary` above - keep white labels on visited
    supporting/outline buttons. `.secondary:visited`/`.outlineLight:visited`
    (0,2,0) beat the global `a:visited` (0,1,1). */
 .secondary:visited,

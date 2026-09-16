@@ -13,7 +13,7 @@ function formatUpdatedAt(updatedAt: string): string {
   return date.toLocaleDateString('en-PH', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
-/** Public Policies page — API-driven; static fallback on error/empty (Q6). */
+/** Public Policies page - API-driven; static fallback on error/empty (Q6). */
 export function PoliciesPage() {
   const { data, isPending } = usePolicies();
   const items = (data?.length ?? 0) > 0 ? data! : POLICY_FALLBACK;
@@ -24,7 +24,7 @@ export function PoliciesPage() {
         variant="page"
         eyebrow="Legal"
         title="Policies"
-        lead="JA&D policies, program guidelines, and terms and conditions — read the documents that govern your membership."
+        lead="JA&D policies, program guidelines, and terms and conditions - read the documents that govern your membership."
         image={ABOUT_IMAGES.trust}
       />
 
@@ -40,7 +40,7 @@ export function PoliciesPage() {
             <ul className={styles.list}>
               {items.map((policy) => (
                 <li key={policy.id}>
-                  <Link className={styles.card} to={policyPath(policy.id)}>
+                  <Link className={styles.card} to={policyPath(policy.slug)}>
                     <span className={styles.kind}>{policy.type}</span>
                     <span className={styles.title}>{policy.title}</span>
                     <span className={styles.meta}>Updated {formatUpdatedAt(policy.updatedAt)}</span>

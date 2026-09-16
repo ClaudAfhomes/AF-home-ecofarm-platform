@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { Button, Dialog, Icon, useToast } from '@jad/ui';
+import { Button, Dialog, Icon, notifyError, notifySuccess } from '@jad/ui';
 import type { Policy } from '@jad/contracts';
 
 import { useUpdatePolicy } from '../hooks/useUpdatePolicy';
@@ -11,13 +11,14 @@ import {
   isPolicyPdf,
   uploadPolicyPdf,
 } from '../services/uploads';
+import { isValidPolicySlug } from '../slug';
 import styles from '../pages/PoliciesPage.module.css';
 
 /**
  * Edit dialog for an admin policy (FR-ADM-004): title, type, optional
  * summary, and optional PDF replacement (uploaded through the same
- * DOCUMENT signed-URL flow as create). The stored PDF can never be unset —
- * replacement only — so every policy keeps its required document.
+ * DOCUMENT signed-URL flow as create). The stored PDF can never be unset -
+ * replacement only - so every policy keeps its required document.
  */
 const KNOWN_TYPES = ['terms', 'privacy', 'guidelines'];
 
@@ -30,9 +31,9 @@ export function PolicyEditDialog({
   item: Policy | null;
   onClose: () => void;
 }) {
-  const { toast } = useToast();
   const updatePolicy = useUpdatePolicy();
   const [title, setTitle] = useState('');
+  const [slug, setSlug] = useState('');
   const [type, setType] = useState('');
   const [content, setContent] = useState('');
   const [file, setFile] = useState<File | null>(null);
@@ -43,6 +44,7 @@ export function PolicyEditDialog({
   useEffect(() => {
     if (open && item) {
       setTitle(item.title);
+      setSlug(item.slug);
       setType(item.type);
       setContent(item.content ?? '');
       setFile(null);
@@ -57,10 +59,16 @@ export function PolicyEditDialog({
   const current: Policy = item;
 
   const titleChanged = title.trim() !== current.title;
+  const slugChanged = slug.trim() !== current.slug;
   const typeChanged = type.trim() !== current.type;
   const contentChanged = (content.trim() || '') !== (current.content ?? '');
-  const dirty = titleChanged || typeChanged || contentChanged || file !== null;
-  const canSave = dirty && title.trim().length > 0 && type.trim().length > 0 && !saving;
+  const dirty = titleChanged || slugChanged || typeChanged || contentChanged || file !== null;
+  const canSave =
+    dirty &&
+    title.trim().length > 0 &&
+    type.trim().length > 0 &&
+    isValidPolicySlug(slug) &&
+    !saving;
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = Array.from(e.target.files ?? [])[0];
@@ -103,19 +111,19 @@ export function PolicyEditDialog({
         id: current.id,
         patch: {
           ...(titleChanged && { title: title.trim() }),
+          ...(slugChanged && { slug: slug.trim() }),
           ...(typeChanged && { type: type.trim() }),
           ...(contentChanged && { content: content.trim() }),
           ...(documentUrl !== undefined && { documentUrl }),
         },
       });
-      toast({
+      notifySuccess({
         title: 'Policy updated',
         message: `"${title.trim()}" was saved${documentUrl ? ', including its replacement PDF' : ''}.`,
-        tone: 'success',
       });
       onClose();
     } catch (e) {
-      toast({ title: 'Update failed', message: (e as Error).message, tone: 'danger' });
+      notifyError({ title: 'Update failed', message: (e as Error).message });
     } finally {
       setSaving(false);
     }
@@ -149,6 +157,21 @@ export function PolicyEditDialog({
             className={styles.input}
             aria-label="Title"
           />
+        </label>
+        <label className={styles.field}>
+          <span className={styles.fieldLabel}>URL slug</span>
+          <input
+            value={slug}
+            onChange={(e) => setSlug(e.target.value)}
+            placeholder="terms"
+            className={styles.input}
+            aria-label="URL slug"
+            aria-invalid={!isValidPolicySlug(slug) ? true : undefined}
+          />
+          <span className={styles.fileHint}>
+            Public link: /policies/{slug.trim() || 'slug'}
+            {!isValidPolicySlug(slug) ? ' - use lowercase letters, numbers, and hyphens.' : ''}
+          </span>
         </label>
         <label className={styles.field}>
           <span className={styles.fieldLabel}>Type</span>
@@ -187,7 +210,7 @@ export function PolicyEditDialog({
             </span>
           ) : (
             <span style={{ fontSize: 'var(--text-caption)', color: 'var(--color-text-muted)' }}>
-              No PDF attached — upload one below to add it.
+              No PDF attached - upload one below to add it.
             </span>
           )}
           <label className={styles.fileDropzone}>

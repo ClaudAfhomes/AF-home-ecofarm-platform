@@ -13,7 +13,7 @@ export function getSale(id: string): Promise<Sale> {
 }
 
 /**
- * Staff status transition — `PATCH /admin/sales/:id` (super_admin, admin).
+ * Staff status transition - `PATCH /admin/sales/:id` (super_admin, admin).
  * Legal moves are enforced server-side (SUBMITTED → ADMIN_APPROVED/REJECTED,
  * ADMIN_APPROVED → PAYMENT_VERIFIED/REJECTED, PAYMENT_VERIFIED →
  * QUALIFYING_SALE/REJECTED); rejection requires a reason (BR-SAL-005).

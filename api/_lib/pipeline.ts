@@ -15,7 +15,7 @@ import { maskIdentifier } from './money.js';
 
 /**
  * Shared member-pipeline logic for api/ handlers (Phase B3).
- * Pure functions — unit-tested. Handlers own Supabase I/O; all state-machine
+ * Pure functions - unit-tested. Handlers own Supabase I/O; all state-machine
  * rules live here so admin and member surfaces cannot drift apart.
  */
 
@@ -332,7 +332,7 @@ export function mapCustomerRow(row: Record<string, unknown>) {
     fullName: row.name ?? row.fullName,
     // Phone is contract-required: fall back to an explicit placeholder so a
     // missing number never drops the row from admin lists.
-    phone: row.phone ?? '—',
+    phone: row.phone ?? '-',
     email: row.email ?? undefined,
   };
 }
@@ -372,7 +372,7 @@ export function isValidSaleRow(row: Record<string, unknown>): boolean {
  * B5 money-list mappers. DB columns are camelCase (quoted) to match the
  * contract shapes; `categorySlug` is the only rename (`categoryId` on the
  * wire). Timestamptz columns arrive as ISO strings; numeric-as-text amounts
- * pass through untouched (no float math — exact-decimal strings end to end).
+ * pass through untouched (no float math - exact-decimal strings end to end).
  */
 
 export function mapPropertyRow(row: Record<string, unknown>) {
@@ -453,7 +453,7 @@ export function isValidVoucherRow(row: Record<string, unknown>): boolean {
   return voucherSchema.safeParse(mapVoucherRow(row)).success;
 }
 
-/** Admin assignment view — voucher plus template/member linkage. */
+/** Admin assignment view - voucher plus template/member linkage. */
 export function mapVoucherAssignmentRow(row: Record<string, unknown>) {
   return {
     ...mapVoucherRow(row),

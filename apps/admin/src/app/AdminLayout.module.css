@@ -6,7 +6,7 @@
 /**
  * Unresolved staff-role notice: the session carries a staff role but no
  * navigation modules resolved (e.g. MemberRole link missing or role lookup
- * failing). Fails loud instead of rendering a mysteriously empty sidebar —
+ * failing). Fails loud instead of rendering a mysteriously empty sidebar - 
  * deny-by-default is preserved (no links are shown).
  */
 .roleNotice {

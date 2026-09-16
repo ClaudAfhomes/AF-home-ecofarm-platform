@@ -252,7 +252,7 @@ export function CatalogPage() {
                         {cat.isFeatured ? (
                           <StatusChip label="Featured" tone="info" />
                         ) : (
-                          <span style={{ color: 'var(--color-text-muted)' }}>—</span>
+                          <span style={{ color: 'var(--color-text-muted)' }}>-</span>
                         )}
                       </TableCell>
                       <TableCell label="Listings">{cat.listingCount}</TableCell>
@@ -376,7 +376,7 @@ export function CatalogPage() {
                                 {formatMoney(row.price)}
                               </span>
                             ) : (
-                              <span style={{ color: 'var(--color-text-muted)' }}>—</span>
+                              <span style={{ color: 'var(--color-text-muted)' }}>-</span>
                             )}
                           </TableCell>
                           <TableCell label="Status">

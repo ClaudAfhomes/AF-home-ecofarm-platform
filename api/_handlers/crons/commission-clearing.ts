@@ -5,14 +5,14 @@ import { methodNotAllowed, requireService } from '../../_lib/rest.js';
 import { toErrorEnvelope } from '../../_lib/envelope.js';
 
 /**
- * GET /crons/commission-clearing — daily scheduled trigger for the
+ * GET /crons/commission-clearing - daily scheduled trigger for the
  * commission clearing batch (Vercel Cron sends GET). Moves every due PENDING
  * commission to AVAILABLE with ledger + wallet movement via the atomic
  * `commission_clear_batch` function (system actor).
  *
  * Intentionally unauthenticated: the operation is idempotent and time-gated
  * (only PENDING rows at/older than COMMISSION_CLEARING_DAYS move), so an
- * unsolicited hit can create no money and advance no early state — it only
+ * unsolicited hit can create no money and advance no early state - it only
  * performs transitions the system already owes. Registered as a daily cron
  * in vercel.json (Hobby allows 2 daily crons; this is the second).
  */

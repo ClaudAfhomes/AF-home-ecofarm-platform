@@ -1,8 +1,8 @@
--- Supabase Auth foundation — Phase 1 fresh start
--- Supabase Postgres 15+ — no Prisma. Roles: admin / user via Member + Role + MemberRole
+-- Supabase Auth foundation - Phase 1 fresh start
+-- Supabase Postgres 15+ - no Prisma. Roles: admin / user via Member + Role + MemberRole
 -- Q3: Do NOT drop existing CRM tables (Customer, Sale, Property, Commission, Wallet, LedgerEntry,
 --     PayoutAccount, Withdrawal, Voucher, ContentItem, Policy, Notification, PublicContent,
---     IdempotencyKey) — leave untouched until CRM database phase.
+--     IdempotencyKey) - leave untouched until CRM database phase.
 -- This migration is idempotent and creates ONLY auth tables if missing.
 
 -- 0) Extensions
@@ -36,13 +36,13 @@ create table if not exists "MemberRole" (
 );
 create index if not exists "MemberRole_roleId_idx" on "MemberRole"("roleId");
 
--- Seed roles (idempotent) — fresh-start roles: admin / user
+-- Seed roles (idempotent) - fresh-start roles: admin / user
 insert into "Role"(slug, name, description) values
-  ('admin', 'Admin', 'Admin dashboard access — Phase 1'),
-  ('user', 'User', 'User/member dashboard access — Phase 1')
+  ('admin', 'Admin', 'Admin dashboard access - Phase 1'),
+  ('user', 'User', 'User/member dashboard access - Phase 1')
 on conflict (slug) do nothing;
 
--- 2) RLS — Phase 1 minimum (DATABASE-DESIGN.md §4.7)
+-- 2) RLS - Phase 1 minimum (DATABASE-DESIGN.md §4.7)
 -- Member: authenticated users can only read their own row; service_role bypasses for seed
 alter table "Member" enable row level security;
 do $$ begin
@@ -76,6 +76,6 @@ do $$ begin
   end if;
 end $$;
 
--- 3) Realtime not needed for auth foundation — skip (handled in later phases)
+-- 3) Realtime not needed for auth foundation - skip (handled in later phases)
 
--- 4) Storage bucket marketing-tools already exists from prior phase — keep as-is, no change here
+-- 4) Storage bucket marketing-tools already exists from prior phase - keep as-is, no change here

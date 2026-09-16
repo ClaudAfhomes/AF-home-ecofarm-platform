@@ -1,13 +1,13 @@
 import { z } from 'zod';
 
 /**
- * CMS contracts — frontend-only Phase 1 Homepage CMS.
+ * CMS contracts - frontend-only Phase 1 Homepage CMS.
  * Shapes mirror the public `HOME` content (`apps/web/src/features/public/content/home.ts`)
  * so the initial CMS seed is derived via an adapter, not duplicated. Future
  * `GET/PUT /cms/homepage` will validate against the same schemas.
  */
 
-// CTA — exactly one of internal `to` or external `href`; rejects javascript:/data:
+// CTA - exactly one of internal `to` or external `href`; rejects javascript:/data:
 export const cmsCtaLinkSchema = z
   .object({
     label: z.string().min(1, 'Label is required').max(40, 'Label must be 40 characters or less'),
@@ -51,10 +51,10 @@ export const cmsCtaLinkSchema = z
 export type CmsCtaLink = z.infer<typeof cmsCtaLinkSchema>;
 
 export const cmsPhotoSchema = z.object({
-  // id is a storage key / Unsplash seed / blob URL — allow full URLs up to 500 chars for Supabase Storage or blob previews
+  // id is a storage key / Unsplash seed / blob URL - allow full URLs up to 500 chars for Supabase Storage or blob previews
   id: z
     .string()
-    .min(1, 'Image is required — upload an image')
+    .min(1, 'Image is required - upload an image')
     .max(500, 'Image reference must be 500 characters or less'),
   alt: z
     .string()
@@ -136,7 +136,7 @@ export const homepageCtaBandSchema = z.object({
   secondaryCta: cmsCtaLinkSchema.optional(),
 });
 
-/** Full Homepage CMS content — mirrors `HOME` in `apps/web/src/features/public/content/home.ts`. */
+/** Full Homepage CMS content - mirrors `HOME` in `apps/web/src/features/public/content/home.ts`. */
 export const homepageContentSchema = z.object({
   hero: homepageHeroSchema,
   value: homepageValueSchema,
@@ -151,7 +151,7 @@ export const homepageContentSchema = z.object({
 export type HomepageContent = z.infer<typeof homepageContentSchema>;
 
 // ---------------------------------------------------------------------------
-// About page — mirrors `ABOUT` in `apps/web/src/features/public/content/about.ts`
+// About page - mirrors `ABOUT` in `apps/web/src/features/public/content/about.ts`
 // 7 sections: hero, intro (Who we are), philosophy (Three readings), approach,
 // vision, mission, cta. Reuses cmsPhoto/cmsCta pillar shapes from homepage.
 // ---------------------------------------------------------------------------
@@ -236,11 +236,11 @@ export const aboutContentSchema = z.object({
 export type AboutContent = z.infer<typeof aboutContentSchema>;
 
 // ---------------------------------------------------------------------------
-// Properties — mirrors `PROPERTY_CATEGORIES` + `PROPERTY_RECORDS` + `PROPERTIES`
+// Properties - mirrors `PROPERTY_CATEGORIES` + `PROPERTY_RECORDS` + `PROPERTIES`
 // in `apps/web/src/features/public/content/properties.ts`.
 // Audit source: actual public types `PropertyCategory` / `Property` / `Photo`.
 // Price remains optional exact-decimal string (not all listings publish a price).
-// Featured is derived — first property per category via `getFeaturedProperties`.
+// Featured is derived - first property per category via `getFeaturedProperties`.
 // ---------------------------------------------------------------------------
 
 export const cmsPropertyFactSchema = z.object({
@@ -384,7 +384,7 @@ export const propertiesContentSchema = z.object({
 export type PropertiesContent = z.infer<typeof propertiesContentSchema>;
 
 // ---------------------------------------------------------------------------
-// FAQs — mirrors `FAQS` in `apps/web/src/features/public/content/faqs.ts`.
+// FAQs - mirrors `FAQS` in `apps/web/src/features/public/content/faqs.ts`.
 // Audit: flat `FaqItem[]` (question/answer), no categories, order = array
 // index, no search/filter, accordion `FAQAccordion` (multiple open allowed).
 // Page wrapper: eyebrow/title + hero (eyebrow/lead/image/primaryCta) +
@@ -434,7 +434,7 @@ export const faqContentSchema = z.object({
 export type FaqContent = z.infer<typeof faqContentSchema>;
 
 // ---------------------------------------------------------------------------
-// Contact — mirrors `CONTACT` in `apps/web/src/features/public/content/contact.ts`
+// Contact - mirrors `CONTACT` in `apps/web/src/features/public/content/contact.ts`
 // Audit: title + hero (eyebrow/image/primaryCta) + methods[] (icon/label/value/
 // href) + form (heading/note/submitLabel) + cta (title/lead/primaryCta/
 // secondaryCta) + detailsHeading + details[] (footer contact column). Method
@@ -518,7 +518,7 @@ export const contactContentSchema = z.object({
 export type ContactContent = z.infer<typeof contactContentSchema>;
 
 // ---------------------------------------------------------------------------
-// Global — site-wide identity, navigation, footer, Messenger FAB, and SEO.
+// Global - site-wide identity, navigation, footer, Messenger FAB, and SEO.
 // Mirrors `SITE` (`site.ts`) + `LOGO` (`images.ts`) + `CONTACT.details`
 // (`contact.ts`) + `index.html` meta. These are the only truly site-wide SSOTs
 // consumed by `Header`/`Footer`/`MessengerButton` and the public `<head>`.
@@ -680,7 +680,7 @@ export const globalContentSchema = z.object({
 export type GlobalContent = z.infer<typeof globalContentSchema>;
 
 // ---------------------------------------------------------------------------
-// Auth — marketing-editable copy + brand imagery for the member auth screens
+// Auth - marketing-editable copy + brand imagery for the member auth screens
 // (Login / Register / Email verification / Application status), plus the auth
 // brand mark and browser icon (favicon). Mirrors `AUTH` (`apps/web/src/features
 // auth/content.ts`) so a future `GET/PUT /cms/auth` can serve the same shape.
@@ -720,7 +720,7 @@ export const registerFieldLabelSchema = z.object({
 
 export type RegisterFieldLabel = z.infer<typeof registerFieldLabelSchema>;
 
-/** One yes/no qualification question (content only — rendered as a Yes/No select). */
+/** One yes/no qualification question (content only - rendered as a Yes/No select). */
 export const registerQualificationQuestionSchema = z.object({
   id: z
     .string()

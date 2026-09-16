@@ -9,7 +9,7 @@ import saleById from './[id].js';
  * call the atomic `sale_qualify` DB function (single tx: transition +
  * commissions + audit) instead of the sequential table path, and map its
  * error envelope. Other transitions keep the table path. Supabase is fully
- * mocked — SQL internals (rate math, idempotency) are covered by migration
+ * mocked - SQL internals (rate math, idempotency) are covered by migration
  * review + seed backfill runs, not here.
  */
 const mocks = vi.hoisted(() => {
@@ -140,7 +140,7 @@ describe('PATCH /admin/sales/:id QUALIFYING_SALE delegation', () => {
     const rpcCall = mocks.calls.find((c) => c.op === 'rpc');
     expect(rpcCall?.fn).toBe('sale_qualify');
     expect(rpcCall?.arg).toMatchObject({ p_id: 'sal-003', p_role: 'super_admin' });
-    // No sequential table write or handler-side audit on the qualify path —
+    // No sequential table write or handler-side audit on the qualify path -
     // the function owns the whole unit.
     expect(mocks.calls.some((c) => c.op === 'update' && c.table === 'Sale')).toBe(false);
     expect(mocks.calls.some((c) => c.op === 'insert' && c.table === 'AuditLog')).toBe(false);

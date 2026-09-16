@@ -11,7 +11,7 @@ import { randomBytes } from 'node:crypto';
  * uniqueness check, which caused `Member_referralCode_uidx` violations on
  * approve-with-referral-code).
  *
- * Pure functions — unit-tested, no Supabase import.
+ * Pure functions - unit-tested, no Supabase import.
  */
 
 /** Suffix alphabet: unambiguous uppercase alphanumerics (no 0/O/1/I). */

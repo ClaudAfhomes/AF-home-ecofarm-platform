@@ -67,7 +67,7 @@ export function SaleFormDialog({ open, onClose, sale }: SaleFormDialogProps) {
         .filter((p) => p.status === 'ACTIVE')
         .map((p) => ({
           value: p.id,
-          label: `${p.name} — ${p.price ? formatMoney(p.price) : 'Price TBD'}`,
+          label: `${p.name} - ${p.price ? formatMoney(p.price) : 'Price unavailable'}`,
         })),
     [properties],
   );

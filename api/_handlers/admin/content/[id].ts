@@ -35,7 +35,7 @@ export function marketingToolsObjectKey(downloadUrl: unknown): string | null {
 }
 
 /**
- * DELETE /admin/content/:id (super_admin + admin, FR-ADM-003) — permanently
+ * DELETE /admin/content/:id (super_admin + admin, FR-ADM-003) - permanently
  * remove a marketing tool: its `ContentItem` row plus the uploaded object
  * when the download URL lives in the `marketing-tools` bucket. Row deletion
  * is authoritative: a storage failure still deletes the row
@@ -85,7 +85,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return deleteContentItem(res, supabase, auth, id, current);
   }
 
-  // PATCH — title / description / kind / downloadUrl (file replacement).
+  // PATCH - title / description / kind / downloadUrl (file replacement).
   const parsedBody = readJsonBody(req);
   if (!parsedBody.ok) {
     const { error, status } = parsedBody.error;
@@ -177,12 +177,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       `Updated marketing tool ${id} (${Object.keys(patch).join(', ')})` +
       (clearedFile
         ? replacedFile
-          ? ' — file removed (old object removed)'
-          : ' — file removed'
+          ? ' - file removed (old object removed)'
+          : ' - file removed'
         : nextDownloadUrl !== undefined && nextDownloadUrl !== current.download_url
           ? replacedFile
-            ? ' — file replaced (old object removed)'
-            : ' — file replaced'
+            ? ' - file replaced (old object removed)'
+            : ' - file replaced'
           : ''),
   });
   res.status(200).json(validated.data);
@@ -198,7 +198,7 @@ async function deleteContentItem(
   id: string,
   current: Record<string, unknown>,
 ) {
-  // Best-effort bucket cleanup — never blocks the row delete.
+  // Best-effort bucket cleanup - never blocks the row delete.
   let fileRemoved = false;
   const objectKey = marketingToolsObjectKey(current.download_url);
   if (objectKey) {

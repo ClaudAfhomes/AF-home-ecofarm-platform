@@ -33,7 +33,7 @@ const LEDGER_TYPE_OPTIONS: { value: string; label: string }[] = [
 /**
  * Ledger (SCR-MEM-009). Append-only financial entries from `GET /me/ledger`
  * with server-computed running balance (BI-001/005) and cursor pagination
- * (API-SPECIFICATION §4). The type filter is a server-side allowlisted key —
+ * (API-SPECIFICATION §4). The type filter is a server-side allowlisted key -
  * changing it starts a fresh cursor stream.
  */
 export function LedgerPage() {
@@ -70,7 +70,7 @@ export function LedgerPage() {
     <section>
       <PageHeader
         title="Ledger"
-        description="Append-only financial ledger (BI-005) — cursor-paginated."
+        description="Append-only financial ledger (BI-005) - cursor-paginated."
         actions={
           <Link className={styles.backLink} to="/member/ewallet" aria-label="Back to eWallet">
             ← Back to eWallet
@@ -96,14 +96,14 @@ export function LedgerPage() {
           placeholder="All types"
           hint={
             type === 'GROUP_INCENTIVE'
-              ? 'Group Incentive is gated — no entries yet until Owner decision OD-006 (FEAT-041).'
-              : 'Filter is shareable via URL — ?type= — and uses a server allowlist.'
+              ? 'Group Incentive is gated - no entries yet until Owner decision OD-006 (FEAT-041).'
+              : 'Filter is shareable via URL - ?type= - and uses a server allowlist.'
           }
         />
       </div>
       {type === 'GROUP_INCENTIVE' ? (
         <p className={styles.gatedNote}>
-          Group Incentive is gated — no entries yet until Owner decision OD-006 (FEAT-041 BLOCKED on
+          Group Incentive is gated - no entries yet until Owner decision OD-006 (FEAT-041 BLOCKED on
           OD-006..012). See <Link to="/member/policies">Policies</Link>.
         </p>
       ) : null}
@@ -125,7 +125,7 @@ export function LedgerPage() {
           <h3 className={styles.emptyTitle}>No ledger entries</h3>
           <p className={styles.emptyBody}>
             {type === 'GROUP_INCENTIVE'
-              ? 'Group Incentive is gated — no entries yet until Owner decision OD-006 (FEAT-041 BLOCKED).'
+              ? 'Group Incentive is gated - no entries yet until Owner decision OD-006 (FEAT-041 BLOCKED).'
               : 'Transactions appear here once commissions clear or withdrawals are requested.'}
           </p>
           {type ? (
@@ -162,7 +162,7 @@ export function LedgerPage() {
                   <span className={styles.meta}>
                     {ledgerDirectionLabel(entry.direction)} · {formatDate(entry.createdAt)}
                     {entry.entryType === 'WITHDRAWAL_COMPLETION'
-                      ? ' · external record — no balance change'
+                      ? ' · external record - no balance change'
                       : ''}
                   </span>
                 </div>
@@ -177,7 +177,7 @@ export function LedgerPage() {
                     }
                     title={
                       entry.entryType === 'WITHDRAWAL_COMPLETION'
-                        ? 'Recorded external completion — Available already reserved at Reservation (BR-WDR-002)'
+                        ? 'Recorded external completion - Available already reserved at Reservation (BR-WDR-002)'
                         : undefined
                     }
                   >

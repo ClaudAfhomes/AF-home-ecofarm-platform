@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 /**
- * Platform account roles — Phase 1 fresh-start (Supabase Auth).
+ * Platform account roles - Phase 1 fresh-start (Supabase Auth).
  * DEVELOPMENT/PHASE-1 scope: only `admin` and `user` are active.
  * Leaves clean path for PostgreSQL/RLS-based authorization later.
  * Legacy values (`MEMBER`, `SUPER_ADMIN`, `member_basic`, etc.) are normalized

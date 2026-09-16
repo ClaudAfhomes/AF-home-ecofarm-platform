@@ -7,7 +7,7 @@ import { mapRegistrationRow } from '../../../_lib/pipeline.js';
 import { methodNotAllowed, requireService } from '../../../_lib/rest.js';
 import { toErrorEnvelope } from '../../../_lib/envelope.js';
 
-/** GET /admin/registrations/:id — single application. */
+/** GET /admin/registrations/:id - single application. */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');

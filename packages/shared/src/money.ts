@@ -1,7 +1,7 @@
 import { EXACT_DECIMAL_STRING_RE } from '@jad/contracts';
 
 /**
- * Money display helpers — DESIGN-SYSTEM.md §9.
+ * Money display helpers - DESIGN-SYSTEM.md §9.
  *
  * Money arrives from the API as exact-decimal STRINGS (BR-WAL-002; NUMERIC,
  * never floats). These helpers are presentation-only: they format a decimal
@@ -27,7 +27,7 @@ function fromCents(cents: bigint): string {
 
 /**
  * Validate that a value is an exact-decimal money string (digits, optional
- * 1–2 decimal places, no sign, no thousands separators). Floating-point or
+ * 1-2 decimal places, no sign, no thousands separators). Floating-point or
  * malformed input is rejected rather than silently formatted.
  */
 export function isExactDecimal(value: string): boolean {
@@ -38,7 +38,7 @@ export function isExactDecimal(value: string): boolean {
  * PROVISIONAL LOCALE (DESIGN-SYSTEM §9; UX-DEC-010): the approved deployment
  * locale is TBD / PROPOSED. `en-PH` is a PLACEHOLDER chosen to match the §9
  * example format (₱ + PHP). Before launch, replace with the approved locale
- * configuration — formatting is isolated here so only this formatter changes.
+ * configuration - formatting is isolated here so only this formatter changes.
  * Money representation stays exact-decimal string; no float arithmetic.
  */
 const phpFormatter = new Intl.NumberFormat('en-PH', {
@@ -63,7 +63,7 @@ export function formatMoney(value: string): string {
 
 /**
  * Compare two exact-decimal money strings (returns -1, 0, or 1). Exact-decimal
- * comparison — never converts to a float.
+ * comparison - never converts to a float.
  */
 export function compareMoney(a: string, b: string): number {
   if (!isExactDecimal(a) || !isExactDecimal(b)) {
@@ -74,7 +74,7 @@ export function compareMoney(a: string, b: string): number {
 }
 
 /**
- * Exact-decimal addition of two money strings (BigInt cents — no float math).
+ * Exact-decimal addition of two money strings (BigInt cents - no float math).
  * The result keeps two decimal places.
  */
 export function addMoney(a: string, b: string): string {
@@ -85,7 +85,7 @@ export function addMoney(a: string, b: string): string {
 }
 
 /**
- * Exact-decimal subtraction of two money strings (BigInt cents — no float
+ * Exact-decimal subtraction of two money strings (BigInt cents - no float
  * math). May return a negative string when `a < b`; callers that must preserve
  * the non-negative invariant (BI-001) should guard with `compareMoney`.
  */

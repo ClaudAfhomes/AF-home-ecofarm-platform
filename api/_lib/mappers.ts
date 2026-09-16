@@ -2,13 +2,13 @@ import { forwardableContentSchema, notificationSchema } from '@jad/contracts';
 
 /**
  * Row mappers: Supabase snake_case rows → contract camelCase shapes.
- * Pure functions — unit-tested; handlers filter mapped rows through the
+ * Pure functions - unit-tested; handlers filter mapped rows through the
  * contract schemas so malformed rows never reach clients.
  *
  * Mappers are idempotent: each renamed field also accepts its already-mapped
  * camelCase key (`??` fallback). List handlers map first and validate after,
  * so a mapper that only reads raw keys would silently drop every valid row
- * on the second pass — the fallbacks make validate-after-map safe.
+ * on the second pass - the fallbacks make validate-after-map safe.
  */
 
 export function mapNotificationRow(row: Record<string, unknown>) {

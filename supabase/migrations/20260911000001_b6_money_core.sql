@@ -1,7 +1,7 @@
 -- Money core (Phase B6): stored wallets, append-only ledger, member payout
--- accounts (raw identifier — masked on output), withdrawals with payout
+-- accounts (raw identifier - masked on output), withdrawals with payout
 -- snapshots, commissions.
--- Idempotent. All service_role-only RLS — every read/write proxies through
+-- Idempotent. All service_role-only RLS - every read/write proxies through
 -- api/v1 Functions, which enforce JWT auth, ownership, and role matrix.
 -- SSOT: walletSchema / ledgerEntrySchema / payoutAccountSchema /
 -- withdrawalSchema / commissionSchema in @jad/contracts.
@@ -9,11 +9,11 @@
 -- Money rules (mirror the member mock semantics exactly):
 -- - Wallet is a STORED row, mutated transactionally alongside ledger appends
 --   (server-authoritative; the client never derives balances, BI-001).
--- - Amounts are exact-decimal TEXT end to end — never floats.
+-- - Amounts are exact-decimal TEXT end to end - never floats.
 -- - WITHDRAWAL_COMPLETION finalizes an already-reserved deduction and does
 --   not move the running balance (BR-WDR-003).
 -- - B5 `PayoutAccount` (admin review queue, pac-*) is intentionally separate
---   from `MemberPayoutAccount` (member-owned, pa-*) — mirrors the mocks;
+--   from `MemberPayoutAccount` (member-owned, pa-*) - mirrors the mocks;
 --   unification needs owner confirmation.
 
 create table if not exists "Wallet" (

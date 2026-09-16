@@ -10,7 +10,7 @@ import {
 import { methodNotAllowed, okList, requireService } from '../../_lib/rest.js';
 import { toErrorEnvelope } from '../../_lib/envelope.js';
 
-/** GET /admin/withdrawals — staff queue, newest first (super_admin, admin, finance). */
+/** GET /admin/withdrawals - staff queue, newest first (super_admin, admin, finance). */
 export async function listAdminWithdrawals(req: VercelRequest, res: VercelResponse) {
   const auth = await verifyStaffModule(req, 'withdrawals', FINANCE_VIEW);
   if ('error' in auth) {

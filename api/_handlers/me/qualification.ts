@@ -7,7 +7,7 @@ import { methodNotAllowed, requireService } from '../../_lib/rest.js';
 import { toErrorEnvelope } from '../../_lib/envelope.js';
 
 /**
- * GET /me/qualification — server-authoritative checklist (mirrors the member
+ * GET /me/qualification - server-authoritative checklist (mirrors the member
  * mock requirement keys and copy). Sources: Member row (status, age,
  * qualification), linked Registration (ID evidence, rejection), SystemConfig
  * (minimum age), Auth (email confirmation).

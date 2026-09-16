@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 
-import { Button, Dialog, Icon, useToast } from '@jad/ui';
+import { Button, Dialog, Icon, notifyError, notifySuccess } from '@jad/ui';
 
 import { useCreatePolicy } from '../hooks/useCreatePolicy';
 import {
@@ -10,6 +10,7 @@ import {
   isPolicyPdf,
   uploadPolicyPdf,
 } from '../services/uploads';
+import { isValidPolicySlug, slugifyPolicyTitle } from '../slug';
 import styles from '../pages/PoliciesPage.module.css';
 
 /**
@@ -21,9 +22,10 @@ import styles from '../pages/PoliciesPage.module.css';
 const KNOWN_TYPES = ['terms', 'privacy', 'guidelines'];
 
 export function PolicyFormDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const { toast } = useToast();
   const createPolicy = useCreatePolicy();
   const [title, setTitle] = useState('');
+  const [slug, setSlug] = useState('');
+  const [slugTouched, setSlugTouched] = useState(false);
   const [type, setType] = useState('');
   const [content, setContent] = useState('');
   const [file, setFile] = useState<File | null>(null);
@@ -33,6 +35,8 @@ export function PolicyFormDialog({ open, onClose }: { open: boolean; onClose: ()
 
   const reset = () => {
     setTitle('');
+    setSlug('');
+    setSlugTouched(false);
     setType('');
     setContent('');
     setFile(null);
@@ -41,7 +45,9 @@ export function PolicyFormDialog({ open, onClose }: { open: boolean; onClose: ()
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  const canSave = title.trim().length > 0 && type.trim().length > 0 && file !== null && !saving;
+  const slugValid = isValidPolicySlug(slug);
+  const canSave =
+    title.trim().length > 0 && type.trim().length > 0 && slugValid && file !== null && !saving;
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selected = Array.from(e.target.files ?? [])[0];
@@ -78,19 +84,19 @@ export function PolicyFormDialog({ open, onClose }: { open: boolean; onClose: ()
     try {
       await createPolicy.mutateAsync({
         title: title.trim(),
+        slug: slug.trim(),
         type: type.trim(),
         ...(content.trim() && { content: content.trim() }),
         documentUrl: uploaded.documentUrl,
       });
-      toast({
+      notifySuccess({
         title: 'Policy published',
         message: `"${title.trim()}" is now live.`,
-        tone: 'success',
       });
       reset();
       onClose();
     } catch (e) {
-      toast({ title: 'Publish failed', message: (e as Error).message, tone: 'danger' });
+      notifyError({ title: 'Publish failed', message: (e as Error).message });
     } finally {
       setSaving(false);
     }
@@ -129,11 +135,32 @@ export function PolicyFormDialog({ open, onClose }: { open: boolean; onClose: ()
           <span className={styles.fieldLabel}>Title</span>
           <input
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={(e) => {
+              setTitle(e.target.value);
+              if (!slugTouched) setSlug(slugifyPolicyTitle(e.target.value));
+            }}
             placeholder="Terms and Conditions"
             className={styles.input}
             aria-label="Title"
           />
+        </label>
+        <label className={styles.field}>
+          <span className={styles.fieldLabel}>URL slug</span>
+          <input
+            value={slug}
+            onChange={(e) => {
+              setSlug(e.target.value);
+              setSlugTouched(true);
+            }}
+            placeholder="terms"
+            className={styles.input}
+            aria-label="URL slug"
+            aria-invalid={slug.length > 0 && !slugValid ? true : undefined}
+          />
+          <span className={styles.fileHint}>
+            Public link: /policies/{slug.trim() || 'slug'}
+            {slug.length > 0 && !slugValid ? ' - use lowercase letters, numbers, and hyphens.' : ''}
+          </span>
         </label>
         <label className={styles.field}>
           <span className={styles.fieldLabel}>Type</span>

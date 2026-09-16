@@ -1,5 +1,5 @@
 /**
- * Supabase Auth seed — Phase 1 fresh start (no Prisma)
+ * Supabase Auth seed - Phase 1 fresh start (no Prisma)
  * Creates exactly two test accounts for login/role/protected-routing:
  *   admin@jad.local -> /admin (role: super_admin)
  *   user@jad.local  -> /user  (role: user)
@@ -75,7 +75,7 @@ if (!adminPassword || !userPassword) {
 const supabase = createClient(supabaseUrl, serviceKey, { auth: { autoRefreshToken: false } });
 
 async function seed() {
-  console.log('Seeding Supabase Auth — admin/user (fresh start)...');
+  console.log('Seeding Supabase Auth - admin/user (fresh start)...');
 
   const users = [
     { email: 'admin@jad.local', password: adminPassword!, role: 'admin', fullName: 'Admin' },
@@ -92,7 +92,7 @@ async function seed() {
     });
     if (error && !isAuthConflict(error)) {
       console.error(`Failed to create ${u.email}:`, error.message);
-      // try to update password if already exists — helps rotating seed passwords from env
+      // try to update password if already exists - helps rotating seed passwords from env
       const { data: listed } = await supabase.auth.admin.listUsers();
       const found = listed.users.find((x) => x.email === u.email);
       if (found) {
@@ -124,7 +124,7 @@ async function seed() {
     process.exit(1);
   }
 
-  // Ensure roles exist (idempotent) — try lowercase plural first (existing DB), then quoted
+  // Ensure roles exist (idempotent) - try lowercase plural first (existing DB), then quoted
   const tryUpsert = async (table: string, payload: unknown, conflict: string) => {
     const { error } = await supabase.from(table).upsert(payload as never, { onConflict: conflict });
     return error;
@@ -133,12 +133,12 @@ async function seed() {
   // source) so GET /admin/roles never drops them (roleRecordSchema requires
   // >=1 permission); member-domain rows keep the empty set by design.
   const roles = [
-    { slug: 'admin', name: 'Admin', description: 'Admin dashboard — Phase 1', domain: 'staff' },
-    { slug: 'user', name: 'User', description: 'User dashboard — Phase 1', domain: 'member' },
+    { slug: 'admin', name: 'Admin', description: 'Admin dashboard - Phase 1', domain: 'staff' },
+    { slug: 'user', name: 'User', description: 'User dashboard - Phase 1', domain: 'member' },
     {
       slug: 'super_admin',
       name: 'Super Admin',
-      description: 'Platform super user — full governance (BUSINESS-RULES #3)',
+      description: 'Platform super user - full governance (BUSINESS-RULES #3)',
       domain: 'staff',
     },
     {
@@ -168,7 +168,7 @@ async function seed() {
       roleFailed = true;
     } else console.log(`Role ready: ${r.slug}`);
   }
-  // Fetch role ids — prefer quoted PascalCase first per migration
+  // Fetch role ids - prefer quoted PascalCase first per migration
   let roleRows: { id: string; slug: string }[] | null = null;
   for (const tbl of ['Role', 'roles', 'role']) {
     const { data, error } = await supabase.from(tbl).select('id,slug');
@@ -181,13 +181,13 @@ async function seed() {
   for (const r of roleRows ?? []) roleIdBySlug[r.slug] = r.id;
   if (!roleIdBySlug['admin'] || !roleIdBySlug['user']) {
     console.warn(
-      'Role table not reachable — DB may have no tables yet (fresh project). Roles will be resolved via user_metadata fallback until migration is applied. Continuing...',
+      'Role table not reachable - DB may have no tables yet (fresh project). Roles will be resolved via user_metadata fallback until migration is applied. Continuing...',
     );
-    // Do not exit — auth via user_metadata will still work for Phase 1
+    // Do not exit - auth via user_metadata will still work for Phase 1
     (roleRows as unknown) = [];
   }
 
-  // Seed members — Phase 5 staff separation: ONLY user@jad.local gets a
+  // Seed members - Phase 5 staff separation: ONLY user@jad.local gets a
   // Member row. admin@jad.local is staff-only (StaffUser, created below) and
   // must never hold a Member row, referral code, or financial identity.
   // Target existing quoted "Member" first (auth foundation: id, email, name, status, "isQualified")
@@ -198,7 +198,7 @@ async function seed() {
     status: 'APPROVED_ACTIVE',
     isQualified: true,
   });
-  // Legacy payload for "members" fallback (19-col Prisma) — only if quoted fails and legacy table exists
+  // Legacy payload for "members" fallback (19-col Prisma) - only if quoted fails and legacy table exists
   const memberPayloadLegacy = (id: string, email: string, firstName: string, lastName: string) => ({
     id,
     email,
@@ -226,7 +226,7 @@ async function seed() {
   for (let i = 0; i < membersQuoted.length; i++) {
     const mQuoted = membersQuoted[i]!;
     const mLegacy = membersLegacy[i]!;
-    // Prefer quoted "Member" — authoritative per migration
+    // Prefer quoted "Member" - authoritative per migration
     let err = await tryUpsert('Member', mQuoted, 'id');
     if (err) {
       // Fallback to legacy lowercase tables only if quoted is missing (compat)
@@ -239,11 +239,11 @@ async function seed() {
     } else console.log(`Member ready: ${mQuoted.email}`);
   }
 
-  // Assign roles — split by domain (Phase 5 staff separation).
+  // Assign roles - split by domain (Phase 5 staff separation).
   // admin@jad.local is staff-only: StaffUser row + StaffAssignment to the
   // super_admin role. user@jad.local stays a pure Member with the member-tier
   // `user` link. A stale `admin` MemberRole from earlier seeds is
-  // intentionally left in place pre-retirement — resolvers prioritize
+  // intentionally left in place pre-retirement - resolvers prioritize
   // super_admin, and Phase 5 removes staffer Member rows entirely.
   let memberRoleFailed = false;
   const userRid = roleIdBySlug['user'];
@@ -287,7 +287,7 @@ async function seed() {
     }
   }
 
-  // Reference data — Phase B1 (programs, questions, config, policies).
+  // Reference data - Phase B1 (programs, questions, config, policies).
   // Values mirror packages/contracts/src/seeds/reference.ts (parity specs lock both sides).
   let refFailed = false;
   try {
@@ -322,12 +322,17 @@ async function seed() {
       } else console.log(`Config ready: ${c.key}`);
     }
     for (const p of refMod.POLICY_SEEDS) {
-      const { error } = await supabase
-        .from('Policy')
-        .upsert(
-          { id: p.id, type: p.type, title: p.title, content: p.content, updated_at: p.updatedAt },
-          { onConflict: 'id' },
-        );
+      const { error } = await supabase.from('Policy').upsert(
+        {
+          id: p.id,
+          slug: p.slug,
+          type: p.type,
+          title: p.title,
+          content: p.content,
+          updated_at: p.updatedAt,
+        },
+        { onConflict: 'id' },
+      );
       if (error) {
         console.error(`Policy seed ${p.id} failed:`, error.message);
         refFailed = true;
@@ -338,7 +343,7 @@ async function seed() {
     refFailed = true;
   }
 
-  // Notifications + content library — Phase B2. Broadcasts carry member_id
+  // Notifications + content library - Phase B2. Broadcasts carry member_id
   // NULL; content items mirror @jad/mock marketing content verbatim.
   let notifyFailed = false;
   try {
@@ -360,7 +365,7 @@ async function seed() {
       {
         id: 'ntf-004',
         title: 'New: Join the JA&D Community',
-        body: 'New marketing material and community update — find it in Marketing Tools or check the community links.',
+        body: 'New marketing material and community update - find it in Marketing Tools or check the community links.',
         created_at: '2026-08-15T10:00:00.000Z',
       },
     ];
@@ -398,7 +403,7 @@ async function seed() {
     notifyFailed = true;
   }
 
-  // Member pipeline — Phase B3 (registrations, members+auth, customers, sales).
+  // Member pipeline - Phase B3 (registrations, members+auth, customers, sales).
   // Values mirror apps/admin/src/mock (parity specs lock both sides).
   // Member auth accounts share one staging password (never commit it).
   let pipelineFailed = false;
@@ -445,7 +450,7 @@ async function seed() {
 
     if (!memberPassword) {
       console.warn(
-        'SUPABASE_SEED_MEMBER_PASSWORD not set — skipping member/sale/customer seeding (registrations kept).',
+        'SUPABASE_SEED_MEMBER_PASSWORD not set - skipping member/sale/customer seeding (registrations kept).',
       );
     } else {
       const memberIds: Record<string, string> = {};
@@ -583,7 +588,7 @@ async function seed() {
       }
       console.log('Sales ready');
 
-      // Staff roster — Phase B4. Same staging password; DISABLED maps to
+      // Staff roster - Phase B4. Same staging password; DISABLED maps to
       // accountStatus INACTIVE. Operational provisioning path: real staff are
       // added the same way (auth user + Member row + staff role link).
       for (const s of adminMock.MOCK_STAFF) {
@@ -647,7 +652,7 @@ async function seed() {
     pipelineFailed = true;
   }
 
-  // B5 money lists — Phase B5 (transactional catalog side, payout accounts,
+  // B5 money lists - Phase B5 (transactional catalog side, payout accounts,
   // voucher templates + assignments, staff adjustments).
   // Values mirror apps/admin/src/mock (parity: same source records).
   let b5Failed = false;
@@ -741,7 +746,7 @@ async function seed() {
     );
     if (b5Unresolved.length > 0) {
       console.warn(
-        `SUPABASE_SEED_MEMBER_PASSWORD seeding incomplete — skipping vouchers/adjustments (members unresolvable: ${b5Unresolved.join(', ')}).`,
+        `SUPABASE_SEED_MEMBER_PASSWORD seeding incomplete - skipping vouchers/adjustments (members unresolvable: ${b5Unresolved.join(', ')}).`,
       );
     } else {
       for (const v of b5Mock.MOCK_VOUCHER_ASSIGNMENTS) {
@@ -794,7 +799,7 @@ async function seed() {
     b5Failed = true;
   }
 
-  // B6 money core — Phase B6 (stored wallets, ledger, member payout
+  // B6 money core - Phase B6 (stored wallets, ledger, member payout
   // accounts, withdrawals, commissions). Values mirror
   // apps/web/src/mock/store.ts (member universe) plus the admin-queue-only
   // withdrawals wdr-004..006 from apps/admin/src/mock/data.ts.
@@ -811,7 +816,7 @@ async function seed() {
     const mem001 = b6UuidByEmail['juan.delacruz@example.com'];
     if (!mem001) {
       console.warn(
-        'Seeded member juan.delacruz@example.com not found — skipping wallets/ledger/payouts/withdrawals/commissions (set SUPABASE_SEED_MEMBER_PASSWORD and re-run).',
+        'Seeded member juan.delacruz@example.com not found - skipping wallets/ledger/payouts/withdrawals/commissions (set SUPABASE_SEED_MEMBER_PASSWORD and re-run).',
       );
     } else {
       const walletSeeds: Record<string, { a: string; p: string; w: string; e: string }> = {
@@ -964,7 +969,7 @@ async function seed() {
     b6Failed = true;
   }
 
-  // B7 referrals — Phase B7 (member sponsor linkage mirrors the web mock).
+  // B7 referrals - Phase B7 (member sponsor linkage mirrors the web mock).
   let b7Failed = false;
   try {
     const webStoreB7 = await import('../apps/web/src/mock/store');
@@ -997,7 +1002,7 @@ async function seed() {
     b7Failed = true;
   }
 
-  // Commission backfill — PENDING commissions for QUALIFYING_SALE rows that
+  // Commission backfill - PENDING commissions for QUALIFYING_SALE rows that
   // have none (mirrors the sale_qualify function: PG round half-away on
   // SystemConfig rates, referral skipped silently without a sponsor).
   // Idempotent: sales that already have commissions are skipped, so re-runs
@@ -1096,8 +1101,8 @@ async function seed() {
     commissionBackfillFailed = true;
   }
 
-  // CMS contents — Q2 single table (key, content JSONB, version) + Q5 updatedAt/By only
-  // Seed-safe shared source per requirements — no browser deps
+  // CMS contents - Q2 single table (key, content JSONB, version) + Q5 updatedAt/By only
+  // Seed-safe shared source per requirements - no browser deps
   let cmsSeeds: { key: string; content: unknown }[] = [];
   let cmsImportFailed = false;
   try {

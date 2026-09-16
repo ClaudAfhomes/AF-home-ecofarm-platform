@@ -10,7 +10,7 @@ export function useRegistrations(options?: { enabled?: boolean }) {
   });
 }
 
-/** Queue page query — list plus the server's hidden-row (`meta.invalid`) count. */
+/** Queue page query - list plus the server's hidden-row (`meta.invalid`) count. */
 export function useRegistrationsPage(options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: ['admin', 'registrations', 'page'],

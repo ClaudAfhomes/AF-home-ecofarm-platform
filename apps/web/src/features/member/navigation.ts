@@ -20,7 +20,7 @@ export const MEMBER_NAV_ITEMS: MemberNavItem[] = [
   /* Single-page link */
   { to: '/member', label: 'Dashboard', icon: 'grid', end: true, primary: true },
 
-  /* Category: Sales & Earnings (dropdown) — order follows Sale → Commission → eWallet → Withdrawal spine (UI-UX §5.5) */
+  /* Category: Sales & Earnings (dropdown) - order follows Sale → Commission → eWallet → Withdrawal spine (UI-UX §5.5) */
   {
     to: '/member/sales',
     label: 'Sales & Earnings',

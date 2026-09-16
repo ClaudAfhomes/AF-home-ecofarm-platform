@@ -5,8 +5,8 @@ import type { VercelRequest, VercelResponse } from '../../_lib/http.js';
 import handler from './session.js';
 
 /**
- * GET /admin/session — own staff session resolved server-side (no anon Role
- * reads). PATCH /admin/session — update own display name. Supabase is fully
+ * GET /admin/session - own staff session resolved server-side (no anon Role
+ * reads). PATCH /admin/session - update own display name. Supabase is fully
  * mocked.
  */
 const mocks = vi.hoisted(() => {

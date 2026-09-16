@@ -83,7 +83,7 @@
   padding-right: 52px;
 }
 
-/* Native select — custom chevron, keeps native keyboard/a11y */
+/* Native select - custom chevron, keeps native keyboard/a11y */
 select.input {
   appearance: none;
   -webkit-appearance: none;
@@ -105,7 +105,7 @@ select.input:disabled {
   color: var(--color-text-muted);
 }
 
-/* Date input — shadcn-inspired: 48px, custom calendar icon, hides native indicator but keeps native picker */
+/* Date input - shadcn-inspired: 48px, custom calendar icon, hides native indicator but keeps native picker */
 .dateWrap {
   position: relative;
   display: grid;

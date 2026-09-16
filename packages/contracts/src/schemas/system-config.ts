@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 /**
- * System config entry — `GET /admin/config` (SUPER_ADMIN + ADMIN read,
+ * System config entry - `GET /admin/config` (SUPER_ADMIN + ADMIN read,
  * SUPER_ADMIN write). One row per key in the `SystemConfig` table; `value`
  * is always transported as an exact string (numeric rates/amounts included)
  * and parsed by consumers per key. Mirrors `MockConfigEntry`.

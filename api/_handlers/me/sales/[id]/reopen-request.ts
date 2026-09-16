@@ -4,7 +4,7 @@ import type { VercelRequest, VercelResponse } from '../../../../_lib/http.js';
 import { methodNotAllowed, requireService } from '../../../../_lib/rest.js';
 import { toErrorEnvelope } from '../../../../_lib/envelope.js';
 
-/** POST /me/sales/:id/reopen-request — LOCKED-only reopen request. */
+/** POST /me/sales/:id/reopen-request - LOCKED-only reopen request. */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS');
@@ -74,7 +74,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     actorRole: 'user',
     targetType: 'Sale',
     targetId: id,
-    targetName: `${row.propertyName} — ${row.customerName}`,
+    targetName: `${row.propertyName} - ${row.customerName}`,
     detail: `Requested reopen of locked sale ${id}`,
   });
   res.status(200).json({ saleId: id, requested: true });

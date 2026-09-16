@@ -48,7 +48,7 @@ describe('ScanVoucherPage', () => {
   beforeEach(() => {
     server = installMockApi();
     server.install();
-    // Camera unavailable in jsdom — the manual/upload paths are what we test.
+    // Camera unavailable in jsdom - the manual/upload paths are what we test.
     Object.defineProperty(navigator, 'mediaDevices', {
       value: undefined,
       configurable: true,
@@ -69,7 +69,7 @@ describe('ScanVoucherPage', () => {
     expect(screen.getByRole('tablist', { name: 'Voucher input method' })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: 'Camera' })).toHaveAttribute('aria-selected', 'true');
     expect(screen.getByLabelText('Voucher QR camera view')).toBeInTheDocument();
-    // Only the active mode renders — manual/upload appear after switching.
+    // Only the active mode renders - manual/upload appear after switching.
     expect(screen.queryByLabelText('Voucher code')).not.toBeInTheDocument();
     expect(screen.queryByLabelText('Upload QR image')).not.toBeInTheDocument();
   });

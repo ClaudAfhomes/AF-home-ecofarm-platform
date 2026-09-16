@@ -58,7 +58,7 @@ export function NotificationBell() {
 
   const all = query.data ?? [];
   const notifications = all.slice(0, NOTIFICATION_LIMIT);
-  // Unread count spans the FULL feed — the 5-item slice is display-only.
+  // Unread count spans the FULL feed - the 5-item slice is display-only.
   const unreadCount = all.filter((n) => !n.readAt).length;
   const unreadLabel =
     unreadCount > UNREAD_DISPLAY_CAP ? `${UNREAD_DISPLAY_CAP}+` : String(unreadCount);

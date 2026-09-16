@@ -152,7 +152,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
 
-  // PATCH — rename and/or replace permissions.
+  // PATCH - rename and/or replace permissions.
   const parsedBody = readJsonBody(req);
   if (!parsedBody.ok) {
     const { error, status } = parsedBody.error;
@@ -166,7 +166,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (!name || name.length > 60) {
       const { error, status } = toErrorEnvelope(
         'VALIDATION_ERROR',
-        'Role name must be 1–60 characters.',
+        'Role name must be 1-60 characters.',
         400,
       );
       res.status(status).json({ error });

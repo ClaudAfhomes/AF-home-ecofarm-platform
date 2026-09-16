@@ -1,4 +1,4 @@
--- Phase 1 — Staff domain foundation (Member/Staff separation).
+-- Phase 1 - Staff domain foundation (Member/Staff separation).
 --
 -- Staff (admin, super_admin, finance, merchant, …) are currently Member rows
 -- distinguished only by MemberRole links, so staff UX inherits member-table

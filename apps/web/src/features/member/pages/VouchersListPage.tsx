@@ -48,7 +48,7 @@ export function VouchersListPage() {
     <section>
       <PageHeader
         title="Vouchers"
-        description="Your JA&D vouchers — each with a code and QR code for redemption."
+        description="Your JA&D vouchers - each with a code and QR code for redemption."
       />
       <Breadcrumbs
         items={[

@@ -26,10 +26,41 @@ export { publicConfigSchema } from './schemas/public-config.js';
 export type { PublicConfig } from './schemas/public-config.js';
 export { systemConfigEntrySchema, PUBLIC_CONFIG_KEYS } from './schemas/system-config.js';
 export type { SystemConfigEntry } from './schemas/system-config.js';
-export { programSchema, qualificationQuestionSchema } from './schemas/program.js';
-export type { Program, QualificationQuestion } from './schemas/program.js';
-export { policySchema, policyCreateSchema, policyUpdateSchema } from './schemas/policy.js';
+export {
+  programSchema,
+  programAdminSchema,
+  programCreateSchema,
+  programUpdateSchema,
+  qualificationQuestionSchema,
+} from './schemas/program.js';
+export type {
+  Program,
+  ProgramAdmin,
+  ProgramCreateRequest,
+  ProgramUpdateRequest,
+  QualificationQuestion,
+} from './schemas/program.js';
+export {
+  policySchema,
+  policySlugSchema,
+  policyCreateSchema,
+  policyUpdateSchema,
+} from './schemas/policy.js';
 export type { Policy, PolicyCreateRequest, PolicyUpdateRequest } from './schemas/policy.js';
+export {
+  contactSubmissionRequestSchema,
+  contactSubmissionResponseSchema,
+  contactInquiryStatusSchema,
+  contactInquirySchema,
+  contactInquiryUpdateSchema,
+} from './schemas/contact.js';
+export type {
+  ContactSubmissionRequest,
+  ContactSubmissionResponse,
+  ContactInquiryStatus,
+  ContactInquiry,
+  ContactInquiryUpdateRequest,
+} from './schemas/contact.js';
 export { roleSchema, normalizeRole } from './schemas/role.js';
 export type { Role } from './schemas/role.js';
 export {

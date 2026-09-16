@@ -25,7 +25,7 @@ export type MockWithdrawal = Withdrawal & { balance?: string };
 /** Extended voucher type with member assignment for mock-only admin forms. */
 export type MockVoucher = Voucher & { issuedTo?: string; issuedToMemberId?: string };
 
-/** Voucher template — defines a voucher type that can be assigned to members. */
+/** Voucher template - defines a voucher type that can be assigned to members. */
 export type VoucherTemplate = {
   id: string;
   title: string;
@@ -37,7 +37,7 @@ export type VoucherTemplate = {
   createdAt: string;
 };
 
-/** Voucher assignment — an instance of a template assigned to a specific member. */
+/** Voucher assignment - an instance of a template assigned to a specific member. */
 export type VoucherAssignment = Voucher & {
   templateId: string;
   memberId: string;
@@ -46,7 +46,7 @@ export type VoucherAssignment = Voucher & {
 
 /**
  * Fictional mock registrations for the F0 registrations queue. 12 rows exercise
- * pagination (page size 10). Strictly mock data — lives behind the API-shaped
+ * pagination (page size 10). Strictly mock data - lives behind the API-shaped
  * mock server, never inside page components.
  */
 export const MOCK_REGISTRATIONS: MemberAccount[] = [
@@ -159,7 +159,7 @@ export const MOCK_SALES: MockSale[] = [
     id: 'sal-002',
     status: 'ADMIN_APPROVED',
     propertyId: 'prisma-celeste-8-6m',
-    propertyName: 'Prisma Residences – Celeste Building Condo',
+    propertyName: 'Prisma Residences - Celeste Building Condo',
     propertyValue: '8600000.00',
     customerId: 'cust-001',
     customerName: 'Ramon Reyes',
@@ -173,7 +173,7 @@ export const MOCK_SALES: MockSale[] = [
     id: 'sal-003',
     status: 'PAYMENT_VERIFIED',
     propertyId: 'levina-place-2br',
-    propertyName: 'Levina Place – 2BR Condo',
+    propertyName: 'Levina Place - 2BR Condo',
     propertyValue: '5500000.00',
     customerId: 'cust-002',
     customerName: 'Celine Cruz',
@@ -212,13 +212,13 @@ export const MOCK_SALES: MockSale[] = [
     submittedAt: '2026-08-14T10:00:00.000Z',
     resubmissionCount: 1,
     rejectionReason:
-      'Customer phone number could not be verified — please update the customer contact.',
+      'Customer phone number could not be verified - please update the customer contact.',
   },
   {
     id: 'sal-006',
     status: 'LOCKED',
     propertyId: 'prisma-celeste-8-3m',
-    propertyName: 'Prisma Residences – Celeste Building Condo',
+    propertyName: 'Prisma Residences - Celeste Building Condo',
     propertyValue: '8300000.00',
     customerId: 'cust-002',
     customerName: 'Celine Cruz',
@@ -233,7 +233,7 @@ export const MOCK_SALES: MockSale[] = [
     id: 'sal-007',
     status: 'QUALIFYING_SALE',
     propertyId: 'prisma-astra-1br',
-    propertyName: 'Prisma Residences – Astra Building Condo',
+    propertyName: 'Prisma Residences - Astra Building Condo',
     propertyValue: '5300000.00',
     customerId: 'cust-002',
     customerName: 'Celine Cruz',
@@ -263,7 +263,7 @@ export const MOCK_SALES: MockSale[] = [
     id: 'sal-009',
     status: 'QUALIFYING_SALE',
     propertyId: 'levina-place-2br',
-    propertyName: 'Levina Place – 2BR Condo',
+    propertyName: 'Levina Place - 2BR Condo',
     propertyValue: '5500000.00',
     customerId: 'cust-002',
     customerName: 'Celine Cruz',
@@ -286,7 +286,7 @@ export const MOCK_SALES: MockSale[] = [
     sellerName: 'Juan Dela Cruz',
     submittedAt: '2026-08-09T10:00:00.000Z',
     resubmissionCount: 3,
-    rejectionReason: 'Duplicate submission — this sale was rejected after repeated resubmissions.',
+    rejectionReason: 'Duplicate submission - this sale was rejected after repeated resubmissions.',
   },
 ];
 
@@ -327,7 +327,7 @@ export const MOCK_PAYOUT_ACCOUNTS: PayoutAccount[] = [
     status: 'REJECTED',
     isPrimary: false,
     createdAt: '2026-08-12T10:00:00.000Z',
-    rejectionReason: 'Account name does not match bank record — please verify and resubmit.',
+    rejectionReason: 'Account name does not match bank record - please verify and resubmit.',
   },
   {
     id: 'pac-005',
@@ -463,7 +463,7 @@ export const MOCK_WITHDRAWALS: MockWithdrawal[] = [
   },
 ];
 
-/** Mock voucher templates — voucher types that can be assigned to members. */
+/** Mock voucher templates - voucher types that can be assigned to members. */
 export const MOCK_VOUCHERS: VoucherTemplate[] = [
   {
     id: 'vtpl-001',
@@ -484,7 +484,7 @@ export const MOCK_VOUCHERS: VoucherTemplate[] = [
     title: 'Season Promo',
     originalValue: '250.00',
     createdAt: '2026-08-03T16:00:00.000Z',
-    // No expiry — open-ended
+    // No expiry - open-ended
   },
   {
     id: 'vtpl-004',
@@ -502,7 +502,7 @@ export const MOCK_VOUCHERS: VoucherTemplate[] = [
   },
 ];
 
-/** Mock voucher assignments — individual vouchers assigned to members. */
+/** Mock voucher assignments - individual vouchers assigned to members. */
 export const MOCK_VOUCHER_ASSIGNMENTS: VoucherAssignment[] = [
   {
     id: 'vch-101',
@@ -588,7 +588,7 @@ export const MOCK_VOUCHER_ASSIGNMENTS: VoucherAssignment[] = [
 ];
 
 /**
- * Mock property catalog records — transactional system-of-record.
+ * Mock property catalog records - transactional system-of-record.
  * Catalog owns: ID, category, price, status. CMS owns presentation
  * (descriptions, highlights, gallery). Both reference the same property ID.
  * Derived from CMS_PROPERTIES_SEED so Admin ↔ Member ↔ Public Website
@@ -789,7 +789,7 @@ export const MOCK_MEMBERS: MemberProfile[] = [
 export const MOCK_CONTENT = MOCK_MARKETING_CONTENT;
 
 /** Mock programs (API-SPECIFICATION #78, FR-PRG-001). */
-/** Program IDs match the web/member mock store (`prg-domestic`/`prg-abroad`) — single scheme. */
+/** Program IDs match the web/member mock store (`prg-domestic`/`prg-abroad`) - single scheme. */
 export const MOCK_PROGRAMS: Program[] = [
   {
     id: 'prg-domestic',
@@ -807,7 +807,7 @@ export const MOCK_PROGRAMS: Program[] = [
   },
 ];
 
-/** Mock ledger adjustments — PROPOSED shape for admin adjustment view. */
+/** Mock ledger adjustments - PROPOSED shape for admin adjustment view. */
 export type MockAdjustment = {
   id: string;
   memberId: string;
@@ -850,13 +850,13 @@ export const MOCK_ADJUSTMENTS: MockAdjustment[] = [
     entryType: 'FINANCIAL_ADJUSTMENT',
     direction: 'CREDIT',
     amount: '100.00',
-    reason: 'Promotional bonus credit — August campaign',
+    reason: 'Promotional bonus credit - August campaign',
     createdBy: 'Saul Super',
     createdAt: '2026-08-16T09:30:00.000Z',
   },
 ];
 
-/** Mock system configuration — PROPOSED key-value pairs. */
+/** Mock system configuration - PROPOSED key-value pairs. */
 export type MockConfigEntry = {
   key: string;
   label: string;
@@ -875,6 +875,12 @@ export const MOCK_CONFIG: MockConfigEntry[] = [
     key: 'COMMISSION_REFERRAL_RATE',
     label: 'Direct Referral Rate',
     value: '0.0400',
+    category: 'Commissions',
+  },
+  {
+    key: 'COMMISSION_CLEARING_DAYS',
+    label: 'Commission Clearing Window (days)',
+    value: '7',
     category: 'Commissions',
   },
   {
@@ -921,7 +927,7 @@ export const MOCK_CONFIG: MockConfigEntry[] = [
   },
 ];
 
-/** Roles — single MEMBER category, roles assigned via DB (member_roles). */
+/** Roles - single MEMBER category, roles assigned via DB (member_roles). */
 export type MockRole = {
   id: string;
   slug: string;
@@ -934,7 +940,7 @@ export const MOCK_ROLES: MockRole[] = [
     id: 'role-001',
     slug: 'member_basic',
     name: 'Member',
-    description: 'Base member — single category default',
+    description: 'Base member - single category default',
   },
   {
     id: 'role-002',
@@ -953,7 +959,7 @@ export const MOCK_ROLES: MockRole[] = [
     id: 'role-005',
     slug: 'super_admin',
     name: 'Super Admin',
-    description: 'Staff SUPER_ADMIN — platform super user',
+    description: 'Staff SUPER_ADMIN - platform super user',
   },
 ];
 
@@ -975,7 +981,7 @@ export const MOCK_MEMBER_ROLES: Record<string, string[]> = {
 };
 
 /**
- * Mock staff roster — PROPOSED shape for the admin Staff directory (RBAC
+ * Mock staff roster - PROPOSED shape for the admin Staff directory (RBAC
  * frontend pass). Exactly one staff role per user; status gates shell
  * access. Static mock; the real backend provisions staff operationally
  * (never seeded) and resolves roles server-side.
@@ -1057,7 +1063,7 @@ export const MOCK_STAFF: MockStaffMember[] = [
   },
 ];
 
-/** Mock audit log entries — PROPOSED shape. */
+/** Mock audit log entries - PROPOSED shape. */
 export type MockAuditEntry = {
   id: string;
   action: string;
@@ -1089,7 +1095,7 @@ export const MOCK_AUDIT: MockAuditEntry[] = [
     actorRole: 'ADMIN',
     targetType: 'Sale',
     targetId: 'sal-002',
-    targetName: 'Prisma Residences – Celeste Building Condo — Juan Dela Cruz',
+    targetName: 'Prisma Residences - Celeste Building Condo - Juan Dela Cruz',
     detail: 'Approved sale submission for admin review',
     createdAt: '2026-08-17T10:15:00.000Z',
   },
@@ -1100,7 +1106,7 @@ export const MOCK_AUDIT: MockAuditEntry[] = [
     actorRole: 'FINANCE',
     targetType: 'PayoutAccount',
     targetId: 'pac-003',
-    targetName: 'Pedro Reyes — GCASH',
+    targetName: 'Pedro Reyes - GCASH',
     detail: 'Confirmed payout account after verification',
     createdAt: '2026-08-16T09:20:00.000Z',
   },
@@ -1111,7 +1117,7 @@ export const MOCK_AUDIT: MockAuditEntry[] = [
     actorRole: 'FINANCE',
     targetType: 'Withdrawal',
     targetId: 'wdr-005',
-    targetName: '₱300.00 — Pedro Reyes',
+    targetName: '₱300.00 - Pedro Reyes',
     detail: 'Processed withdrawal payment via GCASH',
     createdAt: '2026-08-16T10:05:00.000Z',
   },
@@ -1122,7 +1128,7 @@ export const MOCK_AUDIT: MockAuditEntry[] = [
     actorRole: 'SUPER_ADMIN',
     targetType: 'Adjustment',
     targetId: 'adj-001',
-    targetName: 'Maria Santos — ₱250.00 CREDIT',
+    targetName: 'Maria Santos - ₱250.00 CREDIT',
     detail: 'Manual adjustment for missing referral credit',
     createdAt: '2026-08-18T11:05:00.000Z',
   },
@@ -1134,7 +1140,7 @@ export const MOCK_AUDIT: MockAuditEntry[] = [
     targetType: 'Registration',
     targetId: 'reg-005',
     targetName: 'Ramon Garcia',
-    detail: 'Rejected registration — documents require re-verification',
+    detail: 'Rejected registration - documents require re-verification',
     createdAt: '2026-08-17T15:08:00.000Z',
   },
   {
@@ -1166,7 +1172,7 @@ export const MOCK_AUDIT: MockAuditEntry[] = [
     actorRole: 'SYSTEM',
     targetType: 'Sale',
     targetId: 'sal-006',
-    targetName: 'Prisma Residences – Celeste Building Condo — Celine Cruz',
+    targetName: 'Prisma Residences - Celeste Building Condo - Celine Cruz',
     detail: 'Maximum resubmission attempts exceeded (BR-SAL-006)',
     createdAt: '2026-08-13T10:30:00.000Z',
   },
@@ -1177,7 +1183,7 @@ export const MOCK_AUDIT: MockAuditEntry[] = [
     actorRole: 'SYSTEM',
     targetType: 'Sale',
     targetId: 'sal-006',
-    targetName: 'Prisma Residences – Celeste Building Condo — Celine Cruz',
+    targetName: 'Prisma Residences - Celeste Building Condo - Celine Cruz',
     detail: 'Locked after 3 failed verification attempts',
     createdAt: '2026-08-13T14:00:00.000Z',
   },
@@ -1189,7 +1195,7 @@ export const MOCK_AUDIT: MockAuditEntry[] = [
     targetType: 'Registration',
     targetId: 'reg-005',
     targetName: 'Ramon Garcia',
-    detail: 'Rejected registration — documents require re-verification',
+    detail: 'Rejected registration - documents require re-verification',
     createdAt: '2026-08-17T15:10:00.000Z',
   },
   {
@@ -1200,7 +1206,7 @@ export const MOCK_AUDIT: MockAuditEntry[] = [
     targetType: 'Registration',
     targetId: 'reg-012',
     targetName: 'Elena Navarro',
-    detail: 'Rejected registration — identity verification failed',
+    detail: 'Rejected registration - identity verification failed',
     createdAt: '2026-08-15T12:15:00.000Z',
   },
 ];

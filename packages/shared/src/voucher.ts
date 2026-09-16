@@ -1,9 +1,9 @@
 /**
- * Voucher expiry helpers — framework-free, shared between admin and member apps.
+ * Voucher expiry helpers - framework-free, shared between admin and member apps.
  *
  * Template carries the *rule* (fixed date, validity-days-from-issued, or both).
  * At issuance the server snapshots the concrete `expiresAt` onto the member
- * voucher. All validity checks read only that authoritative snapshot — never the
+ * voucher. All validity checks read only that authoritative snapshot - never the
  * template rule.
  */
 
@@ -18,9 +18,9 @@ export type VoucherExpiryRule = {
  * Compute the authoritative `expiresAt` for a newly-issued member voucher.
  *
  * Precedence:
- * 1. Fixed `expiresAt` on the template (if valid date) — wins.
- * 2. `validityDays` from the template + issuedAt — used if > 0.
- * 3. `undefined` — no expiry.
+ * 1. Fixed `expiresAt` on the template (if valid date) - wins.
+ * 2. `validityDays` from the template + issuedAt - used if > 0.
+ * 3. `undefined` - no expiry.
  */
 export function computeMemberExpiry(rule: VoucherExpiryRule, issuedAt: Date): string | undefined {
   // 1. Fixed date takes precedence
@@ -41,7 +41,7 @@ export function computeMemberExpiry(rule: VoucherExpiryRule, issuedAt: Date): st
 
 /**
  * Is a member voucher expired?
- * Reads only the voucher's own `expiresAt` — the authoritative snapshot.
+ * Reads only the voucher's own `expiresAt` - the authoritative snapshot.
  * Missing / invalid date = not expired (safe fallback).
  */
 export function isExpired(expiresAt?: string, now = new Date()): boolean {

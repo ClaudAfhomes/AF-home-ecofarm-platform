@@ -1,5 +1,5 @@
 /*
- * Notifications (SCR-MEM-024) — production feed.
+ * Notifications (SCR-MEM-024) - production feed.
  */
 
 .headerActions {
@@ -82,7 +82,7 @@
   box-shadow: var(--shadow-sm);
 }
 
-/* Unread emphasis: accent edge + tinted surface + bold title (chip retained —
+/* Unread emphasis: accent edge + tinted surface + bold title (chip retained - 
    state is never color-only, DESIGN-SYSTEM §1.1). */
 .cardUnread {
   border-left: 4px solid var(--color-brand-primary);

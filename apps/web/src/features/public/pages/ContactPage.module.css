@@ -16,7 +16,7 @@
   background-color: var(--color-bg-surface);
 }
 
-/* 01 — Contact methods + message form, side by side. */
+/* 01 - Contact methods + message form, side by side. */
 .contactGrid {
   display: grid;
   gap: var(--space-10);
@@ -114,7 +114,7 @@
   height: 18px;
 }
 
-/* 02 — Message: presentational form beside the contact methods. */
+/* 02 - Message: presentational form beside the contact methods. */
 .formPanel {
   display: grid;
   gap: var(--space-6);
@@ -164,6 +164,26 @@
   box-shadow: 0 0 0 3px var(--color-accent-soft);
 }
 
+.inputInvalid {
+  border-color: var(--color-danger) !important;
+}
+
+.fieldError {
+  margin: 0;
+  font-size: var(--text-body-s);
+  color: var(--color-danger);
+}
+
+/* Honeypot anti-spam field - off-screen so humans never see it, but bots
+ * still fill it (display:none would be skipped by smarter bots). */
+.honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
 .formNote {
   margin: 0;
   font-size: var(--text-body-s);
@@ -187,6 +207,11 @@
 
 .submit:hover {
   background-color: var(--color-brand-primary-hover);
+}
+
+.submit:disabled {
+  opacity: 0.65;
+  cursor: progress;
 }
 
 .acknowledgement {

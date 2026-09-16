@@ -26,7 +26,7 @@ function submittableProperties() {
 /**
  * Submit a qualifying sale (SCR-MEM-006, FR-SAL-002). Picks an existing
  * customer or records a new one, picks a property from the catalog, and posts
- * `POST /sales` with an `Idempotency-Key` (API-SPECIFICATION §5.3) — held in
+ * `POST /sales` with an `Idempotency-Key` (API-SPECIFICATION §5.3) - held in
  * component state for the attempt and never persisted. The property value is
  * snapshotted server-side (BI-006); the UI only sends ids.
  */
@@ -200,7 +200,7 @@ export function SaleSubmitPage() {
 
   const propertyOptions = properties.map((property) => ({
     value: property.id,
-    label: `${property.name} — ${formatMoney(property.price!)}`,
+    label: `${property.name} - ${formatMoney(property.price!)}`,
   }));
 
   const submitting = submitSaleMutation.isPending || createCustomerMutation.isPending;
@@ -284,7 +284,7 @@ export function SaleSubmitPage() {
           {selectedProperty ? (
             <div className={styles.snapshotPreview} role="status" aria-live="polite">
               Snapshot value:{' '}
-              <span className={styles.snapshotValue}>{formatMoney(selectedProperty.price!)}</span> —
+              <span className={styles.snapshotValue}>{formatMoney(selectedProperty.price!)}</span> -
               this amount will be recorded and never changes.
             </div>
           ) : null}
@@ -308,7 +308,7 @@ export function SaleSubmitPage() {
             ]}
             error={errors.referrerName}
             hint={
-              'The member who referred this customer — pick from your direct referrals or add a name (optional).'
+              'The member who referred this customer - pick from your direct referrals or add a name (optional).'
             }
           />
           {referrerMode === 'new' ? (
@@ -324,7 +324,7 @@ export function SaleSubmitPage() {
           ) : null}
           {referralsQuery.isError ? (
             <p className={styles.referrerHint} role="status">
-              Could not load your direct referrals — you can still add a name manually.
+              Could not load your direct referrals - you can still add a name manually.
             </p>
           ) : null}
         </fieldset>

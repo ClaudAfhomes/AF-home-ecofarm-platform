@@ -14,7 +14,7 @@ import styles from './CategoryPage.module.css';
 /**
  * Property category listing page (`/properties/:categorySlug`).
  *
- * Derives its listing from the static catalog — no property records are
+ * Derives its listing from the static catalog - no property records are
  * duplicated here. Unknown slugs render the friendly not-found state.
  */
 export function CategoryPage() {
@@ -72,7 +72,7 @@ export function CategoryPage() {
 
       <CTASection
         title={`Looking for something in ${category.title.toLowerCase()}?`}
-        lead="Talk with JA&D Realty Services and tell us what you are looking for — we will match you with the right opportunity."
+        lead="Talk with JA&D Realty Services and tell us what you are looking for - we will match you with the right opportunity."
         primaryCta={{ label: 'Talk to Us', to: '/contact' }}
       />
     </div>

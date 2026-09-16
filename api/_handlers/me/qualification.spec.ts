@@ -145,7 +145,7 @@ describe('GET /me/qualification', () => {
   });
 
   it('marks ID_VERIFIED from the persistent Member flag after the Registration row is deleted', async () => {
-    // Approval deletes the Registration row (and its governmentId) — the
+    // Approval deletes the Registration row (and its governmentId) - the
     // Member.idVerified flag set at approval is the authoritative record.
     mocks.script.member = { ...MEMBER, idVerified: true, registrationId: 'reg-001' };
     mocks.script.registration = null;

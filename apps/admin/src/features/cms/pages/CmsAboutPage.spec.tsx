@@ -18,7 +18,7 @@ function renderAbout(route = '/admin/cms/about', user = MOCK_SUPER_ADMIN) {
   return renderWithProviders(<CmsAboutPage />, { route, user });
 }
 
-describe('CmsAboutPage — Phase 2 About CMS', () => {
+describe('CmsAboutPage - Phase 2 About CMS', () => {
   let server: ReturnType<typeof installMockApi>;
 
   beforeEach(() => {
@@ -159,7 +159,7 @@ describe('CmsAboutPage — Phase 2 About CMS', () => {
     const user = userEvent.setup();
     renderAbout();
     await screen.findByRole('heading', { name: 'Hero' });
-    // Who We Are is collapsed — expand it
+    // Who We Are is collapsed - expand it
     await user.click(screen.getByRole('button', { name: /Who We Are/ }));
     const para = screen.getByDisplayValue(/JA&D Realty Services is a real-estate brokerage/);
     await user.clear(para);
@@ -245,7 +245,7 @@ describe('CmsAboutPage — Phase 2 About CMS', () => {
     const user = userEvent.setup();
     renderAbout();
     await screen.findByRole('heading', { name: 'Hero' });
-    // Vision is collapsed — expand it
+    // Vision is collapsed - expand it
     await user.click(screen.getByRole('button', { name: /Vision/ }));
     const visionInput = screen.getByDisplayValue(/To be the brokerage that Filipinos/);
     await user.clear(visionInput);

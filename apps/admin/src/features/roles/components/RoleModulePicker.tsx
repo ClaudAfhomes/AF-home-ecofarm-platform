@@ -11,7 +11,7 @@ type Props = {
   disabled?: boolean;
   showGlobalActions?: boolean;
   /**
-   * Modules the picker must never select (governance on custom roles — the
+   * Modules the picker must never select (governance on custom roles - the
    * server rejects them, and their endpoints are super_admin-only). Rendered
    * disabled and excluded from the select-all actions.
    */
@@ -34,7 +34,7 @@ export function RoleModulePicker({
 }: Props) {
   const locked = new Set<StaffModule>(lockedModules ?? []);
   const selectable = ALL_MODULES.filter((m) => !locked.has(m));
-  // Indeterminate state cannot be set via JSX props — sync it on mount/update.
+  // Indeterminate state cannot be set via JSX props - sync it on mount/update.
   const groupToggleRef = useCallback(
     (groupModules: StaffModule[]) => (el: HTMLInputElement | null) => {
       if (!el) return;

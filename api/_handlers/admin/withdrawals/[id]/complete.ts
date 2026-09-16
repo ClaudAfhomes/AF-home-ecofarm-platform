@@ -11,7 +11,7 @@ import { methodNotAllowed, requireService } from '../../../../_lib/rest.js';
 import { toErrorEnvelope } from '../../../../_lib/envelope.js';
 
 /**
- * POST /admin/withdrawals/:id/complete — atomic staff completion via the DB
+ * POST /admin/withdrawals/:id/complete - atomic staff completion via the DB
  * function (single transaction: status, ledger WITHDRAWAL_COMPLETION, wallet
  * pending→withdrawn, audit). The function returns {status,...} or
  * {error:{code,message,status}}.

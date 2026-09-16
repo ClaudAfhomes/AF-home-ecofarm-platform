@@ -6,7 +6,7 @@ import { CmsImageField } from './CmsImageField';
 
 const basePhoto = { id: 'photo-1600585154340-be6161a56a0c', alt: 'A modern residence' };
 
-describe('CmsImageField — production upload (Step 1)', () => {
+describe('CmsImageField - production upload (Step 1)', () => {
   it('renders drop zone with preview and actions', () => {
     const onChange = vi.fn();
     render(<CmsImageField label="Hero image" value={basePhoto} onChange={onChange} />);

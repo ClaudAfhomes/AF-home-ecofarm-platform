@@ -10,7 +10,7 @@
   background-color: var(--color-bg-canvas);
 }
 
-/* Mobile/tablet brand masthead — the only auth imagery-free branding below lg. */
+/* Mobile/tablet brand masthead - the only auth imagery-free branding below lg. */
 .masthead {
   display: flex;
   align-items: center;
@@ -54,7 +54,7 @@
   }
 }
 
-/* Brand panel — full-height sticky column with imagery + scrim + story. */
+/* Brand panel - full-height sticky column with imagery + scrim + story. */
 .brandPanel {
   position: relative;
   display: none;
@@ -102,7 +102,7 @@
   color: var(--color-on-dark);
 }
 
-/* Brand logo — constrained to its intrinsic aspect ratio (800×498, 1.607).
+/* Brand logo - constrained to its intrinsic aspect ratio (800×498, 1.607).
    `align-self: flex-start` prevents the flex column's default stretch from
    distorting the image horizontally; `object-fit: contain` + `max-width`
    guard against any future container overflow. */
@@ -141,7 +141,7 @@
   max-width: 44ch;
 }
 
-/* Form column — centered, constrained, strongly spaced. */
+/* Form column - centered, constrained, strongly spaced. */
 .formColumn {
   display: grid;
   justify-items: center;

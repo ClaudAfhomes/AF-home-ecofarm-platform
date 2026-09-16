@@ -1,7 +1,7 @@
 -- Reference data for Phase B1: programs, system config, policies.
 -- Idempotent (IF NOT EXISTS / ON CONFLICT DO NOTHING). Public reads for
 -- programs/policies (anon + authenticated SELECT, mirroring countries/CMS);
--- SystemConfig is service_role-only — the public subset is served exclusively
+-- SystemConfig is service_role-only - the public subset is served exclusively
 -- through GET /api/v1/config/public so sensitive values (commission rates)
 -- are never directly readable.
 

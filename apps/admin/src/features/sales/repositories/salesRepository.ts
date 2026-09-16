@@ -5,7 +5,7 @@ import { saleSchema, type Sale } from '@jad/contracts';
 import { request, requestList } from '../../../lib/api/client';
 
 /**
- * Sales repository — REST over api/v1 (Phase B3 cutover).
+ * Sales repository - REST over api/v1 (Phase B3 cutover).
  * Status transitions are validated server-side; ID/submittedAt immutable.
  */
 export async function getSales(): Promise<Sale[]> {

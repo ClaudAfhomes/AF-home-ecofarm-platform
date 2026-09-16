@@ -23,15 +23,15 @@ describe('CategoryPage', () => {
 
     const expected = [
       '2-Storey House',
-      'Prisma Residences – Astra Building Condo',
-      'Levina Place – 2BR Condo',
+      'Prisma Residences - Astra Building Condo',
+      'Levina Place - 2BR Condo',
     ];
     for (const name of expected) {
       expect(screen.getByRole('heading', { name })).toBeInTheDocument();
     }
     // Two Celeste Building units are listed (₱8.3M and ₱8.6M records).
     expect(
-      screen.getAllByRole('heading', { name: 'Prisma Residences – Celeste Building Condo' }),
+      screen.getAllByRole('heading', { name: 'Prisma Residences - Celeste Building Condo' }),
     ).toHaveLength(2);
     expect(
       screen.queryByRole('heading', { name: 'Mountain View Leisure Community' }),

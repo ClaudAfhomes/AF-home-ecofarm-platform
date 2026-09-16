@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { exactDecimalStringSchema } from './money.js';
 
 /**
- * Catalog — transactional system-of-record (BR-PRP-001..004, FEAT-025/026).
+ * Catalog - transactional system-of-record (BR-PRP-001..004, FEAT-025/026).
  * Catalog owns: ID, category, price, status. CMS owns presentation
  * (descriptions, highlights, gallery, merchandising) but both reference the
  * same property ID. This gives a cleaner future DB model than treating
@@ -33,12 +33,12 @@ export const catalogPropertySchema = z.object({
 
 export type CatalogProperty = z.infer<typeof catalogPropertySchema>;
 
-/** `POST /admin/properties` — id is server-generated. */
+/** `POST /admin/properties` - id is server-generated. */
 export const createPropertyRequestSchema = catalogPropertySchema.omit({ id: true });
 
 export type CreatePropertyRequest = z.infer<typeof createPropertyRequestSchema>;
 
-/** `PATCH /admin/properties/:id` — partial edits. */
+/** `PATCH /admin/properties/:id` - partial edits. */
 export const updatePropertyRequestSchema = catalogPropertySchema.omit({ id: true }).partial();
 
 export type UpdatePropertyRequest = z.infer<typeof updatePropertyRequestSchema>;

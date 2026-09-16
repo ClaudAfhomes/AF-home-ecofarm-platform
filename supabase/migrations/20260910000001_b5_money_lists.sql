@@ -1,6 +1,6 @@
 -- B5 money-list tables (Phase B5): transactional catalog side, payout
 -- accounts, voucher templates + assignments, staff adjustments.
--- Idempotent. All service_role-only RLS — every read proxies through
+-- Idempotent. All service_role-only RLS - every read proxies through
 -- api/v1 Functions, which enforce JWT auth and the role matrix.
 -- SSOT: catalogPropertySchema / payoutAccountSchema / voucherSchema /
 -- voucherTemplateSchema / adjustmentSchema in @jad/contracts.

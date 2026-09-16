@@ -25,7 +25,7 @@ describe('member ContentLibraryPage', () => {
   it('renders the marketing tools gallery with covers, view, download and forward links (SCR-MEM-022)', async () => {
     renderMember(<ContentLibraryPage />, { user: MOCK_MEMBER });
 
-    // Marketing Tools — 12 items (canonical seed from @jad/mock)
+    // Marketing Tools - 12 items (canonical seed from @jad/mock)
     expect(await screen.findByText('JA&D Membership Overview')).toBeInTheDocument();
     expect(screen.getByText('JA&D Project Showcase')).toBeInTheDocument();
     expect(screen.getByText('JA&D Opportunity Video')).toBeInTheDocument();
@@ -39,7 +39,7 @@ describe('member ContentLibraryPage', () => {
     expect(screen.getByText('Member Welcome Video')).toBeInTheDocument();
     expect(screen.getByText('How Qualifying Sales Work')).toBeInTheDocument();
 
-    // Kind chips — icons + labels present (card)
+    // Kind chips - icons + labels present (card)
     expect(screen.getAllByText('Document').length).toBeGreaterThanOrEqual(7);
     expect(screen.getAllByText('Image').length).toBeGreaterThanOrEqual(2);
     expect(screen.getAllByText('Video').length).toBeGreaterThanOrEqual(3);
@@ -55,11 +55,11 @@ describe('member ContentLibraryPage', () => {
     expect(screen.getByText('Featured · Download-ready')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'All' })).toHaveAttribute('aria-pressed', 'true');
     expect(screen.getByText(/Showing 12 of 12 items/)).toBeInTheDocument();
-    // Beautiful covers — image/video/pdf/doc covers visible before View
+    // Beautiful covers - image/video/pdf/doc covers visible before View
     expect(document.querySelector('[class*="coverWrap"]')).toBeInTheDocument();
     expect(document.querySelector('[class*="cover"]')).toBeInTheDocument();
 
-    // View-only previews — no inline media before clicking View (dialog only)
+    // View-only previews - no inline media before clicking View (dialog only)
     expect(screen.queryByLabelText('JA&D Opportunity Video')).not.toBeInTheDocument();
 
     // View is a button for every downloadable item (12 with downloadUrl)
@@ -131,7 +131,7 @@ describe('member ContentLibraryPage', () => {
     expect(screen.queryByLabelText('JA&D Opportunity Video')).not.toBeInTheDocument();
     expect(screen.queryByTitle('JA&D Program Brochure')).not.toBeInTheDocument();
 
-    // Image — View button opens dialog with large preview (no inline before)
+    // Image - View button opens dialog with large preview (no inline before)
     const showcaseCard = screen.getByText('JA&D Project Showcase').closest('li')!;
     await user.click(within(showcaseCard).getByRole('button', { name: 'View' }));
     expect(await screen.findByRole('dialog')).toBeInTheDocument();
@@ -140,7 +140,7 @@ describe('member ContentLibraryPage', () => {
     await user.click(screen.getByRole('button', { name: 'Close dialog' }));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 
-    // Video — View button opens dialog with video player (only after click)
+    // Video - View button opens dialog with video player (only after click)
     const videoCard = screen.getByText('JA&D Opportunity Video').closest('li')!;
     await user.click(within(videoCard).getByRole('button', { name: 'View' }));
     expect(await screen.findByRole('dialog')).toBeInTheDocument();
@@ -148,7 +148,7 @@ describe('member ContentLibraryPage', () => {
     await user.keyboard('{Escape}');
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 
-    // PDF — View button opens dialog with iframe (only after click)
+    // PDF - View button opens dialog with iframe (only after click)
     const pdfCard = screen.getByText('JA&D Program Brochure').closest('li')!;
     await user.click(within(pdfCard).getByRole('button', { name: 'View' }));
     expect(await screen.findByRole('dialog')).toBeInTheDocument();
@@ -156,7 +156,7 @@ describe('member ContentLibraryPage', () => {
     await user.keyboard('{Escape}');
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 
-    // Plain document (data:text/plain) — View shows scrollable text, only after click
+    // Plain document (data:text/plain) - View shows scrollable text, only after click
     const docCard = screen.getByText('JA&D Membership Overview').closest('li')!;
     expect(within(docCard).getByRole('button', { name: 'View' })).toBeInTheDocument();
     await user.click(within(docCard).getByRole('button', { name: 'View' }));

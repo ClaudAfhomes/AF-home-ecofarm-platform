@@ -5,7 +5,7 @@ import { methodNotAllowed, requireService } from '../../../_lib/rest.js';
 
 import { loadNetwork } from '../_network.js';
 
-/** GET /me/reports/group-network — downline summary (reporting only). */
+/** GET /me/reports/group-network - downline summary (reporting only). */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');

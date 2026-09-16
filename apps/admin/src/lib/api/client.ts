@@ -12,7 +12,7 @@ import {
 
 /**
  * Single typed fetch-based API client (FRONTEND-ARCHITECTURE §5). All requests
- * go through here — no ad-hoc `fetch` in features.
+ * go through here - no ad-hoc `fetch` in features.
  *
  * Auth: the session is a Supabase JWT. When Supabase is configured, the access
  * token is attached as `Authorization: Bearer` on every request (the API
@@ -47,14 +47,14 @@ async function rawRequest(path: string, init?: RequestInit, retried = false): Pr
     throw new ApiNetworkError(cause);
   }
   // Expired/rotated sessions surface as 401 (the API never returns 401 for a
-  // merely under-privileged caller — that's 403). Heal once via rotation and
+  // merely under-privileged caller - that's 403). Heal once via rotation and
   // retry; if rotation fails the session is dead, so warn (the only reliable
   // signal that auth was actually required and lost) then clear it and let
   // the route guards redirect to login instead of stranding an error page.
   if (res.status === 401 && !retried && isSupabaseConfigured()) {
     const healed = await tryRefreshSession();
     if (healed) return rawRequest(path, init, true);
-    console.warn(`[api] ${path} returned 401 and session rotation failed — clearing session`);
+    console.warn(`[api] ${path} returned 401 and session rotation failed - clearing session`);
     await clearSession();
   }
   return res;
@@ -108,7 +108,7 @@ export async function requestList<T>(
 }
 
 /**
- * GET a collection and return the full `{ data, meta }` envelope — for callers
+ * GET a collection and return the full `{ data, meta }` envelope - for callers
  * that need `meta` beyond the list (e.g. the registrations queue's
  * `meta.invalid` dropped-row count). Auth + 401 healing are identical to the
  * other helpers.
@@ -139,7 +139,7 @@ export interface PageResult<T> {
   nextCursor?: string;
 }
 
-/** GET a cursor-paginated collection (threads/ledger streams — API-SPECIFICATION §4). */
+/** GET a cursor-paginated collection (threads/ledger streams - API-SPECIFICATION §4). */
 export async function requestPage<T>(
   path: string,
   itemSchema: ZodType<T>,

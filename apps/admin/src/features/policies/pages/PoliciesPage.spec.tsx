@@ -160,7 +160,7 @@ describe('PoliciesPage', () => {
     await screen.findByRole('dialog');
     await user.type(screen.getByLabelText('Title'), 'Rejected Probe');
     await user.type(screen.getByLabelText('Type'), 'terms');
-    // Client accepts .pdf; the server rejects it — bypass with a direct set.
+    // Client accepts .pdf; the server rejects it - bypass with a direct set.
     const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
     Object.defineProperty(fileInput, 'files', { value: [PDF()], configurable: true });
     fireEvent.change(fileInput);

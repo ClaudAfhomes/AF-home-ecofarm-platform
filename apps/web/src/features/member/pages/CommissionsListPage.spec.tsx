@@ -24,7 +24,7 @@ const COMMISSIONS = {
       id: 'com-003',
       commissionType: 'DIRECT_REFERRAL',
       saleId: 'sal-007',
-      salePropertyName: 'Prisma Residences – Astra Building Condo',
+      salePropertyName: 'Prisma Residences - Astra Building Condo',
       baseValue: '5300000.00',
       rate: '0.0400',
       amount: '212000.00',
@@ -65,7 +65,7 @@ describe('member CommissionsListPage', () => {
           id: 'com-005',
           commissionType: 'DIRECT_COMMISSION',
           saleId: 'sal-008',
-          salePropertyName: 'Levina Place – 2BR Condo',
+          salePropertyName: 'Levina Place - 2BR Condo',
           baseValue: '5500000.00',
           rate: '0.0800',
           amount: '440000.00',
@@ -96,7 +96,7 @@ describe('member CommissionsListPage', () => {
     expect(screen.getByText('Cancelled')).toBeInTheDocument();
     expect(screen.getByText(/reversed/)).toBeInTheDocument();
     expect(screen.getByText(/cancelled/)).toBeInTheDocument();
-    // Rate formatting via BigInt helper — 8.00% and 4.00% without float
+    // Rate formatting via BigInt helper - 8.00% and 4.00% without float
     expect(screen.getByText(/8\.00%/)).toBeInTheDocument();
     expect(screen.getByText(/4\.00%/)).toBeInTheDocument();
   });

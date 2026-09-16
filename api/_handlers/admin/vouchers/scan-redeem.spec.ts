@@ -7,8 +7,8 @@ import redeemVoucherHandler from './[id]/redeem.js';
 
 /**
  * Admin voucher scan / redeem lifecycle:
- *   POST /admin/vouchers/scan   — resolve a QR code (verify-only)
- *   POST /admin/vouchers/:id/redeem — confirm a scan, redeem in full
+ *   POST /admin/vouchers/scan - resolve a QR code (verify-only)
+ *   POST /admin/vouchers/:id/redeem - confirm a scan, redeem in full
  * Supabase is fully mocked.
  */
 const mocks = vi.hoisted(() => {

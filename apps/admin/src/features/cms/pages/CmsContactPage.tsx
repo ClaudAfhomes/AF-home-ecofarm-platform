@@ -2,7 +2,15 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { Link } from 'react-router';
 
-import { Button, ConfirmDialog, Dialog, ErrorState, PageHeader, Skeleton } from '@jad/ui';
+import {
+  Button,
+  ConfirmDialog,
+  Dialog,
+  ErrorState,
+  notifySuccess,
+  PageHeader,
+  Skeleton,
+} from '@jad/ui';
 import { contactContentSchema, type ContactContent, type ContactMethod } from '@jad/contracts';
 
 import { CmsAccordionControls } from '../components/CmsAccordionControls';
@@ -203,8 +211,7 @@ export function CmsContactPage() {
       await update.mutateAsync(draft);
       const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       setLastSaved(`just now at ${now}`);
-      setSaveMessage('All changes saved.');
-      setTimeout(() => setSaveMessage(null), 3000);
+      notifySuccess({ title: 'Changes saved' });
     } catch (e) {
       setSaveMessage(e instanceof Error ? e.message : 'Save failed');
     }
@@ -234,8 +241,8 @@ export function CmsContactPage() {
       <PageHeader title="Contact CMS" description="Manage the public Contact page content." />
 
       {saveMessage ? (
-        <div className={styles.bannerSuccess} role="status" aria-live="polite">
-          <strong>All changes saved</strong>: {saveMessage}
+        <div className={styles.bannerError} role="alert">
+          {saveMessage}
         </div>
       ) : null}
 
@@ -520,7 +527,7 @@ export function CmsContactPage() {
           </div>
         </CmsSectionCard>
 
-        {/* 6 Footer Details — read-only preview (canonical in Global CMS) */}
+        {/* 6 Footer Details - read-only preview (canonical in Global CMS) */}
         <CmsSectionCard
           id="details"
           index={6}

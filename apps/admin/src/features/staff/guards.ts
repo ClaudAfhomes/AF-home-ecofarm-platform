@@ -4,7 +4,7 @@ import type { RoleRecord } from '@jad/contracts';
 import type { MockStaffMember } from '../../mock/data';
 
 /**
- * Staff governance guards (pure logic — pages render the reasons).
+ * Staff governance guards (pure logic - pages render the reasons).
  * Exactly one role per staff member; permissions belong to roles. The
  * platform must always keep at least one ACTIVE member in a role granting
  * the `staff` module (governance survival), and nobody may change their

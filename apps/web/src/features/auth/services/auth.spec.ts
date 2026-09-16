@@ -71,7 +71,7 @@ describe('resolveLoginRole (staff-first login resolution)', () => {
   });
 
   it('never queries phantom tables that do not exist in the schema', async () => {
-    // Regression (PGRST205): only "MemberRole"/"Role" (+ StaffUser) exist —
+    // Regression (PGRST205): only "MemberRole"/"Role" (+ StaffUser) exist -
     // probing member_roles/roles/memberrole/role emits failing requests and,
     // on orphaned accounts, surfaces "Could not find the table" noise.
     const seen = new Set<string>();

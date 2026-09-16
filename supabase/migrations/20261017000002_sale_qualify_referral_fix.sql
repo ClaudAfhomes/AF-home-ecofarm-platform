@@ -5,7 +5,7 @@
 --   if v_existing = 0 then ... issue direct + referral ... end if;
 -- If *any* commission row already exists for the sale (e.g. a DIRECT row
 -- issued while the seller was sponsorless, or a seed backfill row), the
--- entire block is skipped — so a later sponsor link NEVER produces the
+-- entire block is skipped - so a later sponsor link NEVER produces the
 -- DIRECT_REFERRAL row. The referral is permanently, silently suppressed.
 --
 -- This re-create checks idempotency per commissionType: DIRECT_COMMISSION and
@@ -90,7 +90,7 @@ begin
   v_base := v_sale."propertyValue"::numeric;
   -- Idempotency per commissionType (never duplicate a row; safe re-entry).
   -- A pre-existing DIRECT row must not suppress a missing REFERRAL (and
-  -- vice versa) — e.g. qualifying before the seller's sponsor was linked.
+  -- vice versa) - e.g. qualifying before the seller's sponsor was linked.
   select count(*) into v_existing_direct from "Commission"
     where "saleId" = p_id and "commissionType" = 'DIRECT_COMMISSION';
   select count(*) into v_existing_referral from "Commission"
@@ -140,7 +140,7 @@ begin
   end if;
   insert into "AuditLog" (action, actor_id, actor_role, target_type, target_id, target_name, detail, created_at)
     values ('SALE_QUALIFIED', p_actor, p_role, 'Sale', p_id,
-            v_sale."propertyName" || ' — ' || v_sale."customerName",
+            v_sale."propertyName" || ' - ' || v_sale."customerName",
             'Qualified sale ' || p_id || '. ' || v_detail, v_now);
   select to_jsonb(s) into v_sale from "Sale" s where s.id = p_id;
   return jsonb_build_object('sale', v_sale);

@@ -244,7 +244,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         .eq('code', cc)
         .maybeSingle();
       if (countryErr) {
-        // If table missing (migration not applied), log and allow — dev fallback. Production must have migration.
+        // If table missing (migration not applied), log and allow - dev fallback. Production must have migration.
         console.warn(
           '[location-verify] countries lookup failed (migration may not be applied):',
           countryErr.message,

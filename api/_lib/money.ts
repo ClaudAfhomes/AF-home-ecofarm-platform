@@ -8,19 +8,19 @@ import { addMoney, compareMoney, subtractMoney } from '@jad/shared';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 /**
- * Money-core helpers for api/ handlers (Phase B6). Pure functions —
+ * Money-core helpers for api/ handlers (Phase B6). Pure functions -
  * unit-tested. All arithmetic is exact-decimal strings via `@jad/shared`
- * (BigInt cents — never floats). Handlers own Supabase I/O.
+ * (BigInt cents - never floats). Handlers own Supabase I/O.
  */
 
-/** Server-side mask of a payout account identifier (SECURITY.md — sensitive on read). */
+/** Server-side mask of a payout account identifier (SECURITY.md - sensitive on read). */
 export function maskIdentifier(identifier: string): string {
   const trimmed = identifier.trim();
   if (trimmed.length <= 4) return '••••';
   return `•••• ${trimmed.slice(-4)}`;
 }
 
-/** Zero wallet — mirrors the mock default for members with no wallet row. */
+/** Zero wallet - mirrors the mock default for members with no wallet row. */
 export function zeroWallet() {
   return {
     availableBalance: '0.00',
@@ -82,7 +82,7 @@ export function isValidLedgerRow(row: Record<string, unknown>): boolean {
 
 function withdrawalPayoutSnapshot(row: Record<string, unknown>) {
   // Idempotent: an already-mapped row carries the snapshot object instead of
-  // flat join fields — reuse it so validate-after-map never drops valid rows.
+  // flat join fields - reuse it so validate-after-map never drops valid rows.
   const snapshot =
     row.payoutAccount && typeof row.payoutAccount === 'object'
       ? (row.payoutAccount as Record<string, unknown>)
@@ -116,7 +116,7 @@ function withdrawalPayoutSnapshot(row: Record<string, unknown>) {
  * Inject live raw identifiers into withdrawal rows before mapping.
  * Withdrawal rows persist only the masked snapshot; the raw number is joined
  * from PayoutAccount (which the caller fetched). Missing entries fall back
- * to the masked snapshot — never throws.
+ * to the masked snapshot - never throws.
  */
 export function injectWithdrawalIdentifiers(
   rows: Record<string, unknown>[],

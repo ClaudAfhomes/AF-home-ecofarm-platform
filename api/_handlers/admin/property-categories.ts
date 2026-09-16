@@ -51,7 +51,7 @@ async function writeCmsCategories(
   return error ? error.message : null;
 }
 
-/** GET /admin/property-categories — merged key + presentation + counts. */
+/** GET /admin/property-categories - merged key + presentation + counts. */
 export async function listCategories(req: VercelRequest, res: VercelResponse) {
   const auth = await verifyStaffModule(req, 'properties', ADMIN_STAFF);
   if ('error' in auth) {
@@ -84,7 +84,7 @@ export async function listCategories(req: VercelRequest, res: VercelResponse) {
   });
 }
 
-/** POST /admin/property-categories — create key + presentation. */
+/** POST /admin/property-categories - create key + presentation. */
 export async function createCategory(req: VercelRequest, res: VercelResponse) {
   const auth = await verifyStaffModule(req, 'properties', ADMIN_STAFF);
   if ('error' in auth) {

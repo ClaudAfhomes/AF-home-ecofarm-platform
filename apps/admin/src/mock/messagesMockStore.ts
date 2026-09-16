@@ -4,7 +4,7 @@ import type { Message } from '@jad/contracts';
  * Canonical in-memory mock store for the admin Messages inbox + threads
  * (FEAT-072, ADR-013). Frontend-only, deterministic IDs, mirrors the real
  * Conversation/Message shape (watermark per side). Later replaced by
- * Supabase/backend — UI calls services/hooks, not this directly.
+ * Supabase/backend - UI calls services/hooks, not this directly.
  */
 
 export interface MockStaffConversation {
@@ -44,7 +44,7 @@ export const messagesMockStore: {
       memberId: 'mem-001',
       senderType: 'STAFF',
       senderName: 'Ada Admin',
-      body: 'Hi Juan! Happy to help — what would you like to know?',
+      body: 'Hi Juan! Happy to help - what would you like to know?',
       createdAt: '2026-09-12T09:30:00.000Z',
     },
     {
@@ -86,7 +86,7 @@ export function resetMessagesMockStore(): void {
       memberId: 'mem-001',
       senderType: 'STAFF',
       senderName: 'Ada Admin',
-      body: 'Hi Juan! Happy to help — what would you like to know?',
+      body: 'Hi Juan! Happy to help - what would you like to know?',
       createdAt: '2026-09-12T09:30:00.000Z',
     },
     {

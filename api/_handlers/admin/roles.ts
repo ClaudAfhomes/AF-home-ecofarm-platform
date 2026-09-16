@@ -29,7 +29,7 @@ function mapRow(row: Record<string, unknown>) {
   };
 }
 
-/** GET /admin/roles — full record list. POST — create custom role + audit. */
+/** GET /admin/roles - full record list. POST - create custom role + audit. */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
@@ -80,7 +80,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!name || name.length > 60) {
     const { error, status } = toErrorEnvelope(
       'VALIDATION_ERROR',
-      'Role name must be 1–60 characters.',
+      'Role name must be 1-60 characters.',
       400,
     );
     res.status(status).json({ error });

@@ -20,12 +20,12 @@ import type {
 import { request, requestList } from '../../../lib/api/client';
 
 /**
- * Member auth services (SCR-AUTH-001..005) — typed wrappers over the API client.
+ * Member auth services (SCR-AUTH-001..005) - typed wrappers over the API client.
  * All calls go through `lib/api/client` (no ad-hoc fetch) and validate
  * responses against the `@jad/contracts` schemas.
  */
 
-/** `POST /auth/login` — establish a session (FR-AUTH-004, SCR-AUTH-001). */
+/** `POST /auth/login` - establish a session (FR-AUTH-004, SCR-AUTH-001). */
 export function login(credentials: LoginRequest): Promise<LoginResponse> {
   return request('/auth/login', loginResponseSchema, {
     method: 'POST',
@@ -33,7 +33,7 @@ export function login(credentials: LoginRequest): Promise<LoginResponse> {
   });
 }
 
-/** `POST /auth/register` — create a `Pending` application (FR-REG-001..013, SCR-AUTH-002). */
+/** `POST /auth/register` - create a `Pending` application (FR-REG-001..013, SCR-AUTH-002). */
 export function registerApplication(input: RegisterRequest): Promise<RegisterResponse> {
   return request('/auth/register', registerResponseSchema, {
     method: 'POST',
@@ -41,7 +41,7 @@ export function registerApplication(input: RegisterRequest): Promise<RegisterRes
   });
 }
 
-/** `POST /auth/verify-email` — one-time code verification (FEAT-009, SCR-AUTH-003). */
+/** `POST /auth/verify-email` - one-time code verification (FEAT-009, SCR-AUTH-003). */
 export function verifyEmail(input: VerifyEmailRequest): Promise<VerifyEmailResponse> {
   return request('/auth/verify-email', verifyEmailResponseSchema, {
     method: 'POST',
@@ -50,7 +50,7 @@ export function verifyEmail(input: VerifyEmailRequest): Promise<VerifyEmailRespo
 }
 
 /**
- * `POST /auth/verify-email/resend` — re-issue the one-time code. MOCK-ONLY:
+ * `POST /auth/verify-email/resend` - re-issue the one-time code. MOCK-ONLY:
  * the dev mock returns `devOnlyCode` (shown in a clearly-labeled simulated
  * email banner); the real API emails the code and returns none.
  */
@@ -61,7 +61,7 @@ export function resendVerificationCode(email: string): Promise<ResendVerificatio
   });
 }
 
-/** `POST /me/resubmit` — corrected data for a REJECTED application (FR-REG-005, SCR-AUTH-005). */
+/** `POST /me/resubmit` - corrected data for a REJECTED application (FR-REG-005, SCR-AUTH-005). */
 export function resubmitApplication(input: Partial<RegisterRequest>): Promise<RegisterResponse> {
   return request('/me/resubmit', registerResponseSchema, {
     method: 'POST',
@@ -90,12 +90,12 @@ export interface LoginRoleClient {
 /**
  * Authoritative login role resolution (staff-first).
  *
- * Staff-only identities (`StaffUser`, no `Member` row — e.g. the provisioned
+ * Staff-only identities (`StaffUser`, no `Member` row - e.g. the provisioned
  * super-admin) hold no `MemberRole` link, so member-table resolution alone
  * misclassifies them as `user` and sends them to the member panel. Checking
  * the own `StaffUser` row first (anon-readable via `staffuser_select_own`
  * RLS) mirrors `SupabaseSessionProvider` and keeps login and refresh
- * consistent. Direct `Role` reads may be revoked for anon (Phase 6) —
+ * consistent. Direct `Role` reads may be revoked for anon (Phase 6) -
  * failures are tolerated and fall through to `user_metadata`, then `user`.
  * Metadata is client-writable and must never confer privilege beyond this
  * last-resort fallback.
@@ -117,7 +117,7 @@ export async function resolveLoginRole(
   }
 
   // 2. Member-tier roles via MemberRole → Role. Only the quoted tables
-  // exist in the schema (auth foundation migration) — legacy snake_case
+  // exist in the schema (auth foundation migration) - legacy snake_case
   // variants are gone, since probing them can only produce PGRST205 noise.
   const variants: [linkTable: string, roleTable: string][] = [['MemberRole', 'Role']];
   for (const [linkTable, roleTable] of variants) {
@@ -150,7 +150,7 @@ export async function resolveLoginRole(
     }
   }
 
-  // 3. Last resort: user_metadata (client-writable — never authoritative for staff).
+  // 3. Last resort: user_metadata (client-writable - never authoritative for staff).
   const metaRole = metadata?.['role'];
   if (typeof metaRole === 'string' && normalizeRole(metaRole) === 'admin') return 'admin';
   return 'user';

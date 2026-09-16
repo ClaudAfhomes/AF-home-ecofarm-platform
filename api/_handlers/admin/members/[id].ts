@@ -115,11 +115,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   if (req.method === 'DELETE') {
-    // Phase D — permanent deletion (super_admin only, owner-approved
+    // Phase D - permanent deletion (super_admin only, owner-approved
     // exception to the archive-only default). The DB function deletes the
     // member's entire graph (ledger, commissions, withdrawals, sales,
     // customers, wallet, payout accounts, roles, notifications) in ONE
-    // transaction — the RESTRICT FKs are satisfied by the leaf-first order.
+    // transaction - the RESTRICT FKs are satisfied by the leaf-first order.
     // The auth.users row is removed afterwards; the purge itself is audited
     // with a snapshot of the destroyed identity.
     if (!slugsAllowed(auth.slugs, [...SUPER_ADMIN_ONLY])) {
@@ -172,7 +172,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
     // Remove the Supabase Auth identity. Best-effort: an already-missing
     // auth account must not fail the purge (the Member row is already gone).
-    // One retry on transient failure — a surviving auth user stays
+    // One retry on transient failure - a surviving auth user stays
     // login-capable, so the outcome is reported (authRemoved) rather than
     // swallowed.
     let authRemoved = true;
@@ -188,7 +188,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       targetType: 'Member',
       targetId: id,
       targetName: result.purged?.name ?? displayName,
-      detail: `Permanently deleted member ${result.purged?.email ?? ''} — reason: ${parsedDelete.data.reason}${
+      detail: `Permanently deleted member ${result.purged?.email ?? ''} - reason: ${parsedDelete.data.reason}${
         authRemoved ? '' : ' (auth user removal failed or already absent)'
       }`,
     });
@@ -196,7 +196,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
 
-  // PATCH — profile fields plus accountStatus; country immutable.
+  // PATCH - profile fields plus accountStatus; country immutable.
   const parsedBody = readJsonBody(req);
   if (!parsedBody.ok) {
     const { error, status } = parsedBody.error;
@@ -268,7 +268,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .maybeSingle();
     qualifiedRoleUuid = ((qualRole as { id: string } | null)?.id as string | undefined) ?? null;
   }
-  // Sponsor link/unlink (super_admin only — rewrites the genealogy graph).
+  // Sponsor link/unlink (super_admin only - rewrites the genealogy graph).
   // Accepts the sponsor's referral CODE (resolved like registration approval);
   // `null` clears the link. Unresolvable codes reject instead of silently
   // unlinking (400), so a typo can never orphan a member's upline.
@@ -366,7 +366,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // rows that past qualifies skipped for this member's qualifying sales.
   // Idempotent per sale+type; a repair failure surfaces loudly because the
   // referrer's money is at stake (the link itself is already saved above).
-  // Amounts stay exact-decimal strings — integer math only, no floats.
+  // Amounts stay exact-decimal strings - integer math only, no floats.
   const exactPercentOf = (value: string, rateValue: string): string => {
     const [vInt, vFrac = ''] = value.split('.');
     const cents = BigInt(vInt + vFrac.padEnd(2, '0').slice(0, 2));

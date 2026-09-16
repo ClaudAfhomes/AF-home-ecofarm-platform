@@ -1,7 +1,7 @@
 # ADR-011: pnpm Workspaces + Turborepo Monorepo
 
 ## Status
-**Proposed** (TECH-STACK.md §11: pnpm workspaces + Turborepo — **PROPOSED / REQUIRES APPROVAL**; FOLDER-STRUCTURE.md documents the intended layout).
+**Proposed** (TECH-STACK.md §11: pnpm workspaces + Turborepo - **PROPOSED / REQUIRES APPROVAL**; FOLDER-STRUCTURE.md documents the intended layout).
 
 ## Context
 The platform is a TypeScript monorepo (ADR-010) with React apps (web/admin), Vercel Functions API, and shared packages, plus infra/CI definitions (FOLDER-STRUCTURE §4 as updated Q1). Tool versions are `REQUIRES VERIFICATION` (TECH-STACK §14). The repository is documentation-only; the monorepo has not been scaffolded.
@@ -10,13 +10,13 @@ The platform is a TypeScript monorepo (ADR-010) with React apps (web/admin), Ver
 Choose the workspace/task tooling that keeps the multi-app TS monorepo fast, reproducible, and simple to build in CI.
 
 ## Options Considered
-- **pnpm workspaces + Turborepo** — chosen direction (PROPOSED).
-- **npm / yarn workspaces** — alternatives; slower task caching.
-- **Single package (no monorepo)** — rejected: three apps + shared packages would be unmanageable.
-- **Nx** — more powerful but heavier.
+- **pnpm workspaces + Turborepo** - chosen direction (PROPOSED).
+- **npm / yarn workspaces** - alternatives; slower task caching.
+- **Single package (no monorepo)** - rejected: three apps + shared packages would be unmanageable.
+- **Nx** - more powerful but heavier.
 
 ## Decision
-Use **pnpm workspaces** as the package manager and **Turborepo** as the task runner (TECH-STACK §11 — PROPOSED). Structure per FOLDER-STRUCTURE: `apps/api`, `apps/web`, `apps/admin`, `apps/merchant`, `packages/contracts`, `packages/config`, `packages/shared`, `infra/`.
+Use **pnpm workspaces** as the package manager and **Turborepo** as the task runner (TECH-STACK §11 - PROPOSED). Structure per FOLDER-STRUCTURE: `apps/api`, `apps/web`, `apps/admin`, `apps/merchant`, `packages/contracts`, `packages/config`, `packages/shared`, `infra/`.
 
 ## Rationale
 - pnpm workspaces give isolated, fast installs and strict dependency handling.

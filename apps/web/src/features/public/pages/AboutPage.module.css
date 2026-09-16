@@ -25,7 +25,7 @@
   margin-bottom: 0;
 }
 
-/* 01 — Who we are: asymmetric editorial split with a floating label on the photo. */
+/* 01 - Who we are: asymmetric editorial split with a floating label on the photo. */
 .introGrid {
   display: grid;
   gap: var(--space-10);
@@ -76,7 +76,7 @@
   color: var(--color-text-secondary);
 }
 
-/* 02 — The JA&D philosophy: numbered editorial sequence with hairline rules. */
+/* 02 - The JA&D philosophy: numbered editorial sequence with hairline rules. */
 .principles {
   list-style: none;
   margin: 0;
@@ -112,7 +112,7 @@
   color: var(--color-text-secondary);
 }
 
-/* 03 — Our approach: statement, check-marked points, framed document photo. */
+/* 03 - Our approach: statement, check-marked points, framed document photo. */
 .approachGrid {
   display: grid;
   gap: var(--space-10);
@@ -208,7 +208,7 @@
   }
 }
 
-/* 04 — Vision: centered editorial statement with a vertical gold rule. */
+/* 04 - Vision: centered editorial statement with a vertical gold rule. */
 .vision {
   display: grid;
   justify-items: center;
@@ -246,7 +246,7 @@
   color: var(--color-text-primary);
 }
 
-/* 05 — Mission: structured points under hairline rules on desktop. */
+/* 05 - Mission: structured points under hairline rules on desktop. */
 .missionPoints {
   list-style: none;
   margin: 0;

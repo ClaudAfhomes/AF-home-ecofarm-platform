@@ -2,16 +2,15 @@ import { verifyEmailRequestSchema } from '@jad/contracts';
 
 import { toErrorEnvelope } from '../../_lib/envelope.js';
 import type { VercelRequest, VercelResponse } from '../../_lib/http.js';
-import { requireAnonClient } from '../../_lib/otp.js';
 import { methodNotAllowed, readJsonBody, requireService } from '../../_lib/rest.js';
+import { checkVerificationCode, resolveAuthUserId } from '../../_lib/verification-code.js';
 
 /**
- * POST /api/v1/auth/verify-email — confirm an email address (BR-AUTH-001,
- * FEAT-009). Public: the one-time code is delivered by email, so possession of
- * a valid code proves ownership. The code is validated against Supabase Auth
- * (`verifyOtp`), then the identity is authoritatively confirmed with
- * `email_confirm: true` (belt-and-suspenders: the OTP verify may not set
- * `email_confirmed_at` for admin-created users).
+ * POST /api/v1/auth/verify-email - confirm an email address (BR-AUTH-001,
+ * FEAT-009). Public: the one-time code is delivered by email, so possession
+ * of a valid code proves ownership. The code is checked against the stored
+ * hash (`EmailVerification`, EmailJS delivery), then the auth user is
+ * authoritatively confirmed with `email_confirm: true`.
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -42,30 +41,43 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
   const { email, code } = parsed.data;
-  const anon = requireAnonClient();
-  if (!anon) {
-    const { error, status } = toErrorEnvelope('INTERNAL', 'Supabase not configured', 500);
+  const supabase = requireService(res);
+  if (!supabase) return;
+  const result = await checkVerificationCode(supabase, email, code);
+  if (!result.ok) {
+    const message =
+      result.reason === 'expired'
+        ? 'The verification code has expired. Request a new one.'
+        : result.reason === 'locked'
+          ? 'Too many incorrect attempts. Request a new code.'
+          : 'The verification code is incorrect or has expired.';
+    const { error, status } = toErrorEnvelope('VALIDATION_ERROR', message, 400);
     res.status(status).json({ error });
     return;
   }
-  const { data, error } = await anon.auth.verifyOtp({ email, token: code, type: 'email' });
-  const userId = (data as { user?: { id?: string } | null } | null)?.user?.id;
-  if (error || !userId) {
-    const { error: envelope, status } = toErrorEnvelope(
-      'VALIDATION_ERROR',
-      'The verification code is incorrect or has expired.',
-      400,
+  // Resolve the auth user for the authoritative confirmation. Fresh rows
+  // carry user_id; legacy rows fall back to a bounded auth-users scan.
+  const { data: row } = await supabase
+    .from('EmailVerification')
+    .select('user_id')
+    .eq('email', email.trim().toLowerCase())
+    .maybeSingle();
+  const storedUserId = (row as { user_id?: string | null } | null)?.user_id ?? null;
+  const userId = storedUserId ?? (await resolveAuthUserId(supabase, email));
+  if (!userId) {
+    const { error, status } = toErrorEnvelope(
+      'INTERNAL',
+      'We could not find your account. Please contact support.',
+      500,
     );
-    res.status(status).json({ error: envelope });
+    res.status(status).json({ error });
     return;
   }
-  const supabase = requireService(res);
-  if (!supabase) return;
   const confirm = await supabase.auth.admin.updateUserById(userId, { email_confirm: true });
   if (confirm.error) {
-    const { error: envelope, status } = toErrorEnvelope('INTERNAL', confirm.error.message, 500);
-    res.status(status).json({ error: envelope });
+    const { error, status } = toErrorEnvelope('INTERNAL', confirm.error.message, 500);
+    res.status(status).json({ error });
     return;
   }
-  res.status(200).json({ email, verifiedAt: new Date().toISOString() });
+  res.status(200).json({ email, verifiedAt: result.verifiedAt });
 }

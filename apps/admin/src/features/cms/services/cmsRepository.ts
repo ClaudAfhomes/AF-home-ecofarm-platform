@@ -28,7 +28,7 @@ import { request } from '../../../lib/api/client';
 import { getSupabaseClient } from '../../../lib/supabase';
 
 // ---------------------------------------------------------------------------
-// Frontend-only CMS repository — Homepage + About + Properties + FAQs
+// Frontend-only CMS repository - Homepage + About + Properties + FAQs
 // This layer mirrors the future API repository: getHomepage / updateHomepage.
 // Phase 1 was in-memory only; Phase 2 persists drafts to LocalStorage
 // (`jad:cms:homepage:draft` / `jad:cms:about:draft` / `jad:cms:properties:draft` / `jad:cms:faqs:draft`)
@@ -61,7 +61,7 @@ loginContentSchema.parse(MOCK_LOGIN_SEED);
 registerContentSchema.parse(MOCK_REGISTER_SEED);
 
 // ---------------------------------------------------------------------------
-// LocalStorage persistence — production-ready mock (Phase 2)
+// LocalStorage persistence - production-ready mock (Phase 2)
 // ---------------------------------------------------------------------------
 const STORAGE_KEY_HOMEPAGE = 'jad:cms:homepage:draft';
 const STORAGE_KEY_ABOUT = 'jad:cms:about:draft';
@@ -297,7 +297,7 @@ function clearRegisterStorage(): void {
   }
 }
 
-// In-memory drafts — hydrated from LocalStorage if available (prod-ready mock)
+// In-memory drafts - hydrated from LocalStorage if available (prod-ready mock)
 // Falls back to seed; refreshed via get* which syncs from storage
 let current: HomepageContent = loadHomepageFromStorage() ?? structuredClone(MOCK_HOMEPAGE_SEED);
 let currentAbout: AboutContent = loadAboutFromStorage() ?? structuredClone(MOCK_ABOUT_SEED);
@@ -310,7 +310,7 @@ let currentLogin: LoginContent = loadLoginFromStorage() ?? structuredClone(MOCK_
 let currentRegister: RegisterContent =
   loadRegisterFromStorage() ?? structuredClone(MOCK_REGISTER_SEED);
 
-/** Simulate network latency (keeps loading Skeleton visible) — skipped in test for speed. */
+/** Simulate network latency (keeps loading Skeleton visible) - skipped in test for speed. */
 function delay(ms: number): Promise<void> {
   if ((import.meta.env as Record<string, string | undefined>).MODE === 'test')
     return Promise.resolve();
@@ -579,7 +579,7 @@ export async function updateRegister(draft: RegisterContent): Promise<RegisterCo
   });
 }
 
-/** Reset to seed — used in tests. */
+/** Reset to seed - used in tests. */
 export function __resetHomepageForTests(): void {
   current = structuredClone(MOCK_HOMEPAGE_SEED);
   clearHomepageStorage();

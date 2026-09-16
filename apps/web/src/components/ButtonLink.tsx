@@ -12,7 +12,7 @@ interface ButtonLinkBaseProps {
 
 export interface ButtonLinkAsRouteProps
   extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'children'>, ButtonLinkBaseProps {
-  /** Internal route — renders a router `Link`. */
+  /** Internal route - renders a router `Link`. */
   to: string;
   href?: never;
 }

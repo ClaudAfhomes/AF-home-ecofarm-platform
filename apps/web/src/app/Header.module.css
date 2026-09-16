@@ -1,9 +1,9 @@
 /*
- * Site header — transparent over the hero with a soft top-to-bottom navy
+ * Site header - transparent over the hero with a soft top-to-bottom navy
  * gradient so the white JA&D logo and white links stay AA-readable over any
  * hero imagery. Once scrolled (or when the mobile menu is open) it becomes a
  * solid translucent navy surface (UI-UX §4.6). Focus rings use the light gold
- * so they stay visible on the dark chrome (WCAG-2.1 AA, DESIGN-SYSTEM §7.1–7.2).
+ * so they stay visible on the dark chrome (WCAG-2.1 AA, DESIGN-SYSTEM §7.1-7.2).
  */
 .header {
   position: sticky;

@@ -10,7 +10,7 @@ export interface ForbiddenProps {
 }
 
 /**
- * Forbidden (403) state (UI-UX §10). Generic message — never reveals whether a
+ * Forbidden (403) state (UI-UX §10). Generic message - never reveals whether a
  * resource exists (API-SPECIFICATION §8); access decisions are server-enforced.
  */
 export function Forbidden({

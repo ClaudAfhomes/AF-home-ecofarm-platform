@@ -70,7 +70,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   if (req.method === 'DELETE') {
     // Presentation rows may exist without sales, but a property referenced by
-    // a Sale is part of financial history (BI-006 snapshot) — keep it.
+    // a Sale is part of financial history (BI-006 snapshot) - keep it.
     const { count } = await supabase
       .from('Sale')
       .select('id', { count: 'exact', head: true })

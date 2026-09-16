@@ -9,7 +9,7 @@ import { z } from 'zod';
  * Lifecycle: Pending → Admin Review → Confirmed (BR-PAY-004).
  */
 
-/** Payout account state machine — CONFIRMED (BR-PAY-004, DATABASE-DESIGN §7.19). REJECTED is a frontend mock extension for the Approve/Reject workflow (requires Owner confirmation if made permanent). */
+/** Payout account state machine - CONFIRMED (BR-PAY-004, DATABASE-DESIGN §7.19). REJECTED is a frontend mock extension for the Approve/Reject workflow (requires Owner confirmation if made permanent). */
 export const payoutAccountStatusSchema = z.enum([
   'PENDING',
   'ADMIN_REVIEW',
@@ -20,7 +20,7 @@ export const payoutAccountStatusSchema = z.enum([
 export type PayoutAccountStatus = z.infer<typeof payoutAccountStatusSchema>;
 
 /**
- * Payout method — candidate categories from BR-PAY-002 / FR-PAY-002. The final
+ * Payout method - candidate categories from BR-PAY-002 / FR-PAY-002. The final
  * supported set is BLOCKED on OD-016 (FEAT-047). This PROPOSED mock set is the
  * minimal contract surface for the Add Payout Account screen; it must be
  * confirmed by the Owner before the real backend lands.
@@ -29,14 +29,14 @@ export const payoutMethodSchema = z.enum(['TRADITIONAL_BANK', 'DIGITAL_BANK', 'G
 
 export type PayoutMethod = z.infer<typeof payoutMethodSchema>;
 
-/** Payout account — `GET /me/payout-accounts` (API-SPECIFICATION #48). */
+/** Payout account - `GET /me/payout-accounts` (API-SPECIFICATION #48). */
 export const payoutAccountSchema = z.object({
   id: z.string().min(1),
   method: payoutMethodSchema,
   accountName: z.string().min(1),
-  /** Server-masked identifier — always present; tables render this. */
+  /** Server-masked identifier - always present; tables render this. */
   accountIdentifierMasked: z.string().min(1),
-  /** Raw identifier — present for owner/staff reads; detail modals render this. */
+  /** Raw identifier - present for owner/staff reads; detail modals render this. */
   accountIdentifier: z.string().min(1).optional(),
   status: payoutAccountStatusSchema,
   isPrimary: z.boolean(),
@@ -55,7 +55,7 @@ export const createPayoutAccountRequestSchema = z.object({
 
 export type CreatePayoutAccountRequest = z.infer<typeof createPayoutAccountRequestSchema>;
 
-/** `PATCH /me/payout-accounts/:id` — designates a single Primary (BR-PAY-006, #50). */
+/** `PATCH /me/payout-accounts/:id` - designates a single Primary (BR-PAY-006, #50). */
 export const setPrimaryPayoutAccountRequestSchema = z.object({
   isPrimary: z.literal(true),
 });

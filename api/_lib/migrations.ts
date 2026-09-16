@@ -8,7 +8,7 @@
  *
  * This module is intentionally free of I/O so the pending-resolution logic is
  * unit-testable (see migrations.spec.ts). The runner lives in
- * supabase/apply-migrations.ts and imports from here — the same cross-package
+ * supabase/apply-migrations.ts and imports from here - the same cross-package
  * pattern as supabase/seed.ts importing api/_lib/auth.
  */
 

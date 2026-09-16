@@ -28,7 +28,7 @@ function buildPageWindow(page: number, pageCount: number): (number | 'ellipsis')
 }
 
 /**
- * Paged navigation (API-SPECIFICATION §4 — page-based admin lists). Prev/Next
+ * Paged navigation (API-SPECIFICATION §4 - page-based admin lists). Prev/Next
  * plus windowed page numbers with `aria-current="page"`; disabled at bounds.
  */
 export function Pagination({

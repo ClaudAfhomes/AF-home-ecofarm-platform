@@ -18,7 +18,8 @@ import {
   TableHead,
   TableHeaderCell,
   TableRow,
-  useToast,
+  notifyError,
+  notifySuccess,
 } from '@jad/ui';
 import type { ContentKind, ForwardableContent } from '@jad/contracts';
 
@@ -89,12 +90,11 @@ function TableSkeleton() {
   );
 }
 
-/** Admin Marketing Tools — CRUD list for forwardable content (FR-ADM-003, BR-MKT-002). */
+/** Admin Marketing Tools - CRUD list for forwardable content (FR-ADM-003, BR-MKT-002). */
 export function ContentPage() {
   const { data, isPending, isError, error, refetch } = useContent();
   const createContent = useCreateContent();
   const deleteContent = useDeleteContent();
-  const { toast } = useToast();
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [filter, setFilter] = useState<ContentFilter>('ALL');
@@ -143,7 +143,7 @@ export function ContentPage() {
 
     for (const f of selected) {
       // The file picker enforces `accept`, but drag-drop and mobile galleries
-      // can still deliver mismatched files — reject them with a clear message
+      // can still deliver mismatched files - reject them with a clear message
       // instead of silently ignoring the selection.
       if (accept !== '*/*' && !matchesAccept(f, accept)) {
         errors.push(`"${f.name}" is not a supported ${form.kind.toLowerCase()} file.`);
@@ -174,15 +174,14 @@ export function ContentPage() {
     if (!deleteTarget) return;
     try {
       const result = await deleteContent.mutateAsync(deleteTarget.id);
-      toast({
+      notifySuccess({
         title: 'Marketing tool deleted',
         message: result.fileRemoved
           ? `"${deleteTarget.title}" was permanently removed, including its uploaded file.`
           : `"${deleteTarget.title}" was permanently removed.`,
-        tone: 'success',
       });
     } catch (e) {
-      toast({ title: 'Delete failed', message: (e as Error).message, tone: 'danger' });
+      notifyError({ title: 'Delete failed', message: (e as Error).message });
     } finally {
       setDeleteTarget(null);
     }
@@ -229,7 +228,7 @@ export function ContentPage() {
     setForm({ title: '', description: '', kind: 'DOCUMENT' });
     setFiles([]);
     if (failed.length === 0) setFileErrors([]);
-    // New items sort newest-first, so return to page 1 with no kind filter —
+    // New items sort newest-first, so return to page 1 with no kind filter -
     // otherwise a stale page/filter keeps the just-published item out of view.
     setPage(1);
     setFilter('ALL');
@@ -326,7 +325,7 @@ export function ContentPage() {
                       />
                     </TableCell>
                     <TableCell label="Description">
-                      <span className={styles.description}>{row.description ?? '\u2014'}</span>
+                      <span className={styles.description}>{row.description ?? '-'}</span>
                     </TableCell>
                     <TableCell label="Created">
                       <span className={styles.meta}>{formatDate(row.createdAt)}</span>

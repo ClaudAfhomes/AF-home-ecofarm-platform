@@ -1,14 +1,13 @@
 import { useState } from 'react';
 
 import { useSession } from '../../../lib/session';
-import { ErrorState, PageHeader, Skeleton } from '@jad/ui';
+import { ErrorState, notifySuccess, PageHeader, Skeleton } from '@jad/ui';
 
-import { Alert } from '../../../components/Alert';
 import { useReferralCode } from '../hooks/useMember';
 import styles from './ReferralCodePage.module.css';
 
 /**
- * Referral code (SCR-MEM-003). The member's personal referral code — assigned
+ * Referral code (SCR-MEM-003). The member's personal referral code - assigned
  * at registration and immutable (BR-REF-004). Presented read-only with a copy
  * button; the value is never invented or derived client-side.
  */
@@ -23,6 +22,10 @@ export function ReferralCodePage() {
     try {
       await navigator.clipboard.writeText(code);
       setCopied(true);
+      notifySuccess({
+        title: 'Code copied',
+        message: 'Share it with people who want to join JA&D.',
+      });
       window.setTimeout(() => setCopied(false), 1600);
     } catch {
       setCopied(false);
@@ -50,11 +53,6 @@ export function ReferralCodePage() {
           <button type="button" className={styles.copyButton} onClick={onCopy}>
             {copied ? 'Copied' : 'Copy code'}
           </button>
-          {copied ? (
-            <Alert variant="success" title="Code copied">
-              Share it with people who want to join JA&amp;D.
-            </Alert>
-          ) : null}
           <p className={styles.note}>
             Your referral code is permanent and cannot be changed (BR-REF-004).
           </p>

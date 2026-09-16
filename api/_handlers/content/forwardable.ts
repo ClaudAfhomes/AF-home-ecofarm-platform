@@ -3,7 +3,7 @@ import type { VercelRequest, VercelResponse } from '../../_lib/http.js';
 import { isValidContentItemRow, mapContentItemRow } from '../../_lib/mappers.js';
 import { methodNotAllowed, okList, requireService } from '../../_lib/rest.js';
 
-/** GET /content/forwardable — published library (API-SPECIFICATION #68). */
+/** GET /content/forwardable - published library (API-SPECIFICATION #68). */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');

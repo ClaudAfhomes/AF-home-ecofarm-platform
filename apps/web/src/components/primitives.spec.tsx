@@ -3,7 +3,6 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { EmptyState } from './EmptyState';
 import { ErrorState } from './ErrorState';
-import { PlaceholderNotice } from './PlaceholderNotice';
 import { Skeleton } from './Skeleton';
 import { ApiError } from '../lib/api/errors';
 import { renderWithProviders } from '../test/utils';
@@ -42,14 +41,6 @@ describe('ErrorState', () => {
     expect(screen.getByText('An unexpected error occurred. Please try again.')).toBeInTheDocument();
     screen.getByRole('button', { name: 'Retry' }).click();
     expect(onRetry).toHaveBeenCalledTimes(1);
-  });
-});
-
-describe('PlaceholderNotice', () => {
-  it('marks content as placeholder pending approval', () => {
-    renderWithProviders(<PlaceholderNotice>Approved copy pending.</PlaceholderNotice>);
-    expect(screen.getByRole('status')).toHaveTextContent('Placeholder content — pending approval');
-    expect(screen.getByRole('status')).toHaveTextContent('Approved copy pending.');
   });
 });
 

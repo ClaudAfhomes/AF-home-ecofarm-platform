@@ -25,7 +25,7 @@ function getPropertyRow(nameText: string): HTMLElement {
   return screen.getByText(nameText).parentElement?.parentElement as HTMLElement;
 }
 
-describe('CmsPropertiesPage — Phase 3 Properties CMS', () => {
+describe('CmsPropertiesPage - Phase 3 Properties CMS', () => {
   let server: ReturnType<typeof installMockApi>;
 
   beforeEach(() => {
@@ -336,7 +336,7 @@ describe('CmsPropertiesPage — Phase 3 Properties CMS', () => {
       (c) => seed.properties.find((p) => p.categoryId === c.slug)?.name,
     );
     expect(featuredNames).toHaveLength(3);
-    expect(featuredNames[0]).toBe('Prisma Residences – Celeste Building Condo');
+    expect(featuredNames[0]).toBe('Prisma Residences - Celeste Building Condo');
     const user = userEvent.setup();
     renderCms();
     await screen.findByRole('heading', { name: 'Page Header' });

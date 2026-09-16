@@ -15,7 +15,7 @@ import { MockSessionProvider, setMockSessionUser, useMockSession } from '@jad/mo
 import { getSupabaseClient, isSupabaseConfigured, tryRefreshSession } from './supabase';
 
 /**
- * App-owned session context — Supabase Auth (JWT + RLS) is the SSOT when
+ * App-owned session context - Supabase Auth (JWT + RLS) is the SSOT when
  * VITE_SUPABASE_URL is set (fixes cross-origin localStorage bug 5173 vs 5174
  * via cookie storage in supabase.ts). Mock remains fallback when env missing
  * (tests, offline dev).
@@ -95,7 +95,7 @@ export function SupabaseSessionProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<SessionStatus>('loading');
   const [user, setUser] = useState<SessionUser | null>(null);
   const [sessionError, setSessionError] = useState(false);
-  // Last verified session — restored on transient resolution failures so a
+  // Last verified session - restored on transient resolution failures so a
   // stale-token race (idle tab return) never silently swaps the identity.
   const lastGoodUser = useRef<SessionUser | null>(null);
   const revalidateRef = useRef<() => Promise<void>>(async () => {});
@@ -131,7 +131,7 @@ export function SupabaseSessionProvider({ children }: { children: ReactNode }) {
     }
 
     // Authoritative role resolution: own StaffUser row → admin (Phase 5 staff
-    // separation — no Role/MemberRole table reads on the member path).
+    // separation - no Role/MemberRole table reads on the member path).
     // Discriminates a verified answer from transient failures (expired token,
     // network) so an unverifiable read never demotes a known identity.
     const resolveRole = async (
@@ -217,14 +217,14 @@ export function SupabaseSessionProvider({ children }: { children: ReactNode }) {
       let role = resolvedRole;
       // Orphaned auth user: valid Supabase login but the Member row was
       // deleted/purged (and no StaffUser identity). Never grant a member
-      // session — sign out so the user lands on login with a clear message
+      // session - sign out so the user lands on login with a clear message
       // instead of a broken panel of 404s. Staff-only identities (no Member
       // row by design) keep their admin session.
       if (!memberFound && role !== 'admin') {
         try {
           await client.auth.signOut();
         } catch {
-          // best effort — local sign-out below still clears the session
+          // best effort - local sign-out below still clears the session
         }
         return { user: null, verified: true };
       }
@@ -291,7 +291,7 @@ export function SupabaseSessionProvider({ children }: { children: ReactNode }) {
     revalidateRef.current = revalidate;
 
     revalidate().catch(() => {
-      // getSession itself failed — stay loading rather than guessing.
+      // getSession itself failed - stay loading rather than guessing.
     });
     const { data: sub } = client.auth.onAuthStateChange(async (event, session) => {
       // A password-recovery flow lands on the public /auth/reset-password
@@ -402,7 +402,7 @@ export function SessionProvider({ initialUser, restoreDelayMs, children }: Sessi
       </MockSessionProvider>
     );
   }
-  // Supabase SSOT when configured — fixes cross-origin localStorage bug (5173 vs 5174)
+  // Supabase SSOT when configured - fixes cross-origin localStorage bug (5173 vs 5174)
   // via cookie storage in supabase.ts (docs/database/DATABASE-DESIGN.md §4.7).
   // Mock remains fallback for offline dev when VITE_SUPABASE_URL missing.
   if (isSupabaseConfigured()) {

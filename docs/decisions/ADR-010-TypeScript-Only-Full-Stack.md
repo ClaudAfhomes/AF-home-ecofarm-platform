@@ -10,11 +10,11 @@ The platform has React + Vite frontends (web/admin), Vercel Functions / REST API
 Choose the language architecture across all tiers to minimize stack diversity while preserving the platform's correctness and security model.
 
 ## Options Considered
-- **TypeScript everywhere** (frontend, backend, shared contracts) — chosen.
-- **Polyglot** (different languages per tier) — rejected: increases cross-tier contract risk and team burden.
+- **TypeScript everywhere** (frontend, backend, shared contracts) - chosen.
+- **Polyglot** (different languages per tier) - rejected: increases cross-tier contract risk and team burden.
 
 ## Decision
-The entire platform is **TypeScript**: React + Vite SPAs, Vercel Functions backend, and shared packages (`packages/contracts`, `packages/config`, `packages/shared`) all use TypeScript. No other language is used in application code (TECH-STACK §2/§3; approved anchors). Native mobile, if ever approved, would be **React Native** — a TypeScript-adjacent stack — but any native code module requires approval (ADR-005; MOBILE-ARCHITECTURE).
+The entire platform is **TypeScript**: React + Vite SPAs, Vercel Functions backend, and shared packages (`packages/contracts`, `packages/config`, `packages/shared`) all use TypeScript. No other language is used in application code (TECH-STACK §2/§3; approved anchors). Native mobile, if ever approved, would be **React Native** - a TypeScript-adjacent stack - but any native code module requires approval (ADR-005; MOBILE-ARCHITECTURE).
 
 ## Rationale
 - Single language across all tiers enables shared, typed contracts (OpenAPI → `packages/contracts`, ADR-008).
@@ -23,11 +23,11 @@ The entire platform is **TypeScript**: React + Vite SPAs, Vercel Functions backe
 
 ## Trade-offs
 - No per-tier language specialization (e.g., no systems-language hotspots).
-- RN native modules require native code — gated by approval (ADR-005).
+- RN native modules require native code - gated by approval (ADR-005).
 
 ## Consequences
 - All code, tooling, and CI conventions are TypeScript (DEVELOPMENT-GUIDELINES; CODE-REVIEW-GUIDELINES).
-- `packages/shared` is framework-free TS (no React, no business logic — FOLDER-STRUCTURE §4.3/§9.7).
+- `packages/shared` is framework-free TS (no React, no business logic - FOLDER-STRUCTURE §4.3/§9.7).
 - Contract types are shared, never duplicated per client.
 
 ## Validation / Evidence

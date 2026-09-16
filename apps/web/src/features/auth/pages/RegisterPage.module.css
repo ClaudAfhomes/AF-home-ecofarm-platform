@@ -23,7 +23,7 @@
   }
 }
 
-/* Expected process strip — Registration → Verify & review → Account active. */
+/* Expected process strip - Registration → Verify & review → Account active. */
 .steps {
   display: grid;
   gap: var(--space-3);
@@ -74,7 +74,7 @@
   color: var(--color-text-muted);
 }
 
-/* Consent checkbox — 24px control inside a ≥44px label target. */
+/* Consent checkbox - 24px control inside a ≥44px label target. */
 .field {
   display: grid;
   gap: var(--space-2);

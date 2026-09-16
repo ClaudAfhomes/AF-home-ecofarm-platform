@@ -1,4 +1,4 @@
-# JAD — Integration Specification SSOT (INTEGRATION-SPECIFICATION.md)
+# JAD - Integration Specification SSOT (INTEGRATION-SPECIFICATION.md)
 
 > **Authority:** Defines how the JA&D platform integrates with **external systems** (email, geolocation, payout, push, CTO signing service, object storage) and how those integrations behave under normal and failure conditions. Companion to `API-SPECIFICATION.md` (the API contract), `ARCHITECTURE.md` (modular monolith, trust boundaries), `BACKEND-ARCHITECTURE.md` (modules, adapters, operational concerns), and `TECH-STACK.md` (stack/statuses).
 >
@@ -6,7 +6,7 @@
 >
 > **Status vocabulary:** **CONFIRMED** (established requirement) · **PROPOSED** (recommended, not approved) · **ASSUMPTION** (working assumption) · **REQUIRES APPROVAL** (material decision) · **REQUIRES VERIFICATION** (value unconfirmed) · **TBD** (undecided).
 >
-> **Version:** Project 09 — API & Integration Engineering (Baseline v1.0)
+> **Version:** Project 09 - API & Integration Engineering (Baseline v1.0)
 
 ---
 
@@ -19,7 +19,7 @@ Integration principles:
 - **Consumer-first:** all external calls are initiated by JA&D through infrastructure adapters (BACKEND-ARCHITECTURE §2.1); no external system can trigger internal side effects except through the public API surface (API-SPECIFICATION §6).
 - **Record-only financials:** external payout/payment events are recorded by staff actions, never auto-executed by JA&D (BR-BND-001, FR-SAL-003, FR-WDR-003).
 - **Data-at-rest:** JA&D stores metadata and storage references only; binary blobs (media, ID documents, profile photos) live in external object storage (DATABASE-DESIGN A-08, §2).
-- **Boundaries:** the only cryptographically trusted external party is the CTO-authorized signing service, and it is **sign-only** — JA&D can only verify (BI-008).
+- **Boundaries:** the only cryptographically trusted external party is the CTO-authorized signing service, and it is **sign-only** - JA&D can only verify (BI-008).
 
 ---
 
@@ -33,7 +33,7 @@ Integration principles:
 | Push notification service | Broadcast/announcement delivery to member devices | FEAT-063, ASSUMPTION 6 | JA&D → provider | Provider unconfirmed (ASSUMPTION 6) |
 | CTO signing service | Voucher signing; JA&D verifies only; master key never in JA&D infrastructure (BI-008) | FEAT-052/059, ASSUMPTION 7 | JA&D → CTO service | CONFIRMED boundary; transport/method TBD |
 | Object storage | Media, government ID documents, profile photos, landing/promo assets | DATABASE-DESIGN A-08, E-24 | JA&D ↔ provider | Adapter approach CONFIRMED; provider TBD |
-| Authentication as platform capability | Credentials/session handling | FEAT-002, ASSUMPTION 1 | — | Credential policy **TBD** (ASSUMPTION 1) |
+| Authentication as platform capability | Credentials/session handling | FEAT-002, ASSUMPTION 1 | - | Credential policy **TBD** (ASSUMPTION 1) |
 
 **Rules for any external system:** never expose provider credentials to clients; never place provider data in the primary DB except as metadata/storage references; every adapter call is time-bounded (BACKEND-ARCHITECTURE §11.7); provider failures must not produce raw provider errors to clients (API-SPECIFICATION §3).
 
@@ -50,7 +50,7 @@ Confirmed boundaries (must not be crossed without approval):
 | Signing boundary | JA&D can only **verify** signatures; the signing master key exists only in the CTO-controlled service; JA&D never signs | BI-008, FEAT-059, API-SPECIFICATION §8 |
 | Storage boundary | Object storage holds blobs; the database holds metadata and storage references only; no blobs in primary DB | DATABASE-DESIGN §2, A-08 |
 | No external-triggered writes | External providers never write into JA&D state; all state changes flow through the API use cases and the single-writer rule | ARCHITECTURE §6 |
-| No webhook trust by default | Inbound webhooks from third parties are **not** confirmed and would be introduced only with approval (§6) | — |
+| No webhook trust by default | Inbound webhooks from third parties are **not** confirmed and would be introduced only with approval (§6) | - |
 
 ---
 
@@ -61,12 +61,12 @@ Confirmed boundaries (must not be crossed without approval):
 - RBAC guards enforce BUSINESS-RULES §3 on every endpoint; object-level ownership checks prevent IDOR/BOLA (NFR-AUTHZ-002). Staff never act through member `/me` scoped paths (API-SPECIFICATION §2.2).
 
 ### 4.2 Service-to-service (internal)
-- Internal/service-to-service calls use a **separate, short-lived token** from the secret manager — never user cookies (API-SPECIFICATION §2.1, §2.2). The `SYS` identity is an internal service identity, not a database role (`accounts.role` CHECK: `MEMBER, ADMIN, FINANCE, SUPER_ADMIN, MERCHANT`).
+- Internal/service-to-service calls use a **separate, short-lived token** from the secret manager - never user cookies (API-SPECIFICATION §2.1, §2.2). The `SYS` identity is an internal service identity, not a database role (`accounts.role` CHECK: `MEMBER, ADMIN, FINANCE, SUPER_ADMIN, MERCHANT`).
 - Used by the voucher signing/verification path (`POST /signing/verify`, SYS) and any future internal operation endpoints.
 
 ### 4.3 External providers
 - Outbound calls authenticate to providers with provider-issued credentials stored **only** in environment/secret manager; never committed, never in logs, never sent to clients (API-SPECIFICATION §8, DEVELOPMENT-GUIDELINES).
-- Provider identity verification (TLS certificate pinning or provider SDK verification) is a deployment-stage decision — **REQUIRES APPROVAL**.
+- Provider identity verification (TLS certificate pinning or provider SDK verification) is a deployment-stage decision - **REQUIRES APPROVAL**.
 
 ---
 
@@ -81,7 +81,7 @@ Confirmed boundaries (must not be crossed without approval):
 ### 5.2 JA&D ↔ external providers (adapter mapping)
 - Each provider integration is isolated behind an infrastructure adapter (BACKEND-ARCHITECTURE §2.1); the domain layer never calls a provider directly.
 - Provider errors are mapped to the error envelope with a **generic client-safe message**; provider-specific detail is logged server-side only (BACKEND-ARCHITECTURE §11.7, API-SPECIFICATION §3).
-- External data entering JA&D (e.g., geolocation result, payout confirmation) is validated/narrowed with schemas before use (DEVELOPMENT-GUIDELINES §2.7 — `unknown` → narrowed).
+- External data entering JA&D (e.g., geolocation result, payout confirmation) is validated/narrowed with schemas before use (DEVELOPMENT-GUIDELINES §2.7 - `unknown` → narrowed).
 - Confirmed mapping examples:
   - **Geolocation:** registration location check → result recorded as `Location Exception` request/decision (BR-GEO-003/004, FEAT-016) or PH-block rejection.
   - **Payout:** staff `POST /withdrawals/:id/complete` records the external confirmation (BR-BND-001); `POST /withdrawals/:id/reject` releases the reservation (BR-WDR-005).
@@ -110,7 +110,7 @@ Confirmed boundaries (must not be crossed without approval):
 - **Time-bounded external calls:** every adapter call has a timeout; failures map to a safe generic client response with server-side logging; idempotent operations remain safe to retry (BACKEND-ARCHITECTURE §11.7).
 - **Reservation model:** withdrawals reserve funds at request (FR-WDR-002, BR-WDR-002); rejection releases the reservation; a new request is required (BR-WDR-005). Balance invariants BI-001/BI-002 enforced at DB layer.
 - **Concurrency:** single-writer per aggregate; unique constraints enforce exactly-one-success on redemption (BI-007, `uq_redemption_idem`) and reservation races are rejected (`RESERVATION_CONFLICT`).
-- **Circuit-breaking/fallback:** not required to be built until provider choices and targets are confirmed — **REQUIRES APPROVAL** when provider selection (OD-016, ASSUMPTIONS 2/3/6) is made.
+- **Circuit-breaking/fallback:** not required to be built until provider choices and targets are confirmed - **REQUIRES APPROVAL** when provider selection (OD-016, ASSUMPTIONS 2/3/6) is made.
 
 ---
 
@@ -123,8 +123,8 @@ Contract (mirrors API-SPECIFICATION §5.3):
 | Header | `Idempotency-Key: <UUID>` required on the four financial mutations listed in §7 |
 | Scope | Key scoped to (principal, operation); stored response returned on retry; no side effects re-applied |
 | Storage | `idempotency_keys` table; key stored **hashed**; never logged (sensitive replay token) |
-| TTL | 24h — **REQUIRES APPROVAL** |
-| Failure | If the stored response is lost (e.g., cleanup), a repeated request creates a new side effect only if the operation is no longer the same logical action — documented per use case; invariants BI-007/BR-WDR-002 still hold |
+| TTL | 24h - **REQUIRES APPROVAL** |
+| Failure | If the stored response is lost (e.g., cleanup), a repeated request creates a new side effect only if the operation is no longer the same logical action - documented per use case; invariants BI-007/BR-WDR-002 still hold |
 | Never logged | `Idempotency-Key` values are redacted in logs (BACKEND-ARCHITECTURE §11) |
 
 ---
@@ -132,7 +132,7 @@ Contract (mirrors API-SPECIFICATION §5.3):
 ## 9. Failure Handling
 
 - **Client errors:** error envelope with stable codes (§3 of API-SPECIFICATION); business-eligibility failures return 403/422, never 401.
-- **External provider failures:** mapped to a generic safe response; provider details logged server-side only; audit unaffected (audit is immutable and separate from runtime logs — BACKEND-ARCHITECTURE §11).
+- **External provider failures:** mapped to a generic safe response; provider details logged server-side only; audit unaffected (audit is immutable and separate from runtime logs - BACKEND-ARCHITECTURE §11).
 - **Financial path failure:** any failure before commit rolls back the whole transaction; no partial ledger/audit state (DATABASE-DESIGN §15.2, NFR-ATOM-001/002).
 - **Idempotent retry:** client retains and resends the `Idempotency-Key`; the server returns the original stored response (API-SPECIFICATION §5.3).
 - **No auto-refund / no compensation workflow** exists (BR-BND-001; corrections are new transactions).
@@ -159,10 +159,10 @@ Contract (mirrors API-SPECIFICATION §5.3):
 
 - **Health endpoints (PROPOSED):** `/health` (liveness) and `/ready` (readiness: DB connectivity, session store, critical adapters) for the orchestrator/load balancer (BACKEND-ARCHITECTURE §15).
 - **Structured logs:** `requestId` correlation in the error envelope and logs; redaction fields per §10 (BACKEND-ARCHITECTURE §11).
-- **Audit vs logs:** immutable audit trail for financial/exception events; runtime logs are operational and rotatable — never the two conflated.
-- **Metrics/APM:** deferred until NFR-PERF-001 targets are approved (TECH-STACK §12); if introduced, scope is read-path and operational counters — never financial values (BACKEND-ARCHITECTURE §15).
-- **Tracing:** distributed tracing only if the deployment (ARCH-DEC-008) requires it — **REQUIRES APPROVAL**.
-- **External-service monitoring:** adapter timeouts/errors logged server-side; slow-query/connection monitoring is deployment-stage — **REQUIRES APPROVAL**.
+- **Audit vs logs:** immutable audit trail for financial/exception events; runtime logs are operational and rotatable - never the two conflated.
+- **Metrics/APM:** deferred until NFR-PERF-001 targets are approved (TECH-STACK §12); if introduced, scope is read-path and operational counters - never financial values (BACKEND-ARCHITECTURE §15).
+- **Tracing:** distributed tracing only if the deployment (ARCH-DEC-008) requires it - **REQUIRES APPROVAL**.
+- **External-service monitoring:** adapter timeouts/errors logged server-side; slow-query/connection monitoring is deployment-stage - **REQUIRES APPROVAL**.
 
 ---
 
@@ -170,7 +170,7 @@ Contract (mirrors API-SPECIFICATION §5.3):
 
 | # | Assumption | Status |
 |---|---|---|
-| ASSUMPTION 1 | Authentication as platform capability (credential policy not approved) | TBD — no mechanism approved |
+| ASSUMPTION 1 | Authentication as platform capability (credential policy not approved) | TBD - no mechanism approved |
 | ASSUMPTION 2 | Email service is external | Provider selection **OPEN** |
 | ASSUMPTION 3 | Geolocation services are external | Accuracy threshold BLOCKED OD-014; anti-spoofing BLOCKED OD-015 |
 | ASSUMPTION 4 | Customers have no self-service access (members record them) | CONFIRMED (FR-CUS-001/002) |
@@ -178,7 +178,7 @@ Contract (mirrors API-SPECIFICATION §5.3):
 | ASSUMPTION 6 | Push notification infrastructure is external | Provider unconfirmed |
 | ASSUMPTION 7 | CTO signing service external to app infrastructure | Boundary CONFIRMED; transport/method TBD |
 | A-08 (DATABASE-DESIGN) | Object storage external; DB holds metadata only | Adapter approach CONFIRMED; provider TBD |
-| NFR targets | NFR-AVAIL-001, NFR-REL-001, NFR-PERF-001, NFR-SCAL-001 | TBD — **REQUIRES VERIFICATION** |
+| NFR targets | NFR-AVAIL-001, NFR-REL-001, NFR-PERF-001, NFR-SCAL-001 | TBD - **REQUIRES VERIFICATION** |
 
 **Rule:** no new external dependency may be introduced beyond those above without an approved requirement and approval (ARCHITECTURE approval boundaries; BACKEND-ARCHITECTURE §21).
 

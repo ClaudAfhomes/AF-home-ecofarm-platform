@@ -169,6 +169,15 @@
   font-size: var(--text-body-s);
 }
 
+.loadingRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--text-body-s);
+}
+
 .error {
   margin: 0;
   color: var(--color-danger);

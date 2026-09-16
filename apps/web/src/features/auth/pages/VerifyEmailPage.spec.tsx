@@ -44,17 +44,18 @@ describe('VerifyEmailPage (SCR-AUTH-003)', () => {
     expect(screen.getByRole('button', { name: 'Resend code' })).toBeInTheDocument();
   });
 
-  it('resends a code and surfaces the mock-only simulated email in a dev-labeled banner', async () => {
+  it('resends a code and shows a success confirmation', async () => {
     mockFetchRoutes({
-      '/auth/verify-email/resend': { email: EMAIL, devOnlyCode: '482913' },
+      '/auth/verify-email/resend': { email: EMAIL },
     });
     const user = userEvent.setup();
     renderVerify();
 
     await user.click(screen.getByRole('button', { name: 'Resend code' }));
 
-    expect(await screen.findByText('Simulated email (dev-only)')).toBeInTheDocument();
-    expect(screen.getByText('482913')).toBeInTheDocument();
+    expect(
+      await screen.findByText('A new code was sent to your email address.'),
+    ).toBeInTheDocument();
   });
 
   it('verifies the one-time code and routes to the application status screen', async () => {
@@ -103,5 +104,24 @@ describe('VerifyEmailPage (SCR-AUTH-003)', () => {
     await user.click(screen.getByRole('button', { name: 'Verify Email' }));
 
     expect(screen.getByText('Enter the 6-digit code from the email.')).toBeInTheDocument();
+  });
+
+  it('warns and starts a resend cooldown when the registration email failed to send', async () => {
+    mockFetchRoutes({
+      '/auth/verify-email/resend': { email: EMAIL, devOnlyCode: '482913' },
+    });
+    renderWithProviders(
+      <Routes>
+        <Route path="/register/verify-email" element={<VerifyEmailPage />} />
+      </Routes>,
+      { route: '/register/verify-email', routeState: { email: EMAIL, emailSent: false } },
+    );
+
+    expect(screen.getByText('We could not send the email')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Resend code' })).toBeInTheDocument();
+
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Resend code' }));
+    expect(await screen.findByRole('button', { name: /Resend in \d:\d\d/ })).toBeInTheDocument();
   });
 });

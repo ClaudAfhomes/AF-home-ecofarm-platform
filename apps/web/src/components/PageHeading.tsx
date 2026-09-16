@@ -8,7 +8,7 @@ export interface PageHeadingProps {
   lead?: ReactNode;
 }
 
-/** Page header — semantic `h1` with optional eyebrow and lead paragraph. */
+/** Page header - semantic `h1` with optional eyebrow and lead paragraph. */
 export function PageHeading({ eyebrow, title, lead }: PageHeadingProps) {
   return (
     <div className={styles.heading}>

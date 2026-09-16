@@ -23,8 +23,8 @@ const AMOUNT_RE = /^\d+(\.\d{1,2})?$/;
 /**
  * Request a withdrawal (SCR-MEM-012, FR-WDR-001..005). Requires at least one
  * verified payout account (BR-PAY-005) and a positive amount ≤ Available
- * Balance. Submission is irreversible — the amount is reserved immediately
- * (BR-WDR-001/002) — so it goes through a ConfirmDialog. `Idempotency-Key`
+ * Balance. Submission is irreversible - the amount is reserved immediately
+ * (BR-WDR-001/002) - so it goes through a ConfirmDialog. `Idempotency-Key`
  * (API-SPECIFICATION §5.3) is held in state for the attempt and reused on retry;
  * the server remains authoritative for balance checks (409/422).
  */
@@ -35,7 +35,7 @@ export function WithdrawalRequestPage() {
   const accountsQuery = usePayoutAccounts();
   // Configured withdrawal bounds (MIN/MAX_WITHDRAWAL_AMOUNT via GET
   // /config/public). The DB function remains authoritative; these only
-  // validate inline. Unknown until loaded — then the checks are skipped.
+  // validate inline. Unknown until loaded - then the checks are skipped.
   const configQuery = usePublicConfig();
   const limits = configQuery.data?.withdrawalLimits;
   const [amount, setAmount] = useState('');
@@ -285,7 +285,7 @@ export function WithdrawalRequestPage() {
         />
         <EmptyState
           title="No verified payout account"
-          description="Add and confirm a payout account before requesting a withdrawal. Verification typically takes 24–48h (BR-PAY-003/004)."
+          description="Add and confirm a payout account before requesting a withdrawal. Verification typically takes 24-48h (BR-PAY-003/004)."
           action={
             <Link to="/member/payouts/new" className={styles.inlineLink}>
               Add a payout account

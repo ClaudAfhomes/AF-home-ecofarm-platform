@@ -4,7 +4,7 @@ import { getSupabaseEnv } from '../../_lib/env.js';
 import { isAuthConflict } from '../../_lib/auth.js';
 import { stripDocumentData, uploadGovernmentId } from '../../_lib/documents.js';
 import type { VercelRequest, VercelResponse } from '../../_lib/http.js';
-import { requireAnonClient } from '../../_lib/otp.js';
+import { issueVerificationCode } from '../../_lib/verification-code.js';
 import { calculateAge, prefixedId } from '../../_lib/pipeline.js';
 import { methodNotAllowed, readJsonBody, requireService } from '../../_lib/rest.js';
 import { toErrorEnvelope } from '../../_lib/envelope.js';
@@ -13,20 +13,20 @@ type Service = NonNullable<ReturnType<typeof requireService>>;
 type RegistrationRow = Record<string, unknown> & { id: string; status: string };
 
 /**
- * Best-effort dispatch of the email-verification one-time code (BR-AUTH-001).
- * The auth account is created unconfirmed by register; the code email goes
- * out via Supabase Auth (`signInWithOtp`). A failed send never fails
- * registration — the applicant can re-request via
- * `POST /auth/verify-email/resend`.
+ * Dispatch the email-verification one-time code (BR-AUTH-001). The auth
+ * account is created unconfirmed by register; the code email is delivered by
+ * EmailJS (`api/_lib/emailjs.ts`) and only its hash is stored. A failed send
+ * never fails registration - the applicant can re-request via
+ * `POST /auth/verify-email/resend`; the response reports `emailSent`.
  */
-async function sendVerificationOtp(email: string): Promise<void> {
-  const anon = requireAnonClient();
-  if (!anon) return;
-  try {
-    await anon.auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
-  } catch {
-    // best-effort — the resend endpoint exists for re-delivery.
-  }
+async function sendVerificationOtp(
+  supabase: Service,
+  email: string,
+  name?: string,
+  userId?: string | null,
+): Promise<boolean> {
+  const result = await issueVerificationCode(supabase, { email, name, userId });
+  return result.sent;
 }
 
 function duplicateAccount() {
@@ -46,6 +46,7 @@ async function findRegistrationByEmail(
 function toApplicationPayload(
   row: { id: string; status: string; createdAt: string },
   email: string,
+  emailSent?: boolean,
 ) {
   return {
     application: {
@@ -55,6 +56,7 @@ function toApplicationPayload(
       emailVerified: false,
       createdAt: row.createdAt,
     },
+    ...(emailSent !== undefined && { emailSent }),
   };
 }
 
@@ -96,7 +98,7 @@ async function attachDocument(
 }
 
 /**
- * POST /api/v1/auth/register — submit a membership application (public).
+ * POST /api/v1/auth/register - submit a membership application (public).
  * Idempotent per email: a retry while PENDING replays the same application
  * (200, no duplicate); a conflict with no application row completes the
  * interrupted registration (orphaned auth account) instead of stranding a
@@ -168,6 +170,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         res.status(status).json({ error });
         return;
       }
+      const emailSent = await sendVerificationOtp(
+        supabase,
+        email,
+        `${input.firstName} ${input.lastName}`.trim(),
+      );
       res.status(200).json(
         toApplicationPayload(
           {
@@ -176,6 +183,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             createdAt: String(existing.createdAt ?? new Date().toISOString()),
           },
           email,
+          emailSent,
         ),
       );
       return;
@@ -268,6 +276,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     email_confirm: false,
     user_metadata: { full_name: `${input.firstName} ${input.lastName}`.trim() },
   });
+  const createdUserId = (created.data as { user?: { id?: string } } | null)?.user?.id ?? null;
+  const applicantName = `${input.firstName} ${input.lastName}`.trim();
   const buildRegistrationRow = (now: string) => ({
     id: prefixedId('reg'),
     status: 'PENDING',
@@ -286,7 +296,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     programCode: (program as { code: string }).code,
     referralCode: input.referralCode?.trim() || null,
     qualificationAnswers: input.qualificationAnswers,
-    // Never persist upload bytes — only metadata (+ storagePath later).
+    // Never persist upload bytes - only metadata (+ storagePath later).
     governmentId: stripDocumentData(input.idDocument as Record<string, unknown>),
     submittedAt: now,
     createdAt: now,
@@ -301,7 +311,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // Lost race with a concurrent submit for the same email: replay it.
       const replay = await findRegistrationByEmail(supabase, email);
       if (replay && replay.status === 'PENDING') {
-        await sendVerificationOtp(email);
+        const emailSent = await sendVerificationOtp(supabase, email, applicantName);
         res.status(200).json(
           toApplicationPayload(
             {
@@ -310,6 +320,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
               createdAt: String(replay.createdAt ?? now),
             },
             email,
+            emailSent,
           ),
         );
         return true;
@@ -330,7 +341,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       res.status(status).json({ error });
       return true;
     }
-    await sendVerificationOtp(email);
+    const emailSent = await sendVerificationOtp(supabase, email, applicantName, createdUserId);
     res.status(201).json({
       application: {
         id: registration.id,
@@ -339,6 +350,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         emailVerified: false,
         createdAt: now,
       },
+      emailSent,
     });
     return true;
   };
@@ -350,7 +362,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const interrupted = await findRegistrationByEmail(supabase, email);
       if (interrupted) {
         if (interrupted.status === 'PENDING') {
-          await sendVerificationOtp(email);
+          const emailSent = await sendVerificationOtp(supabase, email, applicantName);
           res.status(200).json(
             toApplicationPayload(
               {
@@ -359,6 +371,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
                 createdAt: String(interrupted.createdAt ?? new Date().toISOString()),
               },
               email,
+              emailSent,
             ),
           );
           return;

@@ -55,7 +55,7 @@ function extractCmsPhotoIds(content: unknown, out = new Set<string>()): Set<stri
     obj.id.length >= 1 &&
     obj.alt.length >= 1
   ) {
-    // Heuristic: CmsPhoto is {id, alt} — Property/Category have id but no alt, CtaLink has label/to, so id+alt is distinctive
+    // Heuristic: CmsPhoto is {id, alt} - Property/Category have id but no alt, CtaLink has label/to, so id+alt is distinctive
     // Ensure we don't collect non-photo objects that happen to have id+alt (none in CMS schemas)
     out.add(obj.id);
   }
@@ -96,7 +96,7 @@ function getMarketingToolsCmsPath(id: string): string | null {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // CORS — same-origin + configured app origins only (no wildcard)
+  // CORS - same-origin + configured app origins only (no wildcard)
   setCors(res, req, 'GET,PUT,OPTIONS', 'Content-Type, Authorization, X-Requested-With');
   if (req.method === 'OPTIONS') {
     res.status(200).end();
@@ -143,7 +143,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       res.status(status).json({ error: env });
       return;
     }
-    // Return the content object directly (validated shape) — public fallback handles 404 upstream
+    // Return the content object directly (validated shape) - public fallback handles 404 upstream
     // Include version metadata via headers for admin UI if needed
     res.setHeader('X-CMS-Version', String((data as { version: number }).version ?? 1));
     res.status(200).json((data as { content: unknown }).content);
@@ -231,7 +231,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     } catch (e) {
       console.error(`[cms:${key}] realtime broadcast failed:`, (e as Error).message);
     }
-    // Feature 1: Successful save — now cleanup orphaned marketing-tools/cms images (server-side, service_role)
+    // Feature 1: Successful save - now cleanup orphaned marketing-tools/cms images (server-side, service_role)
     // Do not block response on cleanup failure; do not roll back CMS on cleanup error
     if (previousContent) {
       try {

@@ -4,7 +4,7 @@ import type { VercelRequest, VercelResponse } from '../_lib/http.js';
 import { requireService } from '../_lib/rest.js';
 
 /**
- * GET /health (+ /api/v1/health via the vercel.json rewrite) — liveness and a
+ * GET /health (+ /api/v1/health via the vercel.json rewrite) - liveness and a
  * lightweight DB readiness probe for operators. Never returns sensitive data.
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {

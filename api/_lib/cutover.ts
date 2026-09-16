@@ -10,7 +10,7 @@ import { z } from 'zod';
 
 /**
  * B7 cutover helpers (Phase B7): voucher/catalog request validation, category
- * merging, voucher code generation. Pure functions — unit-tested. Row
+ * merging, voucher code generation. Pure functions - unit-tested. Row
  * mappers live in pipeline.ts / money.ts.
  */
 

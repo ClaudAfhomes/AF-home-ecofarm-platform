@@ -1,4 +1,4 @@
--- Location verifications — FEAT-014 / BR-GEO-001..004.
+-- Location verifications - FEAT-014 / BR-GEO-001..004.
 -- BE-authoritative: GPS primary → IP fallback via Vercel header. No external provider invented.
 -- PH → DOMESTIC, non-PH → ABROAD is isolated in app BE mapping function (see api/v1/registration/location-verify.ts).
 -- No accuracy/anti-spoof/location-exceptions yet (OD-014/015 deferred, BR-GEO-005/006 TBD).

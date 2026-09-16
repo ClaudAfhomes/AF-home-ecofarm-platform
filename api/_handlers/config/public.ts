@@ -4,7 +4,7 @@ import { methodNotAllowed, requireService } from '../../_lib/rest.js';
 
 const DEFAULT_GENDERS = ['Male', 'Female', 'Others'];
 
-/** GET /config/public — non-sensitive parameters only (API-SPECIFICATION #81). */
+/** GET /config/public - non-sensitive parameters only (API-SPECIFICATION #81). */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');

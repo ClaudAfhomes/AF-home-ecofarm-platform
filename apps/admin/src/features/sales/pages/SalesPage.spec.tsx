@@ -27,7 +27,7 @@ describe('SalesPage', () => {
     renderWithProviders(<SalesPage />, { user: MOCK_ADMIN });
     await screen.findAllByText('250 SQM Farm Lot with Hotspring');
     expect(
-      screen.getAllByText('Prisma Residences – Celeste Building Condo').length,
+      screen.getAllByText('Prisma Residences - Celeste Building Condo').length,
     ).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('Juan Dela Cruz').length).toBeGreaterThanOrEqual(1);
     // Customer column removed; seller id no longer shown under the name.

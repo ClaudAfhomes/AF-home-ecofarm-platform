@@ -7,7 +7,7 @@ import type { VercelRequest, VercelResponse } from '../../_lib/http.js';
 import { methodNotAllowed, okList, requireService } from '../../_lib/rest.js';
 
 /**
- * GET /admin/conversations — staff inbox (API-SPECIFICATION #90): one row
+ * GET /admin/conversations - staff inbox (API-SPECIFICATION #90): one row
  * per member with a thread, newest activity first. Page-based (`?page=`,
  * `?pageSize=` default 50, max 100). Module-gated `messages`.
  */

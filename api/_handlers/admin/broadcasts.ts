@@ -6,9 +6,9 @@ import { isValidNotificationRow, mapNotificationRow } from '../../_lib/mappers.j
 import { methodNotAllowed, okList, requireService } from '../../_lib/rest.js';
 
 /**
- * GET /admin/broadcasts — every broadcast announcement (Notification rows
+ * GET /admin/broadcasts - every broadcast announcement (Notification rows
  * with member_id NULL), newest first. Powers the admin Broadcasts composer
- * (SCR-ADM-016). Member-scoped rows are out of scope — admins manage
+ * (SCR-ADM-016). Member-scoped rows are out of scope - admins manage
  * announcements here, not per-member notifications.
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {

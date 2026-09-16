@@ -1,5 +1,5 @@
 import type { AdminQueues } from '@jad/contracts';
-import { EmptyState, ErrorState, Icon, PageHeader, Skeleton, StatusChip } from '@jad/ui';
+import { EmptyState, ErrorState, Icon, PageHeader, Skeleton, Spinner, StatusChip } from '@jad/ui';
 import { Link } from 'react-router';
 
 import { canAccess, findNavItem, ROLE_LABELS } from '../../../app/navigation';
@@ -37,7 +37,7 @@ const QUEUE_LINKS: {
   },
 ];
 
-/** Total-members stat card — a head-count snapshot, not a pending queue. */
+/** Total-members stat card - a head-count snapshot, not a pending queue. */
 const MEMBER_STAT: {
   to: string;
   label: string;
@@ -52,7 +52,7 @@ const MEMBER_STAT: {
   description: 'Total registered members',
 };
 
-/** Dashboard queue card — professional SaaS style with icon, count, and navigation. */
+/** Dashboard queue card - professional SaaS style with icon, count, and navigation. */
 function QueueCard({
   to,
   label,
@@ -96,7 +96,7 @@ function QueueCard({
   );
 }
 
-/** Dashboard — total-members stat plus pending-action counts per queue the role may access. */
+/** Dashboard - total-members stat plus pending-action counts per queue the role may access. */
 export function DashboardPage() {
   const { role } = useSession();
   const { data, isPending, isError, error, refetch } = useAdminQueues();
@@ -116,7 +116,7 @@ export function DashboardPage() {
   const roleLabel = role ? (ROLE_LABELS[role] ?? role) : null;
   const description =
     !isPending && data && roleLabel
-      ? `Welcome back, ${roleLabel} — ${sum} pending`
+      ? `Welcome back, ${roleLabel} - ${sum} pending`
       : 'Pending action queues for your role';
   const allClear =
     !isPending &&
@@ -129,18 +129,23 @@ export function DashboardPage() {
       <PageHeader title="Dashboard" description={description} />
       <p className={styles.timeframe}>As of today</p>
       {isPending ? (
-        <ul className={styles.queues} role="status" aria-live="polite" aria-busy="true">
-          {memberVisible ? (
-            <li key={MEMBER_STAT.to}>
-              <Skeleton className={styles.card} />
-            </li>
-          ) : null}
-          {visible.map((queue) => (
-            <li key={queue.to}>
-              <Skeleton className={styles.card} />
-            </li>
-          ))}
-        </ul>
+        <>
+          <p className={styles.loadingRow} role="status" aria-live="polite" aria-busy="true">
+            <Spinner size="sm" /> Loading queues…
+          </p>
+          <ul className={styles.queues} aria-hidden="true">
+            {memberVisible ? (
+              <li key={MEMBER_STAT.to}>
+                <Skeleton className={styles.card} />
+              </li>
+            ) : null}
+            {visible.map((queue) => (
+              <li key={queue.to}>
+                <Skeleton className={styles.card} />
+              </li>
+            ))}
+          </ul>
+        </>
       ) : isError ? (
         <ErrorState error={error} onRetry={refetch} />
       ) : (

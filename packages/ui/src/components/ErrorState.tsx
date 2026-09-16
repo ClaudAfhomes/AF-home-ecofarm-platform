@@ -6,7 +6,7 @@ export interface ErrorStateProps {
   error?: unknown;
   title?: string;
   message?: string;
-  /** Correlation `requestId` (API-SPECIFICATION §3) — no PII (NFR-CONF-001). */
+  /** Correlation `requestId` (API-SPECIFICATION §3) - no PII (NFR-CONF-001). */
   requestId?: string;
   onRetry?: () => void;
 }

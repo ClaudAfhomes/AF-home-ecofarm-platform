@@ -4,7 +4,7 @@
 -- members use ACTIVE/INACTIVE (accountStatusSchema) while staff rows use
 -- ACTIVE/DISABLED (staffStatusSchema, stored on the same column). The 2A
 -- CHECK only allowed the member pair, which wrongly rejects seeded Disabled
--- staff (e.g. stf-005 Leo Tan) — the constraint itself surfaced this during
+-- staff (e.g. stf-005 Leo Tan) - the constraint itself surfaced this during
 -- seeding. Widen to the union; garbage is still rejected.
 -- Idempotent. Down: restore the two-value check.
 

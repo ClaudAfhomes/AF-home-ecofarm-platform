@@ -6,10 +6,12 @@ import {
   Dialog,
   PageHeader,
   QrCode,
+  Spinner,
   StatusChip,
   Tabs,
   getInitials,
-  useToast,
+  notifyError,
+  notifySuccess,
 } from '@jad/ui';
 import { formatMoney, isExpired } from '@jad/shared';
 import type { VoucherAssignment } from '@jad/contracts';
@@ -38,7 +40,6 @@ const INPUT_MODE_TABS = [
 
 export function ScanVoucherPage() {
   const navigate = useNavigate();
-  const { toast } = useToast();
   const scanMutation = useScanVoucher();
   const redeemMutation = useRedeemVoucher();
   const [mode, setMode] = useState<InputMode>('camera');
@@ -97,16 +98,15 @@ export function ScanVoucherPage() {
       const updated = await redeemMutation.mutateAsync(stage.voucher.id);
       setStage({ kind: 'result', voucher: updated });
       setConfirmOpen(false);
-      toast({
+      notifySuccess({
         title: 'Voucher redeemed',
         message: `${code} (${memberName}) redeemed in full.`,
-        tone: 'success',
       });
     } catch (e) {
       const message = (e as Error).message;
       setStage({ kind: 'error', message });
       setConfirmOpen(false);
-      toast({ title: 'Redemption failed', message, tone: 'danger' });
+      notifyError({ title: 'Redemption failed', message });
     } finally {
       setRedeeming(false);
     }
@@ -244,7 +244,11 @@ export function ScanVoucherPage() {
 
         <div className={styles.resultCard} aria-live="polite">
           {stage.kind === 'idle' ? <p className={styles.placeholder}>Waiting for a scan…</p> : null}
-          {stage.kind === 'loading' ? <p role="status">Looking up voucher…</p> : null}
+          {stage.kind === 'loading' ? (
+            <p role="status" className={styles.loadingRow}>
+              <Spinner size="sm" /> Looking up voucher…
+            </p>
+          ) : null}
           {stage.kind === 'error' ? (
             <p role="alert" className={styles.error}>
               {stage.message}
@@ -289,7 +293,7 @@ export function ScanVoucherPage() {
 }
 
 /**
- * Camera pane — mounted only while the Camera tab is active so the stream
+ * Camera pane - mounted only while the Camera tab is active so the stream
  * starts and stops with the tab (unmount cleanup releases the camera).
  */
 function CameraView({ onDecode }: { onDecode: (code: string) => void }) {
@@ -351,7 +355,7 @@ function scannerHint(status: ScannerStatus): string {
     case 'requesting':
       return 'Requesting camera access…';
     case 'running':
-      return 'Scanning — keep the QR code inside the view.';
+      return 'Scanning - keep the QR code inside the view.';
     case 'error':
       return `${status.message} Switch to Manual or Upload to verify a voucher.`;
     default:
@@ -405,7 +409,7 @@ function VoucherResult({
         </div>
         {redeemed ? (
           <p className={styles.success}>
-            Redeemed{voucher.redeemedAt ? ` on ${formatDate(voucher.redeemedAt)}` : ''} — remaining
+            Redeemed{voucher.redeemedAt ? ` on ${formatDate(voucher.redeemedAt)}` : ''} - remaining
             value is 0.00.
           </p>
         ) : null}

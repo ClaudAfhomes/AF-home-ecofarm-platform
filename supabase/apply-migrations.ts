@@ -1,9 +1,9 @@
 /**
- * `pnpm db:migrate` — apply pending Supabase migrations in filename order and
+ * `pnpm db:migrate` - apply pending Supabase migrations in filename order and
  * self-verify the result.
  *
  * Connects via `DATABASE_URL` (transaction pooler connection string from the
- * Dashboard — `db.<ref>.supabase.co` no longer resolves). Records applied
+ * Dashboard - `db.<ref>.supabase.co` no longer resolves). Records applied
  * versions in `supabase_migrations.schema_migrations` (the Supabase CLI
  * convention) so `supabase db push` and this runner agree, and re-applying is
  * a no-op. Idempotent: each `.sql` file is written with `if not exists` /

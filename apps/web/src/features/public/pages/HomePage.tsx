@@ -91,7 +91,7 @@ const TRUST_ICONS = [
   </svg>,
 ];
 
-/** Public Home / landing page — CMS-driven with static fallback (Q6). */
+/** Public Home / landing page - CMS-driven with static fallback (Q6). */
 export function HomePage() {
   const { data: cms } = useQuery({
     queryKey: ['cms', 'homepage'],

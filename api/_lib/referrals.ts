@@ -1,6 +1,6 @@
 /**
  * Referral tree helpers (Phase B7): pure adjacency builders over
- * `{ id, sponsorId }` rows. Cycle-guarded — a corrupt link terminates the
+ * `{ id, sponsorId }` rows. Cycle-guarded - a corrupt link terminates the
  * branch instead of recursing forever.
  */
 
@@ -29,7 +29,7 @@ export function descendantsOf<T extends SponsorRow>(rows: T[], rootId: string): 
 }
 
 /**
- * Upline chain of a member — from the topmost reachable ancestor down to the
+ * Upline chain of a member - from the topmost reachable ancestor down to the
  * direct sponsor, excluding the member itself. Cycle-guarded and depth-capped
  * (a corrupt sponsor link terminates the chain instead of looping).
  */

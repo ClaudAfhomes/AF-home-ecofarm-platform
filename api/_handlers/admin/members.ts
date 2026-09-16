@@ -17,7 +17,7 @@ function validEmail(email: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-/** GET /admin/members — roster excluding archived. POST — create with auth account. */
+/** GET /admin/members - roster excluding archived. POST - create with auth account. */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
@@ -231,7 +231,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if (isReferralCodeConflict(memberResult.error)) {
         const { error, status } = toErrorEnvelope(
           'CONFLICT',
-          'Referral code collision — retry member creation.',
+          'Referral code collision - retry member creation.',
           409,
         );
         res.status(status).json({ error });
@@ -261,7 +261,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       targetName: `${firstName} ${lastName}`,
       detail: `Created member ${firstName} ${lastName}`,
     });
-    // Return the full created row — the client validates POST responses
+    // Return the full created row - the client validates POST responses
     // against adminMemberSchema, so a partial shape would fail parsing
     // AFTER a successful create (phantom member + stuck form).
     const { data: createdRow, error: readBackError } = await supabase

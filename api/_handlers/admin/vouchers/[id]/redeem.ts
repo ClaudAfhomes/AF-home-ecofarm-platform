@@ -9,7 +9,7 @@ import { methodNotAllowed, requireService } from '../../../../_lib/rest.js';
 import { toErrorEnvelope } from '../../../../_lib/envelope.js';
 
 /**
- * POST /admin/vouchers/:id/redeem — confirm a scan and redeem the voucher in
+ * POST /admin/vouchers/:id/redeem - confirm a scan and redeem the voucher in
  * full (super_admin, admin). Single conditional UPDATE (status ACTIVE only)
  * so concurrent confirmations cannot double-redeem; remaining value goes to
  * '0.00' and the redemption is stamped + audited.
@@ -95,7 +95,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     actorRole: auth.slugs[0] ?? 'admin',
     targetType: 'Voucher',
     targetId: id,
-    targetName: `${String(current.title ?? id)} — ${String(current.memberName ?? '')}`,
+    targetName: `${String(current.title ?? id)} - ${String(current.memberName ?? '')}`,
     detail: `Redeemed voucher ${String(current.code ?? id)} for ${String(current.memberName ?? '')}`,
   });
   const validated = voucherAssignmentSchema.safeParse(mapVoucherAssignmentRow(redeemed));

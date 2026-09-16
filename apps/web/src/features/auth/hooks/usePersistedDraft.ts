@@ -34,7 +34,7 @@ function loadPersistedDraft(): Partial<RegistrationDraft> | null {
     const raw = sessionStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as Partial<RegistrationDraft>;
-    // basic shape validation — ensure at least one known field
+    // basic shape validation - ensure at least one known field
     if (typeof parsed !== 'object' || parsed === null) return null;
     return parsed;
   } catch {
@@ -50,7 +50,7 @@ function savePersistedDraft(draft: RegistrationDraft): void {
     }
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify(draft));
   } catch {
-    // storage may be unavailable (e.g., private mode) — ignore
+    // storage may be unavailable (e.g., private mode) - ignore
   }
 }
 

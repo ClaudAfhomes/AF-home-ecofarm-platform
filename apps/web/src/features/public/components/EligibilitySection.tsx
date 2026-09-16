@@ -4,7 +4,7 @@ import { usePublicConfig } from '../hooks/usePublicConfig';
 import styles from './EligibilitySection.module.css';
 
 /**
- * Live public config — `GET /config/public` (PUBLIC, FEAT-005 / FR-ADM-001).
+ * Live public config - `GET /config/public` (PUBLIC, FEAT-005 / FR-ADM-001).
  * Renders the minimum-age parameter the public site legitimately consumes.
  * Config values are never hard-coded (BR-CFG-001, BR-REG-011).
  */

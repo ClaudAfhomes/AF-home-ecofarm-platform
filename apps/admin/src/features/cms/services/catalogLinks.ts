@@ -4,7 +4,7 @@ import type { PropertyCategory } from '../../catalog/services/catalog';
 
 /**
  * Link-by-reference resolution between CMS entries and the catalog
- * system-of-record (read-time only — resolving never writes anything).
+ * system-of-record (read-time only - resolving never writes anything).
  *
  * Precedence per entry: an explicit link (`catalogId` / `catalogSlug`) wins;
  * otherwise the entry auto-matches when its own id/slug equals a catalog

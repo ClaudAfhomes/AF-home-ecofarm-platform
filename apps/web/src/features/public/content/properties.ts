@@ -7,7 +7,7 @@ import type { Photo, Pillar, Property, PropertyCategory } from './types';
  * A static catalog of the current listings from the legacy website (supplied
  * by the project owner): named units, exact prices and availability, tenant
  * status, and descriptions. Rendered through the same premium browsing
- * experience as the site — no backend, database, or API yet. Gallery imagery
+ * experience as the site - no backend, database, or API yet. Gallery imagery
  * is representative stock photography, never a claim that a specific unit is
  * exactly represented.
  */
@@ -30,7 +30,7 @@ export const PROPERTY_CATEGORIES = [
     slug: 'income-generating-properties',
     title: 'Income Generating Properties',
     shortDescription:
-      'Titled hotspring lots in Laguna with a long-term lease already in place — ownership that earns from day one.',
+      'Titled hotspring lots in Laguna with a long-term lease already in place - ownership that earns from day one.',
     description:
       'Individual resale of a titled lot in Laguna with the long-term lease already in place. Title and ownership lead; the rent is stated as a fact of the existing lease, never a promise.',
     image: CATEGORY_IMAGES.landLeisure,
@@ -41,7 +41,7 @@ export const PROPERTY_CATEGORIES = [
     shortDescription:
       'Accredited broker for licensed developer projects, connecting clients to vetted project opportunities.',
     description:
-      'Accredited broker for licensed developer projects — e.g., Mountain View Leisure Community, Nasugbu (LTS No. 0001950).',
+      'Accredited broker for licensed developer projects - e.g., Mountain View Leisure Community, Nasugbu (LTS No. 0001950).',
     image: CATEGORY_IMAGES.commercial,
   },
 ] satisfies PropertyCategory[];
@@ -69,7 +69,7 @@ export const PROPERTY_RECORDS = [
       'Price: ₱1.2M negotiable',
       'Natural hot spring property',
       'Earn rental income from day 1',
-      'Clean title – ready for transfer under your name',
+      'Clean title - ready for transfer under your name',
     ],
     gallery: PROPERTY_IMAGES['igp-lots'],
   },
@@ -80,21 +80,21 @@ export const PROPERTY_RECORDS = [
     location: 'Laguna',
     price: '2000000.00',
     keyFacts: [
-      { label: 'Lot area', value: '520 m² – 3 lots available' },
-      { label: 'Lot area', value: '500 m² – 2 lots available' },
-      { label: 'Price', value: '₱2M–₱2.5M' },
+      { label: 'Lot area', value: '520 m² - 3 lots available' },
+      { label: 'Lot area', value: '500 m² - 2 lots available' },
+      { label: 'Price', value: '₱2M-₱2.5M' },
     ],
     characteristics: ['520 m²', '500 m²', 'Tenanted'],
     overview: [
       'Own a prime hot spring property with existing tenants and enjoy rental income from day one.',
-      'Secure your investment today — message us now for more details or to schedule a site viewing.',
+      'Secure your investment today - message us now for more details or to schedule a site viewing.',
     ],
     highlights: [
-      '520 sqm – 3 lots available',
-      '500 sqm – 2 lots available',
-      'Price: ₱2M–₱2.5M',
+      '520 sqm - 3 lots available',
+      '500 sqm - 2 lots available',
+      'Price: ₱2M-₱2.5M',
       'Titled & ready for transfer',
-      'Currently tenanted – immediate rental income',
+      'Currently tenanted - immediate rental income',
     ],
     gallery: PROPERTY_IMAGES['income-generating-lots-500-520-sqm'],
   },
@@ -112,13 +112,13 @@ export const PROPERTY_RECORDS = [
     characteristics: ['1,000 m²', '4 lots', 'Hotspring', 'Direct owner resale'],
     overview: [
       'Own a 1,000 sqm titled hot spring lot with an existing tenant, providing immediate rental income from day one.',
-      'Don’t miss this rare investment opportunity — only 4 lots available. Message us today for complete details or to schedule a site viewing.',
+      'Don’t miss this rare investment opportunity - only 4 lots available. Message us today for complete details or to schedule a site viewing.',
     ],
     highlights: [
       '1,000 sqm lot area (4 lots available)',
       'Price: ₱4,000,000 only',
-      'Clean title – ready for transfer',
-      'Currently tenanted – earn monthly rental income',
+      'Clean title - ready for transfer',
+      'Currently tenanted - earn monthly rental income',
       'Genuine hotspring property',
       'Individual titled lot',
       'Direct owner resale',
@@ -127,7 +127,7 @@ export const PROPERTY_RECORDS = [
   },
   {
     id: 'prisma-celeste-8-6m',
-    name: 'Prisma Residences – Celeste Building Condo',
+    name: 'Prisma Residences - Celeste Building Condo',
     categoryId: 'tenanted-condo-resales',
     location: 'Pasig City',
     price: '8600000.00',
@@ -135,11 +135,11 @@ export const PROPERTY_RECORDS = [
       { label: 'Bedrooms', value: '2' },
       { label: 'Floor area', value: '56 m²' },
       { label: 'Price', value: 'From ₱8.6 million' },
-      { label: 'Lease', value: 'Tenanted – active lease contract' },
+      { label: 'Lease', value: 'Tenanted - active lease contract' },
     ],
     characteristics: ['2 bd', '56 m²', 'RFO', 'With tenant'],
     overview: [
-      '2-bedroom condominium unit at Prisma Residences – Celeste Building, ready for occupancy (RFO) with an existing tenant and active lease contract — an income-generating unit.',
+      '2-bedroom condominium unit at Prisma Residences - Celeste Building, ready for occupancy (RFO) with an existing tenant and active lease contract - an income-generating unit.',
       'Ideal for investors or end-users looking for a premium property in a prime location.',
     ],
     highlights: [
@@ -154,7 +154,7 @@ export const PROPERTY_RECORDS = [
   },
   {
     id: 'levina-place-2br',
-    name: 'Levina Place – 2BR Condo',
+    name: 'Levina Place - 2BR Condo',
     categoryId: 'tenanted-condo-resales',
     location: 'Pasig City',
     price: '5500000.00',
@@ -162,12 +162,12 @@ export const PROPERTY_RECORDS = [
       { label: 'Bedrooms', value: '2' },
       { label: 'Bathrooms', value: '1' },
       { label: 'Price', value: 'From ₱5.5 million' },
-      { label: 'Lease', value: 'Tenanted – active lease contract' },
+      { label: 'Lease', value: 'Tenanted - active lease contract' },
     ],
     characteristics: ['2 bd', '1 ba', 'RFO', 'With tenant'],
     overview: [
       '2-bedroom condominium unit at Levina Place, ready for occupancy (RFO) with an existing tenant and active lease contract.',
-      'Direct owner sale with clean title — ideal for investors seeking passive income or end-users looking for a prime property in a convenient location.',
+      'Direct owner sale with clean title - ideal for investors seeking passive income or end-users looking for a prime property in a convenient location.',
     ],
     highlights: [
       'Ready for occupancy (RFO)',
@@ -183,7 +183,7 @@ export const PROPERTY_RECORDS = [
   },
   {
     id: 'prisma-celeste-8-3m',
-    name: 'Prisma Residences – Celeste Building Condo',
+    name: 'Prisma Residences - Celeste Building Condo',
     categoryId: 'tenanted-condo-resales',
     location: 'Pasig City',
     price: '8300000.00',
@@ -191,11 +191,11 @@ export const PROPERTY_RECORDS = [
       { label: 'Bedrooms', value: '2' },
       { label: 'Floor area', value: '56 m²' },
       { label: 'Price', value: 'From ₱8.3 million' },
-      { label: 'Lease', value: 'Tenanted – active lease contract' },
+      { label: 'Lease', value: 'Tenanted - active lease contract' },
     ],
     characteristics: ['2 bd', '56 m²', 'RFO', 'With tenant'],
     overview: [
-      '2-bedroom condominium unit at Prisma Residences – Celeste Building, ready for occupancy (RFO) with an existing tenant and active lease contract.',
+      '2-bedroom condominium unit at Prisma Residences - Celeste Building, ready for occupancy (RFO) with an existing tenant and active lease contract.',
       'Located in the prestigious Prisma Residences by DMCI Homes.',
     ],
     highlights: [
@@ -210,7 +210,7 @@ export const PROPERTY_RECORDS = [
   },
   {
     id: 'prisma-astra-1br',
-    name: 'Prisma Residences – Astra Building Condo',
+    name: 'Prisma Residences - Astra Building Condo',
     categoryId: 'tenanted-condo-resales',
     location: 'Pasig City',
     price: '5300000.00',
@@ -219,11 +219,11 @@ export const PROPERTY_RECORDS = [
       { label: 'Floor area', value: '28 m²' },
       { label: 'Parking', value: 'N/A' },
       { label: 'Price', value: 'From ₱5.3 million' },
-      { label: 'Lease', value: 'Tenanted – active lease contract' },
+      { label: 'Lease', value: 'Tenanted - active lease contract' },
     ],
     characteristics: ['1 bd', '28 m²', 'RFO', 'With tenant'],
     overview: [
-      '1-bedroom condominium unit at Prisma Residences – Astra Building, ready for occupancy (RFO) with an existing tenant and active lease contract.',
+      '1-bedroom condominium unit at Prisma Residences - Astra Building, ready for occupancy (RFO) with an existing tenant and active lease contract.',
       'Located in the vibrant Prisma Residences community by DMCI Homes.',
     ],
     highlights: [
@@ -247,7 +247,7 @@ export const PROPERTY_RECORDS = [
       { label: 'Lot area', value: '25 m²' },
       { label: 'Floor area', value: '38 m²' },
       { label: 'Price', value: 'From ₱3.2 million' },
-      { label: 'Lease', value: 'Tenanted – active lease contract' },
+      { label: 'Lease', value: 'Tenanted - active lease contract' },
     ],
     characteristics: ['2-storey', '2 bd', '25 m² lot', 'With tenant'],
     overview: [
@@ -280,8 +280,8 @@ export const PROPERTY_RECORDS = [
     ],
     characteristics: ['₱6,860/sqm', '7 years to pay', 'LTS No. 0001950'],
     overview: [
-      'Invest in serenity — own a prime elevated property in Nasugbu at Mountain View Leisure Community. Lots start at ₱6,860/sqm, with up to 7 years to pay.',
-      'Your investment is secure and protected: LTS No. 0001950, TLS No. 108 & 109, COR 0003812 & 0003813. Message us for full details — limited lots available — or schedule a site viewing.',
+      'Invest in serenity - own a prime elevated property in Nasugbu at Mountain View Leisure Community. Lots start at ₱6,860/sqm, with up to 7 years to pay.',
+      'Your investment is secure and protected: LTS No. 0001950, TLS No. 108 & 109, COR 0003812 & 0003813. Message us for full details - limited lots available - or schedule a site viewing.',
     ],
     highlights: [
       'Prime elevated property in Nasugbu',
@@ -307,8 +307,8 @@ export const PROPERTY_RECORDS = [
     ],
     characteristics: ['₱6,860/sqm', 'LTS No. 0001950'],
     overview: [
-      'Own a prime elevated property in Nasugbu at Mountain Suites — part of Mountain View Leisure Farm and Resort.',
-      'Where prime living meets breathtaking views. Message us for full details — limited lots available.',
+      'Own a prime elevated property in Nasugbu at Mountain Suites - part of Mountain View Leisure Farm and Resort.',
+      'Where prime living meets breathtaking views. Message us for full details - limited lots available.',
     ],
     highlights: [
       'Part of Mountain View Leisure Farm and Resort',
@@ -325,7 +325,7 @@ export const PROPERTY_RECORDS = [
 export const PROPERTIES = {
   eyebrow: 'Properties',
   title: 'Properties & Listings',
-  lead: 'Explore the types of properties we specialize in. Every opportunity is presented individually, with full documentation and due diligence — talk with us about what you are looking for.',
+  lead: 'Explore the types of properties we specialize in. Every opportunity is presented individually, with full documentation and due diligence - talk with us about what you are looking for.',
   hero: {
     eyebrow: 'Properties',
     image: HERO_IMAGES.properties,
@@ -334,7 +334,7 @@ export const PROPERTIES = {
   intro: {
     eyebrow: 'Browse by category',
     title: 'What we specialize in',
-    lead: 'Pick a category to explore our current listings — every opportunity is presented individually, with complete documentation.',
+    lead: 'Pick a category to explore our current listings - every opportunity is presented individually, with complete documentation.',
   },
   featured: {
     eyebrow: 'Featured listings',
@@ -348,7 +348,7 @@ export const PROPERTIES = {
     steps: [
       {
         title: 'Every opportunity, presented individually',
-        body: 'Each property is presented with full documentation and due diligence — one opportunity at a time.',
+        body: 'Each property is presented with full documentation and due diligence - one opportunity at a time.',
       },
       {
         title: 'Documents reviewed, details explained',
@@ -362,13 +362,13 @@ export const PROPERTIES = {
   },
   cta: {
     title: 'Looking for a specific kind of property?',
-    lead: 'Talk with JA&D Realty Services and tell us what you are looking for — we will match you with the right opportunity.',
+    lead: 'Talk with JA&D Realty Services and tell us what you are looking for - we will match you with the right opportunity.',
     primaryCta: { label: 'Talk to Us', to: '/contact' },
   },
 };
 
 /* ---------------------------------------------------------------------------
- * Selectors — the UI derives listings from the catalog instead of duplicating
+ * Selectors - the UI derives listings from the catalog instead of duplicating
  * records. Future API integration can swap these implementations without
  * touching the components.
  * ------------------------------------------------------------------------- */

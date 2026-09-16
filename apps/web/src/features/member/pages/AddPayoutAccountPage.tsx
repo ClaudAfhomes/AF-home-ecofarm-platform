@@ -83,16 +83,16 @@ export function AddPayoutAccountPage() {
       if (!bankName.trim()) nextErrors.bankName = 'Enter the bank name.';
       if (!idTrimmed) nextErrors.accountIdentifier = 'Enter your bank account number.';
       else if (!BANK_ACCOUNT_RE.test(idTrimmed))
-        nextErrors.accountIdentifier = 'Enter a valid 10–12 digit account number.';
+        nextErrors.accountIdentifier = 'Enter a valid 10-12 digit account number.';
     } else if (method === 'DIGITAL_BANK') {
       if (!bankName.trim()) nextErrors.bankName = 'Enter the bank / e-wallet name.';
       if (!idTrimmed) nextErrors.accountIdentifier = 'Enter your account number.';
       else if (!BANK_ACCOUNT_RE.test(idTrimmed))
-        nextErrors.accountIdentifier = 'Enter a valid 10–12 digit account number.';
+        nextErrors.accountIdentifier = 'Enter a valid 10-12 digit account number.';
     } else if (method === 'OTHER') {
       if (!idTrimmed) nextErrors.accountIdentifier = 'Enter the account identifier.';
       else if (!ALPHANUMERIC_RE.test(idTrimmed))
-        nextErrors.accountIdentifier = 'Enter 8–34 alphanumeric characters.';
+        nextErrors.accountIdentifier = 'Enter 8-34 alphanumeric characters.';
     }
 
     setErrors(nextErrors);
@@ -283,7 +283,7 @@ export function AddPayoutAccountPage() {
               hint={
                 isGcash
                   ? 'Format: 09 followed by 9 digits.'
-                  : 'Stored securely — only a masked version is shown after submission.'
+                  : 'Stored securely - only a masked version is shown after submission.'
               }
             />
           </div>

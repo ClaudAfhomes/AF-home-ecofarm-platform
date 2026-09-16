@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import { ConfirmDialog, ErrorState, PageHeader, Skeleton } from '@jad/ui';
+import { ConfirmDialog, ErrorState, notifySuccess, PageHeader, Skeleton } from '@jad/ui';
 import {
   registerContentSchema,
   type RegisterQualificationQuestion,
@@ -258,7 +258,7 @@ export function CmsRegisterPage() {
     setSaveMessage(null);
     update.mutate(draft, {
       onSuccess: () => {
-        setSaveMessage('All changes saved');
+        notifySuccess({ title: 'Changes saved' });
         setLastSaved(new Date().toISOString());
       },
       onError: (err: unknown) => {
@@ -353,7 +353,7 @@ export function CmsRegisterPage() {
 
       <div className={styles.stack}>
         {saveMessage ? (
-          <p className={styles.saveNote} role="status">
+          <p className={styles.saveNote} role="alert">
             {saveMessage}
           </p>
         ) : null}
@@ -487,7 +487,7 @@ export function CmsRegisterPage() {
           id="qualification"
           index={4}
           title="Qualification Questions"
-          description="Yes/No questions shown after the program step, split by program track (Domestic / Abroad). Content only — the public app decides which track to show."
+          description="Yes/No questions shown after the program step, split by program track (Domestic / Abroad). Content only - the public app decides which track to show."
           dirty={dirty && sectionDirty('qualification')}
           collapsible
           open={isOpen('qualification')}

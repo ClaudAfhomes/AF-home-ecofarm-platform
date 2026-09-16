@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router';
 
 import { useQuery } from '@tanstack/react-query';
+import { useMediaQuery } from '@jad/ui';
 
 import { getGlobalCmsPublic } from '@/lib/cms';
 import { LOGO, SITE } from '../features/public/content';
@@ -15,7 +16,7 @@ import styles from './Header.module.css';
  * transparent over the hero (white JA&D logo + white links), then solid
  * deep-navy once scrolled or when the mobile menu is open, so content stays
  * readable on light surfaces (UI-UX §4.6). Property detail pages have no
- * hero backdrop, so the header is always solid brand blue there — as are the
+ * hero backdrop, so the header is always solid brand blue there - as are the
  * auth pages (Login/Register preview, no hero imagery).
  */
 export function Header() {
@@ -40,6 +41,7 @@ export function Header() {
   } as typeof LOGO;
   const logoSrc = (logo as { src?: string }).src ?? (logo as { id?: string }).id ?? LOGO.src;
   const siteName = globalCms?.brand?.name ?? SITE.name;
+  const isDesktop = useMediaQuery('(min-width: 1024px)');
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -47,6 +49,29 @@ export function Header() {
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
+
+  // The mobile panel is an overlay: close it on navigation and when the
+  // viewport grows back to the inline desktop nav (derived-state-during-render
+  // pattern - avoids a setState-in-effect cascading render).
+  const [lastRoute, setLastRoute] = useState({ pathname, isDesktop });
+  if (lastRoute.pathname !== pathname || lastRoute.isDesktop !== isDesktop) {
+    setLastRoute({ pathname, isDesktop });
+    if (menuOpen) setMenuOpen(false);
+  }
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setMenuOpen(false);
+    };
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [menuOpen]);
 
   const closeMenu = () => setMenuOpen(false);
   const onPropertyDetail = /^\/properties\/[^/]+\/[^/]+$/.test(pathname);
@@ -60,7 +85,7 @@ export function Header() {
           to="/"
           className={styles.brand}
           onClick={closeMenu}
-          aria-label={`${siteName} — home`}
+          aria-label={`${siteName} - home`}
         >
           <img
             src={logoSrc}

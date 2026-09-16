@@ -22,6 +22,7 @@ import { InboxPage } from '../features/messages/pages/InboxPage';
 import { ConversationPage } from '../features/messages/pages/ConversationPage';
 import { PoliciesPage } from '../features/policies/pages/PoliciesPage';
 import { PolicyDetailPage } from '../features/policies/pages/PolicyDetailPage';
+import { InquiriesPage } from '../features/inquiries/pages/InquiriesPage';
 import { MyAccountPage } from '../features/account/pages/MyAccountPage';
 import { ConfigPage } from '../features/config/pages/ConfigPage';
 import { AuditPage } from '../features/audit/pages/AuditPage';
@@ -215,6 +216,14 @@ export default function App() {
             element={
               <RequireRole>
                 <PolicyDetailPage />
+              </RequireRole>
+            }
+          />
+          <Route
+            path="/admin/inquiries"
+            element={
+              <RequireRole>
+                <InquiriesPage />
               </RequireRole>
             }
           />

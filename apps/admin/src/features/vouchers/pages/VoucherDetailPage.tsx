@@ -85,7 +85,7 @@ export function VoucherDetailPage() {
     <section>
       <PageHeader
         title={template.title}
-        description={`Voucher definition worth ${formatMoney(template.originalValue)} — assign to members to issue unique codes and QR codes`}
+        description={`Voucher definition worth ${formatMoney(template.originalValue)} - assign to members to issue unique codes and QR codes`}
         actions={
           <>
             <Button variant="secondary" onClick={() => navigate('/admin/vouchers')}>
@@ -447,7 +447,7 @@ export function VoucherDetailPage() {
       <Dialog
         open={qrOpen}
         onClose={() => setQrOpen(false)}
-        title={`QR code — ${detailTarget?.code ?? 'Voucher'}`}
+        title={`QR code - ${detailTarget?.code ?? 'Voucher'}`}
         footer={
           detailTarget ? (
             <button

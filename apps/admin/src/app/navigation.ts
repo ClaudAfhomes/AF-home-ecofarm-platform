@@ -8,7 +8,7 @@ import type { SidebarItem } from '@jad/ui';
  * sidebar link has a unique icon; sub-items share the category visual style.
  * The mock session drives which items render, and the same registry guards
  * route access (RequireRole).
- * PROPOSED paths — no SSOT defines admin route paths yet.
+ * PROPOSED paths - no SSOT defines admin route paths yet.
  */
 /** Dropdown sub-item with its own module for per-link RBAC filtering. */
 export interface AdminNavSubItem {
@@ -53,7 +53,7 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
     module: 'dashboard',
   },
 
-  /* Category: Members — Registration + Members as dropdown */
+  /* Category: Members - Registration + Members as dropdown */
   {
     to: '/admin/members',
     label: 'Members',
@@ -81,7 +81,7 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
     ],
   },
 
-  /* Flat: Properties — transactional catalog + Content as top-level links (no dropdown) */
+  /* Flat: Properties - transactional catalog + Content as top-level links (no dropdown) */
   {
     to: '/admin/properties',
     label: 'Properties',
@@ -146,6 +146,7 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
       { to: '/admin/cms/properties', label: 'Properties', module: 'cms' },
       { to: '/admin/cms/faqs', label: 'FAQs', module: 'cms' },
       { to: '/admin/cms/contact', label: 'Contact', module: 'cms' },
+      { to: '/admin/inquiries', label: 'Inquiries', module: 'cms' },
       { to: '/admin/cms/global', label: 'Global Content', module: 'cms' },
       { divider: true },
       { to: '/admin/cms/login', label: 'Login', module: 'cms' },
@@ -199,8 +200,8 @@ export function canAccess(role: Role | null, item: AdminNavItem): boolean {
 
 /**
  * Check whether a role id can access a nav item's module (records + matrix
- * fallback). `sessionModules` — when provided by the server-resolved
- * session — is authoritative and wins over records (see resolveRoleModules).
+ * fallback). `sessionModules` - when provided by the server-resolved
+ * session - is authoritative and wins over records (see resolveRoleModules).
  */
 export function canAccessModule(
   roleId: string | null,
