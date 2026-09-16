@@ -34,7 +34,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!supabase) return;
   const { data: member, error: memberError } = await supabase
     .from('Member')
-    .select('id,status,isQualified,dateOfBirth,registrationId')
+    .select('id,status,isQualified,dateOfBirth,registrationId,idVerified')
     .eq('id', auth.userId)
     .maybeSingle();
   if (memberError || !member) {
@@ -47,6 +47,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     isQualified?: boolean;
     dateOfBirth?: string | null;
     registrationId?: string | null;
+    idVerified?: boolean | null;
   };
   const [{ data: minAgeRow }, { data: registration }, { data: authUser }] = await Promise.all([
     supabase.from('SystemConfig').select('value').eq('key', 'QUALIFICATION_MIN_AGE').maybeSingle(),
@@ -80,7 +81,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const hasEmail = Boolean(authUserRow?.email);
   const phoneConfirmed = Boolean(authUserRow?.phone_confirmed_at);
   const identityVerified = hasEmail ? emailConfirmed : phoneConfirmed;
-  const idVerified = reg !== null && reg.governmentId !== null && reg.governmentId !== undefined;
+  // Government ID: the persistent Member.idVerified flag (set at approval,
+  // which is the manual ID gate; the Registration row holding governmentId is
+  // deleted on approval). For still-pending applications the linked
+  // Registration row is the evidence source.
+  const idVerified =
+    m.idVerified === true ||
+    (reg !== null && reg.governmentId !== null && reg.governmentId !== undefined);
   const adminApproved = m.status === 'APPROVED_ACTIVE';
   const qualificationMet = m.isQualified === true;
   const rejectionNote = reg?.rejectionNote as { reason?: unknown } | string | null | undefined;

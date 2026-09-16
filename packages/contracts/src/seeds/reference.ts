@@ -73,6 +73,12 @@ export const CONFIG_SEEDS: ConfigSeed[] = [
     category: 'Commissions',
   },
   {
+    key: 'COMMISSION_CLEARING_DAYS',
+    label: 'Commission Clearing Window (days)',
+    value: '7',
+    category: 'Commissions',
+  },
+  {
     key: 'MIN_WITHDRAWAL_AMOUNT',
     label: 'Minimum Withdrawal Amount',
     value: '100.00',

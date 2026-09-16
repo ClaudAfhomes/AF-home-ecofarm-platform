@@ -143,4 +143,27 @@ describe('GET /me/qualification', () => {
     const body = seen.body as { requirements: { key: string; met: boolean }[] };
     expect(body.requirements.find((r) => r.key === 'EMAIL_VERIFIED')?.met).toBe(true);
   });
+
+  it('marks ID_VERIFIED from the persistent Member flag after the Registration row is deleted', async () => {
+    // Approval deletes the Registration row (and its governmentId) — the
+    // Member.idVerified flag set at approval is the authoritative record.
+    mocks.script.member = { ...MEMBER, idVerified: true, registrationId: 'reg-001' };
+    mocks.script.registration = null;
+    mocks.script.authUser = emailUser(true);
+    const { res, seen } = capture();
+    await qualificationHandler(authedGet, res);
+    expect(seen.status).toBe(200);
+    const body = seen.body as { requirements: { key: string; met: boolean }[] };
+    expect(body.requirements.find((r) => r.key === 'ID_VERIFIED')?.met).toBe(true);
+  });
+
+  it('keeps ID_VERIFIED unmet when the flag is false and no Registration evidence exists', async () => {
+    mocks.script.member = { ...MEMBER, idVerified: false, registrationId: 'reg-001' };
+    mocks.script.registration = null;
+    mocks.script.authUser = emailUser(true);
+    const { res, seen } = capture();
+    await qualificationHandler(authedGet, res);
+    const body = seen.body as { requirements: { key: string; met: boolean }[] };
+    expect(body.requirements.find((r) => r.key === 'ID_VERIFIED')?.met).toBe(false);
+  });
 });

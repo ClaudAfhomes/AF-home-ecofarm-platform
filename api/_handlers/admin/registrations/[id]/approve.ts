@@ -214,6 +214,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     gender: (row.gender as string | undefined) ?? null,
     referralCode,
     sponsorId,
+    // Approval is the manual government-ID gate (BR-REG-003): the
+    // application carried the required ID and identity is confirmed above.
+    // Persist it — the Registration row (and its governmentId) is deleted
+    // below, and GET /me/qualification reads this flag.
+    idVerified: true,
     accountStatus: 'ACTIVE',
     registrationId: id,
   });

@@ -72,3 +72,16 @@ Legacy `F0 mock` (`superadmin@gmail.com` / `P@ssword`, localStorage `jad:mock:se
 - Money is exact-decimal **strings** from the API; format with `formatMoney` from `@jad/shared`. No float math anywhere.
 - No business logic in components; shared types/schemas only in `@jad/contracts`.
 - Formatting: prettier with `semi`, `singleQuote`, `printWidth: 100`, `trailingComma: all`.
+
+## Session handoff
+
+When the user says **"hand-off to `SESSION.md`"** (variants: "handoff", "hand off",
+"update the session file"), do this job automatically, no clarification needed:
+
+1. Summarize the current session into `SESSION.md`: what changed (code, migrations,
+   endpoints, routes), key decisions and why, verification status (typecheck/tests/build
+   results), production state (last deploy, live probes), and open items for next time.
+2. Preserve `SESSION.md`'s existing structure; update the date line; keep it tight but
+   include small load-bearing details (exact migration/handler names, cron schedules,
+   plan limits hit, gotchas like the `includeFiles` rule).
+3. Never paste secrets (keys, passwords, tokens) into `SESSION.md` or chat.

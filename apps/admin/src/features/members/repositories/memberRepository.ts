@@ -63,6 +63,8 @@ export interface CreateMemberInput {
   programCode: string;
   dateOfBirth: string;
   temporaryPassword: string;
+  /** Optional sponsor's referral CODE (not a uuid) — resolved server-side. */
+  referralCode?: string;
 }
 
 export async function createMember(input: CreateMemberInput): Promise<AdminMember> {
@@ -70,6 +72,24 @@ export async function createMember(input: CreateMemberInput): Promise<AdminMembe
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input),
+  });
+}
+
+/**
+ * Link/unlink a member's sponsor (super_admin only, enforced server-side).
+ * Accepts the sponsor's referral CODE (resolved like registration approval),
+ * or null to clear the link. Deliberately separate from `updateMember`:
+ * `MemberProfile.referralCode` is the member's OWN code, while this field is
+ * the sponsor's code — sharing the call would invite misrouting.
+ */
+export async function setMemberSponsor(
+  id: string,
+  referralCode: string | null,
+): Promise<AdminMember> {
+  return request(`/admin/members/${id}`, adminMemberSchema, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ referralCode }),
   });
 }
 

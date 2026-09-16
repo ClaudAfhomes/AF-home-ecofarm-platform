@@ -165,6 +165,10 @@ export function mapAdminMemberRow(
           ? row.createdAt
           : new Date().toISOString(),
     registrationId: typeof row.registrationId === 'string' ? row.registrationId : undefined,
+    sponsorId: typeof row.sponsorId === 'string' ? row.sponsorId : undefined,
+    sponsorReferralCode:
+      typeof row.sponsorReferralCode === 'string' ? row.sponsorReferralCode : undefined,
+    sponsorName: typeof row.sponsorName === 'string' ? row.sponsorName : undefined,
   };
 }
 

@@ -160,7 +160,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     let taken: (string | null | undefined)[] = (
       (codeRows as { referralCode?: string | null }[] | null) ?? []
     ).map((candidate) => candidate.referralCode);
-    const buildMemberRow = (referralCode: string) => ({
+    const buildMemberRow = (referralCode: string, sponsorId: string | null) => ({
       id: authId,
       email,
       name: `${firstName} ${lastName}`,
@@ -174,19 +174,58 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       countryName: typeof input.countryName === 'string' ? input.countryName : 'Philippines',
       programId,
       referralCode,
+      sponsorId,
       accountStatus: 'ACTIVE',
       createdAt: now,
     });
+    // Optional sponsor link (B7 Member.sponsorId). Accepts the sponsor's
+    // referral CODE (not a uuid) and resolves it exactly like registration
+    // approval: ACTIVE + qualified, never self. Unresolvable codes reject
+    // (400) instead of silently creating a sponsorless member.
+    let sponsorId: string | null = null;
+    const sponsorCode = String(input.referralCode ?? '').trim();
+    if (sponsorCode) {
+      const { data: sponsorRows } = await supabase
+        .from('Member')
+        .select('id,referralCode,accountStatus,isQualified');
+      const sponsor = (
+        (sponsorRows as
+          | {
+              id: string;
+              referralCode?: string | null;
+              accountStatus?: string;
+              isQualified?: boolean;
+            }[]
+          | null) ?? []
+      ).find(
+        (candidate) => (candidate.referralCode ?? '').toLowerCase() === sponsorCode.toLowerCase(),
+      );
+      if (
+        !sponsor ||
+        sponsor.id === authId ||
+        sponsor.accountStatus !== 'ACTIVE' ||
+        sponsor.isQualified !== true
+      ) {
+        const { error, status } = toErrorEnvelope(
+          'VALIDATION_ERROR',
+          'The referral code could not be matched to an active, qualified sponsor.',
+          400,
+        );
+        res.status(status).json({ error });
+        return;
+      }
+      sponsorId = sponsor.id;
+    }
     let referralCode = pickUniqueReferralCode(taken, lastName);
     let memberResult = await supabase
       .from('Member')
-      .upsert(buildMemberRow(referralCode), { onConflict: 'id' });
+      .upsert(buildMemberRow(referralCode, sponsorId), { onConflict: 'id' });
     if (memberResult.error && isReferralCodeConflict(memberResult.error)) {
       taken = [...taken, referralCode];
       referralCode = pickUniqueReferralCode(taken, lastName);
       memberResult = await supabase
         .from('Member')
-        .upsert(buildMemberRow(referralCode), { onConflict: 'id' });
+        .upsert(buildMemberRow(referralCode, sponsorId), { onConflict: 'id' });
     }
     if (memberResult.error) {
       if (isReferralCodeConflict(memberResult.error)) {

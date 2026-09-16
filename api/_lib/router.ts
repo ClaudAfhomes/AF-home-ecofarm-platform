@@ -341,6 +341,24 @@ export function selectHandler(
       routeKey: 'admin/withdrawals',
     };
   }
+  if (
+    pathname === '/api/v1/admin/commissions/clear-due' ||
+    pathname === '/api/admin/commissions/clear-due'
+  ) {
+    return {
+      handler: lazy(() => import('../_handlers/admin/commissions/clear-due.js')),
+      routeKey: 'admin/commissions/clear-due',
+    };
+  }
+  if (
+    pathname === '/api/v1/crons/commission-clearing' ||
+    pathname === '/crons/commission-clearing'
+  ) {
+    return {
+      handler: lazy(() => import('../_handlers/crons/commission-clearing.js')),
+      routeKey: 'crons/commission-clearing',
+    };
+  }
   if (pathname === '/api/v1/me/wallet' || pathname === '/api/me/wallet') {
     return { handler: lazy(() => import('../_handlers/me/wallet.js')), routeKey: 'me/wallet' };
   }

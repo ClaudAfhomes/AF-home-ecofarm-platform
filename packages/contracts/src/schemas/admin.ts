@@ -28,6 +28,11 @@ export const adminMemberSchema = memberProfileSchema.extend({
   accountStatus: accountStatusSchema,
   registeredAt: z.string(),
   registrationId: z.string().optional(),
+  /** Sponsor link (B7) — uuid of the sponsoring member, absent when unlinked. */
+  sponsorId: z.string().optional(),
+  /** Sponsor's referral code + name for display (resolved server-side on detail reads). */
+  sponsorReferralCode: z.string().optional(),
+  sponsorName: z.string().optional(),
 });
 
 export type AdminMember = z.infer<typeof adminMemberSchema>;

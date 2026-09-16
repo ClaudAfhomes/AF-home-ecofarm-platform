@@ -47,3 +47,16 @@ export const commissionSchema = z.object({
 });
 
 export type Commission = z.infer<typeof commissionSchema>;
+
+/**
+ * Commission clearing batch result — `POST /admin/commissions/clear-due`
+ * and `GET /crons/commission-clearing`. Counts the PENDING commissions moved
+ * to AVAILABLE in this run; `total` is the cleared exact-decimal sum.
+ */
+export const commissionClearBatchSchema = z.object({
+  cleared: z.number().int().nonnegative(),
+  total: exactDecimalStringSchema,
+  windowDays: z.number().int().nonnegative(),
+});
+
+export type CommissionClearBatch = z.infer<typeof commissionClearBatchSchema>;

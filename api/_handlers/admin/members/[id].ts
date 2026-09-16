@@ -76,7 +76,35 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     `${current.firstName ?? ''} ${current.lastName ?? ''}`.trim() || String(current.name ?? id);
 
   if (req.method === 'GET') {
-    const parsed = adminMemberSchema.safeParse(mapAdminMemberRow(current));
+    // Resolve the sponsor's display fields (code + name) for the admin
+    // detail view; absent when the member is unlinked.
+    let enriched: Record<string, unknown> = current;
+    if (typeof current.sponsorId === 'string' && current.sponsorId) {
+      const { data: sponsorRow } = await supabase
+        .from('Member')
+        .select('referralCode,firstName,lastName,name')
+        .eq('id', current.sponsorId)
+        .maybeSingle();
+      const sponsor = (sponsorRow ?? null) as {
+        referralCode?: unknown;
+        firstName?: unknown;
+        lastName?: unknown;
+        name?: unknown;
+      } | null;
+      if (sponsor) {
+        const sponsorName =
+          [sponsor.firstName, sponsor.lastName]
+            .filter((part) => typeof part === 'string' && part)
+            .join(' ') || (typeof sponsor.name === 'string' ? sponsor.name : '');
+        enriched = {
+          ...current,
+          sponsorReferralCode:
+            typeof sponsor.referralCode === 'string' ? sponsor.referralCode : undefined,
+          sponsorName: sponsorName || undefined,
+        };
+      }
+    }
+    const parsed = adminMemberSchema.safeParse(mapAdminMemberRow(enriched));
     if (!parsed.success) {
       const { error, status } = toErrorEnvelope('INTERNAL', 'Stored member failed validation', 500);
       res.status(status).json({ error });
@@ -240,25 +268,173 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .maybeSingle();
     qualifiedRoleUuid = ((qualRole as { id: string } | null)?.id as string | undefined) ?? null;
   }
-  if (Object.keys(patch).length === 0) {
+  // Sponsor link/unlink (super_admin only — rewrites the genealogy graph).
+  // Accepts the sponsor's referral CODE (resolved like registration approval);
+  // `null` clears the link. Unresolvable codes reject instead of silently
+  // unlinking (400), so a typo can never orphan a member's upline.
+  // Linking also repairs past qualifying sales missing their DIRECT_REFERRAL
+  // (the per-sale idempotency era), so one admin action fixes the referrer.
+  let sponsorChanged = false;
+  let resolvedSponsorId: string | null = null;
+  if (input.referralCode !== undefined) {
+    if (!slugsAllowed(auth.slugs, [...SUPER_ADMIN_ONLY])) {
+      const { error, status } = toErrorEnvelope(
+        'FORBIDDEN',
+        'Only super admins can link or unlink a sponsor.',
+        403,
+      );
+      res.status(status).json({ error });
+      return;
+    }
+    if (input.referralCode === null) {
+      if (current.sponsorId !== null && current.sponsorId !== undefined) {
+        patch.sponsorId = null;
+        sponsorChanged = true;
+      }
+    } else {
+      const sponsorCode = String(input.referralCode).trim();
+      if (!sponsorCode) {
+        const { error, status } = toErrorEnvelope(
+          'VALIDATION_ERROR',
+          'Provide a sponsor referral code or null to unlink.',
+          400,
+        );
+        res.status(status).json({ error });
+        return;
+      }
+      const { data: sponsorRows } = await supabase
+        .from('Member')
+        .select('id,referralCode,accountStatus,isQualified');
+      const sponsor = (
+        (sponsorRows as
+          | {
+              id: string;
+              referralCode?: string | null;
+              accountStatus?: string;
+              isQualified?: boolean;
+            }[]
+          | null) ?? []
+      ).find(
+        (candidate) => (candidate.referralCode ?? '').toLowerCase() === sponsorCode.toLowerCase(),
+      );
+      if (
+        !sponsor ||
+        sponsor.id === id ||
+        sponsor.accountStatus !== 'ACTIVE' ||
+        sponsor.isQualified !== true
+      ) {
+        const { error, status } = toErrorEnvelope(
+          'VALIDATION_ERROR',
+          'The referral code could not be matched to an active, qualified sponsor.',
+          400,
+        );
+        res.status(status).json({ error });
+        return;
+      }
+      resolvedSponsorId = sponsor.id;
+      if (current.sponsorId !== sponsor.id) {
+        patch.sponsorId = sponsor.id;
+        sponsorChanged = true;
+      }
+    }
+  }
+  if (Object.keys(patch).length === 0 && !resolvedSponsorId) {
     const { error, status } = toErrorEnvelope('VALIDATION_ERROR', 'Nothing to update.', 400);
     res.status(status).json({ error });
     return;
   }
-  const { data: updated, error: writeError } = await supabase
-    .from('Member')
-    .update(patch)
-    .eq('id', id)
-    .select('*')
-    .single();
-  if (writeError || !updated) {
-    const { error, status } = toErrorEnvelope(
-      'INTERNAL',
-      writeError?.message ?? 'Update failed',
-      500,
+  let updated: Record<string, unknown> = current;
+  if (Object.keys(patch).length > 0) {
+    const { data: updatedRow, error: writeError } = await supabase
+      .from('Member')
+      .update(patch)
+      .eq('id', id)
+      .select('*')
+      .single();
+    if (writeError || !updatedRow) {
+      const { error, status } = toErrorEnvelope(
+        'INTERNAL',
+        writeError?.message ?? 'Update failed',
+        500,
+      );
+      res.status(status).json({ error });
+      return;
+    }
+    updated = updatedRow as Record<string, unknown>;
+  }
+  // Repair: linking (or re-confirming) a sponsor issues the DIRECT_REFERRAL
+  // rows that past qualifies skipped for this member's qualifying sales.
+  // Idempotent per sale+type; a repair failure surfaces loudly because the
+  // referrer's money is at stake (the link itself is already saved above).
+  // Amounts stay exact-decimal strings — integer math only, no floats.
+  const exactPercentOf = (value: string, rateValue: string): string => {
+    const [vInt, vFrac = ''] = value.split('.');
+    const cents = BigInt(vInt + vFrac.padEnd(2, '0').slice(0, 2));
+    const [rInt, rFrac = ''] = rateValue.split('.');
+    const bp = BigInt(rInt + rFrac.padEnd(4, '0').slice(0, 4));
+    const rounded = (cents * bp + 5000n) / 10000n;
+    const digits = rounded.toString().padStart(3, '0');
+    return `${digits.slice(0, -2)}.${digits.slice(-2)}`;
+  };
+  if (resolvedSponsorId) {
+    const { data: rateRow } = await supabase
+      .from('SystemConfig')
+      .select('value')
+      .eq('key', 'COMMISSION_REFERRAL_RATE')
+      .maybeSingle();
+    const rate = (rateRow as { value?: unknown } | null)?.value;
+    if (typeof rate !== 'string' || !/^[0-9]+(\.[0-9]{1,4})?$/.test(rate)) {
+      const { error, status } = toErrorEnvelope(
+        'INTERNAL',
+        'Commission referral rate is not configured.',
+        500,
+      );
+      res.status(status).json({ error });
+      return;
+    }
+    const { data: qualifyingSales } = await supabase
+      .from('Sale')
+      .select('id,propertyValue')
+      .eq('sellerId', id)
+      .eq('status', 'QUALIFYING_SALE');
+    const { data: existingReferrals } = await supabase
+      .from('Commission')
+      .select('saleId')
+      .eq('memberId', resolvedSponsorId)
+      .eq('commissionType', 'DIRECT_REFERRAL');
+    const covered = new Set(
+      ((existingReferrals as { saleId?: unknown }[] | null) ?? []).map((r) =>
+        typeof r.saleId === 'string' ? r.saleId : '',
+      ),
     );
-    res.status(status).json({ error });
-    return;
+    for (const sale of (qualifyingSales as { id: string; propertyValue?: unknown }[] | null) ??
+      []) {
+      if (covered.has(sale.id)) continue;
+      if (
+        typeof sale.propertyValue !== 'string' ||
+        !/^[0-9]+(\.[0-9]{1,2})?$/.test(sale.propertyValue)
+      ) {
+        continue;
+      }
+      const amount = exactPercentOf(sale.propertyValue, rate);
+      const { error: repairError } = await supabase.from('Commission').insert({
+        id: `com-repair-${sale.id}`.slice(0, 32),
+        memberId: resolvedSponsorId,
+        commissionType: 'DIRECT_REFERRAL',
+        saleId: sale.id,
+        baseValue: sale.propertyValue,
+        rate,
+        amount,
+        status: 'PENDING',
+        createdAt: new Date().toISOString(),
+      });
+      if (repairError) {
+        const { error, status } = toErrorEnvelope('INTERNAL', repairError.message, 500);
+        res.status(status).json({ error });
+        return;
+      }
+      covered.add(sale.id);
+    }
   }
   if (qualificationChanged !== null && qualifiedRoleUuid) {
     if (qualificationChanged) {
@@ -312,7 +488,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       ? `${qualificationChanged ? 'Granted' : 'Revoked'} qualification`
       : statusChanged
         ? `Set account status to ${statusChanged}`
-        : 'Updated member profile',
+        : sponsorChanged
+          ? 'Updated sponsor link'
+          : 'Updated member profile',
   });
   res.status(200).json(parsed.data);
 }

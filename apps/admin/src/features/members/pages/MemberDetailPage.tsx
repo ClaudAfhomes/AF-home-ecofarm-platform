@@ -25,6 +25,7 @@ import {
   archiveMember,
   deleteMemberPermanently,
   setMemberQualified,
+  setMemberSponsor,
 } from '../repositories/memberRepository';
 import { MEMBER_STATUS_LABEL, MEMBER_STATUS_TONE } from '../status';
 import styles from './MemberDetail.module.css';
@@ -57,6 +58,9 @@ export function MemberDetailPage() {
   const [purgeEmailConfirm, setPurgeEmailConfirm] = useState('');
   const [purgePending, setPurgePending] = useState(false);
   const [error, setError] = useState<string | undefined>();
+  const [sponsorCode, setSponsorCode] = useState('');
+  const [sponsorPending, setSponsorPending] = useState(false);
+  const [sponsorError, setSponsorError] = useState<string | undefined>();
   const { user } = useSession();
   const isSuperAdmin = user?.roleId === 'super_admin';
 
@@ -206,6 +210,48 @@ export function MemberDetailPage() {
       await queryClient.invalidateQueries({ queryKey: ['admin', 'members'] });
     } catch (e) {
       setError((e as Error).message);
+    }
+  };
+
+  const handleLinkSponsor = async () => {
+    const code = sponsorCode.trim();
+    if (!code || sponsorPending) return;
+    setSponsorPending(true);
+    setSponsorError(undefined);
+    try {
+      await setMemberSponsor(data.id, code);
+      setSponsorCode('');
+      await queryClient.invalidateQueries({ queryKey: ['admin', 'member', data.id] });
+      await queryClient.invalidateQueries({ queryKey: ['admin', 'members'] });
+      toast({
+        title: 'Sponsor linked',
+        message: `${data.firstName} ${data.lastName} is now sponsored by ${code}.`,
+        tone: 'success',
+      });
+    } catch (e) {
+      setSponsorError((e as Error).message);
+    } finally {
+      setSponsorPending(false);
+    }
+  };
+
+  const handleUnlinkSponsor = async () => {
+    if (sponsorPending) return;
+    setSponsorPending(true);
+    setSponsorError(undefined);
+    try {
+      await setMemberSponsor(data.id, null);
+      await queryClient.invalidateQueries({ queryKey: ['admin', 'member', data.id] });
+      await queryClient.invalidateQueries({ queryKey: ['admin', 'members'] });
+      toast({
+        title: 'Sponsor unlinked',
+        message: `${data.firstName} ${data.lastName} no longer has a sponsor.`,
+        tone: 'success',
+      });
+    } catch (e) {
+      setSponsorError((e as Error).message);
+    } finally {
+      setSponsorPending(false);
     }
   };
 
@@ -484,8 +530,75 @@ export function MemberDetailPage() {
                   <dd>{data.address}</dd>
                 </div>
               ) : null}
+              <div className={styles.field}>
+                <dt>Sponsor</dt>
+                <dd>
+                  {data.sponsorReferralCode || data.sponsorId
+                    ? `${data.sponsorName ?? 'Sponsor'} (${data.sponsorReferralCode ?? data.sponsorId})`
+                    : 'No sponsor linked'}
+                </dd>
+              </div>
             </dl>
           )}
+          {isSuperAdmin ? (
+            <div style={{ marginTop: 'var(--space-3)' }}>
+              <span
+                style={{
+                  display: 'block',
+                  fontSize: 'var(--text-body-s)',
+                  fontWeight: 600,
+                  marginBottom: 'var(--space-2)',
+                }}
+              >
+                Link sponsor (super admin)
+              </span>
+              <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
+                <input
+                  type="text"
+                  value={sponsorCode}
+                  onChange={(e) => {
+                    setSponsorCode(e.target.value);
+                    setSponsorError(undefined);
+                  }}
+                  placeholder="Sponsor referral code"
+                  aria-label="Sponsor referral code"
+                  disabled={sponsorPending}
+                  style={{
+                    minHeight: 44,
+                    padding: '10px 12px',
+                    border: '1px solid var(--color-border-default)',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: 'var(--text-body-s)',
+                  }}
+                />
+                <Button
+                  variant="secondary"
+                  onClick={handleLinkSponsor}
+                  loading={sponsorPending}
+                  disabled={!sponsorCode.trim()}
+                >
+                  Link sponsor
+                </Button>
+                {data.sponsorId ? (
+                  <Button
+                    variant="secondary"
+                    onClick={handleUnlinkSponsor}
+                    loading={sponsorPending}
+                  >
+                    Unlink
+                  </Button>
+                ) : null}
+              </div>
+              {sponsorError ? (
+                <p
+                  role="alert"
+                  style={{ color: 'var(--color-danger)', marginTop: 'var(--space-2)' }}
+                >
+                  {sponsorError}
+                </p>
+              ) : null}
+            </div>
+          ) : null}
         </div>
 
         <div className={styles.card}>

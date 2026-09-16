@@ -37,6 +37,7 @@ export function MemberFormDialog({ open, onClose, member }: MemberFormDialogProp
     programCode: 'ABROAD',
     dateOfBirth: '1992-01-01',
     temporaryPassword: '',
+    referralCode: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitError, setSubmitError] = useState<string | undefined>();
@@ -57,6 +58,7 @@ export function MemberFormDialog({ open, onClose, member }: MemberFormDialogProp
         programCode: member.program.code,
         dateOfBirth: member.dateOfBirth,
         temporaryPassword: '',
+        referralCode: '',
       });
     } else {
       setForm({
@@ -71,6 +73,7 @@ export function MemberFormDialog({ open, onClose, member }: MemberFormDialogProp
         programCode: 'ABROAD',
         dateOfBirth: '1992-01-01',
         temporaryPassword: '',
+        referralCode: '',
       });
     }
     setErrors({});
@@ -118,6 +121,7 @@ export function MemberFormDialog({ open, onClose, member }: MemberFormDialogProp
         await qc.invalidateQueries({ queryKey: ['admin', 'member', member.id] });
         await qc.invalidateQueries({ queryKey: ['admin', 'members'] });
       } else {
+        const sponsorCode = form.referralCode.trim();
         await createMember({
           firstName: form.firstName.trim(),
           lastName: form.lastName.trim(),
@@ -130,6 +134,7 @@ export function MemberFormDialog({ open, onClose, member }: MemberFormDialogProp
           programCode: form.programCode,
           dateOfBirth: form.dateOfBirth,
           temporaryPassword: form.temporaryPassword.trim(),
+          ...(sponsorCode ? { referralCode: sponsorCode } : {}),
         });
         await qc.invalidateQueries({ queryKey: ['admin', 'members'] });
       }
@@ -514,6 +519,36 @@ export function MemberFormDialog({ open, onClose, member }: MemberFormDialogProp
             </span>
           ) : null}
         </div>
+
+        {!isEdit ? (
+          <div style={{ display: 'grid', gap: 6 }}>
+            <label
+              htmlFor="member-referralCode"
+              style={{ fontSize: 'var(--text-body-s)', fontWeight: 600 }}
+            >
+              Sponsor referral code (optional)
+            </label>
+            <input
+              id="member-referralCode"
+              type="text"
+              value={form.referralCode}
+              onChange={(e) => setForm((s) => ({ ...s, referralCode: e.target.value }))}
+              aria-label="Sponsor referral code"
+              placeholder="e.g. JAD-DOE12"
+              style={{
+                minHeight: 44,
+                padding: '10px 12px',
+                border: '1px solid var(--color-border-default)',
+                borderRadius: 'var(--radius-md)',
+                fontSize: 'var(--text-body-s)',
+              }}
+            />
+            <span style={{ fontSize: 'var(--text-caption)', color: 'var(--color-text-muted)' }}>
+              Links this member under an active, qualified sponsor for genealogy and referral
+              commissions.
+            </span>
+          </div>
+        ) : null}
 
         <div style={{ display: 'grid', gap: 6 }}>
           <label

@@ -14,6 +14,10 @@ const mocks = vi.hoisted(() => {
   const script = {
     roleSlug: 'super_admin',
     member: null as unknown,
+    sponsorList: null as unknown,
+    referralRate: '0.0400' as string | null,
+    qualifyingSales: [] as { id: string; propertyValue?: unknown }[],
+    existingReferrals: [] as { saleId?: unknown }[],
     updatedMember: null as unknown,
     qualifiedRoleId: 'role-qualified' as string | null,
     rpcResult: { data: null as unknown, error: null as unknown },
@@ -41,12 +45,22 @@ const mocks = vi.hoisted(() => {
           ? { data: { id: script.qualifiedRoleId, slug: 'member_qualified' }, error: null }
           : { data: null, error: null };
       if (table === 'Member') return { data: script.member, error: null };
+      if (table === 'SystemConfig')
+        return script.referralRate === null
+          ? { data: null, error: null }
+          : { data: { value: script.referralRate }, error: null };
       return { data: null, error: null };
     };
     b.single = async () => ({ data: script.updatedMember, error: null });
     b.then = (resolve: (v: unknown) => void) => {
       if (table === 'MemberRole' || table === 'StaffAssignment') {
         resolve({ data: [{ roleId: 'r-1' }], error: null });
+      } else if (table === 'Member') {
+        resolve({ data: script.sponsorList ?? null, error: null });
+      } else if (table === 'Sale') {
+        resolve({ data: script.qualifyingSales, error: null });
+      } else if (table === 'Commission') {
+        resolve({ data: script.existingReferrals, error: null });
       } else resolve({ data: null, error: null });
     };
     return {
@@ -247,6 +261,92 @@ describe('PATCH /admin/members/:id qualification', () => {
     expect(seen.status).toBe(422);
     expect(seen.body).toMatchObject({ error: { code: 'REJECTION_REASON_REQUIRED' } });
     expect(mocks.calls.some((c) => c.op === 'rpc')).toBe(false);
+  });
+});
+
+describe('PATCH /admin/members/:id sponsor link (super_admin only)', () => {
+  const SPONSOR = {
+    id: 'sponsor-uuid',
+    referralCode: 'JD-2026-001',
+    accountStatus: 'ACTIVE',
+    isQualified: true,
+  };
+
+  beforeEach(() => {
+    vi.stubEnv('SUPABASE_URL', 'https://m.test.supabase.co');
+    vi.stubEnv('VITE_SUPABASE_ANON_KEY', 'anon');
+    vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'service');
+    mocks.calls.length = 0;
+    mocks.setRoleSlug('super_admin');
+    mocks.script.member = approvedMember({ sponsorId: null });
+    mocks.script.sponsorList = [SPONSOR];
+    mocks.script.referralRate = '0.0400';
+    mocks.script.qualifyingSales = [];
+    mocks.script.existingReferrals = [];
+    mocks.script.updatedMember = approvedMember({ sponsorId: 'sponsor-uuid' });
+  });
+
+  it('links a sponsor from a valid referral code', async () => {
+    const { res, seen } = capture();
+    await memberById(patchReq({ referralCode: 'jd-2026-001' }), res);
+    expect(seen.status).toBe(200);
+    expect(parsePatch()).toEqual({ sponsorId: 'sponsor-uuid' });
+    const audit = mocks.calls.find((c) => c.table === 'AuditLog')?.arg as Record<string, unknown>;
+    expect(audit).toMatchObject({ action: 'MEMBER_UPDATED' });
+  });
+
+  it('repairs missing referral rows for past qualifying sales when linking', async () => {
+    mocks.script.qualifyingSales = [{ id: 'sal-001', propertyValue: '100000.00' }];
+    mocks.script.existingReferrals = [];
+    const { res, seen } = capture();
+    await memberById(patchReq({ referralCode: 'jd-2026-001' }), res);
+    expect(seen.status).toBe(200);
+    const repair = mocks.calls.find((c) => c.table === 'Commission' && c.op === 'insert')
+      ?.arg as Record<string, unknown>;
+    expect(repair).toMatchObject({
+      memberId: 'sponsor-uuid',
+      commissionType: 'DIRECT_REFERRAL',
+      saleId: 'sal-001',
+      baseValue: '100000.00',
+      rate: '0.0400',
+      amount: '4000.00',
+      status: 'PENDING',
+    });
+  });
+
+  it('skips the repair for sales that already have a referral row', async () => {
+    mocks.script.qualifyingSales = [{ id: 'sal-001', propertyValue: '100000.00' }];
+    mocks.script.existingReferrals = [{ saleId: 'sal-001' }];
+    const { res, seen } = capture();
+    await memberById(patchReq({ referralCode: 'jd-2026-001' }), res);
+    expect(seen.status).toBe(200);
+    expect(mocks.calls.some((c) => c.table === 'Commission' && c.op === 'insert')).toBe(false);
+  });
+
+  it('403s non-super-admin sponsor linking', async () => {
+    mocks.setRoleSlug('admin');
+    const { res, seen } = capture();
+    await memberById(patchReq({ referralCode: 'jd-2026-001' }), res);
+    expect(seen.status).toBe(403);
+    expect(seen.body).toMatchObject({ error: { code: 'FORBIDDEN' } });
+  });
+
+  it('400s an unresolvable or ineligible sponsor code without unlinking', async () => {
+    mocks.script.sponsorList = [];
+    const { res, seen } = capture();
+    await memberById(patchReq({ referralCode: 'NOPE' }), res);
+    expect(seen.status).toBe(400);
+    expect(seen.body).toMatchObject({ error: { code: 'VALIDATION_ERROR' } });
+    expect(parsePatch()).toBeUndefined();
+  });
+
+  it('unlinks the sponsor on explicit null', async () => {
+    mocks.script.member = approvedMember({ sponsorId: 'sponsor-uuid' });
+    mocks.script.updatedMember = approvedMember({ sponsorId: null });
+    const { res, seen } = capture();
+    await memberById(patchReq({ referralCode: null }), res);
+    expect(seen.status).toBe(200);
+    expect(parsePatch()).toEqual({ sponsorId: null });
   });
 });
 

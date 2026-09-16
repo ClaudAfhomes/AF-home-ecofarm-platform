@@ -136,8 +136,14 @@ export {
   commissionStatusSchema,
   commissionTypeSchema,
   commissionSchema,
+  commissionClearBatchSchema,
 } from './schemas/commission.js';
-export type { CommissionStatus, CommissionType, Commission } from './schemas/commission.js';
+export type {
+  CommissionStatus,
+  CommissionType,
+  Commission,
+  CommissionClearBatch,
+} from './schemas/commission.js';
 export {
   payoutAccountStatusSchema,
   payoutMethodSchema,

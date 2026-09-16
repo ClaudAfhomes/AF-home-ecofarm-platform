@@ -277,6 +277,9 @@ describe('POST /admin/registrations/:id/approve', () => {
     const memberUpsert = mocks.calls.find((c) => c.table === 'Member' && c.op === 'upsert')
       ?.arg as Record<string, unknown>;
     expect(memberUpsert.sponsorId).toBe('sponsor-uuid');
+    // Approval is the manual government-ID gate — the flag persists because
+    // the Registration row (and its governmentId) is deleted below.
+    expect(memberUpsert.idVerified).toBe(true);
   });
 
   it('generates a fresh member code instead of copying the sponsor code', async () => {
@@ -471,6 +474,7 @@ describe('POST /admin/members', () => {
     mocks.script.registrationReads = 0;
     mocks.script.updatedRegistration = null;
     mocks.script.existingMembers = [];
+    mocks.script.memberList = [];
     mocks.script.createdAuthId = 'auth-uuid-2';
     mocks.script.createError = null;
     mocks.script.listedUsers = [];
@@ -563,5 +567,70 @@ describe('POST /admin/members', () => {
     );
     expect(seen.status).toBe(201);
     expect(seen.body).toMatchObject({ id: 'orphan-uuid', email: 'jane@example.com' });
+  });
+
+  it('links a sponsor from an optional referral code on quick-create', async () => {
+    mocks.script.memberList = [
+      {
+        id: 'sponsor-uuid',
+        referralCode: 'JD-2026-001',
+        accountStatus: 'ACTIVE',
+        isQualified: true,
+      },
+    ];
+    const { res, seen } = capture();
+    await createMember(
+      {
+        method: 'POST',
+        query: {},
+        headers: authed,
+        body: {
+          firstName: 'Jane',
+          lastName: 'Doe',
+          email: 'jane@example.com',
+          phone: '+639180000001',
+          gender: 'Female',
+          countryCode: 'PH',
+          countryName: 'Philippines',
+          programCode: 'ABROAD',
+          dateOfBirth: '1992-01-01',
+          temporaryPassword: 'password123',
+          referralCode: 'jd-2026-001',
+        },
+      } as VercelRequest,
+      res,
+    );
+    expect(seen.status).toBe(201);
+    const upsert = mocks.calls.find((c) => c.table === 'Member' && c.op === 'upsert')
+      ?.arg as Record<string, unknown>;
+    expect(upsert.sponsorId).toBe('sponsor-uuid');
+  });
+
+  it('400s quick-create with an unresolvable referral code instead of a sponsorless member', async () => {
+    mocks.script.memberList = [];
+    const { res, seen } = capture();
+    await createMember(
+      {
+        method: 'POST',
+        query: {},
+        headers: authed,
+        body: {
+          firstName: 'Jane',
+          lastName: 'Doe',
+          email: 'jane@example.com',
+          phone: '+639180000001',
+          gender: 'Female',
+          countryCode: 'PH',
+          countryName: 'Philippines',
+          programCode: 'ABROAD',
+          dateOfBirth: '1992-01-01',
+          temporaryPassword: 'password123',
+          referralCode: 'NOPE',
+        },
+      } as VercelRequest,
+      res,
+    );
+    expect(seen.status).toBe(400);
+    expect(seen.body).toMatchObject({ error: { code: 'VALIDATION_ERROR' } });
   });
 });

@@ -85,7 +85,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
   }
-  const memberPatch: Record<string, unknown> = { status: 'PENDING', isQualified: false };
+  const memberPatch: Record<string, unknown> = {
+    status: 'PENDING',
+    isQualified: false,
+    // Returning to PENDING re-opens review, including the government ID —
+    // clear the approval-time flag (mirrors the mock's isIdVerified reset).
+    idVerified: false,
+  };
   for (const field of [
     'firstName',
     'lastName',
