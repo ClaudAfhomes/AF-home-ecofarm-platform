@@ -98,7 +98,9 @@
   border-radius: var(--radius-sm);
   font-size: var(--text-body-s);
   background: var(--color-bg-surface-raised);
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
 }
 
 .editInput:focus {

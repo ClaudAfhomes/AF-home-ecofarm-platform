@@ -107,7 +107,9 @@ export function RoleModulePicker({
                 fontWeight: 600,
               }}
             >
-              <label style={{ display: 'inline-flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+              <label
+                style={{ display: 'inline-flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}
+              >
                 <input
                   type="checkbox"
                   ref={groupToggleRef(group.modules)}
@@ -122,11 +124,18 @@ export function RoleModulePicker({
                 {group.label} · {groupSelected.length} of {group.modules.length}
               </label>
             </legend>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2) var(--space-4)' }}>
+            <div
+              style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-2) var(--space-4)' }}
+            >
               {group.modules.map((module) => (
                 <label
                   key={module}
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    cursor: 'pointer',
+                  }}
                 >
                   <input
                     type="checkbox"

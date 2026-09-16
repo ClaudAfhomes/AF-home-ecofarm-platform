@@ -164,7 +164,9 @@ describe('StaffDetailPage', () => {
   it('blocks non-super-admin staff from deleting', async () => {
     renderWithProviders(<StaffDetailPage />, { user: MOCK_FINANCE });
 
-    expect(await screen.findByText('Only super admins can delete staff accounts.')).toBeInTheDocument();
+    expect(
+      await screen.findByText('Only super admins can delete staff accounts.'),
+    ).toBeInTheDocument();
     expect(screen.queryByText('Delete staff')).not.toBeInTheDocument();
     expect(state.deleteMutate).not.toHaveBeenCalled();
   });
@@ -173,7 +175,9 @@ describe('StaffDetailPage', () => {
     state.member = { ...state.Saul };
     renderWithProviders(<StaffDetailPage />, { user: MOCK_SUPER_ADMIN });
 
-    expect(await screen.findByText('You cannot delete your own staff account.')).toBeInTheDocument();
+    expect(
+      await screen.findByText('You cannot delete your own staff account.'),
+    ).toBeInTheDocument();
     expect(screen.queryByText('Delete staff')).not.toBeInTheDocument();
   });
 });

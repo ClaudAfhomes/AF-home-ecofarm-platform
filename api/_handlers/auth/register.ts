@@ -4,12 +4,30 @@ import { getSupabaseEnv } from '../../_lib/env.js';
 import { isAuthConflict } from '../../_lib/auth.js';
 import { stripDocumentData, uploadGovernmentId } from '../../_lib/documents.js';
 import type { VercelRequest, VercelResponse } from '../../_lib/http.js';
+import { requireAnonClient } from '../../_lib/otp.js';
 import { calculateAge, prefixedId } from '../../_lib/pipeline.js';
 import { methodNotAllowed, readJsonBody, requireService } from '../../_lib/rest.js';
 import { toErrorEnvelope } from '../../_lib/envelope.js';
 
 type Service = NonNullable<ReturnType<typeof requireService>>;
 type RegistrationRow = Record<string, unknown> & { id: string; status: string };
+
+/**
+ * Best-effort dispatch of the email-verification one-time code (BR-AUTH-001).
+ * The auth account is created unconfirmed by register; the code email goes
+ * out via Supabase Auth (`signInWithOtp`). A failed send never fails
+ * registration — the applicant can re-request via
+ * `POST /auth/verify-email/resend`.
+ */
+async function sendVerificationOtp(email: string): Promise<void> {
+  const anon = requireAnonClient();
+  if (!anon) return;
+  try {
+    await anon.auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
+  } catch {
+    // best-effort — the resend endpoint exists for re-delivery.
+  }
+}
 
 function duplicateAccount() {
   return toErrorEnvelope('CONFLICT', 'An account with this email address already exists.', 409);
@@ -85,8 +103,8 @@ async function attachDocument(
  * 409. Decided outcomes (member exists, application decided) stay 409.
  * Remaining intake semantics mirror the member mock: qualified-sponsor
  * referral check, minimum age (SystemConfig), country/program validity.
- * The auth account is created unconfirmed — email verification lands with
- * the future email.js integration. No authentication required.
+ * The auth account is created unconfirmed and the email-verification OTP is
+ * dispatched by Supabase Auth (BR-AUTH-001). No authentication required.
  */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -283,6 +301,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // Lost race with a concurrent submit for the same email: replay it.
       const replay = await findRegistrationByEmail(supabase, email);
       if (replay && replay.status === 'PENDING') {
+        await sendVerificationOtp(email);
         res.status(200).json(
           toApplicationPayload(
             {
@@ -311,6 +330,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       res.status(status).json({ error });
       return true;
     }
+    await sendVerificationOtp(email);
     res.status(201).json({
       application: {
         id: registration.id,
@@ -330,6 +350,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const interrupted = await findRegistrationByEmail(supabase, email);
       if (interrupted) {
         if (interrupted.status === 'PENDING') {
+          await sendVerificationOtp(email);
           res.status(200).json(
             toApplicationPayload(
               {

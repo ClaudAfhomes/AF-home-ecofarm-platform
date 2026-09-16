@@ -21,8 +21,7 @@ export function useAdminConversations(options?: { enabled?: boolean }) {
 export function useConversationThread(memberId: string) {
   return useInfiniteQuery({
     queryKey: ['admin', 'conversations', memberId],
-    queryFn: ({ pageParam }) =>
-      getConversationThread(memberId, pageParam as string | undefined),
+    queryFn: ({ pageParam }) => getConversationThread(memberId, pageParam as string | undefined),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) => lastPage.nextCursor,
     enabled: memberId.length > 0,

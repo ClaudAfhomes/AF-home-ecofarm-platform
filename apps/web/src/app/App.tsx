@@ -22,6 +22,8 @@ import { PropertyDetailPage } from '../features/public/pages/PropertyDetailPage'
 import { RegisterPage } from '../features/auth/pages/RegisterPage';
 import { RegistrationStatusPage } from '../features/auth/pages/RegistrationStatusPage';
 import { VerifyEmailPage } from '../features/auth/pages/VerifyEmailPage';
+import { ForgotPasswordPage } from '../features/auth/pages/ForgotPasswordPage';
+import { ResetPasswordPage } from '../features/auth/pages/ResetPasswordPage';
 import { RequireMember } from '../features/member/guards/RequireMember';
 import { RequireQualifiedMember } from '../features/member/guards/RequireQualifiedMember';
 import { MemberLayout } from '../features/member/layouts/MemberLayout';
@@ -107,6 +109,8 @@ export default function App() {
           <Route path="register" element={<RegisterPage />} />
           <Route path="register/verify-email" element={<VerifyEmailPage />} />
           <Route path="register/status" element={<RegistrationStatusPage />} />
+          <Route path="auth/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="auth/reset-password" element={<ResetPasswordPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
         <Route element={<MemberLayout />}>

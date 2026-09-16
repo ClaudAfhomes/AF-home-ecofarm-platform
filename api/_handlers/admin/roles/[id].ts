@@ -14,16 +14,31 @@ import { pickStaffRoleId } from '../../../_lib/rbac.js';
 import { methodNotAllowed, readJsonBody, requireService } from '../../../_lib/rest.js';
 import { toErrorEnvelope } from '../../../_lib/envelope.js';
 
-type DbRole = { id: string; key: string | null; slug: string; name: string; permissions: unknown; is_system: boolean };
+type DbRole = {
+  id: string;
+  key: string | null;
+  slug: string;
+  name: string;
+  permissions: unknown;
+  is_system: boolean;
+};
 
 async function findRole(
   supabase: NonNullable<ReturnType<typeof requireService>>,
   key: string,
 ): Promise<DbRole | null> {
-  const { data } = await supabase.from('Role').select('id,key,slug,name,permissions,is_system').eq('key', key).maybeSingle();
+  const { data } = await supabase
+    .from('Role')
+    .select('id,key,slug,name,permissions,is_system')
+    .eq('key', key)
+    .maybeSingle();
   const row = (data ?? null) as DbRole | null;
   if (row?.id) return row;
-  const fallback = await supabase.from('Role').select('id,key,slug,name,permissions,is_system').eq('slug', key).maybeSingle();
+  const fallback = await supabase
+    .from('Role')
+    .select('id,key,slug,name,permissions,is_system')
+    .eq('slug', key)
+    .maybeSingle();
   const f = (fallback.data ?? null) as DbRole | null;
   return f?.id ? f : null;
 }
@@ -86,17 +101,31 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   if (req.method === 'DELETE') {
     const { data: allRoles } = await supabase.from('Role').select('id,key,slug,permissions');
-    const records = (((allRoles as unknown[]) ?? []) as { id: string; key?: string | null; slug: string; permissions?: unknown }[]).map(
-      (r) => ({
-        id: typeof r.key === 'string' && r.key ? r.key : r.slug,
-        permissions: Array.isArray(r.permissions) ? r.permissions.filter((p): p is string => typeof p === 'string') : [],
-      }),
-    );
-    const { data: holders } = await supabase.from('MemberRole').select('memberId').eq('roleId', role.id);
+    const records = (
+      ((allRoles as unknown[]) ?? []) as {
+        id: string;
+        key?: string | null;
+        slug: string;
+        permissions?: unknown;
+      }[]
+    ).map((r) => ({
+      id: typeof r.key === 'string' && r.key ? r.key : r.slug,
+      permissions: Array.isArray(r.permissions)
+        ? r.permissions.filter((p): p is string => typeof p === 'string')
+        : [],
+    }));
+    const { data: holders } = await supabase
+      .from('MemberRole')
+      .select('memberId')
+      .eq('roleId', role.id);
     const guard = guardRoleDeleteServer(
       records,
       Array.isArray(holders) ? holders.length : 0,
-      { id: toRecord(role).id, permissions: toRecord(role).permissions as string[], isSystem: role.is_system },
+      {
+        id: toRecord(role).id,
+        permissions: toRecord(role).permissions as string[],
+        isSystem: role.is_system,
+      },
       sessionRoleId,
     );
     if (!guard.ok) {
@@ -130,12 +159,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.status(status).json({ error });
     return;
   }
-  const input = ((parsedBody.body ?? {}) as Record<string, unknown>);
+  const input = (parsedBody.body ?? {}) as Record<string, unknown>;
   const patch: { name?: string; permissions?: string[] } = {};
   if (input.name !== undefined) {
     const name = String(input.name).trim();
     if (!name || name.length > 60) {
-      const { error, status } = toErrorEnvelope('VALIDATION_ERROR', 'Role name must be 1–60 characters.', 400);
+      const { error, status } = toErrorEnvelope(
+        'VALIDATION_ERROR',
+        'Role name must be 1–60 characters.',
+        400,
+      );
       res.status(status).json({ error });
       return;
     }
@@ -143,10 +176,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const clash =
       Array.isArray(siblings) &&
       (siblings as { id: string; name?: string }[]).some(
-        (r) => r.id !== role.id && typeof r.name === 'string' && r.name.trim().toLowerCase() === name.toLowerCase(),
+        (r) =>
+          r.id !== role.id &&
+          typeof r.name === 'string' &&
+          r.name.trim().toLowerCase() === name.toLowerCase(),
       );
     if (clash) {
-      const { error, status } = toErrorEnvelope('CONFLICT', 'A role with this name already exists.', 409);
+      const { error, status } = toErrorEnvelope(
+        'CONFLICT',
+        'A role with this name already exists.',
+        409,
+      );
       res.status(status).json({ error });
       return;
     }
@@ -157,10 +197,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       !Array.isArray(input.permissions) ||
       input.permissions.length === 0 ||
       !input.permissions.every(
-        (p) => typeof p === 'string' && (staffModuleSchema.options as readonly string[]).includes(p),
+        (p) =>
+          typeof p === 'string' && (staffModuleSchema.options as readonly string[]).includes(p),
       )
     ) {
-      const { error, status } = toErrorEnvelope('VALIDATION_ERROR', 'At least one valid module permission is required.', 400);
+      const { error, status } = toErrorEnvelope(
+        'VALIDATION_ERROR',
+        'At least one valid module permission is required.',
+        400,
+      );
       res.status(status).json({ error });
       return;
     }
@@ -179,16 +224,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     }
     const { data: allRoles } = await supabase.from('Role').select('id,key,slug,permissions');
-    const records = (((allRoles as unknown[]) ?? []) as {
-      id: string;
-      key?: string | null;
-      slug: string;
-      permissions?: unknown;
-    }[]).map((r) => ({
+    const records = (
+      ((allRoles as unknown[]) ?? []) as {
+        id: string;
+        key?: string | null;
+        slug: string;
+        permissions?: unknown;
+      }[]
+    ).map((r) => ({
       id: typeof r.key === 'string' && r.key ? r.key : r.slug,
-      permissions: Array.isArray(r.permissions) ? r.permissions.filter((p): p is string => typeof p === 'string') : [],
+      permissions: Array.isArray(r.permissions)
+        ? r.permissions.filter((p): p is string => typeof p === 'string')
+        : [],
     }));
-    const guard = guardRolePermissions(records, toRecord(role).id, input.permissions as string[], sessionRoleId);
+    const guard = guardRolePermissions(
+      records,
+      toRecord(role).id,
+      input.permissions as string[],
+      sessionRoleId,
+    );
     if (!guard.ok) {
       const { error, status } = toErrorEnvelope('CONFLICT', guard.reason, 409);
       res.status(status).json({ error });

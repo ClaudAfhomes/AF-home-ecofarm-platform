@@ -172,97 +172,129 @@ function persistHomepage(content: HomepageContent): void {
   if (typeof window === 'undefined' || !window.localStorage) return;
   try {
     window.localStorage.setItem(STORAGE_KEY_HOMEPAGE, JSON.stringify(content));
-  } catch { /* ignore quota or privacy mode - in-memory still holds draft */ }
+  } catch {
+    /* ignore quota or privacy mode - in-memory still holds draft */
+  }
 }
 function persistAbout(content: AboutContent): void {
   if (typeof window === 'undefined' || !window.localStorage) return;
   try {
     window.localStorage.setItem(STORAGE_KEY_ABOUT, JSON.stringify(content));
-  } catch { /* ignore quota or privacy mode - in-memory still holds draft */ }
+  } catch {
+    /* ignore quota or privacy mode - in-memory still holds draft */
+  }
 }
 function persistProperties(content: PropertiesContent): void {
   if (typeof window === 'undefined' || !window.localStorage) return;
   try {
     window.localStorage.setItem(STORAGE_KEY_PROPERTIES, JSON.stringify(content));
-  } catch { /* ignore quota or privacy mode - in-memory still holds draft */ }
+  } catch {
+    /* ignore quota or privacy mode - in-memory still holds draft */
+  }
 }
 function persistFaqs(content: FaqContent): void {
   if (typeof window === 'undefined' || !window.localStorage) return;
   try {
     window.localStorage.setItem(STORAGE_KEY_FAQS, JSON.stringify(content));
-  } catch { /* ignore quota or privacy mode - in-memory still holds draft */ }
+  } catch {
+    /* ignore quota or privacy mode - in-memory still holds draft */
+  }
 }
 function persistContact(content: ContactContent): void {
   if (typeof window === 'undefined' || !window.localStorage) return;
   try {
     window.localStorage.setItem(STORAGE_KEY_CONTACT, JSON.stringify(content));
-  } catch { /* ignore quota or privacy mode - in-memory still holds draft */ }
+  } catch {
+    /* ignore quota or privacy mode - in-memory still holds draft */
+  }
 }
 function persistGlobal(content: GlobalContent): void {
   if (typeof window === 'undefined' || !window.localStorage) return;
   try {
     window.localStorage.setItem(STORAGE_KEY_GLOBAL, JSON.stringify(content));
-  } catch { /* ignore quota or privacy mode - in-memory still holds draft */ }
+  } catch {
+    /* ignore quota or privacy mode - in-memory still holds draft */
+  }
 }
 function persistLogin(content: LoginContent): void {
   if (typeof window === 'undefined' || !window.localStorage) return;
   try {
     window.localStorage.setItem(STORAGE_KEY_LOGIN, JSON.stringify(content));
-  } catch { /* ignore quota or privacy mode - in-memory still holds draft */ }
+  } catch {
+    /* ignore quota or privacy mode - in-memory still holds draft */
+  }
 }
 function persistRegister(content: RegisterContent): void {
   if (typeof window === 'undefined' || !window.localStorage) return;
   try {
     window.localStorage.setItem(STORAGE_KEY_REGISTER, JSON.stringify(content));
-  } catch { /* ignore quota or privacy mode - in-memory still holds draft */ }
+  } catch {
+    /* ignore quota or privacy mode - in-memory still holds draft */
+  }
 }
 function clearHomepageStorage(): void {
   if (typeof window === 'undefined' || !window.localStorage) return;
   try {
     window.localStorage.removeItem(STORAGE_KEY_HOMEPAGE);
-  } catch { /* ignore quota or privacy mode - in-memory still holds draft */ }
+  } catch {
+    /* ignore quota or privacy mode - in-memory still holds draft */
+  }
 }
 function clearAboutStorage(): void {
   if (typeof window === 'undefined' || !window.localStorage) return;
   try {
     window.localStorage.removeItem(STORAGE_KEY_ABOUT);
-  } catch { /* ignore quota or privacy mode - in-memory still holds draft */ }
+  } catch {
+    /* ignore quota or privacy mode - in-memory still holds draft */
+  }
 }
 function clearPropertiesStorage(): void {
   if (typeof window === 'undefined' || !window.localStorage) return;
   try {
     window.localStorage.removeItem(STORAGE_KEY_PROPERTIES);
-  } catch { /* ignore quota or privacy mode - in-memory still holds draft */ }
+  } catch {
+    /* ignore quota or privacy mode - in-memory still holds draft */
+  }
 }
 function clearFaqsStorage(): void {
   if (typeof window === 'undefined' || !window.localStorage) return;
   try {
     window.localStorage.removeItem(STORAGE_KEY_FAQS);
-  } catch { /* ignore quota or privacy mode - in-memory still holds draft */ }
+  } catch {
+    /* ignore quota or privacy mode - in-memory still holds draft */
+  }
 }
 function clearContactStorage(): void {
   if (typeof window === 'undefined' || !window.localStorage) return;
   try {
     window.localStorage.removeItem(STORAGE_KEY_CONTACT);
-  } catch { /* ignore quota or privacy mode - in-memory still holds draft */ }
+  } catch {
+    /* ignore quota or privacy mode - in-memory still holds draft */
+  }
 }
 function clearGlobalStorage(): void {
   if (typeof window === 'undefined' || !window.localStorage) return;
   try {
     window.localStorage.removeItem(STORAGE_KEY_GLOBAL);
-  } catch { /* ignore quota or privacy mode - in-memory still holds draft */ }
+  } catch {
+    /* ignore quota or privacy mode - in-memory still holds draft */
+  }
 }
 function clearLoginStorage(): void {
   if (typeof window === 'undefined' || !window.localStorage) return;
   try {
     window.localStorage.removeItem(STORAGE_KEY_LOGIN);
-  } catch { /* ignore quota or privacy mode - in-memory still holds draft */ }
+  } catch {
+    /* ignore quota or privacy mode - in-memory still holds draft */
+  }
 }
 function clearRegisterStorage(): void {
   if (typeof window === 'undefined' || !window.localStorage) return;
   try {
     window.localStorage.removeItem(STORAGE_KEY_REGISTER);
-  } catch { /* ignore quota or privacy mode - in-memory still holds draft */ }
+  } catch {
+    /* ignore quota or privacy mode - in-memory still holds draft */
+  }
 }
 
 // In-memory drafts — hydrated from LocalStorage if available (prod-ready mock)
@@ -293,7 +325,9 @@ async function getAuthHeader(): Promise<Record<string, string>> {
     const { data } = await supabase.auth.getSession();
     const token = data.session?.access_token;
     if (token) return { Authorization: `Bearer ${token}` };
-  } catch { /* ignore quota or privacy mode - in-memory still holds draft */ }
+  } catch {
+    /* ignore quota or privacy mode - in-memory still holds draft */
+  }
   return {};
 }
 
@@ -310,7 +344,9 @@ async function fetchCmsWithFallback<T>(
     try {
       persist(data);
       setCurrent(data);
-    } catch { /* ignore quota or privacy mode - in-memory still holds draft */ }
+    } catch {
+      /* ignore quota or privacy mode - in-memory still holds draft */
+    }
     return structuredClone(data);
   } catch {
     const persisted = load();
@@ -340,7 +376,9 @@ async function putCmsWithFallback<T>(
     try {
       persist(data);
       updateCurrent(data);
-    } catch { /* ignore quota or privacy mode - in-memory still holds draft */ }
+    } catch {
+      /* ignore quota or privacy mode - in-memory still holds draft */
+    }
     return structuredClone(data);
   } catch (e) {
     // In tests, keep the original silent fallback so existing specs pass
@@ -350,10 +388,18 @@ async function putCmsWithFallback<T>(
       return structuredClone(parsed);
     }
     const message = e instanceof Error ? e.message : String(e);
-    if (message.includes('fetch') || message.includes('ECONNREFUSED') || message.includes('Failed to fetch') || message.includes('NetworkError')) {
-      throw new Error('API not running: run vercel dev --listen 3000 and ensure Supabase is configured. Changes not saved to database.', {
-        cause: e,
-      });
+    if (
+      message.includes('fetch') ||
+      message.includes('ECONNREFUSED') ||
+      message.includes('Failed to fetch') ||
+      message.includes('NetworkError')
+    ) {
+      throw new Error(
+        'API not running: run vercel dev --listen 3000 and ensure Supabase is configured. Changes not saved to database.',
+        {
+          cause: e,
+        },
+      );
     }
     throw e;
   }
@@ -382,9 +428,16 @@ export async function updateHomepage(draft: HomepageContent): Promise<HomepageCo
 
 export async function getAbout(): Promise<AboutContent> {
   await delay(120);
-  return fetchCmsWithFallback('about', aboutContentSchema, loadAboutFromStorage, currentAbout, persistAbout, (v) => {
-    currentAbout = structuredClone(v);
-  });
+  return fetchCmsWithFallback(
+    'about',
+    aboutContentSchema,
+    loadAboutFromStorage,
+    currentAbout,
+    persistAbout,
+    (v) => {
+      currentAbout = structuredClone(v);
+    },
+  );
 }
 
 export async function updateAbout(draft: AboutContent): Promise<AboutContent> {
@@ -396,23 +449,43 @@ export async function updateAbout(draft: AboutContent): Promise<AboutContent> {
 
 export async function getProperties(): Promise<PropertiesContent> {
   await delay(120);
-  return fetchCmsWithFallback('properties', propertiesContentSchema, loadPropertiesFromStorage, currentProperties, persistProperties, (v) => {
-    currentProperties = structuredClone(v);
-  });
+  return fetchCmsWithFallback(
+    'properties',
+    propertiesContentSchema,
+    loadPropertiesFromStorage,
+    currentProperties,
+    persistProperties,
+    (v) => {
+      currentProperties = structuredClone(v);
+    },
+  );
 }
 
 export async function updateProperties(draft: PropertiesContent): Promise<PropertiesContent> {
   await delay(180);
-  return putCmsWithFallback('properties', propertiesContentSchema, draft, persistProperties, (v) => {
-    currentProperties = structuredClone(v);
-  });
+  return putCmsWithFallback(
+    'properties',
+    propertiesContentSchema,
+    draft,
+    persistProperties,
+    (v) => {
+      currentProperties = structuredClone(v);
+    },
+  );
 }
 
 export async function getFaqs(): Promise<FaqContent> {
   await delay(120);
-  return fetchCmsWithFallback('faqs', faqContentSchema, loadFaqsFromStorage, currentFaqs, persistFaqs, (v) => {
-    currentFaqs = structuredClone(v);
-  });
+  return fetchCmsWithFallback(
+    'faqs',
+    faqContentSchema,
+    loadFaqsFromStorage,
+    currentFaqs,
+    persistFaqs,
+    (v) => {
+      currentFaqs = structuredClone(v);
+    },
+  );
 }
 
 export async function updateFaqs(draft: FaqContent): Promise<FaqContent> {
@@ -424,9 +497,16 @@ export async function updateFaqs(draft: FaqContent): Promise<FaqContent> {
 
 export async function getContact(): Promise<ContactContent> {
   await delay(120);
-  return fetchCmsWithFallback('contact', contactContentSchema, loadContactFromStorage, currentContact, persistContact, (v) => {
-    currentContact = structuredClone(v);
-  });
+  return fetchCmsWithFallback(
+    'contact',
+    contactContentSchema,
+    loadContactFromStorage,
+    currentContact,
+    persistContact,
+    (v) => {
+      currentContact = structuredClone(v);
+    },
+  );
 }
 
 export async function updateContact(draft: ContactContent): Promise<ContactContent> {
@@ -438,9 +518,16 @@ export async function updateContact(draft: ContactContent): Promise<ContactConte
 
 export async function getGlobal(): Promise<GlobalContent> {
   await delay(120);
-  return fetchCmsWithFallback('global', globalContentSchema, loadGlobalFromStorage, currentGlobal, persistGlobal, (v) => {
-    currentGlobal = structuredClone(v);
-  });
+  return fetchCmsWithFallback(
+    'global',
+    globalContentSchema,
+    loadGlobalFromStorage,
+    currentGlobal,
+    persistGlobal,
+    (v) => {
+      currentGlobal = structuredClone(v);
+    },
+  );
 }
 
 export async function updateGlobal(draft: GlobalContent): Promise<GlobalContent> {
@@ -452,9 +539,16 @@ export async function updateGlobal(draft: GlobalContent): Promise<GlobalContent>
 
 export async function getLogin(): Promise<LoginContent> {
   await delay(120);
-  return fetchCmsWithFallback('login', loginContentSchema, loadLoginFromStorage, currentLogin, persistLogin, (v) => {
-    currentLogin = structuredClone(v);
-  });
+  return fetchCmsWithFallback(
+    'login',
+    loginContentSchema,
+    loadLoginFromStorage,
+    currentLogin,
+    persistLogin,
+    (v) => {
+      currentLogin = structuredClone(v);
+    },
+  );
 }
 
 export async function updateLogin(draft: LoginContent): Promise<LoginContent> {
@@ -466,9 +560,16 @@ export async function updateLogin(draft: LoginContent): Promise<LoginContent> {
 
 export async function getRegister(): Promise<RegisterContent> {
   await delay(120);
-  return fetchCmsWithFallback('register', registerContentSchema, loadRegisterFromStorage, currentRegister, persistRegister, (v) => {
-    currentRegister = structuredClone(v);
-  });
+  return fetchCmsWithFallback(
+    'register',
+    registerContentSchema,
+    loadRegisterFromStorage,
+    currentRegister,
+    persistRegister,
+    (v) => {
+      currentRegister = structuredClone(v);
+    },
+  );
 }
 
 export async function updateRegister(draft: RegisterContent): Promise<RegisterContent> {

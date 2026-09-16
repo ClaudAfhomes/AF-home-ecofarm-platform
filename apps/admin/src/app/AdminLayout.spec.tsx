@@ -49,9 +49,7 @@ describe('AdminLayout', () => {
     expect(await screen.findByRole('alert')).toBeInTheDocument();
     expect(screen.getByText('Navigation unavailable')).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'Dashboard' })).not.toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: 'Reload' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Reload' })).toBeInTheDocument();
   });
 
   it('shows the session-resolved custom role name and nav without the role catalog', async () => {

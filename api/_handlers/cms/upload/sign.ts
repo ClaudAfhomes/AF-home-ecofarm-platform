@@ -1,5 +1,3 @@
-import { createClient } from '@supabase/supabase-js';
-
 import { contentUploadSignRequestSchema, type ContentKind } from '@jad/contracts';
 
 import { ADMIN_STAFF } from '../../../_lib/access.js';
@@ -8,6 +6,7 @@ import { setCors } from '../../../_lib/cors.js';
 import { getSupabaseEnv } from '../../../_lib/env.js';
 import { toErrorEnvelope as toError } from '../../../_lib/envelope.js';
 import type { VercelRequest, VercelResponse } from '../../../_lib/http.js';
+import { serviceClient } from '../../../_lib/rest.js';
 
 /**
  * Per-kind upload rules — mirrors the admin dialog's `KIND_ACCEPT` /
@@ -158,7 +157,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
 
-  const supabase = createClient(url, serviceKey, { auth: { autoRefreshToken: false } });
+  const supabase = serviceClient();
+  if (!supabase) {
+    const { error, status } = toError('INTERNAL', 'Supabase not configured', 500);
+    res.status(status).json({ error });
+    return;
+  }
   const safeName = fileName.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 80) || 'image';
   const key = `cms/${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${safeName}`;
 

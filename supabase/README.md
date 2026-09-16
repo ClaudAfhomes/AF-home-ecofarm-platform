@@ -28,12 +28,14 @@ Apply with `pnpm db:migrate` (runs `supabase/apply-migrations.ts`): it connects 
 - After each batch, run `supabase/security/rls_invariants.sql` in the SQL editor; expect only the documented `is_staff_user` exception row.
 
 Legacy: `psql $DATABASE_URL -f supabase/migrations/<file>.sql` (requires a working pooler URL). `20260829000001_auth_foundation.sql` — Phase 1 auth only (no Prisma):
+
 - Creates `Member`, `Role`, `MemberRole` if not exists (id = `auth.users.id` for `auth.uid()`).
 - Seeds roles `admin` / `user`.
 - Enables `RLS` `Member auth.uid()=id`, `MemberRole` own row, `Role` read for authenticated.
 - **CRM tables (`Customer`, `Sale`, `Property`, `Commission`, `Wallet`, etc.) are intentionally left untouched** until CRM phase (Q3).
 
 Later migrations (apply in filename order, all idempotent):
+
 - `20260830000001_cms_contents.sql`, `20260831000002_cms_realtime.sql`,
   `20260831000003_location_verifications.sql`, `20260831000004_countries.sql`
 - `20260904000001_staff_roles.sql` — staff `Role` rows (`super_admin`, `finance`, `merchant`)
@@ -60,14 +62,14 @@ pnpm seed
 
 ## Auth scope (Phase 1)
 
-*   Supabase + PostgreSQL + Supabase Auth + TanStack Query only. No Prisma / no ORM.
-*   Only `admin` / `user` test accounts. No registration, MFA, password reset, social login, user management UI.
-*   CRM/CMS backend intentionally deferred — dashboards are static placeholders.
-*   Full RLS/authorization design when CRM modules are connected.
+- Supabase + PostgreSQL + Supabase Auth + TanStack Query only. No Prisma / no ORM.
+- Only `admin` / `user` test accounts. No registration, MFA, password reset, social login, user management UI.
+- CRM/CMS backend intentionally deferred — dashboards are static placeholders.
+- Full RLS/authorization design when CRM modules are connected.
 
 ## Security invariants
 
-*   No `VITE_` service key `docs/security/SECURITY.md:97`.
-*   No hardcoded passwords — `SUPABASE_SEED_*` env only.
-*   Roles resolved authoritatively via `MemberRole` → `Role` (never client-side).
-*   Finance invariants (`BI-005`, `BI-008`) deferred — no finance tables mutated in Phase 1.
+- No `VITE_` service key `docs/security/SECURITY.md:97`.
+- No hardcoded passwords — `SUPABASE_SEED_*` env only.
+- Roles resolved authoritatively via `MemberRole` → `Role` (never client-side).
+- Finance invariants (`BI-005`, `BI-008`) deferred — no finance tables mutated in Phase 1.

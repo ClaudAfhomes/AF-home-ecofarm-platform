@@ -144,13 +144,16 @@ export function CmsImageField({
         if (!signRes.ok) {
           let msg = 'Upload failed — please try again.';
           try {
-            const errJson = (await signRes.json()) as { error?: { code?: string; message?: string } };
+            const errJson = (await signRes.json()) as {
+              error?: { code?: string; message?: string };
+            };
             const code = errJson?.error?.code;
             const serverMsg = errJson?.error?.message;
             if (code === 'UNAUTHORIZED') msg = 'Please sign in again to upload images.';
             else if (code === 'FORBIDDEN') msg = 'You do not have permission to upload images.';
             else if (code === 'VALIDATION_ERROR' && serverMsg) msg = serverMsg;
-            else if (signRes.status >= 500) msg = 'Upload failed due to a server issue — please try again.';
+            else if (signRes.status >= 500)
+              msg = 'Upload failed due to a server issue — please try again.';
           } catch {
             if (signRes.status === 401) msg = 'Please sign in again to upload images.';
             else if (signRes.status === 403) msg = 'You do not have permission to upload images.';
@@ -158,7 +161,11 @@ export function CmsImageField({
           }
           uploadError = msg;
         } else {
-          const signJson = (await signRes.json()) as { signedUrl: string; publicUrl: string; path: string };
+          const signJson = (await signRes.json()) as {
+            signedUrl: string;
+            publicUrl: string;
+            path: string;
+          };
           const signedUrl = signJson.signedUrl;
           const publicUrl = signJson.publicUrl;
           if (!signedUrl || !publicUrl) {

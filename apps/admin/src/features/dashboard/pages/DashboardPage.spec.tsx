@@ -22,7 +22,7 @@ describe('DashboardPage', () => {
 
     expect(await screen.findByText('Registrations')).toBeInTheDocument();
     expect(screen.getByText('Sales')).toBeInTheDocument();
-    expect(screen.getByText('Payouts')).toBeInTheDocument();
+    expect(screen.getByText('Members')).toBeInTheDocument();
     expect(screen.getByText('Withdrawals')).toBeInTheDocument();
     expect(await screen.findByText(/Welcome back, Admin — \d+ pending/)).toBeInTheDocument();
     expect(screen.getByText('As of today')).toBeInTheDocument();

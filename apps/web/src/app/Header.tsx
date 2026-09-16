@@ -22,12 +22,22 @@ export function Header() {
   const { pathname } = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const { data: globalCms } = useQuery({ queryKey: ['cms', 'global'], queryFn: getGlobalCmsPublic, staleTime: 0 });
+  const { data: globalCms } = useQuery({
+    queryKey: ['cms', 'global'],
+    queryFn: getGlobalCmsPublic,
+    staleTime: 0,
+  });
   const nav = globalCms?.nav ?? SITE.nav;
   const authNav = globalCms?.authNav ?? SITE.auth;
   const rawLogo = globalCms?.logo ?? LOGO;
   // Handle both CmsPhoto (id) and LOGO (src) shapes
-  const logo = (rawLogo as { src?: string; id?: string; alt: string; width?: number; height?: number }) as typeof LOGO;
+  const logo = rawLogo as {
+    src?: string;
+    id?: string;
+    alt: string;
+    width?: number;
+    height?: number;
+  } as typeof LOGO;
   const logoSrc = (logo as { src?: string }).src ?? (logo as { id?: string }).id ?? LOGO.src;
   const siteName = globalCms?.brand?.name ?? SITE.name;
 

@@ -47,9 +47,7 @@ export function isReferralCodeTaken(
   candidate: string,
 ): boolean {
   const wanted = candidate.toLowerCase();
-  return existingCodes.some(
-    (code) => typeof code === 'string' && code.toLowerCase() === wanted,
-  );
+  return existingCodes.some((code) => typeof code === 'string' && code.toLowerCase() === wanted);
 }
 
 /**
@@ -80,7 +78,5 @@ export function isReferralCodeConflict(error: unknown): boolean {
   if (!error || typeof error !== 'object') return false;
   const record = error as { code?: unknown; message?: unknown };
   if (record.code === '23505') return true;
-  return (
-    typeof record.message === 'string' && record.message.includes('Member_referralCode_uidx')
-  );
+  return typeof record.message === 'string' && record.message.includes('Member_referralCode_uidx');
 }

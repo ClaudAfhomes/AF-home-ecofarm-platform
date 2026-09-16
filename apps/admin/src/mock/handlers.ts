@@ -19,6 +19,7 @@ import {
   MOCK_ADJUSTMENTS,
   MOCK_AUDIT,
   MOCK_PROGRAMS,
+  MOCK_MEMBERS,
 } from './data';
 import {
   appendStaffAudit,
@@ -93,7 +94,7 @@ export const adminMockHandlers: MockRoute[] = [
       registrations: registrationStore.registrations.filter((row) => row.status === 'PENDING')
         .length,
       sales: MOCK_SALES.length,
-      payouts: MOCK_PAYOUT_ACCOUNTS.length,
+      members: MOCK_MEMBERS.length,
       withdrawals: MOCK_WITHDRAWALS.length,
     }),
   },

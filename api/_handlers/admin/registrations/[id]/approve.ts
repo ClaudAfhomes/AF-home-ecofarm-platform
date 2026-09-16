@@ -1,4 +1,3 @@
-import { createClient } from '@supabase/supabase-js';
 import { randomUUID } from 'node:crypto';
 
 import { ADMIN_STAFF } from '../../../../_lib/access.js';
@@ -6,11 +5,8 @@ import { findAuthUserId, isAuthConflict, verifyStaffModule } from '../../../../_
 import { appendAudit } from '../../../../_lib/audit.js';
 import { getSupabaseEnv } from '../../../../_lib/env.js';
 import type { VercelRequest, VercelResponse } from '../../../../_lib/http.js';
-import {
-  isReferralCodeConflict,
-  pickUniqueReferralCode,
-} from '../../../../_lib/referral-codes.js';
-import { methodNotAllowed, readJsonBody } from '../../../../_lib/rest.js';
+import { isReferralCodeConflict, pickUniqueReferralCode } from '../../../../_lib/referral-codes.js';
+import { methodNotAllowed, readJsonBody, serviceClient } from '../../../../_lib/rest.js';
 import { toErrorEnvelope } from '../../../../_lib/envelope.js';
 
 /**
@@ -60,7 +56,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.status(status).json({ error });
     return;
   }
-  const supabase = createClient(url, serviceKey, { auth: { autoRefreshToken: false } });
+  const supabase = serviceClient();
+  if (!supabase) {
+    const { error, status } = toErrorEnvelope('INTERNAL', 'Supabase not configured', 500);
+    res.status(status).json({ error });
+    return;
+  }
   const { data: reg, error: readError } = await supabase
     .from('Registration')
     .select('*')
@@ -86,12 +87,55 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.status(status).json({ error });
     return;
   }
+  // Resolve the referral code to a sponsor (B7 Member.sponsorId) BEFORE any
+  // auth provisioning so a bad code fails cleanly (no partial writes).
+  // NOTE: Registration.referralCode is the *sponsor's* code from intake; the
+  // new Member always gets a freshly generated *own* code (BR-REF-004).
+  let sponsorId: string | null = null;
+  const sponsorCode = String((row.referralCode as string | undefined) ?? '').trim();
+  type SponsorLookup = {
+    id: string;
+    referralCode?: string | null;
+    accountStatus?: string;
+    isQualified?: boolean;
+  };
+  const { data: sponsors } = await supabase
+    .from('Member')
+    .select('id,referralCode,accountStatus,isQualified');
+  const members = ((sponsors as SponsorLookup[] | null) ?? []) as SponsorLookup[];
+  let existingCodes: (string | null | undefined)[] = members.map(
+    (candidate) => candidate.referralCode,
+  );
+  if (sponsorCode) {
+    const sponsor = members.find(
+      (candidate) => (candidate.referralCode ?? '').toLowerCase() === sponsorCode.toLowerCase(),
+    );
+    // Sponsors must be ACTIVE + Qualified (BR-REF-003, mirrors
+    // POST /auth/register). An intake-valid code that no longer resolves
+    // (sponsor deactivated/disqualified in the meantime) rejects approval
+    // instead of silently creating a sponsorless member — a new applicant is
+    // never an existing Member, so self-referral is impossible here.
+    if (sponsor && sponsor.accountStatus === 'ACTIVE' && sponsor.isQualified === true) {
+      sponsorId = sponsor.id;
+    }
+    if (!sponsorId) {
+      const { error, status } = toErrorEnvelope(
+        'VALIDATION_ERROR',
+        'The referral code could not be matched to an active, qualified sponsor. Verify the sponsor account and retry approval.',
+        400,
+      );
+      res.status(status).json({ error });
+      return;
+    }
+  }
   // Provision the auth account (random unusable password — member sets their own via recovery).
   // Registration identity is phone-based (the Registration table has no
   // email column); email is used when present (forward-compat). Normalized
   // to lowercase to match how Supabase Auth stores emails (GoTrue lowercases)
   // — otherwise adoption after a createUser conflict misses on exact match.
-  const email = String((row.email as string | undefined) ?? '').trim().toLowerCase();
+  const email = String((row.email as string | undefined) ?? '')
+    .trim()
+    .toLowerCase();
   const phone = String((row.phone as string | undefined) ?? '').trim();
   if (!email && !phone) {
     const { error, status } = toErrorEnvelope(
@@ -149,41 +193,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Member.email is NOT NULL + format-validated client-side. Phone-only
   // members get a deterministic unique stand-in (contact stays the phone).
   const memberEmail = email || `${phone.replace(/\D/g, '')}@phone.invalid`;
-  // Resolve the referral code to a sponsor (B7 Member.sponsorId). Skipped
-  // cleanly when absent or unresolvable — approval still proceeds.
-  // NOTE: Registration.referralCode is the *sponsor's* code from intake; the
-  // new Member always gets a freshly generated *own* code (BR-REF-004).
-  let sponsorId: string | null = null;
-  const sponsorCode = String((row.referralCode as string | undefined) ?? '').trim();
-  type SponsorLookup = {
-    id: string;
-    referralCode?: string | null;
-    accountStatus?: string;
-    isQualified?: boolean;
-  };
-  const { data: sponsors } = await supabase
-    .from('Member')
-    .select('id,referralCode,accountStatus,isQualified');
-  const members = ((sponsors as SponsorLookup[] | null) ?? []) as SponsorLookup[];
-  let existingCodes: (string | null | undefined)[] = members.map(
-    (candidate) => candidate.referralCode,
-  );
-  if (sponsorCode) {
-    const sponsor = members.find(
-      (candidate) => (candidate.referralCode ?? '').toLowerCase() === sponsorCode.toLowerCase(),
-    );
-    // Sponsors must be ACTIVE + Qualified (BR-REF-003, mirrors
-    // POST /auth/register); unresolved or ineligible codes simply mean no
-    // sponsor link.
-    if (
-      sponsor &&
-      sponsor.id !== memberAuthId &&
-      sponsor.accountStatus === 'ACTIVE' &&
-      sponsor.isQualified === true
-    ) {
-      sponsorId = sponsor.id;
-    }
-  }
   const buildMemberRow = (referralCode: string) => ({
     id: memberAuthId,
     email: memberEmail,
@@ -220,10 +229,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // and retry before surfacing a safe conflict.
   if (memberResult.error && isReferralCodeConflict(memberResult.error)) {
     existingCodes = [...existingCodes, memberReferralCode];
-    memberReferralCode = pickUniqueReferralCode(
-      existingCodes,
-      row.lastName as string | undefined,
-    );
+    memberReferralCode = pickUniqueReferralCode(existingCodes, row.lastName as string | undefined);
     memberResult = await supabase
       .from('Member')
       .upsert(buildMemberRow(memberReferralCode), { onConflict: 'id' });

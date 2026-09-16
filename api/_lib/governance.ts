@@ -37,7 +37,8 @@ export function guardRolePermissions(
   ) {
     return {
       ok: false,
-      reason: 'You cannot remove your own governance access. Grant the Staff module to another role first.',
+      reason:
+        'You cannot remove your own governance access. Grant the Staff module to another role first.',
     };
   }
   const removed = soleGrantedGovernance(roles, roleId).filter((m) => !next.includes(m));
@@ -82,9 +83,7 @@ export function activeGovernorCount(
   roles: readonly GovRole[],
   excludeId?: string,
 ): number {
-  const granting = new Set(
-    roles.filter((r) => r.permissions.includes('staff')).map((r) => r.id),
-  );
+  const granting = new Set(roles.filter((r) => r.permissions.includes('staff')).map((r) => r.id));
   return members.filter(
     (m) => m.status === 'ACTIVE' && granting.has(m.roleId) && m.id !== excludeId,
   ).length;
@@ -95,9 +94,7 @@ export function isLastGovernor(
   roles: readonly GovRole[],
   target: GovMember,
 ): boolean {
-  const granting = new Set(
-    roles.filter((r) => r.permissions.includes('staff')).map((r) => r.id),
-  );
+  const granting = new Set(roles.filter((r) => r.permissions.includes('staff')).map((r) => r.id));
   return (
     target.status === 'ACTIVE' &&
     granting.has(target.roleId) &&

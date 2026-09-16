@@ -16,7 +16,9 @@ export const MEMBER_SLUGS = ['member_basic', 'member_qualified', 'user'];
 const STAFF_PRIORITY = ['super_admin', 'admin', 'finance', 'merchant'];
 
 function canonical(s: unknown): string {
-  return String(s ?? '').trim().toLowerCase();
+  return String(s ?? '')
+    .trim()
+    .toLowerCase();
 }
 
 /** Pick the effective staff role id from a member's slugs (null = no access). */
@@ -32,7 +34,14 @@ export function pickStaffRoleId(slugs: string[]): string | null {
   return custom ?? null;
 }
 
-export type DbRole = { id: string; key: string | null; slug: string; name: string; permissions: unknown; is_system: boolean };
+export type DbRole = {
+  id: string;
+  key: string | null;
+  slug: string;
+  name: string;
+  permissions: unknown;
+  is_system: boolean;
+};
 
 /**
  * Effective permission modules for a role row. Stored modules win when
@@ -91,8 +100,7 @@ export async function staffRoleModules(
 ): Promise<string[]> {
   const rows = await roleRows(svc as Db);
   const row = rows.find(
-    (r) =>
-      (typeof r.key === 'string' && r.key ? r.key : r.slug) === roleId || r.slug === roleId,
+    (r) => (typeof r.key === 'string' && r.key ? r.key : r.slug) === roleId || r.slug === roleId,
   );
   if (!row) return effectivePermissions(roleId, undefined);
   return effectivePermissions(row.slug ?? row.key ?? '', row.permissions);
@@ -100,7 +108,10 @@ export async function staffRoleModules(
 
 /** Staff slugs held by a staff user (via StaffAssignment links — Phase 1 staff domain). */
 export async function staffAssignmentSlugs(svc: Db, staffUserId: string): Promise<string[]> {
-  const { data: links, error } = await svc.from('StaffAssignment').select('roleId').eq('staffUserId', staffUserId);
+  const { data: links, error } = await svc
+    .from('StaffAssignment')
+    .select('roleId')
+    .eq('staffUserId', staffUserId);
   if (error || !Array.isArray(links)) return [];
   const ids = (links as { roleId?: string; role_id?: string }[])
     .map((l) => l.roleId ?? l.role_id ?? '')
@@ -108,7 +119,7 @@ export async function staffAssignmentSlugs(svc: Db, staffUserId: string): Promis
   if (ids.length === 0) return [];
   const { data: matched } = await svc.from('Role').select('id,slug');
   const slugs: string[] = [];
-  for (const row of ((matched as { id: string; slug: string }[] | null) ?? [])) {
+  for (const row of (matched as { id: string; slug: string }[] | null) ?? []) {
     if (ids.includes(row.id) && typeof row.slug === 'string') slugs.push(row.slug);
   }
   return slugs;
@@ -135,10 +146,12 @@ export async function listStaffEntries(svc: Db): Promise<StaffEntry[]> {
   const { data: links } = await svc.from('StaffAssignment').select('staffUserId,roleId');
   const { data: roles } = await svc.from('Role').select('id,slug');
   const slugById = new Map(
-    (((roles as { id: string; slug: string }[] | null) ?? []).map((r) => [r.id, r.slug])),
+    ((roles as { id: string; slug: string }[] | null) ?? []).map((r) => [r.id, r.slug]),
   );
   const slugsByUser = new Map<string, string[]>();
-  for (const l of ((links as { staffUserId?: string; staff_user_id?: string; roleId?: string; role_id?: string }[] | null) ?? [])) {
+  for (const l of (links as
+    { staffUserId?: string; staff_user_id?: string; roleId?: string; role_id?: string }[] | null) ??
+    []) {
     const uid = l.staffUserId ?? l.staff_user_id ?? '';
     const slug = slugById.get(l.roleId ?? l.role_id ?? '') ?? '';
     if (!uid || !slug) continue;
@@ -147,7 +160,7 @@ export async function listStaffEntries(svc: Db): Promise<StaffEntry[]> {
     slugsByUser.set(uid, list);
   }
   const entries: StaffEntry[] = [];
-  for (const u of (users as Record<string, unknown>[])) {
+  for (const u of users as Record<string, unknown>[]) {
     const id = String(u.id ?? '');
     const roleId = pickStaffRoleId(slugsByUser.get(id) ?? []);
     if (!roleId) continue;

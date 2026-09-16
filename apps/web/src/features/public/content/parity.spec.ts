@@ -55,9 +55,7 @@ describe('cms seed parity', () => {
       delete rest.isFeatured;
       return rest;
     };
-    expect(PROPERTY_RECORDS.map(strip)).toEqual(
-      CMS_PROPERTIES_SEED.properties.map(strip),
-    );
+    expect(PROPERTY_RECORDS.map(strip)).toEqual(CMS_PROPERTIES_SEED.properties.map(strip));
   });
 
   it('matches about values across the hero split', () => {

@@ -1,12 +1,26 @@
+import type { GenealogyNode, MemberStatus } from '@jad/contracts';
+
 import { verifyUser } from '../../_lib/auth.js';
 import type { VercelRequest, VercelResponse } from '../../_lib/http.js';
-import { genealogyTree } from '../../_lib/referrals.js';
+import { ancestorChainOf, genealogyTree } from '../../_lib/referrals.js';
 import { methodNotAllowed, requireService } from '../../_lib/rest.js';
 import { toErrorEnvelope } from '../../_lib/envelope.js';
 
-import { displayName, joinedAt, loadNetwork } from './_network.js';
+import { displayName, joinedAt, loadNetwork, type MemberRow } from './_network.js';
 
-/** GET /me/genealogy — referral tree visualization. */
+/** A genealogy node without children (used for the upline sponsor chain). */
+function toLeafNode(row: MemberRow): GenealogyNode {
+  return {
+    id: row.id,
+    name: displayName(row),
+    status: (row.status ?? 'PENDING') as MemberStatus,
+    isQualified: row.isQualified ?? false,
+    joinedAt: joinedAt(row),
+    children: [],
+  };
+}
+
+/** GET /me/genealogy — referral tree visualization + the member's upline chain. */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
@@ -49,5 +63,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.status(status).json({ error });
     return;
   }
-  res.status(200).json({ root });
+  // Upline: topmost reachable ancestor → direct sponsor (never the member).
+  const ancestors = ancestorChainOf(rows, auth.userId).map(toLeafNode);
+  const sponsor = ancestors.length > 0 ? ancestors[ancestors.length - 1] : null;
+  res.status(200).json({ root, sponsor, ancestors });
 }

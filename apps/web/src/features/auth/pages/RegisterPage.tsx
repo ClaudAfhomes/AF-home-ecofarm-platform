@@ -15,7 +15,11 @@ import { registerApplication } from '../services/auth';
  * email verification screen (SCR-AUTH-003) with the applicant's email.
  */
 export function RegisterPage() {
-  const { data: cmsRegister } = useQuery({ queryKey: ['cms', 'register'], queryFn: getRegisterCmsPublic, staleTime: 0 });
+  const { data: cmsRegister } = useQuery({
+    queryKey: ['cms', 'register'],
+    queryFn: getRegisterCmsPublic,
+    staleTime: 0,
+  });
   const { data: globalCms } = useQuery({
     queryKey: ['cms', 'global'],
     queryFn: getGlobalCmsPublic,

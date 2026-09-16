@@ -29,7 +29,9 @@ export type LocationVerificationPayload =
     }
   | Record<string, never>;
 
-export function verifyLocation(payload: LocationVerificationPayload): Promise<LocationVerificationResponse> {
+export function verifyLocation(
+  payload: LocationVerificationPayload,
+): Promise<LocationVerificationResponse> {
   return request('/registration/location-verify', locationVerificationResponseSchema, {
     method: 'POST',
     body: JSON.stringify(payload),

@@ -55,5 +55,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     id: row.id,
     questionText: row.questionText ?? row.question_text,
   }));
-  okList(res, rows.filter((row) => qualificationQuestionSchema.safeParse(row).success));
+  okList(
+    res,
+    rows.filter((row) => qualificationQuestionSchema.safeParse(row).success),
+  );
 }

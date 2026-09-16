@@ -4,7 +4,12 @@ import { ADMIN_STAFF, FINANCE_VIEW } from '../../_lib/access.js';
 import { verifyStaffModule } from '../../_lib/auth.js';
 import { appendAudit } from '../../_lib/audit.js';
 import type { VercelRequest, VercelResponse } from '../../_lib/http.js';
-import { isValidSaleRow, mapSaleRow, prefixedId, validateSaleTransition } from '../../_lib/pipeline.js';
+import {
+  isValidSaleRow,
+  mapSaleRow,
+  prefixedId,
+  validateSaleTransition,
+} from '../../_lib/pipeline.js';
 import { methodNotAllowed, okList, readJsonBody, requireService } from '../../_lib/rest.js';
 import { toErrorEnvelope } from '../../_lib/envelope.js';
 
@@ -18,7 +23,10 @@ export async function listSales(req: VercelRequest, res: VercelResponse) {
   }
   const supabase = requireService(res);
   if (!supabase) return;
-  const { data, error } = await supabase.from('Sale').select('*').order('submittedAt', { ascending: false });
+  const { data, error } = await supabase
+    .from('Sale')
+    .select('*')
+    .order('submittedAt', { ascending: false });
   if (error) {
     const { error: env, status } = toErrorEnvelope('INTERNAL', error.message, 500);
     res.status(status).json({ error: env });
@@ -42,7 +50,7 @@ export async function createSale(req: VercelRequest, res: VercelResponse) {
     res.status(status).json({ error });
     return;
   }
-  const input = ((parsedBody.body ?? {}) as Record<string, unknown>);
+  const input = (parsedBody.body ?? {}) as Record<string, unknown>;
   const propertyId = String(input.propertyId ?? '').trim();
   const propertyName = String(input.propertyName ?? '').trim();
   const propertyValue = String(input.propertyValue ?? '').trim();
@@ -60,15 +68,24 @@ export async function createSale(req: VercelRequest, res: VercelResponse) {
   }
   const supabase = requireService(res);
   if (!supabase) return;
-  const { data: seller } = await supabase.from('Member').select('id').eq('id', sellerId).maybeSingle();
+  const { data: seller } = await supabase
+    .from('Member')
+    .select('id')
+    .eq('id', sellerId)
+    .maybeSingle();
   if (!seller) {
     const { error, status } = toErrorEnvelope('NOT_FOUND', 'Seller not found.', 404);
     res.status(status).json({ error });
     return;
   }
-  let customerId = typeof input.customerId === 'string' && input.customerId ? input.customerId : null;
+  let customerId =
+    typeof input.customerId === 'string' && input.customerId ? input.customerId : null;
   if (customerId) {
-    const { data: customer } = await supabase.from('Customer').select('id').eq('id', customerId).maybeSingle();
+    const { data: customer } = await supabase
+      .from('Customer')
+      .select('id')
+      .eq('id', customerId)
+      .maybeSingle();
     if (!customer) {
       const { error, status } = toErrorEnvelope('NOT_FOUND', 'Customer not found.', 404);
       res.status(status).json({ error });

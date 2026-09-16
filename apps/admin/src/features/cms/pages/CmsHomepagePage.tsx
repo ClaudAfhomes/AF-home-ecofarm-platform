@@ -225,7 +225,9 @@ export function CmsHomepagePage() {
 
       {saveMessage ? (
         <div
-          className={saveMessage.includes('All changes saved') ? styles.bannerSuccess : styles.bannerError}
+          className={
+            saveMessage.includes('All changes saved') ? styles.bannerSuccess : styles.bannerError
+          }
           role={saveMessage.includes('All changes saved') ? 'status' : 'alert'}
           aria-live="polite"
         >
@@ -253,12 +255,16 @@ export function CmsHomepagePage() {
                     if (el && typeof el.scrollIntoView === 'function') {
                       try {
                         el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                      } catch { /* ignore scroll or history failure */ }
+                      } catch {
+                        /* ignore scroll or history failure */
+                      }
                     }
                     toggleSection(s.id);
                     try {
                       history.pushState(null, '', `#${s.id}`);
-                    } catch { /* ignore scroll or history failure */ }
+                    } catch {
+                      /* ignore scroll or history failure */
+                    }
                   }}
                 >
                   <span className={styles.stepBadge} aria-hidden="true">

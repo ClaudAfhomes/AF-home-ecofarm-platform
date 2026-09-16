@@ -65,7 +65,12 @@ export function clearPersistedDraft(): void {
 export function usePersistedDraft(
   mode: 'create' | 'resubmit',
   initialDraft?: Partial<RegistrationDraft>,
-): [RegistrationDraft, React.Dispatch<React.SetStateAction<RegistrationDraft>>, () => void, boolean] {
+): [
+  RegistrationDraft,
+  React.Dispatch<React.SetStateAction<RegistrationDraft>>,
+  () => void,
+  boolean,
+] {
   const [draft, setDraft] = useState<RegistrationDraft>(() => {
     const empty = createEmptyDraft();
     const base = { ...empty, ...initialDraft };

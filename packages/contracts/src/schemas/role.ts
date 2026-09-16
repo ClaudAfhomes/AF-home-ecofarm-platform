@@ -22,8 +22,15 @@ export function normalizeRole(raw: unknown): Role {
     .trim()
     .toLowerCase()
     .replace(/[-_\s]/g, '_');
-  if (normalized === 'admin' || normalized === 'super_admin' || normalized === 'superadmin') return 'admin';
-  if (normalized === 'user' || normalized === 'member' || normalized === 'member_basic' || normalized === 'member_qualified') return 'user';
+  if (normalized === 'admin' || normalized === 'super_admin' || normalized === 'superadmin')
+    return 'admin';
+  if (
+    normalized === 'user' ||
+    normalized === 'member' ||
+    normalized === 'member_basic' ||
+    normalized === 'member_qualified'
+  )
+    return 'user';
   // compact check for SUPERADMIN without underscore
   if (normalized.replace(/_/g, '') === 'superadmin') return 'admin';
   return 'user';

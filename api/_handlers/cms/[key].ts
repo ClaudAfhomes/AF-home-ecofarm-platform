@@ -1,11 +1,10 @@
-import { createClient } from '@supabase/supabase-js';
-
 import { ADMIN_STAFF } from '../../_lib/access.js';
 import { verifyStaffModule } from '../../_lib/auth.js';
 import { setCors } from '../../_lib/cors.js';
 import { getSupabaseEnv } from '../../_lib/env.js';
 import { toErrorEnvelope } from '../../_lib/envelope.js';
 import type { VercelRequest, VercelResponse } from '../../_lib/http.js';
+import { serviceClient } from '../../_lib/rest.js';
 
 import {
   aboutContentSchema,
@@ -117,7 +116,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.status(status).json({ error });
     return;
   }
-  const supabase = createClient(url, serviceKey, { auth: { autoRefreshToken: false } });
+  const supabase = serviceClient();
+  if (!supabase) {
+    const { error, status } = toErrorEnvelope('INTERNAL', 'Supabase not configured', 500);
+    res.status(status).json({ error });
+    return;
+  }
 
   if (req.method === 'GET') {
     const { data, error } = await supabase

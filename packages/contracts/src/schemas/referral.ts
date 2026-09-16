@@ -63,6 +63,18 @@ export const genealogyNodeSchema: z.ZodType<GenealogyNodeShape> = z.lazy(() =>
 
 export const genealogySchema = z.object({
   root: genealogyNodeSchema,
+  /**
+   * Direct sponsor (the member who referred this member), when one is linked.
+   * Null for members with no sponsor (e.g. the network root or admin-created
+   * members) — BR-REF-003.
+   */
+  sponsor: genealogyNodeSchema.nullable(),
+  /**
+   * Upline chain — from the topmost reachable ancestor down to the direct
+   * sponsor, excluding the member itself. Empty when the member has no
+   * sponsor. Reporting only, never commission-entitlement (BI-004).
+   */
+  ancestors: z.array(genealogyNodeSchema),
 });
 
 export type GenealogyNode = z.infer<typeof genealogyNodeSchema>;

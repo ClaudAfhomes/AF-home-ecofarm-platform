@@ -20,10 +20,7 @@ import fs from 'fs';
 import path from 'path';
 import { Client } from 'pg';
 
-import {
-  parseMigrationVersion,
-  resolvePendingMigrations,
-} from '../api/_lib/migrations.js';
+import { parseMigrationVersion, resolvePendingMigrations } from '../api/_lib/migrations.js';
 
 function loadEnvFile(p: string) {
   try {
@@ -51,9 +48,7 @@ async function appliedVersions(client: Client): Promise<string[]> {
   await client.query(
     'create table if not exists supabase_migrations.schema_migrations (version text primary key)',
   );
-  const { rows } = await client.query(
-    'select version from supabase_migrations.schema_migrations',
-  );
+  const { rows } = await client.query('select version from supabase_migrations.schema_migrations');
   return rows.map((r: { version: string }) => r.version);
 }
 
@@ -80,7 +75,9 @@ async function run(client: Client): Promise<void> {
         marked += 1;
       }
     }
-    console.log(`[db:migrate] --mark-existing: recorded ${marked} existing migration(s) as applied.`);
+    console.log(
+      `[db:migrate] --mark-existing: recorded ${marked} existing migration(s) as applied.`,
+    );
   }
 
   // Re-read after --mark-existing so only genuinely new files are pending.
@@ -109,7 +106,10 @@ async function run(client: Client): Promise<void> {
     `select to_regclass('public."Conversation"') as conversation,
             to_regclass('public."Message"') as message`,
   );
-  const { conversation, message } = rows[0] as { conversation: string | null; message: string | null };
+  const { conversation, message } = rows[0] as {
+    conversation: string | null;
+    message: string | null;
+  };
   if (conversation && message) {
     console.log('[db:migrate] OK: Conversation + Message tables present.');
   } else {

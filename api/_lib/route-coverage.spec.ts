@@ -10,6 +10,8 @@ const SOURCE = `import handlerA from '../_handlers/a.js';
 import handlerB from '../_handlers/admin/b/[id].js';
 import handlerUnused from '../_handlers/unused.js';
 
+const handlerC = lazy(() => import('../_handlers/c.js'));
+
 if (x) {
   handler = handlerA;
 } else if (y) {
@@ -18,11 +20,12 @@ if (x) {
 `;
 
 describe('findRouteCoverageGaps (fixture source)', () => {
-  it('flags missing imports and imported-but-unused bindings', () => {
+  it('flags missing imports and imported-but-unused bindings; accepts lazy loads', () => {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'routes-'));
     fs.writeFileSync(path.join(dir, 'a.ts'), 'x');
     fs.mkdirSync(path.join(dir, 'admin', 'b'), { recursive: true });
     fs.writeFileSync(path.join(dir, 'admin', 'b', '[id].ts'), 'x');
+    fs.writeFileSync(path.join(dir, 'c.ts'), 'x');
     fs.writeFileSync(path.join(dir, 'orphan.ts'), 'x');
     fs.writeFileSync(path.join(dir, 'unused.ts'), 'x');
     expect(findRouteCoverageGaps(dir, SOURCE)).toEqual([

@@ -184,9 +184,7 @@ export function deleteRole(id: string): void {
   staffStore.roles = staffStore.roles.filter((r) => r.id !== id);
 }
 
-export function appendStaffAudit(
-  entry: Omit<MockAuditEntry, 'id' | 'createdAt'>,
-): MockAuditEntry {
+export function appendStaffAudit(entry: Omit<MockAuditEntry, 'id' | 'createdAt'>): MockAuditEntry {
   auditSeq += 1;
   const full: MockAuditEntry = {
     ...entry,

@@ -13,10 +13,7 @@ import type { MockStaffMember } from '../../mock/data';
 export const GOVERNANCE_MODULES: StaffModule[] = ['staff', 'audit', 'config'];
 
 /** Governance modules this role is the sole granter of (excluding itself). */
-export function soleGrantedGovernance(
-  roles: readonly RoleRecord[],
-  roleId: string,
-): StaffModule[] {
+export function soleGrantedGovernance(roles: readonly RoleRecord[], roleId: string): StaffModule[] {
   const current = roles.find((r) => r.id === roleId);
   if (!current) return [];
   return GOVERNANCE_MODULES.filter(
@@ -34,10 +31,16 @@ export function guardRolePermissions(
   sessionRoleId?: string | null,
 ): { ok: true } | { ok: false; reason: string } {
   const current = roles.find((r) => r.id === roleId);
-  if (current && sessionRoleId === roleId && current.permissions.includes('staff') && !next.includes('staff')) {
+  if (
+    current &&
+    sessionRoleId === roleId &&
+    current.permissions.includes('staff') &&
+    !next.includes('staff')
+  ) {
     return {
       ok: false,
-      reason: 'You cannot remove your own governance access. Grant the Staff module to another role first.',
+      reason:
+        'You cannot remove your own governance access. Grant the Staff module to another role first.',
     };
   }
   const removed = soleGrantedGovernance(roles, roleId).filter((m) => !next.includes(m));

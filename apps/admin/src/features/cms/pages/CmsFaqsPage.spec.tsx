@@ -100,9 +100,9 @@ describe('CmsFaqsPage — Phase 4 FAQ CMS', () => {
     expect(cmsItem).toBeDefined();
     expect(cmsItem?.label).toBe('Website CMS');
     expect(canAccess(MOCK_SUPER_ADMIN.role as never, cmsItem!)).toBe(true);
-    expect(
-      cmsItem?.dropdown?.some((d) => !('divider' in d) && d.to === '/admin/cms/faqs'),
-    ).toBe(true);
+    expect(cmsItem?.dropdown?.some((d) => !('divider' in d) && d.to === '/admin/cms/faqs')).toBe(
+      true,
+    );
     expect(
       cmsItem?.dropdown?.some(
         (d) => !('divider' in d) && d.to === '/admin/cms/faqs' && d.label === 'FAQs',

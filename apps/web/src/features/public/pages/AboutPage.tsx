@@ -24,7 +24,11 @@ const CHECK_ICON = (
 
 /** Public About Us page — CMS-driven with static fallback (Q6). */
 export function AboutPage() {
-  const { data: cms } = useQuery({ queryKey: ['cms', 'about'], queryFn: getAboutCms, staleTime: 0 });
+  const { data: cms } = useQuery({
+    queryKey: ['cms', 'about'],
+    queryFn: getAboutCms,
+    staleTime: 0,
+  });
   // CMS AboutContent has hero.title/lead; static ABOUT has top-level title/lead and hero without title/lead.
   // Normalize so both shapes work without hiding mismatches.
   const raw = (cms as unknown as typeof ABOUT) ?? ABOUT;

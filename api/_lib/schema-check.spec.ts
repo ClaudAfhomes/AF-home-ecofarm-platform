@@ -25,7 +25,9 @@ describe('isMissingTableError', () => {
   it('recognizes PostgREST PGRST205 and schema-cache messages', () => {
     expect(isMissingTableError({ code: 'PGRST205', message: 'x' })).toBe(true);
     expect(
-      isMissingTableError({ message: "Could not find the table 'public.Conversation' in the schema cache" }),
+      isMissingTableError({
+        message: "Could not find the table 'public.Conversation' in the schema cache",
+      }),
     ).toBe(true);
   });
 

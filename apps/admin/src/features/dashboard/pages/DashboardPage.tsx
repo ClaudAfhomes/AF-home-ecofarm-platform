@@ -29,13 +29,6 @@ const QUEUE_LINKS: {
     description: 'Sales submissions and approvals',
   },
   {
-    to: '/admin/payouts',
-    label: 'Payouts',
-    key: 'payouts',
-    icon: 'wallet',
-    description: 'Payout accounts pending verification',
-  },
-  {
     to: '/admin/withdrawals',
     label: 'Withdrawals',
     key: 'withdrawals',
@@ -44,6 +37,21 @@ const QUEUE_LINKS: {
   },
 ];
 
+/** Total-members stat card — a head-count snapshot, not a pending queue. */
+const MEMBER_STAT: {
+  to: string;
+  label: string;
+  key: keyof AdminQueues;
+  icon: 'user' | 'check' | 'wallet' | 'list';
+  description: string;
+} = {
+  to: '/admin/members',
+  label: 'Members',
+  key: 'members',
+  icon: 'user',
+  description: 'Total registered members',
+};
+
 /** Dashboard queue card — professional SaaS style with icon, count, and navigation. */
 function QueueCard({
   to,
@@ -51,25 +59,35 @@ function QueueCard({
   icon,
   description,
   data,
+  stat = false,
 }: {
   to: string;
   label: string;
   icon: 'user' | 'check' | 'wallet' | 'list';
   description: string;
   data: number | undefined;
+  stat?: boolean;
 }) {
   const count = data ?? 0;
   const hasItems = count > 0;
   return (
-    <Link className={styles.card} to={to} aria-label={`${label}: ${count} pending`}>
+    <Link
+      className={styles.card}
+      to={to}
+      aria-label={stat ? `${label}: ${count} total` : `${label}: ${count} pending`}
+    >
       <div className={styles.cardHeader}>
         <span className={styles.cardIcon}>
           <Icon name={icon} size={20} />
         </span>
-        <StatusChip
-          label={hasItems ? 'action needed' : 'clear'}
-          tone={hasItems ? 'warning' : 'success'}
-        />
+        {stat ? (
+          <StatusChip label="registered" tone="neutral" />
+        ) : (
+          <StatusChip
+            label={hasItems ? 'action needed' : 'clear'}
+            tone={hasItems ? 'warning' : 'success'}
+          />
+        )}
       </div>
       <span className={styles.count}>{count}</span>
       <span className={styles.label}>{label}</span>
@@ -78,7 +96,7 @@ function QueueCard({
   );
 }
 
-/** Dashboard (queues) — pending-action counts per queue the role may access. */
+/** Dashboard — total-members stat plus pending-action counts per queue the role may access. */
 export function DashboardPage() {
   const { role } = useSession();
   const { data, isPending, isError, error, refetch } = useAdminQueues();
@@ -87,6 +105,9 @@ export function DashboardPage() {
     const item = findNavItem(queue.to);
     return item === undefined || canAccess(role, item);
   });
+
+  const memberItem = findNavItem(MEMBER_STAT.to);
+  const memberVisible = memberItem === undefined || canAccess(role, memberItem);
 
   // Q2: action needed first
   const visible = [...baseVisible].sort((a, b) => (data?.[b.key] ?? 0) - (data?.[a.key] ?? 0));
@@ -109,6 +130,11 @@ export function DashboardPage() {
       <p className={styles.timeframe}>As of today</p>
       {isPending ? (
         <ul className={styles.queues} role="status" aria-live="polite" aria-busy="true">
+          {memberVisible ? (
+            <li key={MEMBER_STAT.to}>
+              <Skeleton className={styles.card} />
+            </li>
+          ) : null}
           {visible.map((queue) => (
             <li key={queue.to}>
               <Skeleton className={styles.card} />
@@ -117,22 +143,37 @@ export function DashboardPage() {
         </ul>
       ) : isError ? (
         <ErrorState error={error} onRetry={refetch} />
-      ) : allClear ? (
-        <EmptyState title="All clear" description="No pending items for your role." />
       ) : (
-        <ul className={styles.queues}>
-          {visible.map((queue) => (
-            <li key={queue.to}>
-              <QueueCard
-                to={queue.to}
-                label={queue.label}
-                icon={queue.icon}
-                description={queue.description}
-                data={data?.[queue.key]}
-              />
-            </li>
-          ))}
-        </ul>
+        <>
+          <ul className={styles.queues}>
+            {memberVisible ? (
+              <li key={MEMBER_STAT.to}>
+                <QueueCard
+                  to={MEMBER_STAT.to}
+                  label={MEMBER_STAT.label}
+                  icon={MEMBER_STAT.icon}
+                  description={MEMBER_STAT.description}
+                  data={data?.[MEMBER_STAT.key]}
+                  stat
+                />
+              </li>
+            ) : null}
+            {visible.map((queue) => (
+              <li key={queue.to}>
+                <QueueCard
+                  to={queue.to}
+                  label={queue.label}
+                  icon={queue.icon}
+                  description={queue.description}
+                  data={data?.[queue.key]}
+                />
+              </li>
+            ))}
+          </ul>
+          {allClear ? (
+            <EmptyState title="All clear" description="No pending items for your role." />
+          ) : null}
+        </>
       )}
     </section>
   );

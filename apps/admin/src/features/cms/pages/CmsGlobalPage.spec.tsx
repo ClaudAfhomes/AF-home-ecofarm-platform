@@ -98,9 +98,9 @@ describe('CmsGlobalPage — Global Content CMS', () => {
     const cmsItem = ADMIN_NAV_ITEMS.find((i) => i.to === '/admin/cms');
     expect(cmsItem).toBeDefined();
     expect(canAccess(MOCK_SUPER_ADMIN.role as never, cmsItem!)).toBe(true);
-    expect(
-      cmsItem?.dropdown?.some((d) => !('divider' in d) && d.to === '/admin/cms/global'),
-    ).toBe(true);
+    expect(cmsItem?.dropdown?.some((d) => !('divider' in d) && d.to === '/admin/cms/global')).toBe(
+      true,
+    );
     expect(
       cmsItem?.dropdown?.some(
         (d) => !('divider' in d) && d.to === '/admin/cms/global' && d.label === 'Global Content',
@@ -108,8 +108,7 @@ describe('CmsGlobalPage — Global Content CMS', () => {
     ).toBe(true);
     expect(
       cmsItem?.dropdown?.some(
-        (d) =>
-          !('divider' in d) && d.label.includes('Coming soon') && d.to === '/admin/cms/global',
+        (d) => !('divider' in d) && d.label.includes('Coming soon') && d.to === '/admin/cms/global',
       ),
     ).toBe(false);
   });
@@ -131,8 +130,14 @@ describe('CmsGlobalPage — Global Content CMS', () => {
     expect(seed.brand.shortName).toBe('JA&D');
     expect(seed.brand.positioningLine).toBe('Where Big Dreams Meet Property That Already Earns');
     expect(seed.logo).toEqual({ id: '/ja-d-logo.png', alt: 'JA&D Realty Services' });
-    expect(seed.brandMark).toEqual({ id: '/ja-d-auth-logo.png', alt: 'JA&D Realty Services (white)' });
-    expect(seed.browserIcon).toEqual({ id: '/ja-d-favicon.png', alt: 'JA&D Realty Services favicon' });
+    expect(seed.brandMark).toEqual({
+      id: '/ja-d-auth-logo.png',
+      alt: 'JA&D Realty Services (white)',
+    });
+    expect(seed.browserIcon).toEqual({
+      id: '/ja-d-favicon.png',
+      alt: 'JA&D Realty Services favicon',
+    });
     expect(seed.nav).toHaveLength(5);
     expect(seed.nav[0]).toMatchObject({ label: 'Home', to: '/' });
     expect(seed.authNav).toHaveLength(2);

@@ -111,10 +111,7 @@ describe('GET /me/messages', () => {
 
   it('200s the thread newest first with a cursor envelope', async () => {
     const { res, seen } = capture();
-    await handler(
-      { method: 'GET', query: { limit: '1' }, headers: authed } as VercelRequest,
-      res,
-    );
+    await handler({ method: 'GET', query: { limit: '1' }, headers: authed } as VercelRequest, res);
     expect(seen.status).toBe(200);
     expect(seen.body).toMatchObject({
       data: [{ id: 'msg-2' }],

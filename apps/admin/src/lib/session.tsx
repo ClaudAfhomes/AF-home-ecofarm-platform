@@ -346,8 +346,7 @@ export function SupabaseSessionProvider({ children }: { children: ReactNode }) {
       // everywhere, since every admin destination requires `admin`.
       // Member-only slugs or a missing assignment stay member-tier.
       const staffRoleId = serverRoleId ?? slugToRoleId(slugs);
-      let role: Role | null =
-        staffRoleId !== null ? 'admin' : slugs.length === 0 ? null : 'user';
+      let role: Role | null = staffRoleId !== null ? 'admin' : slugs.length === 0 ? null : 'user';
       if (role === null) {
         // No staff assignment: member-tier session. user_metadata is
         // client-writable and must never confer privilege.

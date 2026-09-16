@@ -27,7 +27,9 @@ describe('mapNotificationRow', () => {
   });
 
   it('accepts mapped rows and rejects title-less rows', () => {
-    expect(isValidNotificationRow({ id: 'a', title: 'T', created_at: '2026-08-18T09:00:00.000Z' })).toBe(true);
+    expect(
+      isValidNotificationRow({ id: 'a', title: 'T', created_at: '2026-08-18T09:00:00.000Z' }),
+    ).toBe(true);
     expect(isValidNotificationRow({ id: 'a', created_at: '2026-08-18T09:00:00.000Z' })).toBe(false);
   });
 
@@ -68,10 +70,20 @@ describe('mapContentItemRow', () => {
 
   it('accepts mapped rows and rejects unknown kinds', () => {
     expect(
-      isValidContentItemRow({ id: 'a', title: 'T', kind: 'DOCUMENT', created_at: '2026-08-10T09:00:00.000Z' }),
+      isValidContentItemRow({
+        id: 'a',
+        title: 'T',
+        kind: 'DOCUMENT',
+        created_at: '2026-08-10T09:00:00.000Z',
+      }),
     ).toBe(true);
     expect(
-      isValidContentItemRow({ id: 'a', title: 'T', kind: 'NOPE', created_at: '2026-08-10T09:00:00.000Z' }),
+      isValidContentItemRow({
+        id: 'a',
+        title: 'T',
+        kind: 'NOPE',
+        created_at: '2026-08-10T09:00:00.000Z',
+      }),
     ).toBe(false);
   });
 

@@ -41,7 +41,10 @@ export const initialRegistrations: Registration[] = [
     programId: 'prg-domestic',
     programCode: 'DOMESTIC',
     referralCode: 'JAD-REF-001',
-    qualificationAnswers: [{ questionId: 'q-001', answer: 'Yes' }, { questionId: 'q-002', answer: '5 years experience' }],
+    qualificationAnswers: [
+      { questionId: 'q-001', answer: 'Yes' },
+      { questionId: 'q-002', answer: '5 years experience' },
+    ],
     governmentId: { fileName: 'juan_id.pdf', mimeType: 'application/pdf', sizeBytes: 245760 },
     submittedAt: '2026-08-18T09:12:00.000Z',
     createdAt: now,
@@ -81,7 +84,11 @@ export const initialRegistrations: Registration[] = [
     programCode: 'ABROAD',
     referralCode: 'JAD-REF-002',
     qualificationAnswers: [{ questionId: 'q-001', answer: 'Yes' }],
-    governmentId: { fileName: 'ahmed_emirates_id.pdf', mimeType: 'application/pdf', sizeBytes: 300000 },
+    governmentId: {
+      fileName: 'ahmed_emirates_id.pdf',
+      mimeType: 'application/pdf',
+      sizeBytes: 300000,
+    },
     submittedAt: '2026-08-17T10:15:00.000Z',
     createdAt: '2026-08-17T10:15:00.000Z',
     updatedAt: '2026-08-17T10:15:00.000Z',
@@ -161,7 +168,11 @@ export const initialRegistrations: Registration[] = [
     submittedAt: '2026-08-15T12:10:00.000Z',
     reviewedAt: '2026-08-16T08:00:00.000Z',
     reviewedBy: 'admin-001',
-    rejectionNote: { reason: 'Government ID is blurry and not readable.', requiredChanges: 'Please upload a clear, high-resolution government ID and re-verify qualification answers.' },
+    rejectionNote: {
+      reason: 'Government ID is blurry and not readable.',
+      requiredChanges:
+        'Please upload a clear, high-resolution government ID and re-verify qualification answers.',
+    },
     createdAt: '2026-08-15T12:10:00.000Z',
     updatedAt: '2026-08-16T08:00:00.000Z',
   },

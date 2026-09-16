@@ -250,12 +250,16 @@ export function CmsFaqsPage() {
                     if (el && typeof el.scrollIntoView === 'function') {
                       try {
                         el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                      } catch { /* ignore scroll or history failure */ }
+                      } catch {
+                        /* ignore scroll or history failure */
+                      }
                     }
                     toggleSection(s.id);
                     try {
                       history.pushState(null, '', `#${s.id}`);
-                    } catch { /* ignore scroll or history failure */ }
+                    } catch {
+                      /* ignore scroll or history failure */
+                    }
                   }}
                 >
                   <span className={styles.stepBadge} aria-hidden="true">

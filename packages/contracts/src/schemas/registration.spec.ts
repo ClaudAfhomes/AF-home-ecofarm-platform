@@ -1,10 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import {
-  archivedMemberSchema,
-  registrationSchema,
-  registrationStatusSchema,
-} from './registration';
+import { archivedMemberSchema, registrationSchema, registrationStatusSchema } from './registration';
 
 const BASE = {
   id: 'reg-001',
@@ -35,18 +31,14 @@ describe('registrationStatusSchema', () => {
 
 describe('registrationSchema', () => {
   it('accepts PENDING and REJECTED applications', () => {
-    expect(
-      registrationSchema.safeParse({ ...BASE, status: 'PENDING' }).success,
-    ).toBe(true);
-    expect(
-      registrationSchema.safeParse({ ...BASE, status: 'REJECTED' }).success,
-    ).toBe(true);
+    expect(registrationSchema.safeParse({ ...BASE, status: 'PENDING' }).success).toBe(true);
+    expect(registrationSchema.safeParse({ ...BASE, status: 'REJECTED' }).success).toBe(true);
   });
 
   it('rejects APPROVED_ACTIVE applications', () => {
-    expect(
-      registrationSchema.safeParse({ ...BASE, status: 'APPROVED_ACTIVE' }).success,
-    ).toBe(false);
+    expect(registrationSchema.safeParse({ ...BASE, status: 'APPROVED_ACTIVE' }).success).toBe(
+      false,
+    );
   });
 });
 

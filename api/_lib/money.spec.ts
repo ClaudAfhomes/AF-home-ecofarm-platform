@@ -149,9 +149,7 @@ describe('money row mapping', () => {
     ];
     const enriched = injectWithdrawalIdentifiers(rows, new Map([['pa-001', '09175550199']]));
     expect(mapWithdrawalRow(enriched[0]!).payoutAccount.accountIdentifier).toBe('09175550199');
-    expect(
-      mapWithdrawalRow(enriched[1]!).payoutAccount,
-    ).not.toHaveProperty('accountIdentifier');
+    expect(mapWithdrawalRow(enriched[1]!).payoutAccount).not.toHaveProperty('accountIdentifier');
   });
 
   it('fetchWithdrawalIdentifierMap returns an empty map on failure', async () => {

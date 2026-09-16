@@ -113,10 +113,7 @@ export function markAllNotificationsRead(): Promise<ReadAllNotificationsResponse
 }
 
 /** `GET /me/messages?cursor=…` — own admin thread, cursor-paginated newest first (API-SPECIFICATION #90). */
-export function getMessagesPage(
-  cursor?: string,
-  limit?: number,
-): Promise<PageResult<Message>> {
+export function getMessagesPage(cursor?: string, limit?: number): Promise<PageResult<Message>> {
   const params = new URLSearchParams();
   if (cursor) params.set('cursor', cursor);
   if (limit) params.set('limit', String(limit));

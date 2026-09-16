@@ -12,16 +12,10 @@ import type { MockStaffMember } from '../../mock/data';
  */
 
 export function isSelf(sessionEmail: string | undefined, target: MockStaffMember): boolean {
-  return (
-    sessionEmail !== undefined &&
-    sessionEmail.toLowerCase() === target.email.toLowerCase()
-  );
+  return sessionEmail !== undefined && sessionEmail.toLowerCase() === target.email.toLowerCase();
 }
 
-function grantsStaffModule(
-  roles: readonly RoleRecord[] | undefined,
-  roleId: string,
-): boolean {
+function grantsStaffModule(roles: readonly RoleRecord[] | undefined, roleId: string): boolean {
   return resolveRoleModules(roles, roleId).includes('staff');
 }
 

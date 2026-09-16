@@ -132,7 +132,11 @@ export function PropertyFormDialog({ open, onClose, property }: Props) {
             }}
           />
           {errors.name ? (
-            <span id="property-name-error" style={{ color: 'var(--color-danger)', fontSize: 'var(--text-caption)' }} role="alert">
+            <span
+              id="property-name-error"
+              style={{ color: 'var(--color-danger)', fontSize: 'var(--text-caption)' }}
+              role="alert"
+            >
               {errors.name}
             </span>
           ) : null}
@@ -163,7 +167,11 @@ export function PropertyFormDialog({ open, onClose, property }: Props) {
             ))}
           </select>
           {errors.categoryId ? (
-            <span id="property-category-error" style={{ color: 'var(--color-danger)', fontSize: 'var(--text-caption)' }} role="alert">
+            <span
+              id="property-category-error"
+              style={{ color: 'var(--color-danger)', fontSize: 'var(--text-caption)' }}
+              role="alert"
+            >
               {errors.categoryId}
             </span>
           ) : null}
@@ -185,7 +193,11 @@ export function PropertyFormDialog({ open, onClose, property }: Props) {
             }}
           />
           {errors.price ? (
-            <span id="property-price-error" style={{ color: 'var(--color-danger)', fontSize: 'var(--text-caption)' }} role="alert">
+            <span
+              id="property-price-error"
+              style={{ color: 'var(--color-danger)', fontSize: 'var(--text-caption)' }}
+              role="alert"
+            >
               {errors.price}
             </span>
           ) : null}

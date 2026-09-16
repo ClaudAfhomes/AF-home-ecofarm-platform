@@ -27,9 +27,7 @@ describe('messageSchema', () => {
   });
 
   it('rejects unknown sender types and empty bodies', () => {
-    expect(
-      messageSchema.safeParse({ ...validMessage, senderType: 'SYSTEM' }).success,
-    ).toBe(false);
+    expect(messageSchema.safeParse({ ...validMessage, senderType: 'SYSTEM' }).success).toBe(false);
     expect(messageSchema.safeParse({ ...validMessage, body: '' }).success).toBe(false);
   });
 });
@@ -38,9 +36,7 @@ describe('createMessageRequestSchema', () => {
   it('trims and bounds plain-text bodies', () => {
     expect(createMessageRequestSchema.safeParse({ body: '  hi  ' }).success).toBe(true);
     expect(createMessageRequestSchema.safeParse({ body: '   ' }).success).toBe(false);
-    expect(createMessageRequestSchema.safeParse({ body: 'x'.repeat(4001) }).success).toBe(
-      false,
-    );
+    expect(createMessageRequestSchema.safeParse({ body: 'x'.repeat(4001) }).success).toBe(false);
     expect(createMessageRequestSchema.safeParse({ body: 'x'.repeat(4000) }).success).toBe(true);
   });
 });

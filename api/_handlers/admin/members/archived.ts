@@ -42,7 +42,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       typeof row.archiveSnapshot === 'object' && row.archiveSnapshot !== null
         ? (row.archiveSnapshot as Record<string, unknown>)
         : row;
-    const programId = typeof snap.programId === 'string' && snap.programId ? snap.programId : 'prg-domestic';
+    const programId =
+      typeof snap.programId === 'string' && snap.programId ? snap.programId : 'prg-domestic';
     return {
       id: `arch-${row.id}`,
       memberId: row.id,
@@ -60,7 +61,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         programId,
         programCode: snap.programCode ?? (programId === 'prg-abroad' ? 'ABROAD' : 'DOMESTIC'),
         qualificationAnswers: snap.qualificationAnswers ?? [],
-        governmentId: snap.governmentId ?? { fileName: 'archived', mimeType: 'application/pdf', sizeBytes: 1 },
+        governmentId: snap.governmentId ?? {
+          fileName: 'archived',
+          mimeType: 'application/pdf',
+          sizeBytes: 1,
+        },
         submittedAt: snap.submittedAt ?? snap.createdAt ?? row.archivedAt,
         createdAt: snap.createdAt ?? row.archivedAt,
         updatedAt: snap.updatedAt ?? row.archivedAt,
@@ -71,5 +76,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       previousAccountStatus: snap.accountStatus ?? undefined,
     };
   });
-  okList(res, rows.filter((row) => archivedMemberSchema.safeParse(row).success));
+  okList(
+    res,
+    rows.filter((row) => archivedMemberSchema.safeParse(row).success),
+  );
 }

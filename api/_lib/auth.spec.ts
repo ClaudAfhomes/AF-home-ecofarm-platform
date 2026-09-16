@@ -226,7 +226,8 @@ describe('verifyStaff', () => {
             select: () => ({
               eq: async () => {
                 seen.push(`${table}:eq`);
-                if (table === 'StaffAssignment') return { data: [{ roleId: 'r-new' }], error: null };
+                if (table === 'StaffAssignment')
+                  return { data: [{ roleId: 'r-new' }], error: null };
                 return { data: [], error: null };
               },
               in: async () => {

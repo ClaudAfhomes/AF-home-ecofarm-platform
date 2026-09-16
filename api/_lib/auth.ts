@@ -1,11 +1,10 @@
-import { createClient } from '@supabase/supabase-js';
-
 import type { StaffModule } from '@jad/contracts';
 
 import { getSupabaseEnv } from './env.js';
 import { toErrorEnvelope } from './envelope.js';
 import type { VercelRequest } from './http.js';
 import { pickStaffRoleId, staffRoleModules } from './rbac.js';
+import { anonClient as cachedAnonClient, serviceClient as cachedServiceClient } from './rest.js';
 
 export type StaffAuthError = { error: ReturnType<typeof toErrorEnvelope> };
 export type StaffAuthSuccess = { userId: string; slugs: string[] };
@@ -189,7 +188,10 @@ export async function verifyUser(
   if (!token) {
     return { error: toErrorEnvelope('UNAUTHORIZED', 'Missing authentication', 401) };
   }
-  const anon = anonClient ?? createClient(url, anonKey, { auth: { autoRefreshToken: false } });
+  const anon = anonClient ?? cachedAnonClient();
+  if (!anon) {
+    return { error: toErrorEnvelope('INTERNAL', 'Supabase not configured', 500) };
+  }
   const { data, error } = await anon.auth.getUser(token);
   const authedUser = data?.user as { id?: string } | null;
   if (error || !authedUser?.id) {
@@ -294,8 +296,10 @@ export async function verifyStaff(
   if (!token) {
     return { error: toErrorEnvelope('UNAUTHORIZED', 'Missing authentication', 401) };
   }
-  const anon =
-    deps?.anonClient ?? createClient(url, anonKey, { auth: { autoRefreshToken: false } });
+  const anon = deps?.anonClient ?? cachedAnonClient();
+  if (!anon) {
+    return { error: toErrorEnvelope('INTERNAL', 'Supabase not configured', 500) };
+  }
   const { data, error } = await anon.auth.getUser(token);
   const authedUser = data?.user as { id?: string; user_metadata?: Record<string, unknown> } | null;
   if (error || !authedUser?.id) {
@@ -304,8 +308,10 @@ export async function verifyStaff(
   if (!serviceKey) {
     return { error: toErrorEnvelope('INTERNAL', 'Service role not configured', 500) };
   }
-  const svc =
-    deps?.serviceClient ?? createClient(url, serviceKey, { auth: { autoRefreshToken: false } });
+  const svc = deps?.serviceClient ?? cachedServiceClient();
+  if (!svc) {
+    return { error: toErrorEnvelope('INTERNAL', 'Service role not configured', 500) };
+  }
   const standing = await staffStanding(svc, authedUser.id);
   if (standing.status === 'DISABLED') {
     return { error: toErrorEnvelope('FORBIDDEN', 'Account disabled.', 403) };
@@ -348,8 +354,10 @@ export async function verifyStaffModule(
   if (!token) {
     return { error: toErrorEnvelope('UNAUTHORIZED', 'Missing authentication', 401) };
   }
-  const anon =
-    deps?.anonClient ?? createClient(url, anonKey, { auth: { autoRefreshToken: false } });
+  const anon = deps?.anonClient ?? cachedAnonClient();
+  if (!anon) {
+    return { error: toErrorEnvelope('INTERNAL', 'Supabase not configured', 500) };
+  }
   const { data, error } = await anon.auth.getUser(token);
   const authedUser = data?.user as { id?: string } | null;
   if (error || !authedUser?.id) {
@@ -358,8 +366,10 @@ export async function verifyStaffModule(
   if (!serviceKey) {
     return { error: toErrorEnvelope('INTERNAL', 'Service role not configured', 500) };
   }
-  const svc =
-    deps?.serviceClient ?? createClient(url, serviceKey, { auth: { autoRefreshToken: false } });
+  const svc = deps?.serviceClient ?? cachedServiceClient();
+  if (!svc) {
+    return { error: toErrorEnvelope('INTERNAL', 'Service role not configured', 500) };
+  }
   const standing = await staffStanding(svc, authedUser.id);
   if (standing.status === 'DISABLED') {
     return { error: toErrorEnvelope('FORBIDDEN', 'Account disabled.', 403) };

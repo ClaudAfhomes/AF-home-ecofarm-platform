@@ -7,6 +7,10 @@ describe('selectHandler', () => {
     expect(selectHandler('/api/v1/config/public', {})?.routeKey).toBe('config/public');
     expect(selectHandler('/api/v1/admin/queues', {})?.routeKey).toBe('admin/queues');
     expect(selectHandler('/api/v1/me/wallet', {})?.routeKey).toBe('me/wallet');
+    expect(selectHandler('/api/v1/auth/verify-email', {})?.routeKey).toBe('auth/verify-email');
+    expect(selectHandler('/api/v1/auth/verify-email/resend', {})?.routeKey).toBe(
+      'auth/verify-email/resend',
+    );
   });
 
   it('routes nested dynamic endpoints and captures params', () => {

@@ -12,7 +12,9 @@
 export const REQUIRED_MESSAGING_RELATIONS = ['Conversation', 'Message'] as const;
 
 /** PostgREST PGRST205: the relation is not in the schema cache. */
-export function isMissingTableError(error: { code?: unknown; message?: unknown } | null | undefined): boolean {
+export function isMissingTableError(
+  error: { code?: unknown; message?: unknown } | null | undefined,
+): boolean {
   if (!error) return false;
   return (
     error.code === 'PGRST205' ||

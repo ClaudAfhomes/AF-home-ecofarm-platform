@@ -121,10 +121,7 @@ export function StaffPage() {
       ) : isError ? (
         <ErrorState error={error} onRetry={refetch} />
       ) : (data ?? []).length === 0 ? (
-        <EmptyState
-          title="No staff members"
-          description="No staff users have been added yet."
-        />
+        <EmptyState title="No staff members" description="No staff users have been added yet." />
       ) : (
         <>
           <div className={styles.filterBar}>

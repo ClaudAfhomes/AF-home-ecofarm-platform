@@ -15,10 +15,15 @@ import styles from './MessengerButton.module.css';
  * rule would otherwise recolor the link brand-blue after it has been visited.
  */
 export function MessengerButton() {
-  const { data: globalCms } = useQuery({ queryKey: ['cms', 'global'], queryFn: getGlobalCmsPublic, staleTime: 0 });
+  const { data: globalCms } = useQuery({
+    queryKey: ['cms', 'global'],
+    queryFn: getGlobalCmsPublic,
+    staleTime: 0,
+  });
   const messengerUrl = globalCms?.messenger?.url ?? MESSENGER_URL;
   const messengerLabel = globalCms?.messenger?.label ?? 'Let\u2019s Talk';
-  const messengerAriaLabel = globalCms?.messenger?.ariaLabel ?? 'Message JA&D Realty Services on Messenger';
+  const messengerAriaLabel =
+    globalCms?.messenger?.ariaLabel ?? 'Message JA&D Realty Services on Messenger';
   return (
     <a
       className={styles.button}

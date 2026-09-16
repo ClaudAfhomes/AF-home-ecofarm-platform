@@ -1,4 +1,3 @@
-import { createClient } from '@supabase/supabase-js';
 import { randomUUID } from 'node:crypto';
 
 import { ADMIN_STAFF } from '../../_lib/access.js';
@@ -7,12 +6,9 @@ import { appendAudit } from '../../_lib/audit.js';
 import { getSupabaseEnv } from '../../_lib/env.js';
 import type { VercelRequest, VercelResponse } from '../../_lib/http.js';
 import { isValidAdminMemberRow, mapAdminMemberRow } from '../../_lib/pipeline.js';
-import {
-  isReferralCodeConflict,
-  pickUniqueReferralCode,
-} from '../../_lib/referral-codes.js';
+import { isReferralCodeConflict, pickUniqueReferralCode } from '../../_lib/referral-codes.js';
 import { adminMemberSchema } from '@jad/contracts';
-import { methodNotAllowed, okList, readJsonBody } from '../../_lib/rest.js';
+import { methodNotAllowed, okList, readJsonBody, serviceClient } from '../../_lib/rest.js';
 import { toErrorEnvelope } from '../../_lib/envelope.js';
 
 const PROGRAM_IDS = ['prg-domestic', 'prg-abroad'] as const;
@@ -42,7 +38,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.status(status).json({ error });
     return;
   }
-  const supabase = createClient(url, serviceKey, { auth: { autoRefreshToken: false } });
+  const supabase = serviceClient();
+  if (!supabase) {
+    const { error, status } = toErrorEnvelope('INTERNAL', 'Supabase not configured', 500);
+    res.status(status).json({ error });
+    return;
+  }
 
   if (req.method === 'GET') {
     const { data, error } = await supabase

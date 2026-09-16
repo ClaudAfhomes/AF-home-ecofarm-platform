@@ -21,7 +21,9 @@ function renderDialog(onClose = vi.fn()) {
 describe('RoleFormDialog', () => {
   beforeEach(() => {
     resetStaffStore();
-    mutateAsync.mockReset().mockResolvedValue({ id: 'role-finance-reviewer', name: 'Finance Reviewer' });
+    mutateAsync
+      .mockReset()
+      .mockResolvedValue({ id: 'role-finance-reviewer', name: 'Finance Reviewer' });
   });
 
   it('renders name and module picker', async () => {

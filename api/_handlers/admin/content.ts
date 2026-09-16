@@ -82,14 +82,22 @@ export async function createAdminContent(req: VercelRequest, res: VercelResponse
   };
   const { data, error } = await supabase.from('ContentItem').insert(row).select().single();
   if (error || !data) {
-    const { error: env, status } = toErrorEnvelope('INTERNAL', error?.message ?? 'Failed to save content', 500);
+    const { error: env, status } = toErrorEnvelope(
+      'INTERNAL',
+      error?.message ?? 'Failed to save content',
+      500,
+    );
     res.status(status).json({ error: env });
     return;
   }
   const mapped = mapContentItemRow(data as Record<string, unknown>);
   const validated = forwardableContentSchema.safeParse(mapped);
   if (!validated.success) {
-    const { error: env, status } = toErrorEnvelope('INTERNAL', 'Stored content record failed validation', 500);
+    const { error: env, status } = toErrorEnvelope(
+      'INTERNAL',
+      'Stored content record failed validation',
+      500,
+    );
     res.status(status).json({ error: env });
     return;
   }

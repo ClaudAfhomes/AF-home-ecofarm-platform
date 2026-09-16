@@ -190,3 +190,81 @@
   display: grid;
   gap: var(--space-3);
 }
+
+.sponsor {
+  margin: var(--space-4) 0;
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-surface-raised);
+}
+
+.sponsorTitle {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-body-s);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.sponsorIntro {
+  margin: 0 0 var(--space-3);
+  font-size: var(--text-body);
+  color: var(--color-text-primary);
+}
+
+.sponsorNone {
+  margin: 0;
+  font-size: var(--text-body-s);
+  color: var(--color-text-muted);
+}
+
+.chain {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+}
+
+.chainStep,
+.chainStepCurrent {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-full);
+  background-color: var(--color-bg-surface);
+}
+
+.chainStepCurrent {
+  border-color: var(--color-brand-primary);
+  background-color: var(--color-brand-soft);
+}
+
+.chainAvatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-brand-soft);
+  color: var(--color-brand-primary);
+  font-size: var(--text-body-xs);
+  font-weight: 600;
+}
+
+.chainName {
+  font-size: var(--text-body-s);
+  color: var(--color-text-primary);
+}
+
+.chainYou {
+  font-size: var(--text-body-xs);
+  color: var(--color-text-muted);
+}

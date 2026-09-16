@@ -1,15 +1,7 @@
 import { Fragment, useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
-import {
-  Breadcrumbs,
-  Button,
-  EmptyState,
-  ErrorState,
-  Icon,
-  PageHeader,
-  Skeleton,
-} from '@jad/ui';
+import { Breadcrumbs, Button, EmptyState, ErrorState, Icon, PageHeader, Skeleton } from '@jad/ui';
 import type { Message } from '@jad/contracts';
 
 import { Alert } from '@/components/Alert';
@@ -87,7 +79,9 @@ export function MessagesPage() {
     if (el) el.scrollTop = el.scrollHeight;
   };
 
-  const messages: Message[] = (threadQuery.data?.pages.flatMap((page) => page.items) ?? []).slice().reverse();
+  const messages: Message[] = (threadQuery.data?.pages.flatMap((page) => page.items) ?? [])
+    .slice()
+    .reverse();
   const now = new Date();
 
   const canSend = draft.trim().length > 0 && draft.length <= 4000;
@@ -120,9 +114,7 @@ export function MessagesPage() {
           </ButtonLink>
         }
       />
-      <Breadcrumbs
-        items={[{ label: 'Dashboard', to: '/member' }, { label: 'Messages' }]}
-      />
+      <Breadcrumbs items={[{ label: 'Dashboard', to: '/member' }, { label: 'Messages' }]} />
 
       {sendError ? (
         <Alert variant="danger" title="Something went wrong">
@@ -196,9 +188,7 @@ export function MessagesPage() {
                             <span>{dayLabel(message.createdAt, now)}</span>
                           </li>
                         ) : null}
-                        <li
-                          className={`${styles.row} ${own ? styles.rowOwn : styles.rowStaff}`}
-                        >
+                        <li className={`${styles.row} ${own ? styles.rowOwn : styles.rowStaff}`}>
                           {!own ? (
                             <span className={styles.threadAvatar} aria-hidden="true">
                               {(message.senderName.trim()[0] ?? 'A').toUpperCase()}
@@ -243,10 +233,7 @@ export function MessagesPage() {
                 }
               }}
             />
-            <Button
-              onClick={submit}
-              disabled={!canSend || sendMutation.isPending}
-            >
+            <Button onClick={submit} disabled={!canSend || sendMutation.isPending}>
               {sendMutation.isPending ? 'Sending…' : 'Send'}
             </Button>
           </div>

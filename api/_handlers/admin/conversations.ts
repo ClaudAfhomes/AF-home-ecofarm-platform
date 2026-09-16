@@ -49,7 +49,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.status(status).json({ error: env });
     return;
   }
-  const conversations = (((data as unknown[]) ?? []) as Record<string, unknown>[]);
+  const conversations = ((data as unknown[]) ?? []) as Record<string, unknown>[];
   const memberIds = conversations
     .map((c) => c.memberId)
     .filter((id): id is string => typeof id === 'string');
@@ -61,10 +61,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .select('id,name,email')
       .in('id', memberIds);
     membersById = new Map(
-      ((((memberRows as unknown[]) ?? []) as Record<string, unknown>[]).map((m) => [
+      (((memberRows as unknown[]) ?? []) as Record<string, unknown>[]).map((m) => [
         m.id as string,
         { name: m.name, email: m.email },
-      ])),
+      ]),
     );
     // Latest message body per thread for the inbox preview.
     const { data: previewRows } = await supabase
@@ -72,7 +72,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       .select('memberId,body,createdAt')
       .in('memberId', memberIds)
       .order('createdAt', { ascending: false });
-    for (const row of (((previewRows as unknown[]) ?? []) as Record<string, unknown>[])) {
+    for (const row of ((previewRows as unknown[]) ?? []) as Record<string, unknown>[]) {
       const key = row.memberId as string;
       if (typeof key === 'string' && !previews.has(key) && typeof row.body === 'string') {
         previews.set(key, row.body.slice(0, 140));

@@ -119,6 +119,13 @@ export const verifyEmailRequestSchema = z.object({
 
 export type VerifyEmailRequest = z.infer<typeof verifyEmailRequestSchema>;
 
+/** `POST /auth/verify-email/resend` request — re-issue the one-time code (FEAT-009). */
+export const resendVerificationRequestSchema = z.object({
+  email: z.string().email(),
+});
+
+export type ResendVerificationRequest = z.infer<typeof resendVerificationRequestSchema>;
+
 /** `POST /auth/verify-email` response — email now verified (BR-AUTH-001). */
 export const verifyEmailResponseSchema = z.object({
   email: z.string().email(),

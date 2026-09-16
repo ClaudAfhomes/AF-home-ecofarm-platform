@@ -3,7 +3,16 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import { getSupabaseClient, isSupabaseConfigured } from './supabase';
 
-const CMS_KEYS = ['homepage', 'about', 'properties', 'faqs', 'contact', 'global', 'login', 'register'] as const;
+const CMS_KEYS = [
+  'homepage',
+  'about',
+  'properties',
+  'faqs',
+  'contact',
+  'global',
+  'login',
+  'register',
+] as const;
 type CmsKey = (typeof CMS_KEYS)[number];
 
 function isCmsKey(key: unknown): key is CmsKey {
@@ -24,7 +33,9 @@ function isCmsKey(key: unknown): key is CmsKey {
  */
 export function useCmsRealtime() {
   const queryClient = useQueryClient();
-  const channelRef = useRef<ReturnType<NonNullable<ReturnType<typeof getSupabaseClient>>['channel']> | null>(null);
+  const channelRef = useRef<ReturnType<
+    NonNullable<ReturnType<typeof getSupabaseClient>>['channel']
+  > | null>(null);
   const subscribedRef = useRef(false);
 
   useEffect(() => {
@@ -36,7 +47,8 @@ export function useCmsRealtime() {
     subscribedRef.current = true;
 
     // eslint-disable-next-line no-useless-assignment
-    let channel: ReturnType<NonNullable<ReturnType<typeof getSupabaseClient>>['channel']> | null = null;
+    let channel: ReturnType<NonNullable<ReturnType<typeof getSupabaseClient>>['channel']> | null =
+      null;
     try {
       channel = supabase.channel('cms:public', {
         config: {
@@ -46,12 +58,16 @@ export function useCmsRealtime() {
       } as never);
 
       // Broadcast: Vercel PUT handler sends {key, version} after successful cms_contents upsert (service_role)
-      channel.on('broadcast' as never, { event: 'cms_update' } as never, (payload: { payload?: { key?: unknown; version?: unknown } }) => {
-        const key = payload?.payload?.key;
-        if (isCmsKey(key)) {
-          queryClient.invalidateQueries({ queryKey: ['cms', key] });
-        }
-      });
+      channel.on(
+        'broadcast' as never,
+        { event: 'cms_update' } as never,
+        (payload: { payload?: { key?: unknown; version?: unknown } }) => {
+          const key = payload?.payload?.key;
+          if (isCmsKey(key)) {
+            queryClient.invalidateQueries({ queryKey: ['cms', key] });
+          }
+        },
+      );
 
       // Fallback: postgres_changes for INSERT/UPDATE on cms_contents (if table is in supabase_realtime publication)
       // This covers local dev where we added the migration, and also covers direct DB writes
@@ -59,7 +75,9 @@ export function useCmsRealtime() {
         'postgres_changes' as never,
         { event: '*', schema: 'public', table: 'cms_contents' } as never,
         (payload: { eventType?: string; new?: { key?: unknown }; old?: { key?: unknown } }) => {
-          const key = (payload.new as { key?: unknown } | undefined)?.key ?? (payload.old as { key?: unknown } | undefined)?.key;
+          const key =
+            (payload.new as { key?: unknown } | undefined)?.key ??
+            (payload.old as { key?: unknown } | undefined)?.key;
           if (isCmsKey(key)) {
             queryClient.invalidateQueries({ queryKey: ['cms', key] });
           } else if (payload.eventType === 'UPDATE' || payload.eventType === 'INSERT') {

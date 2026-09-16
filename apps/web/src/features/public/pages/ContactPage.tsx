@@ -93,7 +93,11 @@ const METHOD_ICONS: Record<ContactMethod['icon'], ReactNode> = {
  * faking a send.
  */
 export function ContactPage() {
-  const { data: cms } = useQuery({ queryKey: ['cms', 'contact'], queryFn: getContactCmsPublic, staleTime: 0 });
+  const { data: cms } = useQuery({
+    queryKey: ['cms', 'contact'],
+    queryFn: getContactCmsPublic,
+    staleTime: 0,
+  });
   const content = (cms ?? CONTACT) as typeof CONTACT;
   const [acknowledged, setAcknowledged] = useState(false);
 

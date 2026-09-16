@@ -25,8 +25,18 @@ const ADJUSTMENT_TYPE_TONE: Record<string, StatusTone> = {
 /** Audit detail — read-only detail view for an audit entry or ledger adjustment. */
 export function AuditDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const { data: auditData, isPending: auditPending, isError: auditError, error: auditErr } = useAudit();
-  const { data: adjData, isPending: adjPending, isError: adjError, error: adjErr } = useAdjustments();
+  const {
+    data: auditData,
+    isPending: auditPending,
+    isError: auditError,
+    error: auditErr,
+  } = useAudit();
+  const {
+    data: adjData,
+    isPending: adjPending,
+    isError: adjError,
+    error: adjErr,
+  } = useAdjustments();
 
   const isPending = auditPending || adjPending;
   const isError = auditError || adjError;
@@ -81,11 +91,26 @@ export function AuditDetailPage() {
                   <dl className={styles.fieldGrid}>
                     <div className={styles.field}>
                       <dt>Record ID</dt>
-                      <dd><code style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--text-body-s)', padding: '2px 8px', background: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', borderRadius: 'var(--radius-sm)' }}>{record.data.id}</code></dd>
+                      <dd>
+                        <code
+                          style={{
+                            fontFamily: 'var(--font-mono)',
+                            fontSize: 'var(--text-body-s)',
+                            padding: '2px 8px',
+                            background: 'var(--color-bg-surface)',
+                            border: '1px solid var(--color-border-subtle)',
+                            borderRadius: 'var(--radius-sm)',
+                          }}
+                        >
+                          {record.data.id}
+                        </code>
+                      </dd>
                     </div>
                     <div className={styles.field}>
                       <dt>Action</dt>
-                      <dd><StatusChip label={record.data.action} tone="neutral" /></dd>
+                      <dd>
+                        <StatusChip label={record.data.action} tone="neutral" />
+                      </dd>
                     </div>
                     <div className={styles.field}>
                       <dt>Date & time</dt>
@@ -121,7 +146,13 @@ export function AuditDetailPage() {
                     </div>
                     <div className={styles.field}>
                       <dt>ID</dt>
-                      <dd><code style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--text-body-s)' }}>{record.data.targetId}</code></dd>
+                      <dd>
+                        <code
+                          style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--text-body-s)' }}
+                        >
+                          {record.data.targetId}
+                        </code>
+                      </dd>
                     </div>
                     <div className={styles.field}>
                       <dt>Detail</dt>
@@ -137,14 +168,35 @@ export function AuditDetailPage() {
                   <dl className={styles.fieldGrid}>
                     <div className={styles.field}>
                       <dt>Record ID</dt>
-                      <dd><code style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--text-body-s)', padding: '2px 8px', background: 'var(--color-bg-surface)', border: '1px solid var(--color-border-subtle)', borderRadius: 'var(--radius-sm)' }}>{record.data.id}</code></dd>
+                      <dd>
+                        <code
+                          style={{
+                            fontFamily: 'var(--font-mono)',
+                            fontSize: 'var(--text-body-s)',
+                            padding: '2px 8px',
+                            background: 'var(--color-bg-surface)',
+                            border: '1px solid var(--color-border-subtle)',
+                            borderRadius: 'var(--radius-sm)',
+                          }}
+                        >
+                          {record.data.id}
+                        </code>
+                      </dd>
                     </div>
                     <div className={styles.field}>
                       <dt>Type</dt>
                       <dd>
                         <StatusChip
-                          label={ADJUSTMENT_TYPE_LABEL[record.data.entryType as keyof typeof ADJUSTMENT_TYPE_LABEL] ?? record.data.entryType}
-                          tone={ADJUSTMENT_TYPE_TONE[record.data.entryType as keyof typeof ADJUSTMENT_TYPE_TONE] ?? 'neutral'}
+                          label={
+                            ADJUSTMENT_TYPE_LABEL[
+                              record.data.entryType as keyof typeof ADJUSTMENT_TYPE_LABEL
+                            ] ?? record.data.entryType
+                          }
+                          tone={
+                            ADJUSTMENT_TYPE_TONE[
+                              record.data.entryType as keyof typeof ADJUSTMENT_TYPE_TONE
+                            ] ?? 'neutral'
+                          }
                         />
                       </dd>
                     </div>
@@ -159,7 +211,13 @@ export function AuditDetailPage() {
                     </div>
                     <div className={styles.field}>
                       <dt>Amount</dt>
-                      <dd className={record.data.direction === 'CREDIT' ? styles.moneyCredit : styles.moneyDebit}>
+                      <dd
+                        className={
+                          record.data.direction === 'CREDIT'
+                            ? styles.moneyCredit
+                            : styles.moneyDebit
+                        }
+                      >
                         {formatMoney(record.data.amount)}
                       </dd>
                     </div>
@@ -179,7 +237,13 @@ export function AuditDetailPage() {
                     </div>
                     <div className={styles.field}>
                       <dt>Member ID</dt>
-                      <dd><code style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--text-body-s)' }}>{record.data.memberId}</code></dd>
+                      <dd>
+                        <code
+                          style={{ fontFamily: 'var(--font-mono)', fontSize: 'var(--text-body-s)' }}
+                        >
+                          {record.data.memberId}
+                        </code>
+                      </dd>
                     </div>
                     <div className={styles.field}>
                       <dt>Reason</dt>

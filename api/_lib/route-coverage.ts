@@ -15,6 +15,7 @@ import path from 'node:path';
  */
 
 const HANDLER_IMPORT_RE = /^import\s+([A-Za-z_$][\w$]*)\s+from\s+'(\.\.\/_handlers\/[^']+)'/gm;
+const HANDLER_DYNAMIC_RE = /import\(\s*'(\.\.\/_handlers\/[^']+)'\s*\)/g;
 
 export type RouteCoverageGapReason = 'not-imported' | 'imported-but-unused';
 
@@ -62,6 +63,12 @@ export function findRouteCoverageGaps(
   for (const match of routerSource.matchAll(HANDLER_IMPORT_RE)) {
     imports.set(match[2]!, match[1]!);
   }
+  // Lazy-load branches (`lazy(() => import('../_handlers/...'))`) count as
+  // both the import and the usage — no binding to check.
+  const dynamic = new Set<string>();
+  for (const match of routerSource.matchAll(HANDLER_DYNAMIC_RE)) {
+    dynamic.add(match[1]!);
+  }
   const gaps: RouteCoverageGap[] = [];
   for (const file of listHandlerFiles(handlersDir)) {
     const noExt = file.replace(/\.ts$/, '');
@@ -69,7 +76,10 @@ export function findRouteCoverageGaps(
       imports.has(spec),
     );
     if (!hit) {
-      gaps.push({ file: `_handlers/${file}`, reason: 'not-imported' });
+      const dynamicHit = [`../_handlers/${noExt}.js`, `../_handlers/${noExt}`].some((spec) =>
+        dynamic.has(spec),
+      );
+      if (!dynamicHit) gaps.push({ file: `_handlers/${file}`, reason: 'not-imported' });
       continue;
     }
     const binding = imports.get(hit)!;

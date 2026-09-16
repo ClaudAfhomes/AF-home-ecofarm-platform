@@ -137,7 +137,10 @@ export function StaffDetailPage() {
       ) : isError ? (
         <ErrorState error={error} />
       ) : !data ? (
-        <ErrorState title="Staff member not found" message="The requested staff member does not exist." />
+        <ErrorState
+          title="Staff member not found"
+          message="The requested staff member does not exist."
+        />
       ) : (
         <>
           <Breadcrumbs
@@ -217,8 +220,8 @@ export function StaffDetailPage() {
                 </p>
               ) : (
                 <p className={styles.hint}>
-                  Each staff user holds exactly one role. Role changes are recorded in the
-                  audit log.
+                  Each staff user holds exactly one role. Role changes are recorded in the audit
+                  log.
                 </p>
               )}
             </div>

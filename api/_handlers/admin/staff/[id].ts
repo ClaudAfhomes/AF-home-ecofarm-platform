@@ -1,5 +1,3 @@
-import { createClient } from '@supabase/supabase-js';
-
 import { SUPER_ADMIN_ONLY } from '../../../_lib/access.js';
 import { verifyStaff } from '../../../_lib/auth.js';
 import { appendAudit } from '../../../_lib/audit.js';
@@ -7,7 +5,7 @@ import { getSupabaseEnv } from '../../../_lib/env.js';
 import { isLastGovernor } from '../../../_lib/governance.js';
 import type { VercelRequest, VercelResponse } from '../../../_lib/http.js';
 import { listRoleRecords, listStaffEntries } from '../../../_lib/rbac.js';
-import { methodNotAllowed, readJsonBody } from '../../../_lib/rest.js';
+import { methodNotAllowed, readJsonBody, serviceClient } from '../../../_lib/rest.js';
 import { toErrorEnvelope } from '../../../_lib/envelope.js';
 import { staffMemberSchema } from '@jad/contracts';
 
@@ -43,7 +41,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.status(status).json({ error });
     return;
   }
-  const supabase = createClient(url, serviceKey, { auth: { autoRefreshToken: false } });
+  const supabase = serviceClient();
+  if (!supabase) {
+    const { error, status } = toErrorEnvelope('INTERNAL', 'Supabase not configured', 500);
+    res.status(status).json({ error });
+    return;
+  }
   const entries = await listStaffEntries(supabase);
   const target = entries.find((e) => e.id === id);
   if (!target) {
@@ -58,7 +61,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'GET') {
     const parsed = staffMemberSchema.safeParse(target);
     if (!parsed.success) {
-      const { error, status } = toErrorEnvelope('INTERNAL', 'Stored staff record failed validation', 500);
+      const { error, status } = toErrorEnvelope(
+        'INTERNAL',
+        'Stored staff record failed validation',
+        500,
+      );
       res.status(status).json({ error });
       return;
     }
@@ -68,11 +75,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   if (req.method === 'DELETE') {
     if (auth.userId === id) {
-      const { error, status } = toErrorEnvelope('CONFLICT', 'You cannot delete your own staff account.', 409);
+      const { error, status } = toErrorEnvelope(
+        'CONFLICT',
+        'You cannot delete your own staff account.',
+        409,
+      );
       res.status(status).json({ error });
       return;
     }
-    if (isLastGovernor(govMembers, govRoles, { id: target.id, status: target.status, roleId: target.roleId })) {
+    if (
+      isLastGovernor(govMembers, govRoles, {
+        id: target.id,
+        status: target.status,
+        roleId: target.roleId,
+      })
+    ) {
       const { error, status } = toErrorEnvelope(
         'CONFLICT',
         `${target.name} is the last active administrator. Grant the Staff module to another role with an active member first.`,
@@ -84,7 +101,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Safe hard delete (Phase 1 staff domain): StaffUser owns no financial
     // history, so unlike the old Member-row delete this cannot trip ledger
     // RESTRICTs. Assignments cascade; audit keeps its text snapshot.
-    const { error: assignmentError } = await supabase.from('StaffAssignment').delete().eq('staffUserId', id);
+    const { error: assignmentError } = await supabase
+      .from('StaffAssignment')
+      .delete()
+      .eq('staffUserId', id);
     if (assignmentError) {
       const { error, status } = toErrorEnvelope('INTERNAL', assignmentError.message, 500);
       res.status(status).json({ error });
@@ -121,26 +141,44 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.status(status).json({ error });
     return;
   }
-  const input = ((parsedBody.body ?? {}) as Record<string, unknown>);
+  const input = (parsedBody.body ?? {}) as Record<string, unknown>;
   const isSelf = auth.userId === id;
   let applied = false;
   if (input.roleId !== undefined) {
     if (typeof input.roleId !== 'string' || !input.roleId) {
-      const { error, status } = toErrorEnvelope('VALIDATION_ERROR', 'A valid roleId is required.', 400);
+      const { error, status } = toErrorEnvelope(
+        'VALIDATION_ERROR',
+        'A valid roleId is required.',
+        400,
+      );
       res.status(status).json({ error });
       return;
     }
     if (!roles.some((r) => r.id === input.roleId)) {
-      const { error, status } = toErrorEnvelope('VALIDATION_ERROR', 'Selected role does not exist.', 400);
+      const { error, status } = toErrorEnvelope(
+        'VALIDATION_ERROR',
+        'Selected role does not exist.',
+        400,
+      );
       res.status(status).json({ error });
       return;
     }
     if (isSelf) {
-      const { error, status } = toErrorEnvelope('CONFLICT', 'You cannot change your own role.', 409);
+      const { error, status } = toErrorEnvelope(
+        'CONFLICT',
+        'You cannot change your own role.',
+        409,
+      );
       res.status(status).json({ error });
       return;
     }
-    if (isLastGovernor(govMembers, govRoles, { id: target.id, status: target.status, roleId: target.roleId })) {
+    if (
+      isLastGovernor(govMembers, govRoles, {
+        id: target.id,
+        status: target.status,
+        roleId: target.roleId,
+      })
+    ) {
       const { error, status } = toErrorEnvelope(
         'CONFLICT',
         `${target.name} is the last active administrator. Grant the Staff module to another role with an active member first.`,
@@ -149,7 +187,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       res.status(status).json({ error });
       return;
     }
-    const { data: newRole } = await supabase.from('Role').select('id').or(`key.eq.${input.roleId},slug.eq.${input.roleId}`).limit(1);
+    const { data: newRole } = await supabase
+      .from('Role')
+      .select('id')
+      .or(`key.eq.${input.roleId},slug.eq.${input.roleId}`)
+      .limit(1);
     const newUuid = ((newRole as { id: string }[] | null) ?? [])[0]?.id;
     if (!newUuid) {
       const { error, status } = toErrorEnvelope('INTERNAL', 'Role record unresolvable', 500);
@@ -157,7 +199,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return;
     }
     // Exactly one staff assignment: replace, never merge (one staff role per user).
-    const { error: clearError } = await supabase.from('StaffAssignment').delete().eq('staffUserId', id);
+    const { error: clearError } = await supabase
+      .from('StaffAssignment')
+      .delete()
+      .eq('staffUserId', id);
     if (clearError) {
       const { error, status } = toErrorEnvelope('INTERNAL', clearError.message, 500);
       res.status(status).json({ error });
@@ -184,18 +229,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
   if (input.status !== undefined) {
     if (input.status !== 'ACTIVE' && input.status !== 'DISABLED') {
-      const { error, status } = toErrorEnvelope('VALIDATION_ERROR', 'Status must be ACTIVE or DISABLED.', 400);
+      const { error, status } = toErrorEnvelope(
+        'VALIDATION_ERROR',
+        'Status must be ACTIVE or DISABLED.',
+        400,
+      );
       res.status(status).json({ error });
       return;
     }
     if (isSelf) {
-      const { error, status } = toErrorEnvelope('CONFLICT', 'You cannot change your own status.', 409);
+      const { error, status } = toErrorEnvelope(
+        'CONFLICT',
+        'You cannot change your own status.',
+        409,
+      );
       res.status(status).json({ error });
       return;
     }
     if (
       input.status === 'DISABLED' &&
-      isLastGovernor(govMembers, govRoles, { id: target.id, status: target.status, roleId: target.roleId })
+      isLastGovernor(govMembers, govRoles, {
+        id: target.id,
+        status: target.status,
+        roleId: target.roleId,
+      })
     ) {
       const { error, status } = toErrorEnvelope(
         'CONFLICT',
@@ -238,7 +295,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
   const parsed = staffMemberSchema.safeParse(refreshed);
   if (!parsed.success) {
-    const { error, status } = toErrorEnvelope('INTERNAL', 'Stored staff record failed validation', 500);
+    const { error, status } = toErrorEnvelope(
+      'INTERNAL',
+      'Stored staff record failed validation',
+      500,
+    );
     res.status(status).json({ error });
     return;
   }

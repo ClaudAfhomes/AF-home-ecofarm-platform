@@ -132,12 +132,18 @@ export async function getLoginCmsPublic(): Promise<LoginContent> {
         brandLead: AUTH.login.brandLead,
       },
       fields: {
-        identifier: { label: AUTH.login.fields.identifier.label, hint: AUTH.login.fields.identifier.hint },
+        identifier: {
+          label: AUTH.login.fields.identifier.label,
+          hint: AUTH.login.fields.identifier.hint,
+        },
         password: { label: AUTH.login.fields.password.label },
       },
       submitLabel: AUTH.login.submitLabel,
       forgotPassword: { label: AUTH.login.forgotPassword.label },
-      registerPrompt: { text: AUTH.login.registerPrompt.text, linkLabel: AUTH.login.registerPrompt.linkLabel },
+      registerPrompt: {
+        text: AUTH.login.registerPrompt.text,
+        linkLabel: AUTH.login.registerPrompt.linkLabel,
+      },
     } as LoginContent;
   }
 }
@@ -183,7 +189,10 @@ export async function getRegisterCmsPublic(): Promise<RegisterContent> {
       },
       qualification: { domestic: [], abroad: [] },
       submitLabel: AUTH.register.submitLabel,
-      loginPrompt: { text: AUTH.register.loginPrompt.text, linkLabel: AUTH.register.loginPrompt.linkLabel },
+      loginPrompt: {
+        text: AUTH.register.loginPrompt.text,
+        linkLabel: AUTH.register.loginPrompt.linkLabel,
+      },
       verifyEmail: {
         eyebrow: AUTH.verifyEmail.eyebrow,
         title: AUTH.verifyEmail.title,

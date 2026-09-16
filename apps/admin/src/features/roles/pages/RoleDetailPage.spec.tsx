@@ -181,9 +181,9 @@ describe('RoleDetailPage', () => {
     await user.click(withdrawals);
     expect((withdrawals as HTMLInputElement).checked).toBe(true);
     await user.click(screen.getByText('Discard'));
-    expect((screen.getByRole('checkbox', { name: 'Withdrawals' }) as HTMLInputElement).checked).toBe(
-      false,
-    );
+    expect(
+      (screen.getByRole('checkbox', { name: 'Withdrawals' }) as HTMLInputElement).checked,
+    ).toBe(false);
     expect(screen.getByText('Save permissions')).toBeDisabled();
     expect(updateMutate).not.toHaveBeenCalled();
   });

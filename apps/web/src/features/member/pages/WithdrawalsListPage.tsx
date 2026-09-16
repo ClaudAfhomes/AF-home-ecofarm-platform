@@ -107,8 +107,7 @@ export function WithdrawalsListPage() {
                     {payoutMethodLabel(withdrawal.payoutAccount.method)} ·{' '}
                     {withdrawal.payoutAccount.accountIdentifier ??
                       withdrawal.payoutAccount.accountIdentifierMasked}{' '}
-                    · requested{' '}
-                    {formatDate(withdrawal.createdAt)}
+                    · requested {formatDate(withdrawal.createdAt)}
                   </span>
                 </div>
                 <StatusChip

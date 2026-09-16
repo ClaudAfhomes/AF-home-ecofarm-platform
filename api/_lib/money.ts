@@ -149,7 +149,11 @@ export async function fetchWithdrawalIdentifierMap(
       : await query.in('id', ids);
     if (error || !Array.isArray(data)) return out;
     for (const row of data as { id?: unknown; accountIdentifier?: unknown }[]) {
-      if (typeof row.id === 'string' && typeof row.accountIdentifier === 'string' && row.accountIdentifier) {
+      if (
+        typeof row.id === 'string' &&
+        typeof row.accountIdentifier === 'string' &&
+        row.accountIdentifier
+      ) {
         out.set(row.id, row.accountIdentifier);
       }
     }

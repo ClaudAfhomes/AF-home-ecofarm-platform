@@ -1,8 +1,4 @@
-import {
-  CUSTOM_ROLE_FORBIDDEN_MODULES,
-  roleRecordSchema,
-  staffModuleSchema,
-} from '@jad/contracts';
+import { CUSTOM_ROLE_FORBIDDEN_MODULES, roleRecordSchema, staffModuleSchema } from '@jad/contracts';
 
 import { SUPER_ADMIN_ONLY } from '../../_lib/access.js';
 import { verifyStaff } from '../../_lib/auth.js';
@@ -13,7 +9,11 @@ import { methodNotAllowed, okList, readJsonBody, requireService } from '../../_l
 import { toErrorEnvelope } from '../../_lib/envelope.js';
 
 function slugify(name: string): string {
-  const slug = name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  const slug = name
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
   return slug ? `role-${slug}` : 'role-custom';
 }
 
@@ -52,14 +52,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!supabase) return;
 
   if (req.method === 'GET') {
-    const { data, error } = await supabase.from('Role').select('key,slug,name,permissions,is_system,domain').order('name');
+    const { data, error } = await supabase
+      .from('Role')
+      .select('key,slug,name,permissions,is_system,domain')
+      .order('name');
     if (error) {
       const { error: env, status } = toErrorEnvelope('INTERNAL', error.message, 500);
       res.status(status).json({ error: env });
       return;
     }
     const rows = (((data as unknown[]) ?? []) as Record<string, unknown>[]).map(mapRow);
-    okList(res, rows.filter((row) => roleRecordSchema.safeParse(row).success));
+    okList(
+      res,
+      rows.filter((row) => roleRecordSchema.safeParse(row).success),
+    );
     return;
   }
 
@@ -69,17 +75,28 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.status(status).json({ error });
     return;
   }
-  const input = ((parsedBody.body ?? {}) as Record<string, unknown>);
+  const input = (parsedBody.body ?? {}) as Record<string, unknown>;
   const name = typeof input.name === 'string' ? input.name.trim() : '';
   if (!name || name.length > 60) {
-    const { error, status } = toErrorEnvelope('VALIDATION_ERROR', 'Role name must be 1–60 characters.', 400);
+    const { error, status } = toErrorEnvelope(
+      'VALIDATION_ERROR',
+      'Role name must be 1–60 characters.',
+      400,
+    );
     res.status(status).json({ error });
     return;
   }
   const permissions = Array.isArray(input.permissions) ? input.permissions : [];
   const validModules = staffModuleSchema.options as readonly string[];
-  if (permissions.length === 0 || !permissions.every((p) => typeof p === 'string' && validModules.includes(p))) {
-    const { error, status } = toErrorEnvelope('VALIDATION_ERROR', 'At least one valid module permission is required.', 400);
+  if (
+    permissions.length === 0 ||
+    !permissions.every((p) => typeof p === 'string' && validModules.includes(p))
+  ) {
+    const { error, status } = toErrorEnvelope(
+      'VALIDATION_ERROR',
+      'At least one valid module permission is required.',
+      400,
+    );
     res.status(status).json({ error });
     return;
   }
@@ -105,7 +122,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       (r) => typeof r.name === 'string' && r.name.trim().toLowerCase() === name.toLowerCase(),
     );
   if (taken) {
-    const { error, status } = toErrorEnvelope('CONFLICT', 'A role with this name already exists.', 409);
+    const { error, status } = toErrorEnvelope(
+      'CONFLICT',
+      'A role with this name already exists.',
+      409,
+    );
     res.status(status).json({ error });
     return;
   }
@@ -124,7 +145,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     .select('key,slug,name,permissions,is_system,domain')
     .single();
   if (error || !created) {
-    const { error: env, status } = toErrorEnvelope('INTERNAL', error?.message ?? 'Create failed', 500);
+    const { error: env, status } = toErrorEnvelope(
+      'INTERNAL',
+      error?.message ?? 'Create failed',
+      500,
+    );
     res.status(status).json({ error: env });
     return;
   }

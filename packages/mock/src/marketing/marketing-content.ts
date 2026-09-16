@@ -95,8 +95,7 @@ export const MOCK_MARKETING_CONTENT: ForwardableContent[] = [
     kind: 'VIDEO',
     downloadUrl: 'https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
     share: {
-      messengerUrl:
-        'https://www.facebook.com/sharer/sharer.php?u=https://jad.example/virtual-tour',
+      messengerUrl: 'https://www.facebook.com/sharer/sharer.php?u=https://jad.example/virtual-tour',
       viberUrl: 'https://www.viber.com/forward?text=JA%26D%20Virtual%20Office%20Tour',
       copyUrl: 'https://jad.example/virtual-tour',
     },
@@ -127,8 +126,7 @@ export const MOCK_MARKETING_CONTENT: ForwardableContent[] = [
         'Buyer Guide Checklist\n\n1. Determine your budget\n2. Choose a property from the JA&D catalog\n3. Record your sale on the platform\n4. Complete verification with admin\n5. Proceed to payment',
       ),
     share: {
-      messengerUrl:
-        'https://www.facebook.com/sharer/sharer.php?u=https://jad.example/buyer-guide',
+      messengerUrl: 'https://www.facebook.com/sharer/sharer.php?u=https://jad.example/buyer-guide',
       viberUrl: 'https://www.viber.com/forward?text=JA%26D%20Buyer%20Guide%20Checklist',
       copyUrl: 'https://jad.example/buyer-guide',
     },
@@ -145,8 +143,7 @@ export const MOCK_MARKETING_CONTENT: ForwardableContent[] = [
         'JA&D Community Open House\n\nJoin us for an exclusive community open house event.\n\nDate: Every Saturday\nTime: 10:00 AM\nVenue: JA&D Showroom\n\nBring a friend and discover property opportunities together.',
       ),
     share: {
-      messengerUrl:
-        'https://www.facebook.com/sharer/sharer.php?u=https://jad.example/open-house',
+      messengerUrl: 'https://www.facebook.com/sharer/sharer.php?u=https://jad.example/open-house',
       viberUrl: 'https://www.viber.com/forward?text=JA%26D%20Open%20House%20Flyer',
       copyUrl: 'https://jad.example/open-house',
     },

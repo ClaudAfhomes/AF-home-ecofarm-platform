@@ -127,7 +127,7 @@ describe('custom-role staff access (module authorization)', () => {
     expect(seen.body).toMatchObject({
       registrations: 0,
       sales: 0,
-      payouts: 0,
+      members: 0,
       withdrawals: 0,
     });
   });

@@ -42,7 +42,9 @@ describe('LoginPage regression – mock fallback preservation', () => {
     await user.click(screen.getByRole('button', { name: 'Sign In' }));
 
     expect(await screen.findByText('Member home')).toBeInTheDocument();
-    const authCalls = (fetchMock.mock.calls as unknown[][]).filter(([url]) => String(url).includes('/auth/login'));
+    const authCalls = (fetchMock.mock.calls as unknown[][]).filter(([url]) =>
+      String(url).includes('/auth/login'),
+    );
     expect(authCalls).toHaveLength(1);
   });
 
@@ -89,13 +91,23 @@ describe('LoginPage regression – mock fallback preservation', () => {
     expect(hrefValue).toMatch(/5174/);
     expect(hrefValue).toMatch(/\/admin/);
 
-    Object.defineProperty(window, 'location', { configurable: true, writable: true, value: originalLocation });
+    Object.defineProperty(window, 'location', {
+      configurable: true,
+      writable: true,
+      value: originalLocation,
+    });
   });
 
   it('surfaces API error envelope on failed credentials (no silent fallback)', async () => {
     mockFetchRoutes({
       '/auth/login': {
-        body: { error: { code: 'UNAUTHORIZED', message: 'Email or password is incorrect.', timestamp: '2026-08-20T10:00:00Z' } },
+        body: {
+          error: {
+            code: 'UNAUTHORIZED',
+            message: 'Email or password is incorrect.',
+            timestamp: '2026-08-20T10:00:00Z',
+          },
+        },
         status: 401,
       },
     });
@@ -125,7 +137,13 @@ describe('LoginPage regression – mock fallback preservation', () => {
   it('members lookup failure is observable via error UI, not silent mock', async () => {
     mockFetchRoutes({
       '/auth/login': {
-        body: { error: { code: 'INTERNAL', message: 'An unexpected error occurred.', timestamp: '2026-08-20T10:00:00Z' } },
+        body: {
+          error: {
+            code: 'INTERNAL',
+            message: 'An unexpected error occurred.',
+            timestamp: '2026-08-20T10:00:00Z',
+          },
+        },
         status: 500,
       },
     });

@@ -191,6 +191,39 @@ export function MyGenealogyPage() {
         ]}
       />
 
+      {genealogyQuery.data ? (
+        <div className={styles.sponsor}>
+          <h2 className={styles.sponsorTitle}>Sponsorship</h2>
+          {genealogyQuery.data.sponsor ? (
+            <>
+              <p className={styles.sponsorIntro}>
+                Sponsored by <strong>{genealogyQuery.data.sponsor.name}</strong>
+              </p>
+              <ol className={styles.chain} aria-label="Your sponsor chain">
+                {genealogyQuery.data.ancestors.map((node) => (
+                  <li key={node.id} className={styles.chainStep}>
+                    <span className={styles.chainAvatar} aria-hidden="true">
+                      {initials(node.name)}
+                    </span>
+                    <span className={styles.chainName}>{node.name}</span>
+                  </li>
+                ))}
+                <li className={styles.chainStepCurrent}>
+                  <span className={styles.chainAvatar} aria-hidden="true">
+                    {initials(genealogyQuery.data.root.name)}
+                  </span>
+                  <span className={styles.chainName}>
+                    {genealogyQuery.data.root.name} <span className={styles.chainYou}>(you)</span>
+                  </span>
+                </li>
+              </ol>
+            </>
+          ) : (
+            <p className={styles.sponsorNone}>No sponsor linked to your account yet.</p>
+          )}
+        </div>
+      ) : null}
+
       <div className={styles.filters} role="group" aria-label="Filter genealogy by status">
         {STATUS_FILTERS.map((option) => (
           <button

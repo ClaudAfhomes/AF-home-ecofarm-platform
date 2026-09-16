@@ -22,10 +22,7 @@ export type VoucherExpiryRule = {
  * 2. `validityDays` from the template + issuedAt — used if > 0.
  * 3. `undefined` — no expiry.
  */
-export function computeMemberExpiry(
-  rule: VoucherExpiryRule,
-  issuedAt: Date,
-): string | undefined {
+export function computeMemberExpiry(rule: VoucherExpiryRule, issuedAt: Date): string | undefined {
   // 1. Fixed date takes precedence
   if (rule.expiresAt) {
     const d = new Date(rule.expiresAt);

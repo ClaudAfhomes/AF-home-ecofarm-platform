@@ -128,9 +128,38 @@ describe('member referral endpoints', () => {
     expect(seen.status).toBe(200);
     const body = seen.body as {
       root: { id: string; children: { id: string; children: { id: string }[] }[] };
+      sponsor: { id: string } | null;
+      ancestors: { id: string }[];
     };
     expect(body.root.id).toBe('mem-uuid-1');
     expect(body.root.children.map((c) => c.id)).toEqual(['mem-uuid-2', 'mem-uuid-3']);
     expect(body.root.children[0]?.children.map((c) => c.id)).toEqual(['mem-uuid-4']);
+    // Root member has no sponsor → no upline.
+    expect(body.sponsor).toBeNull();
+    expect(body.ancestors).toEqual([]);
+  });
+
+  it('returns the upline sponsor chain (topmost ancestor → direct sponsor)', async () => {
+    const previous = mocks.anon.auth.getUser;
+    mocks.anon.auth.getUser = async () => ({
+      data: { user: { id: 'mem-uuid-4', user_metadata: {} } },
+      error: null,
+    });
+    try {
+      const { res, seen } = capture();
+      await getGenealogy(authedGet, res);
+      expect(seen.status).toBe(200);
+      const body = seen.body as {
+        root: { id: string };
+        sponsor: { id: string } | null;
+        ancestors: { id: string }[];
+      };
+      // mem-uuid-4 → mem-uuid-2 → mem-uuid-1 (topmost, no sponsor of its own).
+      expect(body.root.id).toBe('mem-uuid-4');
+      expect(body.ancestors.map((node) => node.id)).toEqual(['mem-uuid-1', 'mem-uuid-2']);
+      expect(body.sponsor).toEqual(expect.objectContaining({ id: 'mem-uuid-2' }));
+    } finally {
+      mocks.anon.auth.getUser = previous;
+    }
   });
 });

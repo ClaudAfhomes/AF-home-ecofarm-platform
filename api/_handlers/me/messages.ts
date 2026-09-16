@@ -51,9 +51,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       res.status(status).json({ error: env });
       return;
     }
-    const rows = ((((data as unknown[]) ?? []) as Record<string, unknown>[]).map(
-      mapMessageRow,
-    ).filter(isValidMessageRow) as { id: string }[]);
+    const rows = (((data as unknown[]) ?? []) as Record<string, unknown>[])
+      .map(mapMessageRow)
+      .filter(isValidMessageRow) as { id: string }[];
     const { page, nextCursor } = paginateByCursor(rows, cursor, limit);
     res.status(200).json({
       data: page,

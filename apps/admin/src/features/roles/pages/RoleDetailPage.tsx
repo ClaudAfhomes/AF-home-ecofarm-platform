@@ -56,7 +56,8 @@ export function RoleDetailPage() {
   const nameValue = nameDraft ?? data?.name ?? '';
   const nameChanged = data !== undefined && nameDraft !== null && nameDraft.trim() !== data.name;
   const effectivePermissions = permDraft ?? data?.permissions ?? [];
-  const permsChanged = data !== undefined && permDraft !== null && !sameModules(permDraft, data.permissions);
+  const permsChanged =
+    data !== undefined && permDraft !== null && !sameModules(permDraft, data.permissions);
 
   const permGuard =
     data !== undefined
@@ -75,7 +76,12 @@ export function RoleDetailPage() {
     }
     setNameError(null);
     try {
-      await updateRole.mutateAsync({ id: data.id, name: nameValue.trim(), actor: actorName, actorRole });
+      await updateRole.mutateAsync({
+        id: data.id,
+        name: nameValue.trim(),
+        actor: actorName,
+        actorRole,
+      });
       setNameDraft(null);
       toast({ title: 'Role renamed', message: `Role is now ${nameValue.trim()}`, tone: 'success' });
     } catch (e) {
@@ -111,7 +117,10 @@ export function RoleDetailPage() {
       setPermDraft(null);
       toast({
         title: 'Permissions updated',
-        message: diff.length > 0 ? diff.join('; ') : `${data.name} now grants ${effectivePermissions.length} modules`,
+        message:
+          diff.length > 0
+            ? diff.join('; ')
+            : `${data.name} now grants ${effectivePermissions.length} modules`,
         tone: 'success',
       });
     } catch (e) {
@@ -155,9 +164,7 @@ export function RoleDetailPage() {
         <ErrorState title="Role not found" message="The requested role does not exist." />
       ) : (
         <>
-          <Breadcrumbs
-            items={[{ label: 'Roles', to: '/admin/roles' }, { label: data.name }]}
-          />
+          <Breadcrumbs items={[{ label: 'Roles', to: '/admin/roles' }, { label: data.name }]} />
 
           <div className={styles.detailGrid}>
             <div className={styles.card}>
@@ -196,10 +203,7 @@ export function RoleDetailPage() {
                     className={styles.nameInput}
                   />
                 </label>
-                <Button
-                  onClick={handleSaveName}
-                  disabled={!nameChanged || updateRole.isPending}
-                >
+                <Button onClick={handleSaveName} disabled={!nameChanged || updateRole.isPending}>
                   {updateRole.isPending ? 'Saving…' : 'Save name'}
                 </Button>
                 {nameDraft !== null && !updateRole.isPending ? (
@@ -224,9 +228,7 @@ export function RoleDetailPage() {
                 onChange={setPermDraft}
                 disabled={updateRole.isPending}
                 showGlobalActions
-                lockedModules={
-                  data && !data.isSystem ? CUSTOM_ROLE_FORBIDDEN_MODULES : undefined
-                }
+                lockedModules={data && !data.isSystem ? CUSTOM_ROLE_FORBIDDEN_MODULES : undefined}
               />
               {effectivePermissions.length === 0 ? (
                 <p className={styles.guardNote} role="status">
@@ -295,8 +297,8 @@ export function RoleDetailPage() {
               ) : (
                 <>
                   <p className={styles.statusMessage}>
-                    Permanently remove this {data.isSystem ? 'system' : 'custom'} role. This
-                    action cannot be undone.
+                    Permanently remove this {data.isSystem ? 'system' : 'custom'} role. This action
+                    cannot be undone.
                   </p>
                   <div>
                     <Button variant="danger" onClick={() => setShowDeleteConfirm(true)}>

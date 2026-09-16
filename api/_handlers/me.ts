@@ -41,7 +41,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.status(status).json({ error });
     return;
   }
-  const input = ((parsedBody.body ?? {}) as Record<string, unknown>);
+  const input = (parsedBody.body ?? {}) as Record<string, unknown>;
   const supabase = requireService(res);
   if (!supabase) return;
   const { data: current, error: readError } = await supabase
@@ -64,7 +64,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     (input.countryCode !== undefined && input.countryCode !== row.countryCode) ||
     (input.countryName !== undefined && input.countryName !== row.countryName)
   ) {
-    const { error, status } = toErrorEnvelope('VALIDATION_ERROR', 'Country cannot be changed.', 400);
+    const { error, status } = toErrorEnvelope(
+      'VALIDATION_ERROR',
+      'Country cannot be changed.',
+      400,
+    );
     res.status(status).json({ error });
     return;
   }
@@ -94,7 +98,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     .eq('id', auth.userId)
     .single();
   if (rereadError || !updated) {
-    const { error, status } = toErrorEnvelope('INTERNAL', rereadError?.message ?? 'Update failed', 500);
+    const { error, status } = toErrorEnvelope(
+      'INTERNAL',
+      rereadError?.message ?? 'Update failed',
+      500,
+    );
     res.status(status).json({ error });
     return;
   }

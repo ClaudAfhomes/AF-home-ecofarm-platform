@@ -40,10 +40,7 @@ export function getConversationThread(
 }
 
 /** `POST /admin/conversations/:memberId/messages` — staff reply (audited). */
-export function sendStaffMessage(
-  memberId: string,
-  input: CreateMessageRequest,
-): Promise<Message> {
+export function sendStaffMessage(memberId: string, input: CreateMessageRequest): Promise<Message> {
   return request(`/admin/conversations/${memberId}/messages`, messageSchema, {
     method: 'POST',
     body: JSON.stringify(input),

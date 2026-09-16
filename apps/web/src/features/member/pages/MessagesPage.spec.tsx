@@ -28,7 +28,9 @@ describe('member MessagesPage', () => {
     expect(
       await screen.findByText('Hello, I have a question about my commission.'),
     ).toBeInTheDocument();
-    expect(screen.getByText('Hi Juan! Happy to help — what would you like to know?')).toBeInTheDocument();
+    expect(
+      screen.getByText('Hi Juan! Happy to help — what would you like to know?'),
+    ).toBeInTheDocument();
     expect(screen.getByText('You')).toBeInTheDocument();
     expect(screen.getByText('Ada Admin')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Send' })).toBeDisabled();

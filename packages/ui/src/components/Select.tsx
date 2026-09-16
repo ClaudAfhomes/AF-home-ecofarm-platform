@@ -8,8 +8,7 @@ export interface SelectOption {
   label: string;
 }
 
-export interface SelectProps
-  extends Omit<SelectHTMLAttributes<HTMLSelectElement>, 'children'> {
+export interface SelectProps extends Omit<SelectHTMLAttributes<HTMLSelectElement>, 'children'> {
   options: SelectOption[];
 }
 
@@ -23,12 +22,7 @@ export function Select({ options, className, ...rest }: SelectProps) {
           </option>
         ))}
       </select>
-      <Icon
-        name="chevron-down"
-        size={16}
-        className={styles.chevron}
-        aria-hidden="true"
-      />
+      <Icon name="chevron-down" size={16} className={styles.chevron} aria-hidden="true" />
     </div>
   );
 }

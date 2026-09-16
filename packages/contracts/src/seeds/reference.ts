@@ -28,7 +28,10 @@ export const PROGRAM_QUESTION_SEEDS: { programId: string; questions: Qualificati
   {
     programId: 'prg-domestic',
     questions: [
-      { id: 'qual-dom-1', questionText: 'Are you at least 18 years old and able to enter into a binding contract?' },
+      {
+        id: 'qual-dom-1',
+        questionText: 'Are you at least 18 years old and able to enter into a binding contract?',
+      },
       {
         id: 'qual-dom-2',
         questionText:
@@ -41,7 +44,8 @@ export const PROGRAM_QUESTION_SEEDS: { programId: string; questions: Qualificati
     questions: [
       {
         id: 'qual-ab-1',
-        questionText: 'Are you at least 18 years old and legally able to enter into a contract in your country?',
+        questionText:
+          'Are you at least 18 years old and legally able to enter into a contract in your country?',
       },
       {
         id: 'qual-ab-2',
@@ -56,15 +60,60 @@ export type ConfigSeed = { key: string; label: string; value: string; category: 
 
 /** Mirrors admin MOCK_CONFIG plus the public GENDERS row. */
 export const CONFIG_SEEDS: ConfigSeed[] = [
-  { key: 'COMMISSION_DIRECT_RATE', label: 'Direct Commission Rate', value: '0.0800', category: 'Commissions' },
-  { key: 'COMMISSION_REFERRAL_RATE', label: 'Direct Referral Rate', value: '0.0400', category: 'Commissions' },
-  { key: 'MIN_WITHDRAWAL_AMOUNT', label: 'Minimum Withdrawal Amount', value: '100.00', category: 'Withdrawals' },
-  { key: 'MAX_WITHDRAWAL_AMOUNT', label: 'Maximum Withdrawal Amount', value: '50000.00', category: 'Withdrawals' },
-  { key: 'QUALIFICATION_MIN_SALES', label: 'Minimum Qualifying Sales', value: '1', category: 'Qualification' },
-  { key: 'QUALIFICATION_MIN_AGE', label: 'Minimum Member Age', value: '18', category: 'Qualification' },
-  { key: 'MAX_RESUBMISSION_ATTEMPTS', label: 'Max Sale Resubmission Attempts', value: '3', category: 'Sales' },
-  { key: 'VOUCHER_DEFAULT_EXPIRY_DAYS', label: 'Voucher Expiry (days)', value: '90', category: 'Vouchers' },
-  { key: 'GENDERS', label: 'Gender Options', value: '["Male","Female","Others"]', category: 'Registration' },
+  {
+    key: 'COMMISSION_DIRECT_RATE',
+    label: 'Direct Commission Rate',
+    value: '0.0800',
+    category: 'Commissions',
+  },
+  {
+    key: 'COMMISSION_REFERRAL_RATE',
+    label: 'Direct Referral Rate',
+    value: '0.0400',
+    category: 'Commissions',
+  },
+  {
+    key: 'MIN_WITHDRAWAL_AMOUNT',
+    label: 'Minimum Withdrawal Amount',
+    value: '100.00',
+    category: 'Withdrawals',
+  },
+  {
+    key: 'MAX_WITHDRAWAL_AMOUNT',
+    label: 'Maximum Withdrawal Amount',
+    value: '50000.00',
+    category: 'Withdrawals',
+  },
+  {
+    key: 'QUALIFICATION_MIN_SALES',
+    label: 'Minimum Qualifying Sales',
+    value: '1',
+    category: 'Qualification',
+  },
+  {
+    key: 'QUALIFICATION_MIN_AGE',
+    label: 'Minimum Member Age',
+    value: '18',
+    category: 'Qualification',
+  },
+  {
+    key: 'MAX_RESUBMISSION_ATTEMPTS',
+    label: 'Max Sale Resubmission Attempts',
+    value: '3',
+    category: 'Sales',
+  },
+  {
+    key: 'VOUCHER_DEFAULT_EXPIRY_DAYS',
+    label: 'Voucher Expiry (days)',
+    value: '90',
+    category: 'Vouchers',
+  },
+  {
+    key: 'GENDERS',
+    label: 'Gender Options',
+    value: '["Male","Female","Others"]',
+    category: 'Registration',
+  },
 ];
 
 export const POLICY_SEEDS: (PolicyType & { content: string })[] = [

@@ -198,9 +198,7 @@ export function RolesPage() {
                             {row.id}
                           </span>
                         </TableCell>
-                        <TableCell label="Members">
-                          {memberCounts.get(row.id) ?? 0}
-                        </TableCell>
+                        <TableCell label="Members">{memberCounts.get(row.id) ?? 0}</TableCell>
                         <TableCell label="Modules">
                           {row.permissions.length} module{row.permissions.length === 1 ? '' : 's'}
                         </TableCell>

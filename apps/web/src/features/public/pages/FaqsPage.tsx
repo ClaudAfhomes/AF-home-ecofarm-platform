@@ -9,7 +9,11 @@ import styles from './FaqsPage.module.css';
 
 /** Public FAQs page — CMS-driven with static fallback (Q6). */
 export function FaqsPage() {
-  const { data: cms } = useQuery({ queryKey: ['cms', 'faqs'], queryFn: getFaqsCmsPublic, staleTime: 0 });
+  const { data: cms } = useQuery({
+    queryKey: ['cms', 'faqs'],
+    queryFn: getFaqsCmsPublic,
+    staleTime: 0,
+  });
   const content = (cms ?? FAQS) as typeof FAQS;
   return (
     <div className={styles.page}>

@@ -1,4 +1,3 @@
-import { createClient } from '@supabase/supabase-js';
 import { randomUUID } from 'node:crypto';
 
 import { locationVerificationRequestSchema } from '@jad/contracts';
@@ -7,6 +6,7 @@ import { getSupabaseEnv } from '../../_lib/env.js';
 import { toErrorEnvelope } from '../../_lib/envelope.js';
 import { setCors } from '../../_lib/cors.js';
 import type { VercelRequest, VercelResponse } from '../../_lib/http.js';
+import { serviceClient } from '../../_lib/rest.js';
 
 function headerValue(
   headers: Record<string, string | string[] | undefined>,
@@ -235,15 +235,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // Validate against countries master data (ISO 3166-1). Do NOT default unknown to US/PH.
   // If provider returns unknown/invalid code → 422 GEO_REVERSE_FAILED
-  const { url: supaUrl, serviceKey: supaServiceKey } = getSupabaseEnv();
-  let supabaseForValidation: ReturnType<typeof createClient> | null = null;
-  if (supaUrl && supaServiceKey) {
-    try {
-      supabaseForValidation = createClient(supaUrl, supaServiceKey, {
-        auth: { autoRefreshToken: false },
-      });
-    } catch {}
-  }
+  const supabaseForValidation = serviceClient();
   if (supabaseForValidation) {
     try {
       const { data: countryRow, error: countryErr } = await supabaseForValidation
@@ -287,29 +279,31 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Attempt to persist (optional; do not block response on DB failure beyond logging)
   const { url, serviceKey } = getSupabaseEnv();
   if (url && serviceKey) {
-    try {
-      const supabase = createClient(url, serviceKey, { auth: { autoRefreshToken: false } });
-      const { error } = await supabase.from('location_verifications').insert({
-        verification_id: verificationId,
-        verified_country_code: cc,
-        detected_country_code: detectedCountryCode,
-        program_id: programId,
-        program_code: programCode,
-        method,
-        is_philippines: isPhilippines,
-        blocked: false,
-        requires_exception: false,
-        accuracy: accuracy ?? null,
-        latitude: latitude ?? null,
-        longitude: longitude ?? null,
-        ip_country_header: ipCountryHeader ?? null,
-      });
-      if (error) {
-        // Non-fatal for MVP: log and continue (table may not exist until migration applied)
-        console.error('[location-verify] insert failed:', error.message);
+    const supabase = serviceClient();
+    if (supabase) {
+      try {
+        const { error } = await supabase.from('location_verifications').insert({
+          verification_id: verificationId,
+          verified_country_code: cc,
+          detected_country_code: detectedCountryCode,
+          program_id: programId,
+          program_code: programCode,
+          method,
+          is_philippines: isPhilippines,
+          blocked: false,
+          requires_exception: false,
+          accuracy: accuracy ?? null,
+          latitude: latitude ?? null,
+          longitude: longitude ?? null,
+          ip_country_header: ipCountryHeader ?? null,
+        });
+        if (error) {
+          // Non-fatal for MVP: log and continue (table may not exist until migration applied)
+          console.error('[location-verify] insert failed:', error.message);
+        }
+      } catch (e) {
+        console.error('[location-verify] insert error:', (e as Error).message);
       }
-    } catch (e) {
-      console.error('[location-verify] insert error:', (e as Error).message);
     }
   } else {
     console.warn(

@@ -43,7 +43,21 @@ export function useMemberRoles() {
             let links: { roleId: string }[] | null = null;
             let linkErr: unknown = null;
             for (const tbl of ['MemberRole'] as const) {
-              const res = (await (client as unknown as { from: (t: string) => { select: (c: string) => { eq: (k: string, v: string) => Promise<{ data: unknown[] | null; error: unknown }> } } }).from(tbl).select('roleId').eq('memberId', user.id)) as { data: { roleId: string }[] | null; error: unknown };
+              const res = (await (
+                client as unknown as {
+                  from: (t: string) => {
+                    select: (c: string) => {
+                      eq: (
+                        k: string,
+                        v: string,
+                      ) => Promise<{ data: unknown[] | null; error: unknown }>;
+                    };
+                  };
+                }
+              )
+                .from(tbl)
+                .select('roleId')
+                .eq('memberId', user.id)) as { data: { roleId: string }[] | null; error: unknown };
               if (!res.error && Array.isArray(res.data) && res.data.length > 0) {
                 links = res.data as { roleId: string }[];
                 linkErr = null;

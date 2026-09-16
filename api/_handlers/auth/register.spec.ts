@@ -98,11 +98,20 @@ const mocks = vi.hoisted(() => {
         return { data: {}, error: new Error('signup disabled') };
       },
     },
+    otp: {
+      signInWithOtp: async (input: unknown) => {
+        calls.push({ table: 'auth.users', op: 'signInWithOtp', arg: input });
+        return { data: {}, error: null };
+      },
+    },
   };
 });
 
 vi.mock('@supabase/supabase-js', () => ({
-  createClient: () => ({ ...mocks.service, auth: { admin: mocks.adminAuth } }),
+  createClient: () => ({
+    ...mocks.service,
+    auth: { admin: mocks.adminAuth, signInWithOtp: mocks.otp.signInWithOtp },
+  }),
 }));
 
 function capture() {
@@ -143,6 +152,7 @@ describe('POST /api/v1/auth/register', () => {
   beforeEach(() => {
     vi.stubEnv('SUPABASE_URL', 'https://reg.test.supabase.co');
     vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'service');
+    vi.stubEnv('VITE_SUPABASE_ANON_KEY', 'anon');
     mocks.calls.length = 0;
     mocks.script.existingMembers = [];
     mocks.script.sponsors = [];
@@ -219,6 +229,15 @@ describe('POST /api/v1/auth/register', () => {
       unknown
     >;
     expect(createCall).toMatchObject({ email: 'new.applicant@example.com', email_confirm: false });
+    // The email-verification OTP is dispatched after the application is filed.
+    const otpCall = mocks.calls.find((c) => c.op === 'signInWithOtp')?.arg as Record<
+      string,
+      unknown
+    >;
+    expect(otpCall).toMatchObject({
+      email: 'new.applicant@example.com',
+      options: { shouldCreateUser: false },
+    });
     const insert = mocks.calls.find((c) => c.table === 'Registration')?.arg as Record<
       string,
       unknown
@@ -274,9 +293,7 @@ describe('POST /api/v1/auth/register', () => {
     expect(seen.body).toMatchObject({
       application: { email: 'new.applicant@example.com', status: 'PENDING' },
     });
-    expect(
-      mocks.calls.some((c) => c.table === 'Registration' && c.op === 'delete'),
-    ).toBe(true);
+    expect(mocks.calls.some((c) => c.table === 'Registration' && c.op === 'delete')).toBe(true);
   });
 
   it('completes the interrupted registration on auth conflict', async () => {

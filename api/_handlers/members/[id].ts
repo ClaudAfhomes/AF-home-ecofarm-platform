@@ -47,7 +47,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
   const parsed = memberProfileSchema.safeParse(mapMemberRow(data as Record<string, unknown>));
   if (!parsed.success) {
-    const { error: env, status } = toErrorEnvelope('INTERNAL', 'Stored profile failed validation', 500);
+    const { error: env, status } = toErrorEnvelope(
+      'INTERNAL',
+      'Stored profile failed validation',
+      500,
+    );
     res.status(status).json({ error: env });
     return;
   }

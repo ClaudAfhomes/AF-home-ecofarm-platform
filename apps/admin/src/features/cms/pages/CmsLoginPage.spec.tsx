@@ -155,16 +155,20 @@ describe('CmsLoginPage — Login CMS module', () => {
     const cmsItem = ADMIN_NAV_ITEMS.find((i) => i.to === '/admin/cms');
     expect(cmsItem?.label).toBe('Website CMS');
     expect(
-      cmsItem?.dropdown?.some((d) => !('divider' in d) && d.to === '/admin/cms/login' && d.label === 'Login'),
+      cmsItem?.dropdown?.some(
+        (d) => !('divider' in d) && d.to === '/admin/cms/login' && d.label === 'Login',
+      ),
     ).toBe(true);
     expect(
-      cmsItem?.dropdown?.some((d) => !('divider' in d) && d.to === '/admin/cms/register' && d.label === 'Register'),
+      cmsItem?.dropdown?.some(
+        (d) => !('divider' in d) && d.to === '/admin/cms/register' && d.label === 'Register',
+      ),
     ).toBe(true);
-    expect(
-      cmsItem?.dropdown?.some((d) => 'divider' in d),
-    ).toBe(true);
-    const globalIdx = cmsItem?.dropdown?.findIndex((d) => !('divider' in d) && d.to === '/admin/cms/global') ?? -1;
-    const loginIdx = cmsItem?.dropdown?.findIndex((d) => !('divider' in d) && d.to === '/admin/cms/login') ?? -1;
+    expect(cmsItem?.dropdown?.some((d) => 'divider' in d)).toBe(true);
+    const globalIdx =
+      cmsItem?.dropdown?.findIndex((d) => !('divider' in d) && d.to === '/admin/cms/global') ?? -1;
+    const loginIdx =
+      cmsItem?.dropdown?.findIndex((d) => !('divider' in d) && d.to === '/admin/cms/login') ?? -1;
     const dividerIdx = cmsItem?.dropdown?.findIndex((d) => 'divider' in d) ?? -1;
     expect(dividerIdx).toBeGreaterThan(globalIdx);
     expect(loginIdx).toBeGreaterThan(dividerIdx);

@@ -42,7 +42,10 @@ export async function createSale(input: CreateSaleInput): Promise<Sale> {
   });
 }
 
-export async function updateSale(id: string, patch: Partial<Omit<Sale, 'id' | 'submittedAt'>>): Promise<Sale> {
+export async function updateSale(
+  id: string,
+  patch: Partial<Omit<Sale, 'id' | 'submittedAt'>>,
+): Promise<Sale> {
   return request(`/admin/sales/${id}`, saleSchema, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },

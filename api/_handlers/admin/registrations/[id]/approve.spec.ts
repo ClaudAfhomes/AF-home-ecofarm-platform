@@ -115,7 +115,12 @@ function capture() {
 }
 
 const approveReq = (id: string): VercelRequest =>
-  ({ method: 'POST', query: { id }, headers: { authorization: 'Bearer good' }, body: {} }) as VercelRequest;
+  ({
+    method: 'POST',
+    query: { id },
+    headers: { authorization: 'Bearer good' },
+    body: {},
+  }) as VercelRequest;
 
 function pendingRegistration(overrides: Record<string, unknown> = {}) {
   return {
@@ -168,14 +173,10 @@ describe('POST /admin/registrations/:id/approve', () => {
     await approveHandler(approveReq('reg-001'), res);
     expect(seen.status).toBe(200);
     expect(seen.body).toMatchObject({ id: 'reg-001', memberId: 'mem-auth-1' });
-    const deletion = mocks.calls.find(
-      (c) => c.table === 'Registration' && c.op === 'delete',
-    );
+    const deletion = mocks.calls.find((c) => c.table === 'Registration' && c.op === 'delete');
     expect(deletion?.arg).toEqual({ id: 'reg-001' });
     // No APPROVED_ACTIVE registration row is ever written back.
-    const updates = mocks.calls.filter(
-      (c) => c.table === 'Registration' && c.op === 'update',
-    );
+    const updates = mocks.calls.filter((c) => c.table === 'Registration' && c.op === 'update');
     expect(updates.length).toBe(0);
     // The member itself is still created with its own active status.
     const member = mocks.calls.find((c) => c.table === 'Member' && c.op === 'upsert')

@@ -28,6 +28,33 @@ export function descendantsOf<T extends SponsorRow>(rows: T[], rootId: string): 
   return out;
 }
 
+/**
+ * Upline chain of a member — from the topmost reachable ancestor down to the
+ * direct sponsor, excluding the member itself. Cycle-guarded and depth-capped
+ * (a corrupt sponsor link terminates the chain instead of looping).
+ */
+export function ancestorChainOf<T extends SponsorRow>(
+  rows: T[],
+  memberId: string,
+  maxDepth = 10,
+): T[] {
+  const chain: T[] = [];
+  const visited = new Set<string>([memberId]);
+  let current = rows.find((row) => row.id === memberId);
+  let depth = 0;
+  while (current && depth < maxDepth) {
+    const sponsorId = current.sponsorId;
+    if (!sponsorId || visited.has(sponsorId)) break;
+    visited.add(sponsorId);
+    const parent = rows.find((row) => row.id === sponsorId);
+    if (!parent) break;
+    chain.unshift(parent);
+    current = parent;
+    depth += 1;
+  }
+  return chain;
+}
+
 export type GenealogyNodeInput = SponsorRow & {
   name: string;
   status: string;

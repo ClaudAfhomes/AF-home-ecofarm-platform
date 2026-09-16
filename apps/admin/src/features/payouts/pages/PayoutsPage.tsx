@@ -416,9 +416,7 @@ export function PayoutsPage() {
                     />
                     <DetailRow
                       label="Account Number"
-                      value={
-                        detailTarget.accountIdentifier ?? detailTarget.accountIdentifierMasked
-                      }
+                      value={detailTarget.accountIdentifier ?? detailTarget.accountIdentifierMasked}
                       mono
                     />
                     <DetailRow

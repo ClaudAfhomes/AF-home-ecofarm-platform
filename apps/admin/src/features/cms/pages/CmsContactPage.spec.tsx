@@ -100,9 +100,9 @@ describe('CmsContactPage — Phase 8 Contact CMS', () => {
     expect(cmsItem).toBeDefined();
     expect(cmsItem?.label).toBe('Website CMS');
     expect(canAccess(MOCK_SUPER_ADMIN.role as never, cmsItem!)).toBe(true);
-    expect(
-      cmsItem?.dropdown?.some((d) => !('divider' in d) && d.to === '/admin/cms/contact'),
-    ).toBe(true);
+    expect(cmsItem?.dropdown?.some((d) => !('divider' in d) && d.to === '/admin/cms/contact')).toBe(
+      true,
+    );
     expect(
       cmsItem?.dropdown?.some(
         (d) => !('divider' in d) && d.to === '/admin/cms/contact' && d.label === 'Contact',

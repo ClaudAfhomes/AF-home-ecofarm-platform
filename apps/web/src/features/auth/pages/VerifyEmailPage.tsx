@@ -36,9 +36,12 @@ export function VerifyEmailPage() {
     queryFn: getRegisterCmsPublic,
     staleTime: 0,
   });
-  const verifyCopy = (registerCms as { verifyEmail?: typeof AUTH.verifyEmail } | undefined)?.verifyEmail ?? AUTH.verifyEmail;
+  const verifyCopy =
+    (registerCms as { verifyEmail?: typeof AUTH.verifyEmail } | undefined)?.verifyEmail ??
+    AUTH.verifyEmail;
   const verifyImage =
-    (registerCms as { image?: { id: string; alt: string } } | undefined)?.image ?? AUTH.images.register;
+    (registerCms as { image?: { id: string; alt: string } } | undefined)?.image ??
+    AUTH.images.register;
   const brandMark = globalCms?.brandMark ?? null;
 
   const resolveInitialEmail = (): string => {

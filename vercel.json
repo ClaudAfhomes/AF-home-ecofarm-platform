@@ -8,6 +8,12 @@
       "includeFiles": "packages/**"
     }
   },
+  "crons": [
+    {
+      "path": "/health",
+      "schedule": "0 * * * *"
+    }
+  ],
   "rewrites": [
     { "source": "/api/v1/:path*", "destination": "/api/router" },
     { "source": "/health", "destination": "/api/router?path=health" },

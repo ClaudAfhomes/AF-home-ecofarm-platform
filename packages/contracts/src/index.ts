@@ -111,6 +111,7 @@ export {
   registerResponseSchema,
   verifyEmailRequestSchema,
   verifyEmailResponseSchema,
+  resendVerificationRequestSchema,
   resendVerificationResponseSchema,
   resubmitRequestSchema,
 } from './schemas/auth.js';
@@ -125,6 +126,7 @@ export type {
   RegisterResponse,
   VerifyEmailRequest,
   VerifyEmailResponse,
+  ResendVerificationRequest,
   ResendVerificationResponse,
   ResubmitRequest,
 } from './schemas/auth.js';

@@ -1,10 +1,8 @@
-import { createClient } from '@supabase/supabase-js';
-
 import { verifyUser } from '../../../_lib/auth.js';
 import { appendAudit } from '../../../_lib/audit.js';
 import { getSupabaseEnv } from '../../../_lib/env.js';
 import type { VercelRequest, VercelResponse } from '../../../_lib/http.js';
-import { methodNotAllowed, readJsonBody, requireService } from '../../../_lib/rest.js';
+import { methodNotAllowed, readJsonBody, requireService, anonClient } from '../../../_lib/rest.js';
 import { toErrorEnvelope } from '../../../_lib/envelope.js';
 import { changeStaffPasswordRequestSchema } from '@jad/contracts';
 
@@ -70,7 +68,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
   const row = staff as { id: string; email: string; name: string };
-  const anon = createClient(url, anonKey, { auth: { autoRefreshToken: false } });
+  const anon = anonClient();
+  if (!anon) {
+    const { error, status } = toErrorEnvelope('INTERNAL', 'Supabase not configured', 500);
+    res.status(status).json({ error });
+    return;
+  }
   const { error: reauthError } = await anon.auth.signInWithPassword({
     email: row.email,
     password: parsed.data.currentPassword,

@@ -49,7 +49,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const names = new Map<string, string>();
   if (actorIds.length > 0) {
     const { data: members } = await supabase.from('Member').select('id,name').in('id', actorIds);
-    for (const m of ((members as { id: string; name: string | null }[] | null) ?? [])) {
+    for (const m of (members as { id: string; name: string | null }[] | null) ?? []) {
       names.set(m.id, m.name || m.id);
     }
   }
@@ -67,5 +67,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     detail: row.detail ?? '',
     createdAt: row.created_at,
   }));
-  okList(res, rows.filter((row) => auditLogEntrySchema.safeParse(row).success));
+  okList(
+    res,
+    rows.filter((row) => auditLogEntrySchema.safeParse(row).success),
+  );
 }

@@ -1,12 +1,16 @@
-import { createClient } from '@supabase/supabase-js';
-
 import { SUPER_ADMIN_ONLY } from '../../_lib/access.js';
 import { findAuthUserId, isAuthConflict, verifyStaff } from '../../_lib/auth.js';
 import { appendAudit } from '../../_lib/audit.js';
 import { getSupabaseEnv } from '../../_lib/env.js';
 import type { VercelRequest, VercelResponse } from '../../_lib/http.js';
 import { listRoleRecords, listStaffEntries, MEMBER_SLUGS } from '../../_lib/rbac.js';
-import { methodNotAllowed, okList, readJsonBody, requireService } from '../../_lib/rest.js';
+import {
+  methodNotAllowed,
+  okList,
+  readJsonBody,
+  requireService,
+  serviceClient,
+} from '../../_lib/rest.js';
 import { toErrorEnvelope } from '../../_lib/envelope.js';
 import { staffMemberSchema, staffPasswordSchema } from '@jad/contracts';
 
@@ -39,7 +43,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.status(status).json({ error });
     return;
   }
-  const supabase = createClient(url, serviceKey, { auth: { autoRefreshToken: false } });
+  const supabase = serviceClient();
+  if (!supabase) {
+    const { error, status } = toErrorEnvelope('INTERNAL', 'Supabase not configured', 500);
+    res.status(status).json({ error });
+    return;
+  }
 
   if (req.method === 'GET') {
     const entries = await listStaffEntries(supabase);

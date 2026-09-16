@@ -36,9 +36,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.status(status).json({ error: env });
     return;
   }
-  const counts = ((((data as unknown[]) ?? []) as Record<string, unknown>[]).map((c) =>
+  const counts = (((data as unknown[]) ?? []) as Record<string, unknown>[]).map((c) =>
     typeof c.staffUnread === 'number' ? c.staffUnread : 0,
-  ));
+  );
   const parsed = adminMessagesSummarySchema.safeParse({
     unreadCount: counts.reduce((sum, n) => sum + n, 0),
     unreadConversations: counts.filter((n) => n > 0).length,

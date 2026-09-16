@@ -30,9 +30,7 @@ export function Topbar({
   hideMenuOnMobile = false,
   menuPosition = 'left',
 }: TopbarProps) {
-  const menuBtn = (
-    <IconButton icon="menu" label={menuLabel} onClick={onMenuClick} />
-  );
+  const menuBtn = <IconButton icon="menu" label={menuLabel} onClick={onMenuClick} />;
 
   return (
     <header className={styles.topbar}>
@@ -50,7 +48,9 @@ export function Topbar({
         <div className={styles.actions}>
           {actions}
           {menuPosition === 'right' ? (
-            <span className={hideMenuOnMobile ? styles.menuHiddenOnMobile : styles.menuOnMobileOnly}>
+            <span
+              className={hideMenuOnMobile ? styles.menuHiddenOnMobile : styles.menuOnMobileOnly}
+            >
               {menuBtn}
             </span>
           ) : null}

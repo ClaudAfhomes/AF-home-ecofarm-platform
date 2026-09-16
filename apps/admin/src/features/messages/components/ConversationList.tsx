@@ -126,7 +126,10 @@ export function ConversationList({ query, selectedId }: ConversationListProps) {
                       </span>
                     </span>
                     {conversation.unreadCount > 0 ? (
-                      <span className={styles.itemBadge} aria-label={`${conversation.unreadCount} unread`}>
+                      <span
+                        className={styles.itemBadge}
+                        aria-label={`${conversation.unreadCount} unread`}
+                      >
                         {conversation.unreadCount}
                       </span>
                     ) : null}

@@ -14,6 +14,8 @@ export const AUTH = {
   /** Routes (registered in app/App.tsx). */
   loginPath: '/login',
   registerPath: '/register',
+  forgotPasswordPath: '/auth/forgot-password',
+  resetPasswordPath: '/auth/reset-password',
   /** Contact route — the documented public channel for support requests. */
   supportPath: '/contact',
   /** Brand images for the editorial split panels (centralized Unsplash catalog). */
@@ -45,9 +47,7 @@ export const AUTH = {
     submitLabel: 'Sign In',
     forgotPassword: {
       label: 'Forgot password?',
-      /** No dedicated recovery screen exists in the SSOT yet — route to the
-          documented public support channel instead of inventing one. */
-      to: '/contact',
+      to: '/auth/forgot-password',
     },
     registerPrompt: {
       text: "Don't have a JA&D account yet?",
@@ -194,6 +194,49 @@ export const AUTH = {
     ],
     signInLabel: 'Sign in',
   },
+  /** Forgot-password (password recovery via Supabase Auth email link). */
+  forgotPasswordPage: {
+    eyebrow: 'Reset your password',
+    title: 'Forgot your password?',
+    lead: "Enter the email address you registered with and we'll send you a link to set a new password.",
+    brandTitle: 'Account recovery keeps your membership safe',
+    brandLead: 'We will email a secure reset link to the address on your account.',
+    fields: {
+      email: { label: 'Email address', autocomplete: 'email' },
+    },
+    submitLabel: 'Send reset link',
+    successTitle: 'Check your email',
+    successMessage:
+      'If an account exists for that address, a password reset link is on its way. Follow it to choose a new password.',
+    backLabel: 'Back to login',
+    simulatedEmail: {
+      title: 'Simulated email (dev-only)',
+      message: 'Password recovery is not wired to a provider in this preview — no email was sent.',
+    },
+  },
+  /** Reset-password — lands from the Supabase recovery link with a session. */
+  resetPasswordPage: {
+    eyebrow: 'Set a new password',
+    title: 'Choose a new password',
+    lead: 'Enter a new password for your account.',
+    brandTitle: 'Your password keeps your membership secure',
+    brandLead: 'Use at least 8 characters — a mix of letters and numbers is best.',
+    fields: {
+      password: {
+        label: 'New password',
+        hint: 'At least 8 characters.',
+        autocomplete: 'new-password',
+      },
+      confirmPassword: { label: 'Confirm new password', autocomplete: 'new-password' },
+    },
+    submitLabel: 'Update password',
+    successTitle: 'Password updated',
+    successMessage: 'Your password has been changed. You can now sign in with it.',
+    backLabel: 'Back to login',
+    invalidTitle: 'Link invalid or expired',
+    invalidMessage:
+      'This password reset link is invalid or has expired. Request a new one from the login screen.',
+  },
 };
 
 /** Web-optimized image URL for the auth brand panels. */
@@ -204,11 +247,13 @@ export function authPhoto(photo: Photo, width = 1400): string {
 /** White JA&D logo (renders on dark brand surfaces only). */
 export const AUTH_LOGO = LOGO;
 
-/** True when `pathname` is a member auth screen (Login/Register/Verify/Status). */
+/** True when `pathname` is a member auth screen (Login/Register/Verify/Status/Recovery). */
 export function isAuthPath(pathname: string): boolean {
   return (
     pathname === AUTH.loginPath ||
     pathname === AUTH.registerPath ||
+    pathname === AUTH.forgotPasswordPath ||
+    pathname === AUTH.resetPasswordPath ||
     pathname === '/register/verify-email' ||
     pathname === '/register/status' ||
     pathname.startsWith('/register/verify-email') ||

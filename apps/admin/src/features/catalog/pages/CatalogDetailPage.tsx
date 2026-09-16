@@ -132,11 +132,7 @@ export function CatalogDetailPage() {
             )}
           </div>
 
-          <PropertyFormDialog
-            open={editOpen}
-            onClose={() => setEditOpen(false)}
-            property={data}
-          />
+          <PropertyFormDialog open={editOpen} onClose={() => setEditOpen(false)} property={data} />
 
           <ConfirmDialog
             open={deleteOpen}

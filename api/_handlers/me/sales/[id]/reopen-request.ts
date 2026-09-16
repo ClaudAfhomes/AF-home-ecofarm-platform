@@ -50,7 +50,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
   const row = found as { id: string; status: string; propertyName: string; customerName: string };
   if (row.status !== 'LOCKED') {
-    const { error, status } = toErrorEnvelope('CONFLICT', 'Only a locked sale can be reopened by request.', 409);
+    const { error, status } = toErrorEnvelope(
+      'CONFLICT',
+      'Only a locked sale can be reopened by request.',
+      409,
+    );
     res.status(status).json({ error });
     return;
   }

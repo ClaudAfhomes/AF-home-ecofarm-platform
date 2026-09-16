@@ -191,7 +191,11 @@ export function SupabaseSessionProvider({ children }: { children: ReactNode }) {
         // did. No legacy-table fallback: only quoted PascalCase tables exist
         // in the schema (auth foundation migration), so probing "members"
         // can only ever produce PGRST205 noise.
-        const r = (await supaAny.from('Member').select('*').eq('id', supaUser.id).maybeSingle()) as {
+        const r = (await supaAny
+          .from('Member')
+          .select('*')
+          .eq('id', supaUser.id)
+          .maybeSingle()) as {
           data: Record<string, unknown> | null;
           error: unknown;
         };
@@ -289,7 +293,13 @@ export function SupabaseSessionProvider({ children }: { children: ReactNode }) {
     revalidate().catch(() => {
       // getSession itself failed — stay loading rather than guessing.
     });
-    const { data: sub } = client.auth.onAuthStateChange(async (_event, session) => {
+    const { data: sub } = client.auth.onAuthStateChange(async (event, session) => {
+      // A password-recovery flow lands on the public /auth/reset-password
+      // page, which manages its own session. Never resolve or force-sign-out
+      // here: a not-yet-approved applicant (no Member row) would otherwise be
+      // orphaned and signed out, destroying the recovery session before the
+      // new password can be saved.
+      if (event === 'PASSWORD_RECOVERY') return;
       const supaUser =
         (
           session as {

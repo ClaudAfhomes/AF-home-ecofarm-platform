@@ -27,8 +27,7 @@ const mocks = vi.hoisted(() => {
     b.select = () => b;
     b.eq = () => b;
     b.in = async () => {
-      if (table === 'Role')
-        return { data: script.slugs.map((slug) => ({ slug })), error: null };
+      if (table === 'Role') return { data: script.slugs.map((slug) => ({ slug })), error: null };
       return { data: [], error: null };
     };
     b.then = (resolve: (v: unknown) => void) => {
@@ -137,7 +136,9 @@ describe('GET /admin/session', () => {
       roleName: 'Super Admin',
     });
     const modules = (seen.body as { modules?: string[] }).modules ?? [];
-    expect(modules).toEqual(expect.arrayContaining(['dashboard', 'members', 'staff', 'audit', 'config']));
+    expect(modules).toEqual(
+      expect.arrayContaining(['dashboard', 'members', 'staff', 'audit', 'config']),
+    );
   });
 
   it('resolves a custom role identity from its record (name + modules)', async () => {

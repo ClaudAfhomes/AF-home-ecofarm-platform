@@ -16,7 +16,11 @@ import styles from './Footer.module.css';
  * Contact details follow the legacy website supplied by the project owner.
  */
 export function Footer() {
-  const { data: globalCms } = useQuery({ queryKey: ['cms', 'global'], queryFn: getGlobalCmsPublic, staleTime: 0 });
+  const { data: globalCms } = useQuery({
+    queryKey: ['cms', 'global'],
+    queryFn: getGlobalCmsPublic,
+    staleTime: 0,
+  });
   const footerBrandLine = globalCms?.footer?.brandLine ?? SITE.footer.brandLine;
   const footerNav = globalCms?.nav ?? SITE.nav;
   const footerContacts = globalCms?.footer?.contacts ?? CONTACT.details;

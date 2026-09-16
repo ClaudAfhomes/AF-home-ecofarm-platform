@@ -6,14 +6,14 @@ import { accountStatusSchema } from './registration.js';
 /**
  * Admin dashboard queue counts — PROPOSED baseline (UI-UX §4.1 "Dashboard
  * (queues)"). Counts of actionable pending items for the documented queues
- * (Registrations, Sales, Payouts, Withdrawals). Mock-only for F0; replaced by
- * the real admin queue endpoints. Counts are server facts, never derived
- * client-side.
+ * (Registrations, Sales, Withdrawals) plus the total non-archived member
+ * count. Mock-only for F0; replaced by the real admin queue endpoints. Counts
+ * are server facts, never derived client-side.
  */
 export const adminQueuesSchema = z.object({
   registrations: z.number().int().nonnegative(),
   sales: z.number().int().nonnegative(),
-  payouts: z.number().int().nonnegative(),
+  members: z.number().int().nonnegative(),
   withdrawals: z.number().int().nonnegative(),
 });
 

@@ -22,7 +22,11 @@ import styles from './PropertiesPage.module.css';
  * listing.
  */
 export function PropertiesPage() {
-  const { data: cms } = useQuery({ queryKey: ['cms', 'properties'], queryFn: getPropertiesCmsPublic, staleTime: 0 });
+  const { data: cms } = useQuery({
+    queryKey: ['cms', 'properties'],
+    queryFn: getPropertiesCmsPublic,
+    staleTime: 0,
+  });
   // CMS PropertiesContent stores page-level copy under `page` (hero/intro/featured/note/cta + title/lead),
   // while static PROPERTIES has it top-level. Normalize so both shapes work without a cast that hides mismatches.
   const content = (() => {

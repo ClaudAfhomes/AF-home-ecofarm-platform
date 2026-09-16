@@ -274,6 +274,28 @@ function buildGenealogyNode(store: MockStore, member: MockMember): GenealogyNode
   };
 }
 
+/** F2-B: upline chain — topmost reachable ancestor → direct sponsor (cycle-guarded). */
+function buildAncestorChain(store: MockStore, member: MockMember): GenealogyNode[] {
+  const chain: GenealogyNode[] = [];
+  const visited = new Set<string>([member.id]);
+  let currentId: string | null = member.sponsorId ?? null;
+  while (currentId && !visited.has(currentId)) {
+    visited.add(currentId);
+    const parent = store.members.find((candidate) => candidate.id === currentId);
+    if (!parent) break;
+    chain.unshift({
+      id: parent.id,
+      name: `${parent.firstName} ${parent.lastName}`,
+      status: parent.status,
+      isQualified: parent.isQualified,
+      joinedAt: parent.registeredAt,
+      children: [],
+    });
+    currentId = parent.sponsorId ?? null;
+  }
+  return chain;
+}
+
 /** F2-B: descendant set of a member (the member's network, reporting only — BR-RPT-002). */
 function networkDescendants(store: MockStore, memberId: string): MockMember[] {
   const result: MockMember[] = [];
@@ -1061,7 +1083,12 @@ export function memberMockHandlers(store: MockStore): MockRoute[] {
       handler: () => {
         const member = currentMember(store);
         if (!member) return unauthorized();
-        return ok({ root: buildGenealogyNode(store, member) });
+        const ancestors = buildAncestorChain(store, member);
+        return ok({
+          root: buildGenealogyNode(store, member),
+          sponsor: ancestors.length > 0 ? ancestors[ancestors.length - 1] : null,
+          ancestors,
+        });
       },
     },
 

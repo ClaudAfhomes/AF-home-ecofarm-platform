@@ -7,105 +7,32 @@
  * `api/_handlers/**` (underscore-prefixed → Vercel never turns them into
  * functions; they are bundled into the catch-all instead).
  *
- * A new handler must be added BOTH as an import and as a branch here —
- * `api/_lib/route-coverage.ts` fails CI if one is forgotten.
+ * A new handler must be added as a lazy branch here (`lazy(() => import(...))`)
+ * — `api/_lib/route-coverage.ts` fails CI if one is forgotten. Handlers are
+ * loaded on first use (cold-start win); shared libs stay imported eagerly.
  */
 import type { VercelRequest, VercelResponse } from './http.js';
-
-import handlerCms from '../_handlers/cms/[key].js';
-import handlerUpload from '../_handlers/cms/upload.js';
-import handlerUploadSign from '../_handlers/cms/upload/sign.js';
-import handlerLocationVerify from '../_handlers/registration/location-verify.js';
-import handlerAuthRegister from '../_handlers/auth/register.js';
-import handlerPrograms from '../_handlers/programs.js';
-import handlerProgramQuestions from '../_handlers/programs/[id]/questions.js';
-import handlerConfigPublic from '../_handlers/config/public.js';
-import handlerPolicies from '../_handlers/policies.js';
-import handlerPolicyById from '../_handlers/policies/[id].js';
-import handlerAdminConfig from '../_handlers/admin/config.js';
-import handlerAdminConfigKey from '../_handlers/admin/config/[key].js';
-import handlerBroadcasts from '../_handlers/me/broadcasts.js';
-import handlerBroadcastCreate from '../_handlers/broadcasts.js';
-import handlerAdminBroadcasts from '../_handlers/admin/broadcasts.js';
-import handlerMeBroadcastRead from '../_handlers/me/broadcasts/[id]/read.js';
-import handlerMeBroadcastsReadAll from '../_handlers/me/broadcasts/read-all.js';
-import handlerForwardable from '../_handlers/content/forwardable.js';
-import handlerAdminContent from '../_handlers/admin/content.js';
-import handlerAdminContentById from '../_handlers/admin/content/[id].js';
-import handlerAdminSession from '../_handlers/admin/session.js';
-import handlerAdminSessionPassword from '../_handlers/admin/session/password.js';
-import handlerAdminRegistrations from '../_handlers/admin/registrations.js';
-import handlerAdminRegistrationById from '../_handlers/admin/registrations/[id].js';
-import handlerAdminRegistrationApprove from '../_handlers/admin/registrations/[id]/approve.js';
-import handlerAdminRegistrationReject from '../_handlers/admin/registrations/[id]/reject.js';
-import handlerAdminRegistrationGovId from '../_handlers/admin/registrations/[id]/government-id.js';
-import handlerAdminMembers from '../_handlers/admin/members.js';
-import handlerAdminMemberById from '../_handlers/admin/members/[id].js';
-import handlerAdminMembersArchived from '../_handlers/admin/members/archived.js';
-import handlerAdminMemberArchive from '../_handlers/admin/members/[id]/archive.js';
-import handlerAdminMemberRestore from '../_handlers/admin/members/[id]/restore.js';
-import handlerAdminSales from '../_handlers/admin/sales.js';
-import handlerAdminSaleById from '../_handlers/admin/sales/[id].js';
-import handlerAdminCustomers from '../_handlers/admin/customers.js';
-import handlerAdminRoles from '../_handlers/admin/roles.js';
-import handlerAdminRoleById from '../_handlers/admin/roles/[id].js';
-import handlerAdminStaff from '../_handlers/admin/staff.js';
-import handlerAdminStaffById from '../_handlers/admin/staff/[id].js';
-import handlerAdminAuditLog from '../_handlers/admin/audit-log.js';
-import handlerAdminProperties from '../_handlers/admin/properties.js';
-import handlerAdminPropertyById from '../_handlers/admin/properties/[id].js';
-import handlerAdminPayouts from '../_handlers/admin/payouts.js';
-import handlerAdminVouchers from '../_handlers/admin/vouchers.js';
-import handlerAdminVoucherTemplates from '../_handlers/admin/voucher-templates.js';
-import handlerAdminAdjustments from '../_handlers/admin/adjustments.js';
-import handlerAdminQueues from '../_handlers/admin/queues.js';
-import handlerAdminWithdrawals from '../_handlers/admin/withdrawals.js';
-import handlerAdminWithdrawalById from '../_handlers/admin/withdrawals/[id].js';
-import handlerAdminWithdrawalComplete from '../_handlers/admin/withdrawals/[id]/complete.js';
-import handlerAdminWithdrawalReject from '../_handlers/admin/withdrawals/[id]/reject.js';
-import handlerAdminPayoutById from '../_handlers/admin/payouts/[id].js';
-import handlerAdminVoucherTemplateById from '../_handlers/admin/voucher-templates/[id].js';
-import handlerAdminVoucherAssign from '../_handlers/admin/vouchers/assign.js';
-import handlerAdminVoucherScan from '../_handlers/admin/vouchers/scan.js';
-import handlerAdminVoucherRedeem from '../_handlers/admin/vouchers/[id]/redeem.js';
-import handlerAdminVoucherById from '../_handlers/admin/vouchers/[id].js';
-import handlerAdminPropertyCategories from '../_handlers/admin/property-categories.js';
-import handlerAdminPropertyCategoryBySlug from '../_handlers/admin/property-categories/[slug].js';
-import handlerMeWallet from '../_handlers/me/wallet.js';
-import handlerMeLedger from '../_handlers/me/ledger.js';
-import handlerMeCommissions from '../_handlers/me/commissions.js';
-import handlerMePayoutAccounts from '../_handlers/me/payout-accounts.js';
-import handlerMePayoutAccountById from '../_handlers/me/payout-accounts/[id].js';
-import handlerMeWithdrawals from '../_handlers/me/withdrawals.js';
-import handlerMeWithdrawalById from '../_handlers/me/withdrawals/[id].js';
-import handlerMeVouchers from '../_handlers/me/vouchers.js';
-import handlerVoucherById from '../_handlers/vouchers/[id].js';
-import handlerMeQualification from '../_handlers/me/qualification.js';
-import handlerMeDirectReferrals from '../_handlers/me/direct-referrals.js';
-import handlerMeGroupNetwork from '../_handlers/me/reports/group-network.js';
-import handlerMeGenealogy from '../_handlers/me/genealogy.js';
-import handlerMeResubmit from '../_handlers/me/resubmit.js';
-import handlerMe from '../_handlers/me.js';
-import handlerMeReferralCode from '../_handlers/me/referral-code.js';
-import handlerCustomers from '../_handlers/customers.js';
-import handlerSales from '../_handlers/sales.js';
-import handlerSaleById from '../_handlers/sales/[id].js';
-import handlerSaleResubmit from '../_handlers/sales/[id]/resubmit.js';
-import handlerSaleReopenRequest from '../_handlers/me/sales/[id]/reopen-request.js';
-import handlerMemberById from '../_handlers/members/[id].js';
-import handlerMeMessages from '../_handlers/me/messages.js';
-import handlerMeMessagesRead from '../_handlers/me/messages/read.js';
-import handlerMeMessagesSummary from '../_handlers/me/messages/summary.js';
-import handlerAdminConversations from '../_handlers/admin/conversations.js';
-import handlerAdminConversationThread from '../_handlers/admin/conversations/[memberId].js';
-import handlerAdminConversationMessages from '../_handlers/admin/conversations/[memberId]/messages.js';
-import handlerAdminConversationRead from '../_handlers/admin/conversations/[memberId]/read.js';
-import handlerAdminMessagesSummary from '../_handlers/admin/messages/summary.js';
-import handlerHealth from '../_handlers/health.js';
 
 type HandlerFn = (req: VercelRequest, res: VercelResponse) => Promise<void> | void;
 
 export type RouteMatch = { handler: HandlerFn; routeKey: string | null };
+
+/**
+ * Lazy handler loader — defers a handler module's evaluation until its first
+ * request (per-route code splitting). Big cold-start win for the monolith:
+ * only the matched handler (plus shared libs) is evaluated per boot instead
+ * of all ~90 modules. Cached per instance; each route gets its own loader.
+ */
+function lazy(load: () => Promise<{ default: HandlerFn }>): HandlerFn {
+  let cached: HandlerFn | null = null;
+  return (req: VercelRequest, res: VercelResponse) => {
+    if (cached) return cached(req, res);
+    return load().then((mod) => {
+      cached = mod.default;
+      return cached(req, res);
+    });
+  };
+}
 
 /**
  * Route `pathname` (+ the mutable `query` object to populate path params) to a
@@ -117,94 +44,154 @@ export function selectHandler(
   query: Record<string, string | string[] | undefined>,
 ): RouteMatch | null {
   if (pathname === '/api/v1/health' || pathname === '/health') {
-    return { handler: handlerHealth as HandlerFn, routeKey: 'health' };
+    return { handler: lazy(() => import('../_handlers/health.js')), routeKey: 'health' };
   }
   if (
     pathname === '/api/v1/registration/location-verify' ||
     pathname === '/api/registration/location-verify'
   ) {
     return {
-      handler: handlerLocationVerify as HandlerFn,
+      handler: lazy(() => import('../_handlers/registration/location-verify.js')),
       routeKey: 'registration/location-verify',
     };
   }
   if (pathname === '/api/v1/auth/register' || pathname === '/api/auth/register') {
-    return { handler: handlerAuthRegister as HandlerFn, routeKey: 'auth/register' };
+    return {
+      handler: lazy(() => import('../_handlers/auth/register.js')),
+      routeKey: 'auth/register',
+    };
+  }
+  if (pathname === '/api/v1/auth/verify-email' || pathname === '/api/auth/verify-email') {
+    return {
+      handler: lazy(() => import('../_handlers/auth/verify-email.js')),
+      routeKey: 'auth/verify-email',
+    };
+  }
+  if (
+    pathname === '/api/v1/auth/verify-email/resend' ||
+    pathname === '/api/auth/verify-email/resend'
+  ) {
+    return {
+      handler: lazy(() => import('../_handlers/auth/verify-email/resend.js')),
+      routeKey: 'auth/verify-email/resend',
+    };
   }
   if (pathname === '/api/v1/cms/upload/sign' || pathname === '/api/cms/upload/sign') {
-    return { handler: handlerUploadSign as HandlerFn, routeKey: 'upload/sign' };
+    return {
+      handler: lazy(() => import('../_handlers/cms/upload/sign.js')),
+      routeKey: 'upload/sign',
+    };
   }
   if (pathname === '/api/v1/cms/upload' || pathname === '/api/cms/upload') {
-    return { handler: handlerUpload as HandlerFn, routeKey: 'upload' };
+    return { handler: lazy(() => import('../_handlers/cms/upload.js')), routeKey: 'upload' };
   }
   if (pathname === '/api/v1/programs' || pathname === '/api/programs') {
-    return { handler: handlerPrograms as HandlerFn, routeKey: 'programs' };
+    return { handler: lazy(() => import('../_handlers/programs.js')), routeKey: 'programs' };
   }
   if (pathname === '/api/v1/config/public' || pathname === '/api/config/public') {
-    return { handler: handlerConfigPublic as HandlerFn, routeKey: 'config/public' };
+    return {
+      handler: lazy(() => import('../_handlers/config/public.js')),
+      routeKey: 'config/public',
+    };
   }
   if (pathname === '/api/v1/policies' || pathname === '/api/policies') {
-    return { handler: handlerPolicies as HandlerFn, routeKey: 'policies' };
+    return { handler: lazy(() => import('../_handlers/policies.js')), routeKey: 'policies' };
   }
   if (pathname === '/api/v1/admin/config' || pathname === '/api/admin/config') {
-    return { handler: handlerAdminConfig as HandlerFn, routeKey: 'admin/config' };
+    return {
+      handler: lazy(() => import('../_handlers/admin/config.js')),
+      routeKey: 'admin/config',
+    };
   }
   if (pathname === '/api/v1/admin/content' || pathname === '/api/admin/content') {
-    return { handler: handlerAdminContent as HandlerFn, routeKey: 'admin/content' };
+    return {
+      handler: lazy(() => import('../_handlers/admin/content.js')),
+      routeKey: 'admin/content',
+    };
   }
   if (pathname.startsWith('/api/v1/admin/content/') || pathname.startsWith('/api/admin/content/')) {
     const m = pathname.match(/\/content\/([^/]+)$/);
     if (m) {
       query.id = decodeURIComponent(m[1] ?? '');
-      return { handler: handlerAdminContentById as HandlerFn, routeKey: 'admin/content/[id]' };
+      return {
+        handler: lazy(() => import('../_handlers/admin/content/[id].js')),
+        routeKey: 'admin/content/[id]',
+      };
     }
   }
   if (pathname === '/api/v1/admin/session' || pathname === '/api/admin/session') {
-    return { handler: handlerAdminSession as HandlerFn, routeKey: 'admin/session' };
+    return {
+      handler: lazy(() => import('../_handlers/admin/session.js')),
+      routeKey: 'admin/session',
+    };
   }
   if (pathname === '/api/v1/admin/session/password' || pathname === '/api/admin/session/password') {
     return {
-      handler: handlerAdminSessionPassword as HandlerFn,
+      handler: lazy(() => import('../_handlers/admin/session/password.js')),
       routeKey: 'admin/session/password',
     };
   }
   if (pathname === '/api/v1/content/forwardable' || pathname === '/api/content/forwardable') {
-    return { handler: handlerForwardable as HandlerFn, routeKey: 'content/forwardable' };
+    return {
+      handler: lazy(() => import('../_handlers/content/forwardable.js')),
+      routeKey: 'content/forwardable',
+    };
   }
   if (pathname === '/api/v1/me/broadcasts' || pathname === '/api/me/broadcasts') {
-    return { handler: handlerBroadcasts as HandlerFn, routeKey: 'me/broadcasts' };
+    return {
+      handler: lazy(() => import('../_handlers/me/broadcasts.js')),
+      routeKey: 'me/broadcasts',
+    };
   }
   if (pathname === '/api/v1/broadcasts' || pathname === '/api/broadcasts') {
-    return { handler: handlerBroadcastCreate as HandlerFn, routeKey: 'broadcasts' };
+    return { handler: lazy(() => import('../_handlers/broadcasts.js')), routeKey: 'broadcasts' };
   }
   if (pathname === '/api/v1/admin/broadcasts' || pathname === '/api/admin/broadcasts') {
-    return { handler: handlerAdminBroadcasts as HandlerFn, routeKey: 'admin/broadcasts' };
+    return {
+      handler: lazy(() => import('../_handlers/admin/broadcasts.js')),
+      routeKey: 'admin/broadcasts',
+    };
   }
   if (pathname === '/api/v1/me/broadcasts/read-all' || pathname === '/api/me/broadcasts/read-all') {
-    return { handler: handlerMeBroadcastsReadAll as HandlerFn, routeKey: 'me/broadcasts/read-all' };
+    return {
+      handler: lazy(() => import('../_handlers/me/broadcasts/read-all.js')),
+      routeKey: 'me/broadcasts/read-all',
+    };
   }
   if (pathname.startsWith('/api/v1/me/broadcasts/') || pathname.startsWith('/api/me/broadcasts/')) {
     const m = pathname.match(/\/me\/broadcasts\/([^/]+)\/read$/);
     if (m) {
       query.id = decodeURIComponent(m[1] ?? '');
-      return { handler: handlerMeBroadcastRead as HandlerFn, routeKey: 'me/broadcasts/[id]/read' };
+      return {
+        handler: lazy(() => import('../_handlers/me/broadcasts/[id]/read.js')),
+        routeKey: 'me/broadcasts/[id]/read',
+      };
     }
   }
   if (pathname === '/api/v1/me/messages' || pathname === '/api/me/messages') {
-    return { handler: handlerMeMessages as HandlerFn, routeKey: 'me/messages' };
+    return { handler: lazy(() => import('../_handlers/me/messages.js')), routeKey: 'me/messages' };
   }
   if (pathname === '/api/v1/me/messages/read' || pathname === '/api/me/messages/read') {
-    return { handler: handlerMeMessagesRead as HandlerFn, routeKey: 'me/messages/read' };
+    return {
+      handler: lazy(() => import('../_handlers/me/messages/read.js')),
+      routeKey: 'me/messages/read',
+    };
   }
   if (pathname === '/api/v1/me/messages/summary' || pathname === '/api/me/messages/summary') {
-    return { handler: handlerMeMessagesSummary as HandlerFn, routeKey: 'me/messages/summary' };
+    return {
+      handler: lazy(() => import('../_handlers/me/messages/summary.js')),
+      routeKey: 'me/messages/summary',
+    };
   }
   if (pathname === '/api/v1/admin/conversations' || pathname === '/api/admin/conversations') {
-    return { handler: handlerAdminConversations as HandlerFn, routeKey: 'admin/conversations' };
+    return {
+      handler: lazy(() => import('../_handlers/admin/conversations.js')),
+      routeKey: 'admin/conversations',
+    };
   }
   if (pathname === '/api/v1/admin/messages/summary' || pathname === '/api/admin/messages/summary') {
     return {
-      handler: handlerAdminMessagesSummary as HandlerFn,
+      handler: lazy(() => import('../_handlers/admin/messages/summary.js')),
       routeKey: 'admin/messages/summary',
     };
   }
@@ -217,143 +204,206 @@ export function selectHandler(
       query.memberId = decodeURIComponent(m[1] ?? '');
       if (m[2] === '/messages') {
         return {
-          handler: handlerAdminConversationMessages as HandlerFn,
+          handler: lazy(() => import('../_handlers/admin/conversations/[memberId]/messages.js')),
           routeKey: 'admin/conversations/[memberId]/messages',
         };
       }
       if (m[2] === '/read') {
         return {
-          handler: handlerAdminConversationRead as HandlerFn,
+          handler: lazy(() => import('../_handlers/admin/conversations/[memberId]/read.js')),
           routeKey: 'admin/conversations/[memberId]/read',
         };
       }
       return {
-        handler: handlerAdminConversationThread as HandlerFn,
+        handler: lazy(() => import('../_handlers/admin/conversations/[memberId].js')),
         routeKey: 'admin/conversations/[memberId]',
       };
     }
   }
   if (pathname === '/api/v1/me' || pathname === '/api/me') {
-    return { handler: handlerMe as HandlerFn, routeKey: 'me' };
+    return { handler: lazy(() => import('../_handlers/me.js')), routeKey: 'me' };
   }
   if (pathname === '/api/v1/me/referral-code' || pathname === '/api/me/referral-code') {
-    return { handler: handlerMeReferralCode as HandlerFn, routeKey: 'me/referral-code' };
+    return {
+      handler: lazy(() => import('../_handlers/me/referral-code.js')),
+      routeKey: 'me/referral-code',
+    };
   }
   if (pathname === '/api/v1/customers' || pathname === '/api/customers') {
-    return { handler: handlerCustomers as HandlerFn, routeKey: 'customers' };
+    return { handler: lazy(() => import('../_handlers/customers.js')), routeKey: 'customers' };
   }
   if (pathname === '/api/v1/sales' || pathname === '/api/sales') {
-    return { handler: handlerSales as HandlerFn, routeKey: 'sales' };
+    return { handler: lazy(() => import('../_handlers/sales.js')), routeKey: 'sales' };
   }
   if (pathname.startsWith('/api/v1/members/') || pathname.startsWith('/api/members/')) {
     const m = pathname.match(/\/members\/([^/]+)$/);
     if (m) {
       query.id = decodeURIComponent(m[1] ?? '');
-      return { handler: handlerMemberById as HandlerFn, routeKey: 'members/[id]' };
+      return {
+        handler: lazy(() => import('../_handlers/members/[id].js')),
+        routeKey: 'members/[id]',
+      };
     }
   }
   if (pathname === '/api/v1/admin/registrations' || pathname === '/api/admin/registrations') {
-    return { handler: handlerAdminRegistrations as HandlerFn, routeKey: 'admin/registrations' };
+    return {
+      handler: lazy(() => import('../_handlers/admin/registrations.js')),
+      routeKey: 'admin/registrations',
+    };
   }
   if (pathname === '/api/v1/admin/members' || pathname === '/api/admin/members') {
-    return { handler: handlerAdminMembers as HandlerFn, routeKey: 'admin/members' };
+    return {
+      handler: lazy(() => import('../_handlers/admin/members.js')),
+      routeKey: 'admin/members',
+    };
   }
   if (pathname === '/api/v1/admin/members/archived' || pathname === '/api/admin/members/archived') {
     return {
-      handler: handlerAdminMembersArchived as HandlerFn,
+      handler: lazy(() => import('../_handlers/admin/members/archived.js')),
       routeKey: 'admin/members/archived',
     };
   }
   if (pathname === '/api/v1/admin/sales' || pathname === '/api/admin/sales') {
-    return { handler: handlerAdminSales as HandlerFn, routeKey: 'admin/sales' };
+    return { handler: lazy(() => import('../_handlers/admin/sales.js')), routeKey: 'admin/sales' };
   }
   if (pathname === '/api/v1/admin/customers' || pathname === '/api/admin/customers') {
-    return { handler: handlerAdminCustomers as HandlerFn, routeKey: 'admin/customers' };
+    return {
+      handler: lazy(() => import('../_handlers/admin/customers.js')),
+      routeKey: 'admin/customers',
+    };
   }
   if (pathname === '/api/v1/admin/roles' || pathname === '/api/admin/roles') {
-    return { handler: handlerAdminRoles as HandlerFn, routeKey: 'admin/roles' };
+    return { handler: lazy(() => import('../_handlers/admin/roles.js')), routeKey: 'admin/roles' };
   }
   if (pathname === '/api/v1/admin/staff' || pathname === '/api/admin/staff') {
-    return { handler: handlerAdminStaff as HandlerFn, routeKey: 'admin/staff' };
+    return { handler: lazy(() => import('../_handlers/admin/staff.js')), routeKey: 'admin/staff' };
   }
   if (pathname === '/api/v1/admin/audit-log' || pathname === '/api/admin/audit-log') {
-    return { handler: handlerAdminAuditLog as HandlerFn, routeKey: 'admin/audit-log' };
+    return {
+      handler: lazy(() => import('../_handlers/admin/audit-log.js')),
+      routeKey: 'admin/audit-log',
+    };
   }
   if (pathname === '/api/v1/admin/properties' || pathname === '/api/admin/properties') {
-    return { handler: handlerAdminProperties as HandlerFn, routeKey: 'admin/properties' };
+    return {
+      handler: lazy(() => import('../_handlers/admin/properties.js')),
+      routeKey: 'admin/properties',
+    };
   }
   if (pathname === '/api/v1/admin/payouts' || pathname === '/api/admin/payouts') {
-    return { handler: handlerAdminPayouts as HandlerFn, routeKey: 'admin/payouts' };
+    return {
+      handler: lazy(() => import('../_handlers/admin/payouts.js')),
+      routeKey: 'admin/payouts',
+    };
   }
   if (pathname === '/api/v1/admin/vouchers' || pathname === '/api/admin/vouchers') {
-    return { handler: handlerAdminVouchers as HandlerFn, routeKey: 'admin/vouchers' };
+    return {
+      handler: lazy(() => import('../_handlers/admin/vouchers.js')),
+      routeKey: 'admin/vouchers',
+    };
   }
   if (pathname === '/api/v1/admin/vouchers/assign' || pathname === '/api/admin/vouchers/assign') {
-    return { handler: handlerAdminVoucherAssign as HandlerFn, routeKey: 'admin/vouchers/assign' };
+    return {
+      handler: lazy(() => import('../_handlers/admin/vouchers/assign.js')),
+      routeKey: 'admin/vouchers/assign',
+    };
   }
   if (pathname === '/api/v1/admin/vouchers/scan' || pathname === '/api/admin/vouchers/scan') {
-    return { handler: handlerAdminVoucherScan as HandlerFn, routeKey: 'admin/vouchers/scan' };
+    return {
+      handler: lazy(() => import('../_handlers/admin/vouchers/scan.js')),
+      routeKey: 'admin/vouchers/scan',
+    };
   }
   if (
     pathname === '/api/v1/admin/voucher-templates' ||
     pathname === '/api/admin/voucher-templates'
   ) {
     return {
-      handler: handlerAdminVoucherTemplates as HandlerFn,
+      handler: lazy(() => import('../_handlers/admin/voucher-templates.js')),
       routeKey: 'admin/voucher-templates',
     };
   }
   if (pathname === '/api/v1/admin/adjustments' || pathname === '/api/admin/adjustments') {
-    return { handler: handlerAdminAdjustments as HandlerFn, routeKey: 'admin/adjustments' };
+    return {
+      handler: lazy(() => import('../_handlers/admin/adjustments.js')),
+      routeKey: 'admin/adjustments',
+    };
   }
   if (pathname === '/api/v1/admin/queues' || pathname === '/api/admin/queues') {
-    return { handler: handlerAdminQueues as HandlerFn, routeKey: 'admin/queues' };
+    return {
+      handler: lazy(() => import('../_handlers/admin/queues.js')),
+      routeKey: 'admin/queues',
+    };
   }
   if (pathname === '/api/v1/admin/withdrawals' || pathname === '/api/admin/withdrawals') {
-    return { handler: handlerAdminWithdrawals as HandlerFn, routeKey: 'admin/withdrawals' };
+    return {
+      handler: lazy(() => import('../_handlers/admin/withdrawals.js')),
+      routeKey: 'admin/withdrawals',
+    };
   }
   if (pathname === '/api/v1/me/wallet' || pathname === '/api/me/wallet') {
-    return { handler: handlerMeWallet as HandlerFn, routeKey: 'me/wallet' };
+    return { handler: lazy(() => import('../_handlers/me/wallet.js')), routeKey: 'me/wallet' };
   }
   if (pathname === '/api/v1/me/ledger' || pathname === '/api/me/ledger') {
-    return { handler: handlerMeLedger as HandlerFn, routeKey: 'me/ledger' };
+    return { handler: lazy(() => import('../_handlers/me/ledger.js')), routeKey: 'me/ledger' };
   }
   if (pathname === '/api/v1/me/commissions' || pathname === '/api/me/commissions') {
-    return { handler: handlerMeCommissions as HandlerFn, routeKey: 'me/commissions' };
+    return {
+      handler: lazy(() => import('../_handlers/me/commissions.js')),
+      routeKey: 'me/commissions',
+    };
   }
   if (pathname === '/api/v1/me/payout-accounts' || pathname === '/api/me/payout-accounts') {
-    return { handler: handlerMePayoutAccounts as HandlerFn, routeKey: 'me/payout-accounts' };
+    return {
+      handler: lazy(() => import('../_handlers/me/payout-accounts.js')),
+      routeKey: 'me/payout-accounts',
+    };
   }
   if (pathname === '/api/v1/me/withdrawals' || pathname === '/api/me/withdrawals') {
-    return { handler: handlerMeWithdrawals as HandlerFn, routeKey: 'me/withdrawals' };
+    return {
+      handler: lazy(() => import('../_handlers/me/withdrawals.js')),
+      routeKey: 'me/withdrawals',
+    };
   }
   if (pathname === '/api/v1/me/vouchers' || pathname === '/api/me/vouchers') {
-    return { handler: handlerMeVouchers as HandlerFn, routeKey: 'me/vouchers' };
+    return { handler: lazy(() => import('../_handlers/me/vouchers.js')), routeKey: 'me/vouchers' };
   }
   if (pathname === '/api/v1/me/qualification' || pathname === '/api/me/qualification') {
-    return { handler: handlerMeQualification as HandlerFn, routeKey: 'me/qualification' };
+    return {
+      handler: lazy(() => import('../_handlers/me/qualification.js')),
+      routeKey: 'me/qualification',
+    };
   }
   if (pathname === '/api/v1/me/direct-referrals' || pathname === '/api/me/direct-referrals') {
-    return { handler: handlerMeDirectReferrals as HandlerFn, routeKey: 'me/direct-referrals' };
+    return {
+      handler: lazy(() => import('../_handlers/me/direct-referrals.js')),
+      routeKey: 'me/direct-referrals',
+    };
   }
   if (
     pathname === '/api/v1/me/reports/group-network' ||
     pathname === '/api/me/reports/group-network'
   ) {
-    return { handler: handlerMeGroupNetwork as HandlerFn, routeKey: 'me/reports/group-network' };
+    return {
+      handler: lazy(() => import('../_handlers/me/reports/group-network.js')),
+      routeKey: 'me/reports/group-network',
+    };
   }
   if (pathname === '/api/v1/me/genealogy' || pathname === '/api/me/genealogy') {
-    return { handler: handlerMeGenealogy as HandlerFn, routeKey: 'me/genealogy' };
+    return {
+      handler: lazy(() => import('../_handlers/me/genealogy.js')),
+      routeKey: 'me/genealogy',
+    };
   }
   if (pathname === '/api/v1/me/resubmit' || pathname === '/api/me/resubmit') {
-    return { handler: handlerMeResubmit as HandlerFn, routeKey: 'me/resubmit' };
+    return { handler: lazy(() => import('../_handlers/me/resubmit.js')), routeKey: 'me/resubmit' };
   }
   if (
     pathname === '/api/v1/admin/property-categories' ||
     pathname === '/api/admin/property-categories'
   ) {
     return {
-      handler: handlerAdminPropertyCategories as HandlerFn,
+      handler: lazy(() => import('../_handlers/admin/property-categories.js')),
       routeKey: 'admin/property-categories',
     };
   }
@@ -362,7 +412,7 @@ export function selectHandler(
     if (m) {
       query.id = decodeURIComponent(m[1] ?? '');
       return {
-        handler: handlerSaleReopenRequest as HandlerFn,
+        handler: lazy(() => import('../_handlers/me/sales/[id]/reopen-request.js')),
         routeKey: 'me/sales/reopen-request',
       };
     }
@@ -371,12 +421,15 @@ export function selectHandler(
     const resubmit = pathname.match(/\/sales\/([^/]+)\/resubmit$/);
     if (resubmit) {
       query.id = decodeURIComponent(resubmit[1] ?? '');
-      return { handler: handlerSaleResubmit as HandlerFn, routeKey: 'sales/resubmit' };
+      return {
+        handler: lazy(() => import('../_handlers/sales/[id]/resubmit.js')),
+        routeKey: 'sales/resubmit',
+      };
     }
     const m = pathname.match(/\/sales\/([^/]+)$/);
     if (m) {
       query.id = decodeURIComponent(m[1] ?? '');
-      return { handler: handlerSaleById as HandlerFn, routeKey: 'sales/[id]' };
+      return { handler: lazy(() => import('../_handlers/sales/[id].js')), routeKey: 'sales/[id]' };
     }
   }
   if (
@@ -390,28 +443,28 @@ export function selectHandler(
     if (govId) {
       query.id = decodeURIComponent(govId[1] ?? '');
       return {
-        handler: handlerAdminRegistrationGovId as HandlerFn,
+        handler: lazy(() => import('../_handlers/admin/registrations/[id]/government-id.js')),
         routeKey: 'admin/registrations/government-id',
       };
     }
     if (approve) {
       query.id = decodeURIComponent(approve[1] ?? '');
       return {
-        handler: handlerAdminRegistrationApprove as HandlerFn,
+        handler: lazy(() => import('../_handlers/admin/registrations/[id]/approve.js')),
         routeKey: 'admin/registrations/approve',
       };
     }
     if (reject) {
       query.id = decodeURIComponent(reject[1] ?? '');
       return {
-        handler: handlerAdminRegistrationReject as HandlerFn,
+        handler: lazy(() => import('../_handlers/admin/registrations/[id]/reject.js')),
         routeKey: 'admin/registrations/reject',
       };
     }
     if (one) {
       query.id = decodeURIComponent(one[1] ?? '');
       return {
-        handler: handlerAdminRegistrationById as HandlerFn,
+        handler: lazy(() => import('../_handlers/admin/registrations/[id].js')),
         routeKey: 'admin/registrations/[id]',
       };
     }
@@ -422,22 +475,34 @@ export function selectHandler(
     const one = pathname.match(/\/members\/([^/]+)$/);
     if (archive) {
       query.id = decodeURIComponent(archive[1] ?? '');
-      return { handler: handlerAdminMemberArchive as HandlerFn, routeKey: 'admin/members/archive' };
+      return {
+        handler: lazy(() => import('../_handlers/admin/members/[id]/archive.js')),
+        routeKey: 'admin/members/archive',
+      };
     }
     if (restore) {
       query.id = decodeURIComponent(restore[1] ?? '');
-      return { handler: handlerAdminMemberRestore as HandlerFn, routeKey: 'admin/members/restore' };
+      return {
+        handler: lazy(() => import('../_handlers/admin/members/[id]/restore.js')),
+        routeKey: 'admin/members/restore',
+      };
     }
     if (one) {
       query.id = decodeURIComponent(one[1] ?? '');
-      return { handler: handlerAdminMemberById as HandlerFn, routeKey: 'admin/members/[id]' };
+      return {
+        handler: lazy(() => import('../_handlers/admin/members/[id].js')),
+        routeKey: 'admin/members/[id]',
+      };
     }
   }
   if (pathname.startsWith('/api/v1/admin/sales/') || pathname.startsWith('/api/admin/sales/')) {
     const m = pathname.match(/\/sales\/([^/]+)$/);
     if (m) {
       query.id = decodeURIComponent(m[1] ?? '');
-      return { handler: handlerAdminSaleById as HandlerFn, routeKey: 'admin/sales/[id]' };
+      return {
+        handler: lazy(() => import('../_handlers/admin/sales/[id].js')),
+        routeKey: 'admin/sales/[id]',
+      };
     }
   }
   if (
@@ -447,7 +512,10 @@ export function selectHandler(
     const m = pathname.match(/\/properties\/([^/]+)$/);
     if (m) {
       query.id = decodeURIComponent(m[1] ?? '');
-      return { handler: handlerAdminPropertyById as HandlerFn, routeKey: 'admin/properties/[id]' };
+      return {
+        handler: lazy(() => import('../_handlers/admin/properties/[id].js')),
+        routeKey: 'admin/properties/[id]',
+      };
     }
   }
   if (
@@ -458,7 +526,7 @@ export function selectHandler(
     if (m) {
       query.id = decodeURIComponent(m[1] ?? '');
       return {
-        handler: handlerAdminVoucherTemplateById as HandlerFn,
+        handler: lazy(() => import('../_handlers/admin/voucher-templates/[id].js')),
         routeKey: 'admin/voucher-templates/[id]',
       };
     }
@@ -472,13 +540,16 @@ export function selectHandler(
     if (redeem) {
       query.id = decodeURIComponent(redeem[1] ?? '');
       return {
-        handler: handlerAdminVoucherRedeem as HandlerFn,
+        handler: lazy(() => import('../_handlers/admin/vouchers/[id]/redeem.js')),
         routeKey: 'admin/vouchers/[id]/redeem',
       };
     }
     if (one) {
       query.id = decodeURIComponent(one[1] ?? '');
-      return { handler: handlerAdminVoucherById as HandlerFn, routeKey: 'admin/vouchers/[id]' };
+      return {
+        handler: lazy(() => import('../_handlers/admin/vouchers/[id].js')),
+        routeKey: 'admin/vouchers/[id]',
+      };
     }
   }
   if (
@@ -489,7 +560,7 @@ export function selectHandler(
     if (m) {
       query.slug = decodeURIComponent(m[1] ?? '');
       return {
-        handler: handlerAdminPropertyCategoryBySlug as HandlerFn,
+        handler: lazy(() => import('../_handlers/admin/property-categories/[slug].js')),
         routeKey: 'admin/property-categories/[slug]',
       };
     }
@@ -498,14 +569,20 @@ export function selectHandler(
     const m = pathname.match(/\/vouchers\/([^/]+)$/);
     if (m) {
       query.id = decodeURIComponent(m[1] ?? '');
-      return { handler: handlerVoucherById as HandlerFn, routeKey: 'vouchers/[id]' };
+      return {
+        handler: lazy(() => import('../_handlers/vouchers/[id].js')),
+        routeKey: 'vouchers/[id]',
+      };
     }
   }
   if (pathname.startsWith('/api/v1/admin/payouts/') || pathname.startsWith('/api/admin/payouts/')) {
     const m = pathname.match(/\/payouts\/([^/]+)$/);
     if (m) {
       query.id = decodeURIComponent(m[1] ?? '');
-      return { handler: handlerAdminPayoutById as HandlerFn, routeKey: 'admin/payouts/[id]' };
+      return {
+        handler: lazy(() => import('../_handlers/admin/payouts/[id].js')),
+        routeKey: 'admin/payouts/[id]',
+      };
     }
   }
   if (
@@ -518,21 +595,21 @@ export function selectHandler(
     if (complete) {
       query.id = decodeURIComponent(complete[1] ?? '');
       return {
-        handler: handlerAdminWithdrawalComplete as HandlerFn,
+        handler: lazy(() => import('../_handlers/admin/withdrawals/[id]/complete.js')),
         routeKey: 'admin/withdrawals/complete',
       };
     }
     if (reject) {
       query.id = decodeURIComponent(reject[1] ?? '');
       return {
-        handler: handlerAdminWithdrawalReject as HandlerFn,
+        handler: lazy(() => import('../_handlers/admin/withdrawals/[id]/reject.js')),
         routeKey: 'admin/withdrawals/reject',
       };
     }
     if (one) {
       query.id = decodeURIComponent(one[1] ?? '');
       return {
-        handler: handlerAdminWithdrawalById as HandlerFn,
+        handler: lazy(() => import('../_handlers/admin/withdrawals/[id].js')),
         routeKey: 'admin/withdrawals/[id]',
       };
     }
@@ -545,7 +622,7 @@ export function selectHandler(
     if (m) {
       query.id = decodeURIComponent(m[1] ?? '');
       return {
-        handler: handlerMePayoutAccountById as HandlerFn,
+        handler: lazy(() => import('../_handlers/me/payout-accounts/[id].js')),
         routeKey: 'me/payout-accounts/[id]',
       };
     }
@@ -557,48 +634,69 @@ export function selectHandler(
     const m = pathname.match(/\/withdrawals\/([^/]+)$/);
     if (m) {
       query.id = decodeURIComponent(m[1] ?? '');
-      return { handler: handlerMeWithdrawalById as HandlerFn, routeKey: 'me/withdrawals/[id]' };
+      return {
+        handler: lazy(() => import('../_handlers/me/withdrawals/[id].js')),
+        routeKey: 'me/withdrawals/[id]',
+      };
     }
   }
   if (pathname.startsWith('/api/v1/admin/roles/') || pathname.startsWith('/api/admin/roles/')) {
     const m = pathname.match(/\/roles\/([^/]+)$/);
     if (m) {
       query.id = decodeURIComponent(m[1] ?? '');
-      return { handler: handlerAdminRoleById as HandlerFn, routeKey: 'admin/roles/[id]' };
+      return {
+        handler: lazy(() => import('../_handlers/admin/roles/[id].js')),
+        routeKey: 'admin/roles/[id]',
+      };
     }
   }
   if (pathname.startsWith('/api/v1/admin/staff/') || pathname.startsWith('/api/admin/staff/')) {
     const m = pathname.match(/\/staff\/([^/]+)$/);
     if (m) {
       query.id = decodeURIComponent(m[1] ?? '');
-      return { handler: handlerAdminStaffById as HandlerFn, routeKey: 'admin/staff/[id]' };
+      return {
+        handler: lazy(() => import('../_handlers/admin/staff/[id].js')),
+        routeKey: 'admin/staff/[id]',
+      };
     }
   }
   if (pathname.startsWith('/api/v1/programs/') || pathname.startsWith('/api/programs/')) {
     const m = pathname.match(/\/programs\/([^/]+)\/qualification-questions$/);
     if (m) {
       query.id = decodeURIComponent(m[1] ?? '');
-      return { handler: handlerProgramQuestions as HandlerFn, routeKey: 'programs/questions' };
+      return {
+        handler: lazy(() => import('../_handlers/programs/[id]/questions.js')),
+        routeKey: 'programs/questions',
+      };
     }
   }
   if (pathname.startsWith('/api/v1/policies/') || pathname.startsWith('/api/policies/')) {
     const m = pathname.match(/\/policies\/([^/]+)$/);
     if (m) {
       query.id = decodeURIComponent(m[1] ?? '');
-      return { handler: handlerPolicyById as HandlerFn, routeKey: 'policies/[id]' };
+      return {
+        handler: lazy(() => import('../_handlers/policies/[id].js')),
+        routeKey: 'policies/[id]',
+      };
     }
   }
   if (pathname.startsWith('/api/v1/admin/config/') || pathname.startsWith('/api/admin/config/')) {
     const m = pathname.match(/\/admin\/config\/([^/]+)$/);
     if (m) {
       query.key = decodeURIComponent(m[1] ?? '');
-      return { handler: handlerAdminConfigKey as HandlerFn, routeKey: 'admin/config/[key]' };
+      return {
+        handler: lazy(() => import('../_handlers/admin/config/[key].js')),
+        routeKey: 'admin/config/[key]',
+      };
     }
   }
   const cmsMatch = pathname.match(/\/cms\/([^/]+)$/);
   if (cmsMatch) {
     query.key = decodeURIComponent(cmsMatch[1] ?? '');
-    return { handler: handlerCms as HandlerFn, routeKey: query.key ?? null };
+    return {
+      handler: lazy(() => import('../_handlers/cms/[key].js')),
+      routeKey: query.key ?? null,
+    };
   }
   return null;
 }

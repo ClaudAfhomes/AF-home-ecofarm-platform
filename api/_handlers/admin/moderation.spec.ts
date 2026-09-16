@@ -302,7 +302,7 @@ describe('POST /admin/registrations/:id/approve', () => {
     expect(String(memberUpsert.referralCode)).toMatch(/^JAD-/);
   });
 
-  it('does not link an unqualified sponsor', async () => {
+  it('rejects approval when the referral code matches an ineligible sponsor', async () => {
     mocks.script.memberList = [
       {
         id: 'sponsor-uuid',
@@ -317,10 +317,11 @@ describe('POST /admin/registrations/:id/approve', () => {
       { method: 'POST', query: { id: 'reg-001' }, headers: authed, body: {} } as VercelRequest,
       res,
     );
-    expect(seen.status).toBe(200);
-    const memberUpsert = mocks.calls.find((c) => c.table === 'Member' && c.op === 'upsert')
-      ?.arg as Record<string, unknown>;
-    expect(memberUpsert.sponsorId).toBeNull();
+    expect(seen.status).toBe(400);
+    expect(seen.body).toMatchObject({ error: { code: 'VALIDATION_ERROR' } });
+    // No Member row is written for a failed sponsor resolution.
+    const memberUpserts = mocks.calls.filter((c) => c.table === 'Member' && c.op === 'upsert');
+    expect(memberUpserts).toHaveLength(0);
   });
 
   it('retries once on a referral-code race then succeeds', async () => {
@@ -354,7 +355,7 @@ describe('POST /admin/registrations/:id/approve', () => {
     expect(JSON.stringify(seen.body)).not.toContain('Member_referralCode_uidx');
   });
 
-  it('approves without a sponsor when the code is unresolvable', async () => {
+  it('rejects approval when the referral code is unresolvable (no silent sponsorless member)', async () => {
     mocks.script.memberList = [];
     mocks.script.registration = { ...PHONE_REGISTRATION, referralCode: 'NOPE' };
     const { res, seen } = capture();
@@ -362,10 +363,10 @@ describe('POST /admin/registrations/:id/approve', () => {
       { method: 'POST', query: { id: 'reg-001' }, headers: authed, body: {} } as VercelRequest,
       res,
     );
-    expect(seen.status).toBe(200);
-    const memberUpsert = mocks.calls.find((c) => c.table === 'Member' && c.op === 'upsert')
-      ?.arg as Record<string, unknown>;
-    expect(memberUpsert.sponsorId).toBeNull();
+    expect(seen.status).toBe(400);
+    expect(seen.body).toMatchObject({ error: { code: 'VALIDATION_ERROR' } });
+    const memberUpserts = mocks.calls.filter((c) => c.table === 'Member' && c.op === 'upsert');
+    expect(memberUpserts).toHaveLength(0);
   });
 
   it('adopts the orphaned auth account on the real duplicate message', async () => {

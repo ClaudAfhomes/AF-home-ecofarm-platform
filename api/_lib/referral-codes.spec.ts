@@ -42,9 +42,9 @@ describe('pickUniqueReferralCode', () => {
 describe('isReferralCodeConflict', () => {
   it('detects the unique-violation by code or constraint name', () => {
     expect(isReferralCodeConflict({ code: '23505', message: 'duplicate key' })).toBe(true);
-    expect(
-      isReferralCodeConflict({ message: 'duplicate key "Member_referralCode_uidx"' }),
-    ).toBe(true);
+    expect(isReferralCodeConflict({ message: 'duplicate key "Member_referralCode_uidx"' })).toBe(
+      true,
+    );
     expect(isReferralCodeConflict({ message: 'connection reset' })).toBe(false);
     expect(isReferralCodeConflict(null)).toBe(false);
   });

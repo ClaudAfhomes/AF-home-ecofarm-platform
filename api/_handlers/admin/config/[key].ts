@@ -38,7 +38,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
   const value = (parsedBody.body as Record<string, unknown> | null)?.value;
   if (typeof value !== 'string' || value.length === 0) {
-    const { error, status } = toErrorEnvelope('VALIDATION_ERROR', 'A non-empty string value is required', 400);
+    const { error, status } = toErrorEnvelope(
+      'VALIDATION_ERROR',
+      'A non-empty string value is required',
+      400,
+    );
     res.status(status).json({ error });
     return;
   }

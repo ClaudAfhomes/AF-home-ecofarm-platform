@@ -33,9 +33,7 @@ vi.mock('@supabase/supabase-js', () => ({
         };
         b.single = async () => {
           if (table === 'Role') {
-            const latest = [...mocks.script.inserts]
-              .reverse()
-              .find((i) => i.table === 'Role');
+            const latest = [...mocks.script.inserts].reverse().find((i) => i.table === 'Role');
             if (latest) {
               const created = { ...latest.row, id: 'uuid-new' };
               mocks.roleRows.push(created);

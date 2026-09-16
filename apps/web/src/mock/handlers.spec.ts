@@ -527,6 +527,17 @@ describe('F1 member mock API', () => {
       expect(genealogy.root.children[1]!.children).toHaveLength(0);
       expect(genealogy.root.children[2]!.children.map((node) => node.id)).toEqual(['mem-008']);
       expect(genealogy.root.children[3]!.children).toHaveLength(0);
+      // Juan is the network root — no sponsor, empty upline.
+      expect(genealogy.sponsor).toBeNull();
+      expect(genealogy.ancestors).toEqual([]);
+    });
+
+    it('returns the sponsor and upline chain for a member with a referral-code sponsor', async () => {
+      setMockSessionUser(MOCK_MEMBER_NOT_QUALIFIED);
+      const genealogy = await getGenealogy();
+      expect(genealogy.root).toMatchObject({ id: 'mem-002', name: 'Maria Santos' });
+      expect(genealogy.ancestors.map((node) => node.id)).toEqual(['mem-001']);
+      expect(genealogy.sponsor).toMatchObject({ id: 'mem-001', name: 'Juan Dela Cruz' });
     });
 
     it('lists own vouchers newest first with server-computed remaining value (SCR-MEM-020)', async () => {

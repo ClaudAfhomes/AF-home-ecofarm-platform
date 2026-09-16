@@ -85,7 +85,11 @@ describe('CmsImageField — production upload (Step 1)', () => {
       const url = String(input);
       if (url.includes('/api/v1/cms/upload/sign')) {
         return new Response(
-          JSON.stringify({ signedUrl: 'https://example.com/signed-drag', publicUrl: 'https://example.com/drag.jpg', path: 'cms/drag.jpg' }),
+          JSON.stringify({
+            signedUrl: 'https://example.com/signed-drag',
+            publicUrl: 'https://example.com/drag.jpg',
+            path: 'cms/drag.jpg',
+          }),
           { status: 200, headers: { 'Content-Type': 'application/json' } },
         );
       }
@@ -121,7 +125,9 @@ describe('CmsImageField — production upload (Step 1)', () => {
     } as unknown as DragEvent);
 
     await vi.waitFor(() => expect(onChange).toHaveBeenCalled());
-    expect(onChange).toHaveBeenCalledWith(expect.objectContaining({ id: 'https://example.com/drag.jpg' }));
+    expect(onChange).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'https://example.com/drag.jpg' }),
+    );
 
     vi.restoreAllMocks();
   });

@@ -167,8 +167,14 @@ export function HomePage() {
             ))}
           </div>
           <div className={styles.featuredFooter}>
-            {typeof content.featured.cta.href === 'string' && content.featured.cta.href.length > 0 ? (
-              <ButtonLink href={content.featured.cta.href} variant="primary" target="_blank" rel="noopener noreferrer">
+            {typeof content.featured.cta.href === 'string' &&
+            content.featured.cta.href.length > 0 ? (
+              <ButtonLink
+                href={content.featured.cta.href}
+                variant="primary"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 {content.featured.cta.label}
               </ButtonLink>
             ) : (
@@ -201,7 +207,11 @@ export function HomePage() {
 
       <section className={styles.section}>
         <div className="container">
-          <SectionHeader eyebrow={content.trust.eyebrow} title={content.trust.title} align="center" />
+          <SectionHeader
+            eyebrow={content.trust.eyebrow}
+            title={content.trust.title}
+            align="center"
+          />
           <ul className={styles.pillars}>
             {content.trust.items.map((item, index) => (
               <li key={item.title} className={styles.pillar}>
@@ -224,10 +234,19 @@ export function HomePage() {
             frameClassName={styles.editorialFrame}
           />
           <div>
-            <SectionHeader eyebrow={content.aboutPreview.eyebrow} title={content.aboutPreview.title} />
+            <SectionHeader
+              eyebrow={content.aboutPreview.eyebrow}
+              title={content.aboutPreview.title}
+            />
             <p className={`${styles.paragraph} prose`}>{content.aboutPreview.lead}</p>
-            {typeof content.aboutPreview.cta.href === 'string' && content.aboutPreview.cta.href.length > 0 ? (
-              <ButtonLink href={content.aboutPreview.cta.href} variant="secondary" target="_blank" rel="noopener noreferrer">
+            {typeof content.aboutPreview.cta.href === 'string' &&
+            content.aboutPreview.cta.href.length > 0 ? (
+              <ButtonLink
+                href={content.aboutPreview.cta.href}
+                variant="secondary"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 {content.aboutPreview.cta.label}
               </ButtonLink>
             ) : (

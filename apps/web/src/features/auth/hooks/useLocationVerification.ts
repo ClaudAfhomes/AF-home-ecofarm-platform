@@ -51,7 +51,12 @@ export function useLocationVerification(enabled = true): UseLocationVerification
 
     // Step 1: Try GPS
     setStatus('detecting');
-    let gpsPayload: { latitude: number; longitude: number; accuracy?: number; timestamp?: string } | null = null;
+    let gpsPayload: {
+      latitude: number;
+      longitude: number;
+      accuracy?: number;
+      timestamp?: string;
+    } | null = null;
     let gpsStatus: LocationVerificationStatus | null = null;
 
     try {

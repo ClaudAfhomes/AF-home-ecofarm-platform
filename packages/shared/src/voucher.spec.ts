@@ -32,10 +32,7 @@ describe('computeMemberExpiry', () => {
   });
 
   it('falls back to validityDays when fixed date is invalid', () => {
-    const result = computeMemberExpiry(
-      { expiresAt: 'not-a-date', validityDays: 15 },
-      issuedAt,
-    );
+    const result = computeMemberExpiry({ expiresAt: 'not-a-date', validityDays: 15 }, issuedAt);
     expect(result).toBe('2026-09-04T10:00:00.000Z');
   });
 

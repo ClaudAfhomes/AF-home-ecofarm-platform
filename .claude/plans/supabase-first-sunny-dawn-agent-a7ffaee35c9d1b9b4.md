@@ -51,17 +51,18 @@ User approved **Option A (Supabase-first, no custom backend)** for vibe-coder ea
 
 ## Verification
 
-*   `pnpm typecheck` — all workspaces `tsc --noEmit`.
-*   `pnpm test` — `vitest run` (jsdom) `apps/web` + `packages/*` mocks still pass (`renderWithProviders` `initialUser`).
-*   `pnpm build` — `@jad/web` `tsc --noEmit && vite build`.
-*   Manual: `VITE_SUPABASE_URL` unset → mock still works (fallback `UnauthenticatedSessionProvider` `session.tsx:1`); set → `supabase.auth.signInWithPassword` `superadmin@gmail.com/P@ssword` → `5173/login` → `member_roles super_admin` → `/admin`.
-*   Supabase: `supabase db reset` applies `supabase/migrations/*`; `anon` cannot `SELECT` other `memberId`; `ledger_entries UPDATE` denied; `pgcrypto` masking verified.
+- `pnpm typecheck` — all workspaces `tsc --noEmit`.
+- `pnpm test` — `vitest run` (jsdom) `apps/web` + `packages/*` mocks still pass (`renderWithProviders` `initialUser`).
+- `pnpm build` — `@jad/web` `tsc --noEmit && vite build`.
+- Manual: `VITE_SUPABASE_URL` unset → mock still works (fallback `UnauthenticatedSessionProvider` `session.tsx:1`); set → `supabase.auth.signInWithPassword` `superadmin@gmail.com/P@ssword` → `5173/login` → `member_roles super_admin` → `/admin`.
+- Supabase: `supabase db reset` applies `supabase/migrations/*`; `anon` cannot `SELECT` other `memberId`; `ledger_entries UPDATE` denied; `pgcrypto` masking verified.
 
 ## Decisions made
 
-*   Keep `Prisma` as migration source (already `8.0.0-rc.9` `package.json:23`) — supplements `supabase/migrations` SQL (Prisma generates baseline, SQL adds `RLS`/`REVOKE`).
-*   Public reads via `anon_key` PostgREST; financial writes via `service_role` RPCs — approved.
-*   Keep `member_roles` 5 slugs `prisma/seed.ts:130` as RBAC source; `normalizeRole` stays 2-value client helper `role.ts:1`.
+- Keep `Prisma` as migration source (already `8.0.0-rc.9` `package.json:23`) — supplements `supabase/migrations` SQL (Prisma generates baseline, SQL adds `RLS`/`REVOKE`).
+- Public reads via `anon_key` PostgREST; financial writes via `service_role` RPCs — approved.
+- Keep `member_roles` 5 slugs `prisma/seed.ts:130` as RBAC source; `normalizeRole` stays 2-value client helper `role.ts:1`.
 
 ---
+
 References: `AGENTS.md:3` no backend, `docs/database/DATABASE-DESIGN.md:134` Supabase Postgres, `docs/security/SECURITY.md:97` never `VITE_` service key, `BUSINESS-RULES.md:10` BI-001..010, `ARCH-DEC-007` session cookie.

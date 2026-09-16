@@ -37,7 +37,9 @@ export function Sidebar({ brand, items, footer, ariaLabel = 'Primary', collapsed
   const location = useLocation();
   const isItemActive = (item: SidebarItem) =>
     item.dropdown?.some(
-      (sub) => !('divider' in sub) && (location.pathname === sub.to || location.pathname.startsWith(`${sub.to}/`)),
+      (sub) =>
+        !('divider' in sub) &&
+        (location.pathname === sub.to || location.pathname.startsWith(`${sub.to}/`)),
     ) ?? false;
 
   const [openCategory, setOpenCategory] = useState<string | null>(() => {

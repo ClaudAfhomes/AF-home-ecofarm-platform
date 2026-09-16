@@ -26,7 +26,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
   const supabase = requireService(res);
   if (!supabase) return;
-  const { data, error } = await supabase.from('SystemConfig').select('key, label, value, category').order('key');
+  const { data, error } = await supabase
+    .from('SystemConfig')
+    .select('key, label, value, category')
+    .order('key');
   if (error) {
     const { error: env, status } = toErrorEnvelope('INTERNAL', error.message, 500);
     res.status(status).json({ error: env });
@@ -38,5 +41,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     value: row.value,
     category: row.category,
   }));
-  okList(res, rows.filter((row) => systemConfigEntrySchema.safeParse(row).success));
+  okList(
+    res,
+    rows.filter((row) => systemConfigEntrySchema.safeParse(row).success),
+  );
 }

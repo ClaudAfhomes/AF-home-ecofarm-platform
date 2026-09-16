@@ -73,9 +73,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
   // Display snapshot: replier's staff name (falls back to role slug).
-  const { data: staff } = await supabase.from('StaffUser').select('name').eq('id', auth.userId).maybeSingle();
-  const senderName =
-    (staff as { name?: unknown } | null)?.name || auth.slugs[0] || 'JAD Support';
+  const { data: staff } = await supabase
+    .from('StaffUser')
+    .select('name')
+    .eq('id', auth.userId)
+    .maybeSingle();
+  const senderName = (staff as { name?: unknown } | null)?.name || auth.slugs[0] || 'JAD Support';
   const { data, error } = await supabase
     .from('Message')
     .insert({

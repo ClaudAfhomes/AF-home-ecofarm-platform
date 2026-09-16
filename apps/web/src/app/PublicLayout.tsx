@@ -24,7 +24,11 @@ import styles from './PublicLayout.module.css';
  */
 export function PublicLayout() {
   const { pathname } = useLocation();
-  const { data: globalCms } = useQuery({ queryKey: ['cms', 'global'], queryFn: getGlobalCmsPublic, staleTime: 0 });
+  const { data: globalCms } = useQuery({
+    queryKey: ['cms', 'global'],
+    queryFn: getGlobalCmsPublic,
+    staleTime: 0,
+  });
   useDynamicFavicon(globalCms?.browserIcon ?? null);
   const hideOnAuth = globalCms?.messenger?.hideOnAuth ?? true;
   const shouldHideMessenger = hideOnAuth ? isAuthPath(pathname) : false;

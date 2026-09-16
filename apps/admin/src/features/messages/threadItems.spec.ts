@@ -15,15 +15,13 @@ const msg = (id: string, senderType: 'MEMBER' | 'STAFF', createdAt: string): Mes
 describe('buildThreadItems', () => {
   it('returns a day separator before the first message of each day', () => {
     const items = buildThreadItems(
-      [msg('1', 'MEMBER', '2026-09-12T09:00:00.000Z'), msg('2', 'STAFF', '2026-09-13T10:00:00.000Z')],
+      [
+        msg('1', 'MEMBER', '2026-09-12T09:00:00.000Z'),
+        msg('2', 'STAFF', '2026-09-13T10:00:00.000Z'),
+      ],
       new Date('2026-09-14T12:00:00.000Z'),
     );
-    expect(items.map((i) => i.kind)).toEqual([
-      'day',
-      'message',
-      'day',
-      'message',
-    ]);
+    expect(items.map((i) => i.kind)).toEqual(['day', 'message', 'day', 'message']);
     expect(items[0]).toMatchObject({ kind: 'day', label: 'Sep 12, 2026' });
     expect(items[2]).toMatchObject({ kind: 'day', label: 'Yesterday' });
   });
@@ -31,7 +29,10 @@ describe('buildThreadItems', () => {
   it('uses Today/Yesterday for adjacent days', () => {
     const now = new Date('2026-09-14T12:00:00.000Z');
     const items = buildThreadItems(
-      [msg('1', 'MEMBER', '2026-09-14T09:00:00.000Z'), msg('2', 'STAFF', '2026-09-13T10:00:00.000Z')],
+      [
+        msg('1', 'MEMBER', '2026-09-14T09:00:00.000Z'),
+        msg('2', 'STAFF', '2026-09-13T10:00:00.000Z'),
+      ],
       now,
     );
     expect(items[0]).toMatchObject({ kind: 'day', label: 'Today' });

@@ -65,8 +65,21 @@ export function DateField({
         />
         <span className={fieldStyles.dateIcon} aria-hidden="true">
           <svg viewBox="0 0 16 16" width="18" height="18" fill="none" aria-hidden="true">
-            <rect x="2.5" y="3.5" width="11" height="9" rx="1.5" stroke="currentColor" strokeWidth="1.3" />
-            <path d="M5 2.5v2M11 2.5v2M2.5 6.5h11" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+            <rect
+              x="2.5"
+              y="3.5"
+              width="11"
+              height="9"
+              rx="1.5"
+              stroke="currentColor"
+              strokeWidth="1.3"
+            />
+            <path
+              d="M5 2.5v2M11 2.5v2M2.5 6.5h11"
+              stroke="currentColor"
+              strokeWidth="1.3"
+              strokeLinecap="round"
+            />
           </svg>
         </span>
       </div>

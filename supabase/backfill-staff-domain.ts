@@ -272,7 +272,9 @@ async function main(): Promise<void> {
       if (error) throw new Error(`retire-rollback MemberRole restore failed: ${error.message}`);
     }
     for (const row of snap.notifications) {
-      const { error } = await supabase.from('Notification').upsert(row as never, { onConflict: 'id' });
+      const { error } = await supabase
+        .from('Notification')
+        .upsert(row as never, { onConflict: 'id' });
       if (error) throw new Error(`retire-rollback Notification restore failed: ${error.message}`);
     }
     console.log(
@@ -314,7 +316,9 @@ async function main(): Promise<void> {
       .limit(5);
     if (sponsErr) throw new Error(`retire pre-check sponsors failed: ${sponsErr.message}`);
     if ((sponsored ?? []).length > 0) {
-      console.error('Refusing: members are still sponsored by retiring staffers. Aborting with no changes.');
+      console.error(
+        'Refusing: members are still sponsored by retiring staffers. Aborting with no changes.',
+      );
       process.exit(2);
     }
     const { data: idem, error: idemErr } = await supabase

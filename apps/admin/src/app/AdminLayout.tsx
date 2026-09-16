@@ -6,7 +6,7 @@ import { AppShell, Breadcrumbs, ConfirmDialog, UserMenu } from '@jad/ui';
 
 import { findNavItem, findNavSubItem, navItemsForRole, ROLE_LABELS } from './navigation';
 import { resolveRoleModules, roleNameFor } from '@jad/contracts';
-import { useRegistrations } from '../features/registrations/hooks/useRegistrations';
+import { useAdminQueues } from '../features/dashboard/hooks/useAdminQueues';
 import { useRoles } from '../features/roles/hooks/useRoles';
 import { useMessagesRealtime } from '../features/messages/hooks/useMessagesRealtime';
 import { useAdminMessagesSummary } from '../features/messages/hooks/useConversations';
@@ -35,16 +35,15 @@ export function AdminLayout() {
   const baseItems = mustChangePassword
     ? []
     : navItemsForRole(role, roleId, roles, user?.roleModules);
-  // The pending-count badge needs the registrations queue; skip that fetch
-  // for roles without the module (a doomed 403 for e.g. custom roles that
-  // were never granted it).
-  const canSeeRegistrations = resolveRoleModules(roles, roleId, user?.roleModules).includes(
-    'registrations',
+  // The pending-count badge needs the registrations queue; the cheap
+  // GET /admin/queues counts endpoint serves it (the full registrations list
+  // is fetched only on the registrations page itself). Gate on the dashboard
+  // module the endpoint actually requires.
+  const canSeeDashboard = resolveRoleModules(roles, roleId, user?.roleModules).includes(
+    'dashboard',
   );
-  const { data: registrations } = useRegistrations({
-    enabled: queriesEnabled && canSeeRegistrations,
-  });
-  const pendingCount = (registrations ?? []).filter((r) => r.status === 'PENDING').length;
+  const { data: queues } = useAdminQueues({ enabled: queriesEnabled && canSeeDashboard });
+  const pendingCount = queues?.registrations ?? 0;
   // Messages inbox badge (unread member messages), module-gated like the
   // registrations queue; skip the doomed fetch for roles without the module.
   const canSeeMessages = resolveRoleModules(roles, roleId, user?.roleModules).includes('messages');
@@ -129,7 +128,12 @@ export function AdminLayout() {
             items={[
               { label: 'My Account', icon: 'user', to: '/admin/profile' },
               { label: '-', icon: '', onClick: undefined },
-              { label: 'Logout', icon: 'logout', danger: true, onClick: () => setShowLogoutConfirm(true) },
+              {
+                label: 'Logout',
+                icon: 'logout',
+                danger: true,
+                onClick: () => setShowLogoutConfirm(true),
+              },
             ]}
           />
         }
@@ -146,9 +150,8 @@ export function AdminLayout() {
             <div className={styles.roleNotice} role="alert">
               <p className={styles.roleNoticeTitle}>Navigation unavailable</p>
               <p className={styles.roleNoticeText}>
-                Your staff role could not be resolved, so navigation links are hidden.
-                Try reloading — if this persists, an administrator needs to check
-                your role assignment.
+                Your staff role could not be resolved, so navigation links are hidden. Try reloading
+                — if this persists, an administrator needs to check your role assignment.
               </p>
               <button
                 type="button"

@@ -3,11 +3,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { resetStaffStore, staffStore } from '../../../mock/staffMockStore';
 import { installMockApi } from '../../../test/utils';
 import { getAudit } from '../../audit/services/audit';
-import {
-  createRole,
-  deleteRole,
-  updateRole,
-} from './roles';
+import { createRole, deleteRole, updateRole } from './roles';
 
 const ACTOR = { actor: 'Saul Super', actorRole: 'SUPER_ADMIN' };
 

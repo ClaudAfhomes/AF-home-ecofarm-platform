@@ -222,7 +222,8 @@ export const CMS_PROPERTIES_SEED: PropertiesContent = {
       title: 'Tenanted Condo Resales',
       shortDescription:
         'Resale condominium units and houses with tenants and existing lease contracts already in place.',
-      description: 'Individual resale of condominium units with tenants and existing lease contracts.',
+      description:
+        'Individual resale of condominium units with tenants and existing lease contracts.',
       image: { id: 'photo-1460317442991-0ec209397118', alt: 'A modern condominium tower' },
       isFeatured: true,
     },
@@ -239,7 +240,8 @@ export const CMS_PROPERTIES_SEED: PropertiesContent = {
     {
       slug: 'developer-project-brokerage',
       title: 'Developer Project Brokerage',
-      shortDescription: 'Accredited broker for licensed developer projects, connecting clients to vetted project opportunities.',
+      shortDescription:
+        'Accredited broker for licensed developer projects, connecting clients to vetted project opportunities.',
       description:
         'Accredited broker for licensed developer projects — e.g., Mountain View Leisure Community, Nasugbu (LTS No. 0001950).',
       image: { id: 'photo-1486406146926-c627a92ad1ab', alt: 'A contemporary development building' },
@@ -272,7 +274,10 @@ export const CMS_PROPERTIES_SEED: PropertiesContent = {
       ],
       gallery: [
         { id: 'photo-1500530855697-b586d89ba3ee', alt: 'A green landscape with open grassland' },
-        { id: 'photo-1500382017468-9049fed747ef', alt: 'A wide open field of land under a bright sky' },
+        {
+          id: 'photo-1500382017468-9049fed747ef',
+          alt: 'A wide open field of land under a bright sky',
+        },
       ],
       isFeatured: true,
     },
@@ -300,7 +305,10 @@ export const CMS_PROPERTIES_SEED: PropertiesContent = {
         'Currently tenanted – immediate rental income',
       ],
       gallery: [
-        { id: 'photo-1470071459604-3b5ec3a7fe05', alt: 'Rolling green hills in soft morning light' },
+        {
+          id: 'photo-1470071459604-3b5ec3a7fe05',
+          alt: 'Rolling green hills in soft morning light',
+        },
         { id: 'photo-1500530855697-b586d89ba3ee', alt: 'A green landscape with open grassland' },
       ],
       isFeatured: false,
@@ -331,8 +339,14 @@ export const CMS_PROPERTIES_SEED: PropertiesContent = {
         'Direct owner resale',
       ],
       gallery: [
-        { id: 'photo-1500382017468-9049fed747ef', alt: 'A wide open field of land under a bright sky' },
-        { id: 'photo-1470071459604-3b5ec3a7fe05', alt: 'Rolling green hills in soft morning light' },
+        {
+          id: 'photo-1500382017468-9049fed747ef',
+          alt: 'A wide open field of land under a bright sky',
+        },
+        {
+          id: 'photo-1470071459604-3b5ec3a7fe05',
+          alt: 'Rolling green hills in soft morning light',
+        },
       ],
       isFeatured: false,
     },
@@ -363,7 +377,10 @@ export const CMS_PROPERTIES_SEED: PropertiesContent = {
       ],
       gallery: [
         { id: 'photo-1460317442991-0ec209397118', alt: 'A modern condominium tower' },
-        { id: 'photo-1582407947304-fd86f028f716', alt: 'A contemporary apartment building exterior' },
+        {
+          id: 'photo-1582407947304-fd86f028f716',
+          alt: 'A contemporary apartment building exterior',
+        },
       ],
       isFeatured: false,
     },
@@ -396,7 +413,10 @@ export const CMS_PROPERTIES_SEED: PropertiesContent = {
       ],
       gallery: [
         { id: 'photo-1600210492486-724fe5c67fb0', alt: 'A modern apartment living space' },
-        { id: 'photo-1560448204-e02f11c3d0e2', alt: 'A bright apartment interior with modern finishes' },
+        {
+          id: 'photo-1560448204-e02f11c3d0e2',
+          alt: 'A bright apartment interior with modern finishes',
+        },
       ],
       isFeatured: false,
     },
@@ -426,7 +446,10 @@ export const CMS_PROPERTIES_SEED: PropertiesContent = {
         'Located in the prestigious Prisma Residences by DMCI Homes',
       ],
       gallery: [
-        { id: 'photo-1600607687939-ce8a6c25118c', alt: 'A bright, open luxury interior with floor-to-ceiling windows' },
+        {
+          id: 'photo-1600607687939-ce8a6c25118c',
+          alt: 'A bright, open luxury interior with floor-to-ceiling windows',
+        },
         { id: 'photo-1600210492486-724fe5c67fb0', alt: 'A modern apartment living space' },
         { id: 'photo-1556912167-f556f1f39fdf', alt: 'A modern kitchen with fitted cabinetry' },
       ],
@@ -459,8 +482,14 @@ export const CMS_PROPERTIES_SEED: PropertiesContent = {
         'Located in the vibrant Prisma Residences community by DMCI Homes',
       ],
       gallery: [
-        { id: 'photo-1522708323590-d24dbb6b0267', alt: 'A thoughtfully furnished apartment living room' },
-        { id: 'photo-1560448204-e02f11c3d0e2', alt: 'A bright apartment interior with modern finishes' },
+        {
+          id: 'photo-1522708323590-d24dbb6b0267',
+          alt: 'A thoughtfully furnished apartment living room',
+        },
+        {
+          id: 'photo-1560448204-e02f11c3d0e2',
+          alt: 'A bright apartment interior with modern finishes',
+        },
       ],
       isFeatured: false,
     },
@@ -493,7 +522,10 @@ export const CMS_PROPERTIES_SEED: PropertiesContent = {
       ],
       gallery: [
         { id: 'photo-1568605114967-8130f3a36994', alt: 'A suburban family house exterior' },
-        { id: 'photo-1600585154340-be6161a56a0c', alt: 'A modern residence with warm interior lighting at dusk' },
+        {
+          id: 'photo-1600585154340-be6161a56a0c',
+          alt: 'A modern residence with warm interior lighting at dusk',
+        },
         { id: 'photo-1512917774080-9991f1c4c750', alt: 'A two-storey home exterior at dusk' },
       ],
       isFeatured: false,
@@ -526,7 +558,10 @@ export const CMS_PROPERTIES_SEED: PropertiesContent = {
         'Phase 1 West, Phase 1 East & Phase 2 East',
       ],
       gallery: [
-        { id: 'photo-1454496522488-7a8e488e8606', alt: 'A dramatic mountain landscape under clear skies' },
+        {
+          id: 'photo-1454496522488-7a8e488e8606',
+          alt: 'A dramatic mountain landscape under clear skies',
+        },
         { id: 'photo-1506905925346-21bda4d32df4', alt: 'A scenic leisure property landscape' },
         { id: 'photo-1470770841072-f978cf4d019e', alt: 'A mountain lake beneath a clear sky' },
         { id: 'photo-1519681393784-d120267933ba', alt: 'A mountain ridge under a starry dusk sky' },
@@ -557,8 +592,14 @@ export const CMS_PROPERTIES_SEED: PropertiesContent = {
         'Limited lots available',
       ],
       gallery: [
-        { id: 'photo-1566073771259-6a8506099945', alt: 'A resort pool with lounge chairs and palm trees' },
-        { id: 'photo-1584132967334-10e028bd69f7', alt: 'A modern resort suite with a private terrace' },
+        {
+          id: 'photo-1566073771259-6a8506099945',
+          alt: 'A resort pool with lounge chairs and palm trees',
+        },
+        {
+          id: 'photo-1584132967334-10e028bd69f7',
+          alt: 'A modern resort suite with a private terrace',
+        },
       ],
       isFeatured: false,
     },
@@ -706,7 +747,8 @@ export const CMS_CONTACT_SEED: ContactContent = {
     },
     {
       label: 'Office address',
-      value: 'Alaminos Commercial Complex, Unit 103–104, Maharlika Road, Brgy. San Juan, Alaminos, Laguna',
+      value:
+        'Alaminos Commercial Complex, Unit 103–104, Maharlika Road, Brgy. San Juan, Alaminos, Laguna',
       icon: 'location',
       external: false,
       featured: false,
@@ -727,7 +769,8 @@ export const CMS_CONTACT_SEED: ContactContent = {
   details: [
     {
       label: 'Office address',
-      value: 'Alaminos Commercial Complex, Unit 103–104, Maharlika Road, Brgy. San Juan, Alaminos, Laguna',
+      value:
+        'Alaminos Commercial Complex, Unit 103–104, Maharlika Road, Brgy. San Juan, Alaminos, Laguna',
     },
     { label: 'Email', value: 'info.jaandd@gmail.com' },
     { label: 'Phone', value: '0965-250-0052' },
@@ -763,7 +806,8 @@ export const CMS_GLOBAL_SEED: GlobalContent = {
     contacts: [
       {
         label: 'Office address',
-        value: 'Alaminos Commercial Complex, Unit 103–104, Maharlika Road, Brgy. San Juan, Alaminos, Laguna',
+        value:
+          'Alaminos Commercial Complex, Unit 103–104, Maharlika Road, Brgy. San Juan, Alaminos, Laguna',
       },
       { label: 'Email', value: 'info.jaandd@gmail.com' },
       { label: 'Phone', value: '0965-250-0052' },
@@ -801,7 +845,8 @@ export const CMS_LOGIN_SEED: LoginContent = {
     title: 'Welcome back',
     lead: 'Access your JA&D member account.',
     brandTitle: 'Where Big Dreams meet property that already earns',
-    brandLead: 'Sign in to manage your membership, property interests, and account details — in one secure place.',
+    brandLead:
+      'Sign in to manage your membership, property interests, and account details — in one secure place.',
   },
   fields: {
     identifier: {
@@ -867,17 +912,20 @@ export const CMS_REGISTER_SEED: RegisterContent = {
       },
       {
         id: 'qual-dom-2',
-        question: 'Do you understand this is a real estate brokerage and not a guaranteed investment or profit-sharing scheme?',
+        question:
+          'Do you understand this is a real estate brokerage and not a guaranteed investment or profit-sharing scheme?',
       },
     ],
     abroad: [
       {
         id: 'qual-ab-1',
-        question: 'Are you at least 18 years old and legally able to enter into a contract in your country?',
+        question:
+          'Are you at least 18 years old and legally able to enter into a contract in your country?',
       },
       {
         id: 'qual-ab-2',
-        question: 'Do you understand this is a real estate brokerage and not a guaranteed investment or profit-sharing scheme?',
+        question:
+          'Do you understand this is a real estate brokerage and not a guaranteed investment or profit-sharing scheme?',
       },
     ],
   },
@@ -891,13 +939,15 @@ export const CMS_REGISTER_SEED: RegisterContent = {
     title: 'Check your email',
     lead: 'We sent a one-time verification code to your email address.',
     brandTitle: 'Verification keeps your account secure',
-    brandLead: 'Confirm that the email address belongs to you. JA&D reviews your application after your email is verified.',
+    brandLead:
+      'Confirm that the email address belongs to you. JA&D reviews your application after your email is verified.',
   },
   status: {
     eyebrow: 'Application received',
     title: 'Application received',
     brandTitle: 'You’re one step closer',
-    brandLead: 'Your application is being reviewed. There is no purchase requirement and no cost to apply.',
+    brandLead:
+      'Your application is being reviewed. There is no purchase requirement and no cost to apply.',
     lead: 'Your application is being reviewed.',
   },
 };

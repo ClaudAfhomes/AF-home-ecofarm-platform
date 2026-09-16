@@ -10,7 +10,7 @@ import { AdminLayout } from './AdminLayout';
 /**
  * While a temporary-password change is required, the admin shell must not
  * fire admin data requests (they 403) and must recover cleanly once the flag
- * clears. Red: AdminLayout fires useRoles/useRegistrations unconditionally.
+ * clears. Red: AdminLayout fires useRoles/useAdminQueues unconditionally.
  */
 describe('AdminLayout mustChangePassword', () => {
   const requested: string[] = [];
@@ -40,7 +40,8 @@ describe('AdminLayout mustChangePassword', () => {
       const url = String(input);
       if (url.includes('/admin/')) requested.push(url);
       if (url.includes('/admin/roles')) return Response.json({ data: [], meta: {} });
-      if (url.includes('/admin/registrations')) return Response.json({ data: [], meta: {} });
+      if (url.includes('/admin/queues'))
+        return Response.json({ registrations: 0, sales: 0, members: 0, withdrawals: 0 });
       return Response.json({ error: { code: 'NOT_FOUND' } }, { status: 404 });
     });
   });
@@ -73,7 +74,9 @@ describe('AdminLayout mustChangePassword', () => {
     rerender(renderWithFlag(false));
     await waitFor(() => expect(requested.length).toBeGreaterThan(0));
     expect(requested.some((u) => u.includes('/admin/roles'))).toBe(true);
-    expect(requested.some((u) => u.includes('/admin/registrations'))).toBe(true);
+    // The badge count comes from the cheap /admin/queues counts, not the full
+    // registrations list (the list is fetched only on the registrations page).
+    expect(requested.some((u) => u.includes('/admin/queues'))).toBe(true);
   });
 
   it('does not fetch admin data while the session is still resolving', async () => {

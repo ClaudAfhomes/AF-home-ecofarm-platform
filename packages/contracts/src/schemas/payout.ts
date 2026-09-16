@@ -10,7 +10,12 @@ import { z } from 'zod';
  */
 
 /** Payout account state machine — CONFIRMED (BR-PAY-004, DATABASE-DESIGN §7.19). REJECTED is a frontend mock extension for the Approve/Reject workflow (requires Owner confirmation if made permanent). */
-export const payoutAccountStatusSchema = z.enum(['PENDING', 'ADMIN_REVIEW', 'CONFIRMED', 'REJECTED']);
+export const payoutAccountStatusSchema = z.enum([
+  'PENDING',
+  'ADMIN_REVIEW',
+  'CONFIRMED',
+  'REJECTED',
+]);
 
 export type PayoutAccountStatus = z.infer<typeof payoutAccountStatusSchema>;
 

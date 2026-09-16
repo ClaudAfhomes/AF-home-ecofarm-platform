@@ -29,7 +29,7 @@ describe('LoginPage', () => {
     expect(screen.getByRole('button', { name: 'Sign In' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Forgot password?' })).toHaveAttribute(
       'href',
-      '/contact',
+      '/auth/forgot-password',
     );
     expect(screen.getByRole('link', { name: 'Create your account' })).toHaveAttribute(
       'href',
@@ -90,8 +90,7 @@ describe('LoginPage', () => {
 
     expect(await screen.findByText('Member home')).toBeInTheDocument();
     const authCall = fetchFn.mock.calls.find(([url]) => String(url).includes('/auth/login')) as
-      | [RequestInfo, RequestInit]
-      | undefined;
+      [RequestInfo, RequestInit] | undefined;
     expect(authCall).toBeDefined();
     const [input, init] = authCall!;
     expect(String(input)).toMatch(/\/auth\/login$/);
@@ -168,7 +167,11 @@ describe('LoginPage', () => {
     expect(hrefValue).toMatch(/5174/);
     expect(hrefValue).toMatch(/\/admin/);
 
-    Object.defineProperty(window, 'location', { configurable: true, writable: true, value: originalLocation });
+    Object.defineProperty(window, 'location', {
+      configurable: true,
+      writable: true,
+      value: originalLocation,
+    });
 
     vi.restoreAllMocks();
   });

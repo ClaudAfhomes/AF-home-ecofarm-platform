@@ -58,10 +58,10 @@ Legacy `F0 mock` (`superadmin@gmail.com` / `P@ssword`, localStorage `jad:mock:se
 
 ## Authentication (fresh-start)
 
-*   **Stack:** Supabase + PostgreSQL + Supabase Auth + TanStack Query + React 19 + Vite 8 + TypeScript + Vercel Functions. **No Prisma / no ORM. No NestJS (superseded by Q1 — see ADR-002b).**
-*   **Accounts:** `admin@jad.local` → `/admin`, `user@jad.local` → `/user` (seeded via `supabase/seed.ts` using `SUPABASE_SERVICE_ROLE_KEY`, passwords from `SUPABASE_SEED_*` env).
-*   **Flow:** `POST` via `supabase.auth.signInWithPassword` (`apps/web/src/features/auth/pages/LoginPage.tsx`), `supabase.auth.signOut()` for logout, session persistence via `supabase-js` PKCE + `cookieStorage` cross-port `5173↔5174` (`apps/web/src/lib/supabase.ts`). Protected routes `RequireRole` (`apps/web/src/app/App.tsx` + `apps/admin/src/app/RequireRole.tsx`) redirect unauth → `/login` and cross-role → denied.
-*   **Scope:** Only `Member` / `Role` / `MemberRole` are active for auth. All other tables (`Customer`, `Sale`, etc) remain untouched (empty) until CRM phase. No registration, MFA, or guest flows in this phase.
+- **Stack:** Supabase + PostgreSQL + Supabase Auth + TanStack Query + React 19 + Vite 8 + TypeScript + Vercel Functions. **No Prisma / no ORM. No NestJS (superseded by Q1 — see ADR-002b).**
+- **Accounts:** `admin@jad.local` → `/admin`, `user@jad.local` → `/user` (seeded via `supabase/seed.ts` using `SUPABASE_SERVICE_ROLE_KEY`, passwords from `SUPABASE_SEED_*` env).
+- **Flow:** `POST` via `supabase.auth.signInWithPassword` (`apps/web/src/features/auth/pages/LoginPage.tsx`), `supabase.auth.signOut()` for logout, session persistence via `supabase-js` PKCE + `cookieStorage` cross-port `5173↔5174` (`apps/web/src/lib/supabase.ts`). Protected routes `RequireRole` (`apps/web/src/app/App.tsx` + `apps/admin/src/app/RequireRole.tsx`) redirect unauth → `/login` and cross-role → denied.
+- **Scope:** Only `Member` / `Role` / `MemberRole` are active for auth. All other tables (`Customer`, `Sale`, etc) remain untouched (empty) until CRM phase. No registration, MFA, or guest flows in this phase.
 
 ## Code conventions
 

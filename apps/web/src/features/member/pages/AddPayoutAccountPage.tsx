@@ -24,11 +24,21 @@ const ALPHANUMERIC_RE = /^[A-Z0-9]{8,34}$/i;
 
 const TRADITIONAL_BANK_FIELDS = [
   { id: 'bankName', label: 'Bank name', placeholder: 'e.g. BDO, BPI, Metrobank', required: true },
-  { id: 'branch', label: 'Branch (optional)', placeholder: 'e.g. Makati Ayala Ave', required: false },
+  {
+    id: 'branch',
+    label: 'Branch (optional)',
+    placeholder: 'e.g. Makati Ayala Ave',
+    required: false,
+  },
 ];
 
 const DIGITAL_BANK_FIELDS = [
-  { id: 'bankName', label: 'Bank / e-wallet name', placeholder: 'e.g. Maya, GoTyme, Tonik', required: true },
+  {
+    id: 'bankName',
+    label: 'Bank / e-wallet name',
+    placeholder: 'e.g. Maya, GoTyme, Tonik',
+    required: true,
+  },
 ];
 
 export function AddPayoutAccountPage() {
@@ -67,25 +77,30 @@ export function AddPayoutAccountPage() {
 
     if (method === 'GCASH') {
       if (!idTrimmed) nextErrors.accountIdentifier = 'Enter your GCash mobile number.';
-      else if (!GCASH_RE.test(idTrimmed)) nextErrors.accountIdentifier = 'Enter a valid GCash number (09 followed by 9 digits).';
+      else if (!GCASH_RE.test(idTrimmed))
+        nextErrors.accountIdentifier = 'Enter a valid GCash number (09 followed by 9 digits).';
     } else if (method === 'TRADITIONAL_BANK') {
       if (!bankName.trim()) nextErrors.bankName = 'Enter the bank name.';
       if (!idTrimmed) nextErrors.accountIdentifier = 'Enter your bank account number.';
-      else if (!BANK_ACCOUNT_RE.test(idTrimmed)) nextErrors.accountIdentifier = 'Enter a valid 10–12 digit account number.';
+      else if (!BANK_ACCOUNT_RE.test(idTrimmed))
+        nextErrors.accountIdentifier = 'Enter a valid 10–12 digit account number.';
     } else if (method === 'DIGITAL_BANK') {
       if (!bankName.trim()) nextErrors.bankName = 'Enter the bank / e-wallet name.';
       if (!idTrimmed) nextErrors.accountIdentifier = 'Enter your account number.';
-      else if (!BANK_ACCOUNT_RE.test(idTrimmed)) nextErrors.accountIdentifier = 'Enter a valid 10–12 digit account number.';
+      else if (!BANK_ACCOUNT_RE.test(idTrimmed))
+        nextErrors.accountIdentifier = 'Enter a valid 10–12 digit account number.';
     } else if (method === 'OTHER') {
       if (!idTrimmed) nextErrors.accountIdentifier = 'Enter the account identifier.';
-      else if (!ALPHANUMERIC_RE.test(idTrimmed)) nextErrors.accountIdentifier = 'Enter 8–34 alphanumeric characters.';
+      else if (!ALPHANUMERIC_RE.test(idTrimmed))
+        nextErrors.accountIdentifier = 'Enter 8–34 alphanumeric characters.';
     }
 
     setErrors(nextErrors);
     if (nextErrors.method) document.getElementById('payout-method')?.focus();
     else if (nextErrors.bankName) document.getElementById('payout-bankName')?.focus();
     else if (nextErrors.accountName) document.getElementById('payout-accountName')?.focus();
-    else if (nextErrors.accountIdentifier) document.getElementById('payout-accountIdentifier')?.focus();
+    else if (nextErrors.accountIdentifier)
+      document.getElementById('payout-accountIdentifier')?.focus();
     if (Object.keys(nextErrors).length > 0) return;
 
     setServerError(undefined);
@@ -183,7 +198,10 @@ export function AddPayoutAccountPage() {
           name="method"
           label="Payout method"
           value={method}
-          onChange={(v) => { setMethod(v); resetMethodFields(); }}
+          onChange={(v) => {
+            setMethod(v);
+            resetMethodFields();
+          }}
           options={PAYOUT_METHOD_OPTIONS}
           error={errors.method}
           hint="Select where your withdrawals should be sent."
@@ -203,7 +221,7 @@ export function AddPayoutAccountPage() {
                     name={field.id}
                     label={field.label}
                     value={field.id === 'bankName' ? bankName : branch}
-                    onChange={(v) => field.id === 'bankName' ? setBankName(v) : setBranch(v)}
+                    onChange={(v) => (field.id === 'bankName' ? setBankName(v) : setBranch(v))}
                     error={errors[field.id]}
                     placeholder={field.placeholder}
                     autoComplete="off"
@@ -231,7 +249,8 @@ export function AddPayoutAccountPage() {
               </>
             ) : isGcash ? (
               <p className={styles.fieldGroupHint}>
-                Enter your GCash-registered mobile number. Funds will be sent directly to this number.
+                Enter your GCash-registered mobile number. Funds will be sent directly to this
+                number.
               </p>
             ) : (
               <p className={styles.fieldGroupHint}>
@@ -261,9 +280,11 @@ export function AddPayoutAccountPage() {
               inputMode={isGcash ? 'tel' : 'numeric'}
               placeholder={isGcash ? '09xxxxxxxxx' : 'Account number'}
               maxLength={isGcash ? 11 : 34}
-              hint={isGcash
-                ? 'Format: 09 followed by 9 digits.'
-                : 'Stored securely — only a masked version is shown after submission.'}
+              hint={
+                isGcash
+                  ? 'Format: 09 followed by 9 digits.'
+                  : 'Stored securely — only a masked version is shown after submission.'
+              }
             />
           </div>
         ) : null}

@@ -26,7 +26,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
   const supabase = requireService(res);
   if (!supabase) return;
-  const { data, error } = await supabase.from('Customer').select('*').order('createdAt', { ascending: false });
+  const { data, error } = await supabase
+    .from('Customer')
+    .select('*')
+    .order('createdAt', { ascending: false });
   if (error) {
     const { error: env, status } = toErrorEnvelope('INTERNAL', error.message, 500);
     res.status(status).json({ error: env });

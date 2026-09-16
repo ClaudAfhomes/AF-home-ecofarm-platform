@@ -102,8 +102,14 @@ describe('POST /cms/upload/sign', () => {
     [{ name: 'f.mp4', type: 'video/mp4', size: 100, kind: 'DOCUMENT' }, 'Documents must be'],
     [{ name: 'g.pdf', type: 'application/pdf', size: 100, kind: 'VIDEO' }, 'Videos must be'],
     [{ name: 'h.exe', type: 'application/x-msdownload', size: 100 }, 'Only JPG, PNG and WebP'],
-    [{ name: 'i.mp4', type: 'video/mp4', size: 200 * 1024 * 1024, kind: 'VIDEO' }, '100 MB or less'],
-    [{ name: 'j.pdf', type: 'application/pdf', size: 30 * 1024 * 1024, kind: 'DOCUMENT' }, '20 MB or less'],
+    [
+      { name: 'i.mp4', type: 'video/mp4', size: 200 * 1024 * 1024, kind: 'VIDEO' },
+      '100 MB or less',
+    ],
+    [
+      { name: 'j.pdf', type: 'application/pdf', size: 30 * 1024 * 1024, kind: 'DOCUMENT' },
+      '20 MB or less',
+    ],
   ])('rejects %j', async (body, messagePart) => {
     const { res, seen } = capture();
     await handler(req(body), res);

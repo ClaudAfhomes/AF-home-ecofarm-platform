@@ -64,7 +64,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.status(status).json({ error });
     return;
   }
-  const displayName = `${row.firstName ?? ''} ${row.lastName ?? ''}`.trim() || String(row.name ?? id);
+  const displayName =
+    `${row.firstName ?? ''} ${row.lastName ?? ''}`.trim() || String(row.name ?? id);
   await appendAudit(supabase, {
     action: 'MEMBER_ARCHIVED',
     actorId: auth.userId,

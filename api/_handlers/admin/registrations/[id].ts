@@ -29,13 +29,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const rawId = req.query.id;
   const id = Array.isArray(rawId) ? rawId[0] : rawId;
   if (!id) {
-    const { error, status } = toErrorEnvelope('VALIDATION_ERROR', 'Registration id is required', 400);
+    const { error, status } = toErrorEnvelope(
+      'VALIDATION_ERROR',
+      'Registration id is required',
+      400,
+    );
     res.status(status).json({ error });
     return;
   }
   const supabase = requireService(res);
   if (!supabase) return;
-  const { data, error } = await supabase.from('Registration').select('*').eq('id', id).maybeSingle();
+  const { data, error } = await supabase
+    .from('Registration')
+    .select('*')
+    .eq('id', id)
+    .maybeSingle();
   if (error) {
     const { error: env, status } = toErrorEnvelope('INTERNAL', error.message, 500);
     res.status(status).json({ error: env });
@@ -48,7 +56,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
   const parsed = registrationSchema.safeParse(mapRegistrationRow(data as Record<string, unknown>));
   if (!parsed.success) {
-    const { error: env, status } = toErrorEnvelope('INTERNAL', 'Stored registration failed validation', 500);
+    const { error: env, status } = toErrorEnvelope(
+      'INTERNAL',
+      'Stored registration failed validation',
+      500,
+    );
     res.status(status).json({ error: env });
     return;
   }
