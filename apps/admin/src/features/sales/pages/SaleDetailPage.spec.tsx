@@ -31,10 +31,17 @@ vi.mock('../hooks/useSale', () => ({
   }),
 }));
 
+const { mockDeleteSaleMutate, mockDeleteSalePending } = vi.hoisted(() => ({
+  mockDeleteSaleMutate: vi.fn(),
+  mockDeleteSalePending: { value: false },
+}));
+
 vi.mock('../hooks/useDeleteSale', () => ({
   useDeleteSale: () => ({
-    mutateAsync: vi.fn(),
-    isPending: false,
+    mutateAsync: (...args: unknown[]) => mockDeleteSaleMutate(...args),
+    get isPending() {
+      return mockDeleteSalePending.value;
+    },
   }),
 }));
 
@@ -127,6 +134,23 @@ describe('SaleDetailPage transitions', () => {
     await screen.findByText('Cannot transition sale.');
     // Still on the submitted step - nothing advanced locally.
     expect(screen.getByRole('button', { name: 'Approve sale' })).toBeInTheDocument();
+  });
+
+  it('locks the delete confirm while a delete is in flight', async () => {
+    mockDeleteSalePending.value = true;
+    try {
+      renderDetail();
+
+      fireEvent.click(screen.getByRole('button', { name: 'Delete sale' }));
+      // Pending confirm renders its loading state and stays disabled.
+      const confirm = await screen.findByRole('button', { name: /loading/i });
+      expect(confirm).toBeDisabled();
+      // Cancel is a no-op while the delete is in flight.
+      fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+      expect(screen.getByRole('button', { name: /loading/i })).toBeInTheDocument();
+    } finally {
+      mockDeleteSalePending.value = false;
+    }
   });
 
   it('sends the rejection reason when rejecting', async () => {

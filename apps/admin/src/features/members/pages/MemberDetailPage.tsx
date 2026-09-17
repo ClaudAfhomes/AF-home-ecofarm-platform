@@ -57,6 +57,7 @@ export function MemberDetailPage() {
   const [purgeReason, setPurgeReason] = useState('');
   const [purgeEmailConfirm, setPurgeEmailConfirm] = useState('');
   const [purgePending, setPurgePending] = useState(false);
+  const [actionPending, setActionPending] = useState(false);
   const [error, setError] = useState<string | undefined>();
   const [sponsorCode, setSponsorCode] = useState('');
   const [sponsorPending, setSponsorPending] = useState(false);
@@ -168,9 +169,11 @@ export function MemberDetailPage() {
   };
 
   const handleSave = async () => {
+    if (actionPending) return;
     const errs = validateEdit();
     setEditErrors(errs);
     if (Object.keys(errs).length > 0) return;
+    setActionPending(true);
     try {
       await updateMember(data.id, {
         firstName: edit.firstName.trim(),
@@ -185,10 +188,14 @@ export function MemberDetailPage() {
       await queryClient.invalidateQueries({ queryKey: ['admin', 'members'] });
     } catch (e) {
       setError((e as Error).message);
+    } finally {
+      setActionPending(false);
     }
   };
 
   const handleToggleActive = async () => {
+    if (actionPending) return;
+    setActionPending(true);
     try {
       if (data.accountStatus === 'ACTIVE') await deactivateMember(data.id);
       else await activateMember(data.id);
@@ -198,10 +205,14 @@ export function MemberDetailPage() {
       await queryClient.invalidateQueries({ queryKey: ['admin', 'members'] });
     } catch (e) {
       setError((e as Error).message);
+    } finally {
+      setActionPending(false);
     }
   };
 
   const handleToggleQualified = async () => {
+    if (actionPending) return;
+    setActionPending(true);
     try {
       await setMemberQualified(data.id, !data.isQualified);
       setShowQualifyConfirm(false);
@@ -210,6 +221,8 @@ export function MemberDetailPage() {
       await queryClient.invalidateQueries({ queryKey: ['admin', 'members'] });
     } catch (e) {
       setError((e as Error).message);
+    } finally {
+      setActionPending(false);
     }
   };
 
@@ -254,6 +267,8 @@ export function MemberDetailPage() {
   };
 
   const handleArchive = async () => {
+    if (actionPending) return;
+    setActionPending(true);
     try {
       await archiveMember(data.id);
       await queryClient.invalidateQueries({ queryKey: ['admin', 'members'] });
@@ -265,6 +280,8 @@ export function MemberDetailPage() {
       navigate('/admin/members');
     } catch (e) {
       setError((e as Error).message);
+    } finally {
+      setActionPending(false);
     }
   };
 
@@ -458,7 +475,7 @@ export function MemberDetailPage() {
                 </p>
               ) : null}
               <div className={styles.editActions}>
-                <Button onClick={handleSave} variant="primary">
+                <Button onClick={handleSave} variant="primary" loading={actionPending}>
                   Save
                 </Button>
                 <Button
@@ -467,6 +484,7 @@ export function MemberDetailPage() {
                     else setIsEditing(false);
                   }}
                   variant="secondary"
+                  disabled={actionPending}
                 >
                   Cancel
                 </Button>
@@ -827,8 +845,9 @@ export function MemberDetailPage() {
                     purgeEmailConfirm.trim().toLowerCase() !== data.email.toLowerCase() ||
                     purgePending
                   }
+                  loading={purgePending}
                 >
-                  {purgePending ? 'Deleting…' : 'Delete Permanently'}
+                  Delete Permanently
                 </Button>
               </>
             }
@@ -883,7 +902,9 @@ export function MemberDetailPage() {
 
           <ConfirmDialog
             open={showQualifyConfirm}
-            onCancel={() => setShowQualifyConfirm(false)}
+            onCancel={() => {
+              if (!actionPending) setShowQualifyConfirm(false);
+            }}
             onConfirm={handleToggleQualified}
             title={
               data.isQualified
@@ -898,11 +919,15 @@ export function MemberDetailPage() {
             confirmLabel={data.isQualified ? 'Revoke' : 'Grant'}
             cancelLabel="Cancel"
             danger={data.isQualified}
+            confirmDisabled={actionPending}
+            confirmLoading={actionPending}
           />
 
           <ConfirmDialog
             open={showDeactivateConfirm}
-            onCancel={() => setShowDeactivateConfirm(false)}
+            onCancel={() => {
+              if (!actionPending) setShowDeactivateConfirm(false);
+            }}
             onConfirm={handleToggleActive}
             title={
               data.accountStatus === 'ACTIVE'
@@ -917,17 +942,23 @@ export function MemberDetailPage() {
             confirmLabel={data.accountStatus === 'ACTIVE' ? 'Deactivate' : 'Activate'}
             cancelLabel="Cancel"
             danger={data.accountStatus === 'ACTIVE'}
+            confirmDisabled={actionPending}
+            confirmLoading={actionPending}
           />
 
           <ConfirmDialog
             open={showArchiveConfirm}
-            onCancel={() => setShowArchiveConfirm(false)}
+            onCancel={() => {
+              if (!actionPending) setShowArchiveConfirm(false);
+            }}
             onConfirm={handleArchive}
             title={`Archive ${memberName}?`}
             message="Archive this member? Record will be moved to Archives and removed from active Members. Original data retained for audit."
             confirmLabel="Archive"
             cancelLabel="Cancel"
             danger
+            confirmDisabled={actionPending}
+            confirmLoading={actionPending}
           />
         </div>
       </div>

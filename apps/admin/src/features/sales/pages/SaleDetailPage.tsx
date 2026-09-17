@@ -139,8 +139,9 @@ export function SaleDetailPage() {
     }
   };
 
+  const deletePending = deleteMut.isPending;
   const handleDelete = async () => {
-    if (!data) return;
+    if (!data || deleteMut.isPending) return;
     try {
       await deleteMut.mutateAsync(data.id);
       notifySuccess({ title: 'Sale deleted', message: `${data.propertyName} removed` });
@@ -607,13 +608,17 @@ export function SaleDetailPage() {
       ) : null}
       <ConfirmDialog
         open={showDeleteConfirm}
-        onCancel={() => setShowDeleteConfirm(false)}
+        onCancel={() => {
+          if (!deletePending) setShowDeleteConfirm(false);
+        }}
         onConfirm={handleDelete}
         title={data ? `Delete ${data.propertyName}?` : 'Delete sale?'}
         message="This sale will be permanently removed along with any uncredited commissions. Sales with credited commissions cannot be deleted."
         confirmLabel="Delete"
         cancelLabel="Cancel"
         danger
+        confirmDisabled={deletePending}
+        confirmLoading={deletePending}
       />
     </section>
   );

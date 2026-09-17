@@ -5,15 +5,18 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderWithProviders } from '../../../test/utils';
 import { RegistrationDetailPage } from './RegistrationDetailPage';
 
-const { mockGetRegistrationById, mockGetGovernmentIdUrl } = vi.hoisted(() => ({
-  mockGetRegistrationById: vi.fn(),
-  mockGetGovernmentIdUrl: vi.fn(),
-}));
+const { mockGetRegistrationById, mockGetGovernmentIdUrl, mockApproveRegistration } = vi.hoisted(
+  () => ({
+    mockGetRegistrationById: vi.fn(),
+    mockGetGovernmentIdUrl: vi.fn(),
+    mockApproveRegistration: vi.fn(),
+  }),
+);
 
 vi.mock('../repositories/registrationRepository', () => ({
   getRegistrationById: (...args: unknown[]) => mockGetRegistrationById(...args),
   getGovernmentIdUrl: (...args: unknown[]) => mockGetGovernmentIdUrl(...args),
-  approveRegistration: vi.fn(),
+  approveRegistration: (...args: unknown[]) => mockApproveRegistration(...args),
   rejectRegistration: vi.fn(),
 }));
 
@@ -123,6 +126,27 @@ describe('RegistrationDetailPage government ID preview', () => {
     expect(screen.getByText('No email provided')).toBeInTheDocument();
     expect(screen.getByText('No sponsor code provided')).toBeInTheDocument();
     expect(screen.getAllByText('Not yet reviewed').length).toBeGreaterThan(0);
+  });
+
+  it('locks the accept confirm while approving so double-click sends one request', async () => {
+    mockGetRegistrationById.mockReturnValue(
+      registration({ fileName: 'id.png', mimeType: 'image/png', sizeBytes: 70 }),
+    );
+    let resolveApprove!: (value: unknown) => void;
+    const gate = new Promise((resolve) => {
+      resolveApprove = resolve;
+    });
+    mockApproveRegistration.mockReturnValueOnce(gate);
+    renderDetail();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Accept Registration' }));
+    const confirm = await screen.findByRole('button', { name: 'Accept' });
+    fireEvent.click(confirm);
+    await waitFor(() => expect(confirm).toBeDisabled());
+    // Second click while pending must not fire again.
+    fireEvent.click(confirm);
+    resolveApprove(undefined);
+    await waitFor(() => expect(mockApproveRegistration).toHaveBeenCalledTimes(1));
   });
 
   it('shows an error with retry when the signed URL fails', async () => {

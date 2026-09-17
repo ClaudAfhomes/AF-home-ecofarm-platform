@@ -288,7 +288,7 @@ export function SaleSubmitPage() {
             ]}
             error={errors.referrerId}
             hint={
-              'The member who referred this customer - pick from your direct referrals (members only).'
+              'The member who referred this customer - pick from your direct referrals (members only). Leave empty and your sponsor automatically receives the referral share.'
             }
           />
           {referralsQuery.isError ? (

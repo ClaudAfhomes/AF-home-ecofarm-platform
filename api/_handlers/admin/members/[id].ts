@@ -363,10 +363,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     updated = updatedRow as Record<string, unknown>;
   }
   // Repair: linking (or re-confirming) a sponsor issues the DIRECT_REFERRAL
-  // rows that past qualifies skipped for this member's qualifying sales.
-  // Idempotent per sale+type; a repair failure surfaces loudly because the
-  // referrer's money is at stake (the link itself is already saved above).
-  // Amounts stay exact-decimal strings - integer math only, no floats.
+  // rows that past qualifies skipped for this member's qualifying sales -
+  // but only for sales with no picked referrer. A sale that already paid its
+  // selected referrer must never pay the sponsor too (referrer wins, never
+  // both). Idempotent per sale+type; a repair failure surfaces loudly
+  // because the referrer's money is at stake (the link itself is already
+  // saved above). Amounts stay exact-decimal strings - integer math only,
+  // no floats.
   const exactPercentOf = (value: string, rateValue: string): string => {
     const [vInt, vFrac = ''] = value.split('.');
     const cents = BigInt(vInt + vFrac.padEnd(2, '0').slice(0, 2));
@@ -394,7 +397,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
     const { data: qualifyingSales } = await supabase
       .from('Sale')
-      .select('id,propertyValue')
+      .select('id,propertyValue,referrerId')
       .eq('sellerId', id)
       .eq('status', 'QUALIFYING_SALE');
     const { data: existingReferrals } = await supabase
@@ -407,9 +410,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         typeof r.saleId === 'string' ? r.saleId : '',
       ),
     );
-    for (const sale of (qualifyingSales as { id: string; propertyValue?: unknown }[] | null) ??
-      []) {
+    for (const sale of (qualifyingSales as
+      { id: string; propertyValue?: unknown; referrerId?: unknown }[] | null) ?? []) {
       if (covered.has(sale.id)) continue;
+      // A picked referrer already earned (or will earn) this sale's referral -
+      // the sponsor must not be paid too.
+      if (sale.referrerId) continue;
       if (
         typeof sale.propertyValue !== 'string' ||
         !/^[0-9]+(\.[0-9]{1,2})?$/.test(sale.propertyValue)

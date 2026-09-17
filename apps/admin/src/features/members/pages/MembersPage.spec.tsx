@@ -1,9 +1,10 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { screen } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { MOCK_ADMIN } from '@jad/mock';
 
 import { installMockApi, renderWithProviders } from '../../../test/utils';
+import { MOCK_MEMBERS } from '../../../mock/data';
 import { MembersPage } from './MembersPage';
 
 describe('MembersPage', () => {
@@ -63,5 +64,63 @@ describe('MembersPage', () => {
     expect(screen.getByLabelText('Filter by country')).toBeInTheDocument();
     expect(screen.getByLabelText('Filter by membership status')).toBeInTheDocument();
     expect(screen.getByLabelText('Filter by account status')).toBeInTheDocument();
+  });
+});
+
+describe('MembersPage archive pending guard', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  function json(body: unknown, status = 200): Response {
+    return new Response(JSON.stringify(body), {
+      status,
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  it('locks the archive confirm while archiving so double-click sends one request', async () => {
+    const member = {
+      ...MOCK_MEMBERS[0]!,
+      accountStatus: 'ACTIVE',
+      registeredAt: '2026-08-12T10:00:00.000Z',
+      registrationId: 'reg-001',
+    };
+    let resolveArchive!: (response: Response) => void;
+    const archiveGate = new Promise<Response>((resolve) => {
+      resolveArchive = resolve;
+    });
+    const archivePosts: string[] = [];
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: unknown, init?: RequestInit) => {
+        const url = String(input);
+        const method = (init?.method ?? 'GET').toUpperCase();
+        if (url.endsWith('/admin/members') && method === 'GET') {
+          return json({ data: [member], meta: { page: 1, pageSize: 10, total: 1 } });
+        }
+        if (url.endsWith('/admin/members/archived')) {
+          return json({ data: [], meta: { page: 1, pageSize: 10, total: 0 } });
+        }
+        if (url.includes('/admin/members/') && url.endsWith('/archive') && method === 'POST') {
+          archivePosts.push(url);
+          return archiveGate;
+        }
+        return json({ data: [], meta: { page: 1, pageSize: 10, total: 0 } });
+      }),
+    );
+    const user = userEvent.setup();
+    renderWithProviders(<MembersPage />, { user: MOCK_ADMIN });
+
+    await screen.findByText('Juan Dela Cruz');
+    await user.click(screen.getByRole('button', { name: 'Archive member Juan Dela Cruz' }));
+    const confirm = await screen.findByRole('button', { name: 'Archive' });
+    await user.click(confirm);
+    await waitFor(() => expect(confirm).toBeDisabled());
+    // Second click while pending must not fire again.
+    await user.click(confirm);
+    resolveArchive(json({ archivedId: 'mem-001' }));
+    await waitFor(() => expect(archivePosts).toHaveLength(1));
+    expect(await screen.findByText('Member archived')).toBeInTheDocument();
   });
 });

@@ -95,8 +95,9 @@ export function SalesPage() {
   const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const rows = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
+  const deletePending = deleteMut.isPending;
   const handleDelete = async () => {
-    if (!deleteTarget) return;
+    if (!deleteTarget || deleteMut.isPending) return;
     try {
       await deleteMut.mutateAsync(deleteTarget.id);
       notifySuccess({ title: 'Sale deleted', message: `${deleteTarget.name} removed` });
@@ -257,13 +258,17 @@ export function SalesPage() {
       />
       <ConfirmDialog
         open={Boolean(deleteTarget)}
-        onCancel={() => setDeleteTarget(null)}
+        onCancel={() => {
+          if (!deletePending) setDeleteTarget(null);
+        }}
         onConfirm={handleDelete}
         title={deleteTarget ? `Delete ${deleteTarget.name}?` : 'Delete sale?'}
-        message="This sale will be permanently removed. This action cannot be undone."
+        message="This sale will be permanently removed along with any uncredited commissions. Sales with credited commissions cannot be deleted."
         confirmLabel="Delete"
         cancelLabel="Cancel"
         danger
+        confirmDisabled={deletePending}
+        confirmLoading={deletePending}
       />
     </section>
   );

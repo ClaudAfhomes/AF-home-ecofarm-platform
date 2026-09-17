@@ -1004,9 +1004,10 @@ async function seed() {
 
   // Commission backfill - PENDING commissions for QUALIFYING_SALE rows that
   // have none (mirrors the sale_qualify function: PG round half-away on
-  // SystemConfig rates, referral skipped silently without a sponsor).
-  // Idempotent: sales that already have commissions are skipped, so re-runs
-  // (and the live qualify path) never duplicate.
+  // SystemConfig rates; referral payee is the picked referrer, else the
+  // seller's sponsor, else skipped). Idempotent: sales that already have
+  // commissions are skipped, so re-runs (and the live qualify path) never
+  // duplicate.
   let commissionBackfillFailed = false;
   try {
     const toCents = (value: string): bigint => {
@@ -1038,11 +1039,17 @@ async function seed() {
     } else {
       const { data: qualifiedSales } = await supabase
         .from('Sale')
-        .select('id,propertyValue,sellerId')
+        .select('id,propertyValue,sellerId,referrerId')
         .eq('status', 'QUALIFYING_SALE');
       let created = 0;
       for (const s of (qualifiedSales as
-        { id: string; propertyValue: string; sellerId: string | null }[] | null) ?? []) {
+        | {
+            id: string;
+            propertyValue: string;
+            sellerId: string | null;
+            referrerId: string | null;
+          }[]
+        | null) ?? []) {
         if (!s.sellerId || !/^\d+(\.\d{1,2})?$/.test(s.propertyValue)) continue;
         const { count } = await supabase
           .from('Commission')
@@ -1072,11 +1079,18 @@ async function seed() {
           .eq('id', s.sellerId)
           .maybeSingle();
         const sponsorId = (seller as { sponsorId?: string | null } | null)?.sponsorId ?? null;
-        if (sponsorId) {
+        // Referrer wins; otherwise the seller's sponsor; never the seller.
+        const payeeId =
+          s.referrerId && s.referrerId !== s.sellerId
+            ? s.referrerId
+            : sponsorId && sponsorId !== s.sellerId
+              ? sponsorId
+              : null;
+        if (payeeId) {
           const referral = fromCents((base * toBp(referralRate) + 5000n) / 10000n);
           rows.push({
             id: `com-${s.id}-referral`,
-            memberId: sponsorId,
+            memberId: payeeId,
             commissionType: 'DIRECT_REFERRAL',
             saleId: s.id,
             baseValue: s.propertyValue,

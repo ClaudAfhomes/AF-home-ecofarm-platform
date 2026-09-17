@@ -130,7 +130,7 @@ Each rule has a stable ID (`BR-<MODULE>-<NNN>`). Statuses reflect the latest app
 | ID | Rule | Status |
 |---|---|---|
 | BR-COM-001 | **Direct Commission = 8% of applicable Property/Sale Value.** Rate is configurable by Super Admin. | **CONFIRMED / PROVISIONAL RATE** |
-| BR-COM-002 | **Direct Referral = 4% of applicable Property/Sale Value.** Paid to the **direct sponsor/referrer**. Rate is configurable by Super Admin. | **CONFIRMED / PROVISIONAL RATE** |
+| BR-COM-002 | **Direct Referral = 4% of applicable Property/Sale Value.** Paid to the **sale's selected referrer** when one is picked; otherwise automatically to the **seller's direct sponsor**; never both. Rate is configurable by Super Admin. | **CONFIRMED / PROVISIONAL RATE** |
 | BR-COM-003 | Both Direct Commission (8%) and Direct Referral (4%) may apply to the **same** qualifying sale. | **CONFIRMED** |
 | BR-COM-004 | An **Active + Qualified Member** who completes a **Qualifying Sale** is eligible for Direct Commission. | **CONFIRMED** |
 | BR-COM-005 | Commission is created **immediately as Pending** after qualification. | **CONFIRMED** |

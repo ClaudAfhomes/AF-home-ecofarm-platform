@@ -38,16 +38,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.status(status).json({ error: env });
     return;
   }
-  // Pending commission estimate: own open sales x direct rate + referred sales x referral rate.
+  // Pending commission estimate: own open sales x direct rate + referred
+  // sales x referral rate + direct-downline open sales with no referrer
+  // picked x referral rate (the sponsor fallback). A downline sale that
+  // later gets a referrer pays the referrer instead, so the downline slice
+  // is an expectation, not a guarantee.
   let pendingCommission = '0.00';
   try {
-    const [rateRows, ownSales, referredSales] = await Promise.all([
+    const [rateRows, ownSales, referredSales, downlineMembers] = await Promise.all([
       supabase
         .from('SystemConfig')
         .select('key,value')
         .in('key', ['COMMISSION_DIRECT_RATE', 'COMMISSION_REFERRAL_RATE']),
       supabase.from('Sale').select('propertyValue,status').eq('sellerId', auth.userId),
       supabase.from('Sale').select('propertyValue,status').eq('referrerId', auth.userId),
+      supabase.from('Member').select('id').eq('sponsorId', auth.userId),
     ]);
     const rateByKey: Record<string, string> = {};
     for (const r of ((rateRows as { data?: { key: string; value: string }[] | null })?.data ??
@@ -62,9 +67,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       status: unknown;
       propertyValue: unknown;
     }[];
+    const downlineIds = (
+      ((downlineMembers as { data?: { id: string }[] | null })?.data ?? []) as {
+        id: string;
+      }[]
+    )
+      .map((m) => m.id)
+      .filter(Boolean);
+    let downlineRows: { status: unknown; propertyValue: unknown }[] = [];
+    if (downlineIds.length > 0) {
+      const { data: dlSales } = (await supabase
+        .from('Sale')
+        .select('propertyValue,status')
+        .in('sellerId', downlineIds)
+        .is('referrerId', null)) as { data?: unknown[] | null };
+      downlineRows = (dlSales ?? []) as { status: unknown; propertyValue: unknown }[];
+    }
     pendingCommission = sumPendingCommission({
       ownSales: ownRows,
       referredSales: referredRows,
+      downlineSales: downlineRows,
       directRate: rateByKey.COMMISSION_DIRECT_RATE,
       referralRate: rateByKey.COMMISSION_REFERRAL_RATE,
     });

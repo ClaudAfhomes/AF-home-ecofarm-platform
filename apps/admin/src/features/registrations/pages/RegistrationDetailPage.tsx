@@ -120,6 +120,7 @@ export function RegistrationDetailPage() {
   }
 
   const handleApprove = async () => {
+    if (actionPending) return;
     setActionPending(true);
     try {
       await approveRegistration(data.id);
@@ -133,6 +134,7 @@ export function RegistrationDetailPage() {
   };
 
   const handleReject = async () => {
+    if (actionPending) return;
     if (!rejectReason.trim() || !rejectChanges.trim()) {
       setFormError('Both reason and required changes are required.');
       return;
@@ -415,13 +417,17 @@ export function RegistrationDetailPage() {
 
             <ConfirmDialog
               open={showAcceptConfirm}
-              onCancel={() => setShowAcceptConfirm(false)}
+              onCancel={() => {
+                if (!actionPending) setShowAcceptConfirm(false);
+              }}
               onConfirm={handleApprove}
               title={`Accept ${applicantName}?`}
               message={`${applicantName} will be activated as a member and appear in Members. This action is audited.`}
-              confirmLabel={actionPending ? 'Processing...' : 'Accept'}
+              confirmLabel="Accept"
               cancelLabel="Cancel"
               danger={false}
+              confirmDisabled={actionPending}
+              confirmLoading={actionPending}
             />
 
             <Dialog
@@ -453,8 +459,9 @@ export function RegistrationDetailPage() {
                     variant="danger"
                     onClick={handleReject}
                     disabled={!rejectReason.trim() || !rejectChanges.trim() || actionPending}
+                    loading={actionPending}
                   >
-                    {actionPending ? 'Processing...' : 'Confirm Rejection'}
+                    Confirm Rejection
                   </Button>
                 </>
               }

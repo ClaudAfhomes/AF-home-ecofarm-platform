@@ -132,6 +132,7 @@ export function SaleFormDialog({ open, onClose, sale }: SaleFormDialogProps) {
   };
 
   const handleSubmit = async () => {
+    if (isPending) return;
     const v = validate();
     setErrors(v);
     if (Object.keys(v).length > 0) return;
@@ -399,7 +400,7 @@ export function SaleFormDialog({ open, onClose, sale }: SaleFormDialogProps) {
             options={[{ value: '', label: 'No referrer' }, ...referrerOptions]}
           />
           <span style={{ fontSize: 'var(--text-caption)', color: 'var(--color-text-muted)' }}>
-            The member who referred this customer
+            The member who referred this customer. Empty awards the seller&apos;s sponsor.
           </span>
         </div>
 

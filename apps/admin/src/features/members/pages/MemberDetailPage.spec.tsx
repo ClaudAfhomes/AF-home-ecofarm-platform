@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import { Route, Routes } from 'react-router';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -15,7 +15,8 @@ const { mockUseMember, mockUseMemberRegistration, mockGetGovernmentIdUrl } = vi.
   mockGetGovernmentIdUrl: vi.fn(),
 }));
 
-const { mockDeleteMemberPermanently } = vi.hoisted(() => ({
+const { mockArchiveMember, mockDeleteMemberPermanently } = vi.hoisted(() => ({
+  mockArchiveMember: vi.fn(),
   mockDeleteMemberPermanently: vi.fn(),
 }));
 
@@ -35,7 +36,7 @@ vi.mock('../repositories/memberRepository', () => ({
   updateMember: vi.fn(),
   deactivateMember: vi.fn(),
   activateMember: vi.fn(),
-  archiveMember: vi.fn(),
+  archiveMember: (...args: unknown[]) => mockArchiveMember(...args),
   deleteMemberPermanently: (...args: unknown[]) => mockDeleteMemberPermanently(...args),
   setMemberQualified: vi.fn(),
 }));
@@ -175,6 +176,27 @@ describe('MemberDetailPage permanent purge (super_admin)', () => {
       'mem-uuid-1',
       'Duplicate test account',
     );
+  });
+
+  it('locks the archive confirm while archiving so double-click sends one request', async () => {
+    primeMemberMocks();
+    let resolveArchive!: (value: unknown) => void;
+    const gate = new Promise((resolve) => {
+      resolveArchive = resolve;
+    });
+    mockArchiveMember.mockReturnValueOnce(gate);
+    const user = userEvent.setup();
+    renderDetailAs(MOCK_STAFF_ADMIN as SessionUser);
+
+    await user.click(screen.getByRole('button', { name: 'Archive member' }));
+    const confirm = await screen.findByRole('button', { name: 'Archive' });
+    await user.click(confirm);
+    await waitFor(() => expect(confirm).toBeDisabled());
+    // Second click while pending must not fire again.
+    await user.click(confirm);
+    resolveArchive({ archivedId: 'mem-uuid-1' });
+    await waitFor(() => expect(mockArchiveMember).toHaveBeenCalledTimes(1));
+    expect(await screen.findByText('Member archived')).toBeInTheDocument();
   });
 
   it('warns when the auth identity survived the purge (authRemoved:false)', async () => {

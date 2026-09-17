@@ -62,6 +62,8 @@ export function MembersPage() {
   const [editingMember, setEditingMember] = useState<AdminMember | null>(null);
   const [archiveTarget, setArchiveTarget] = useState<AdminMember | null>(null);
   const [restoreTarget, setRestoreTarget] = useState<string | null>(null);
+  const [archivePending, setArchivePending] = useState(false);
+  const [restorePending, setRestorePending] = useState(false);
 
   const { data: membersData, isPending: membersPending } = useQuery({
     queryKey: ['admin', 'members'],
@@ -131,7 +133,8 @@ export function MembersPage() {
   const archivedRows = archFiltered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const handleArchive = async () => {
-    if (!archiveTarget) return;
+    if (!archiveTarget || archivePending) return;
+    setArchivePending(true);
     try {
       await archiveMember(archiveTarget.id);
       await qc.invalidateQueries({ queryKey: ['admin', 'members'] });
@@ -140,15 +143,17 @@ export function MembersPage() {
         title: 'Member archived',
         message: `${archiveTarget.firstName} ${archiveTarget.lastName} moved to archives`,
       });
+      setArchiveTarget(null);
     } catch (e) {
       notifyError({ title: 'Archive failed', message: (e as Error).message });
     } finally {
-      setArchiveTarget(null);
+      setArchivePending(false);
     }
   };
 
   const handleRestore = async () => {
-    if (!restoreTarget) return;
+    if (!restoreTarget || restorePending) return;
+    setRestorePending(true);
     try {
       await restoreArchivedMember(restoreTarget);
       await qc.invalidateQueries({ queryKey: ['admin', 'members'] });
@@ -157,10 +162,11 @@ export function MembersPage() {
         title: 'Member restored',
         message: 'Member restored to active list',
       });
+      setRestoreTarget(null);
     } catch (e) {
       notifyError({ title: 'Restore failed', message: (e as Error).message });
     } finally {
-      setRestoreTarget(null);
+      setRestorePending(false);
     }
   };
 
@@ -540,7 +546,9 @@ export function MembersPage() {
       />
       <ConfirmDialog
         open={Boolean(archiveTarget)}
-        onCancel={() => setArchiveTarget(null)}
+        onCancel={() => {
+          if (!archivePending) setArchiveTarget(null);
+        }}
         onConfirm={handleArchive}
         title={
           archiveTarget
@@ -551,15 +559,21 @@ export function MembersPage() {
         confirmLabel="Archive"
         cancelLabel="Cancel"
         danger
+        confirmDisabled={archivePending}
+        confirmLoading={archivePending}
       />
       <ConfirmDialog
         open={Boolean(restoreTarget)}
-        onCancel={() => setRestoreTarget(null)}
+        onCancel={() => {
+          if (!restorePending) setRestoreTarget(null);
+        }}
         onConfirm={handleRestore}
         title="Restore member?"
         message="Restore this archived member to the active list?"
         confirmLabel="Restore"
         cancelLabel="Cancel"
+        confirmDisabled={restorePending}
+        confirmLoading={restorePending}
       />
     </section>
   );

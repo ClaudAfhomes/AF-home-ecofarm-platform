@@ -16,7 +16,7 @@ const mocks = vi.hoisted(() => {
     member: null as unknown,
     sponsorList: null as unknown,
     referralRate: '0.0400' as string | null,
-    qualifyingSales: [] as { id: string; propertyValue?: unknown }[],
+    qualifyingSales: [] as { id: string; propertyValue?: unknown; referrerId?: unknown }[],
     existingReferrals: [] as { saleId?: unknown }[],
     updatedMember: null as unknown,
     qualifiedRoleId: 'role-qualified' as string | null,
@@ -317,6 +317,17 @@ describe('PATCH /admin/members/:id sponsor link (super_admin only)', () => {
   it('skips the repair for sales that already have a referral row', async () => {
     mocks.script.qualifyingSales = [{ id: 'sal-001', propertyValue: '100000.00' }];
     mocks.script.existingReferrals = [{ saleId: 'sal-001' }];
+    const { res, seen } = capture();
+    await memberById(patchReq({ referralCode: 'jd-2026-001' }), res);
+    expect(seen.status).toBe(200);
+    expect(mocks.calls.some((c) => c.table === 'Commission' && c.op === 'insert')).toBe(false);
+  });
+
+  it('skips the repair for sales with a picked referrer (referrer wins, never both)', async () => {
+    mocks.script.qualifyingSales = [
+      { id: 'sal-001', propertyValue: '100000.00', referrerId: 'mem-ref-1' },
+    ];
+    mocks.script.existingReferrals = [];
     const { res, seen } = capture();
     await memberById(patchReq({ referralCode: 'jd-2026-001' }), res);
     expect(seen.status).toBe(200);
