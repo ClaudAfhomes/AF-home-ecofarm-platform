@@ -138,6 +138,10 @@ describe('saleSchema', () => {
   it('accepts an optional referrer name snapshot', () => {
     expect(saleSchema.safeParse({ ...base, referrerName: 'Maria Santos' }).success).toBe(true);
   });
+
+  it('accepts an optional referrerId', () => {
+    expect(saleSchema.safeParse({ ...base, referrerId: 'mem-123' }).success).toBe(true);
+  });
 });
 
 describe('submitSaleRequestSchema', () => {
@@ -147,14 +151,14 @@ describe('submitSaleRequestSchema', () => {
     expect(submitSaleRequestSchema.safeParse(base).success).toBe(true);
   });
 
-  it('accepts an optional referrer name', () => {
-    expect(
-      submitSaleRequestSchema.safeParse({ ...base, referrerName: 'Maria Santos' }).success,
-    ).toBe(true);
+  it('accepts an optional referrerId', () => {
+    expect(submitSaleRequestSchema.safeParse({ ...base, referrerId: 'mem-123' }).success).toBe(
+      true,
+    );
   });
 
-  it('rejects a blank referrer name', () => {
-    expect(submitSaleRequestSchema.safeParse({ ...base, referrerName: '   ' }).success).toBe(false);
+  it('rejects a blank referrerId', () => {
+    expect(submitSaleRequestSchema.safeParse({ ...base, referrerId: '   ' }).success).toBe(false);
   });
 });
 

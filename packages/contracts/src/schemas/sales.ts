@@ -55,11 +55,12 @@ export const saleSchema = z.object({
   approvedAt: z.string().optional(),
   paymentVerifiedAt: z.string().optional(),
   lockedAt: z.string().optional(),
+  /** The member who referred this customer (members only, direct referral). */
+  referrerId: z.string().min(1).optional(),
   /**
-   * Optional snapshot of the member who referred this customer, chosen from
-   * the seller's direct referrals or typed free-form at submission
-   * (SCR-MEM-006). Informational only - has no commission effect
-   * (BR-REF-001/002).
+   * Snapshot of the member who referred this customer, chosen from the
+   * seller's direct referrals (SCR-MEM-006). When `referrerId` is set the
+   * DIRECT_REFERRAL commission is paid to that member.
    */
   referrerName: z.string().optional(),
   /**
@@ -81,8 +82,8 @@ export type Sale = z.infer<typeof saleSchema>;
 export const submitSaleRequestSchema = z.object({
   customerId: z.string().min(1),
   propertyId: z.string().min(1),
-  /** Optional referrer name snapshot (direct referral pick or free text). */
-  referrerName: z.string().trim().min(1).max(120).optional(),
+  /** The member who referred this customer (must be a direct referral). */
+  referrerId: z.string().trim().min(1).optional(),
 });
 
 export type SubmitSaleRequest = z.infer<typeof submitSaleRequestSchema>;

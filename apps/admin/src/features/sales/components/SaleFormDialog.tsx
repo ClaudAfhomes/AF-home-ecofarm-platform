@@ -61,6 +61,16 @@ export function SaleFormDialog({ open, onClose, sale }: SaleFormDialogProps) {
     [members],
   );
 
+  const referrerOptions = useMemo(() => {
+    if (!form.sellerId) return [];
+    return members
+      .filter((m) => m.sponsorId === form.sellerId)
+      .map((m) => ({
+        value: m.id,
+        label: `${m.firstName} ${m.lastName} (${m.id})`,
+      }));
+  }, [members, form.sellerId]);
+
   const propertyOptions = useMemo(
     () =>
       properties
@@ -90,7 +100,7 @@ export function SaleFormDialog({ open, onClose, sale }: SaleFormDialogProps) {
         customerPhone: '',
         customerEmail: '',
         sellerId: sale.sellerId,
-        referrerId: '',
+        referrerId: (sale as unknown as { referrerId?: string }).referrerId ?? '',
         status: sale.status,
       });
     } else {
@@ -143,7 +153,9 @@ export function SaleFormDialog({ open, onClose, sale }: SaleFormDialogProps) {
             sellerName,
             sellerId: form.sellerId,
             status: form.status,
-          },
+            referrerId: form.referrerId || null,
+            referrerName: referrerName || null,
+          } as unknown as Record<string, unknown>,
         });
       } else {
         await createMut.mutateAsync({
@@ -351,7 +363,15 @@ export function SaleFormDialog({ open, onClose, sale }: SaleFormDialogProps) {
           <Select
             aria-label="Seller"
             value={form.sellerId}
-            onChange={(e) => setForm((s) => ({ ...s, sellerId: e.target.value }))}
+            onChange={(e) => {
+              const nextSeller = e.target.value;
+              setForm((s) => {
+                const nextRefValid = members.some(
+                  (m) => m.id === s.referrerId && m.sponsorId === nextSeller,
+                );
+                return { ...s, sellerId: nextSeller, referrerId: nextRefValid ? s.referrerId : '' };
+              });
+            }}
             options={[{ value: '', label: 'Select seller…' }, ...memberOptions]}
           />
           {errors.sellerId ? (
@@ -376,7 +396,7 @@ export function SaleFormDialog({ open, onClose, sale }: SaleFormDialogProps) {
             aria-label="Referrer"
             value={form.referrerId}
             onChange={(e) => setForm((s) => ({ ...s, referrerId: e.target.value }))}
-            options={[{ value: '', label: 'Select referrer (optional)…' }, ...memberOptions]}
+            options={[{ value: '', label: 'No referrer' }, ...referrerOptions]}
           />
           <span style={{ fontSize: 'var(--text-caption)', color: 'var(--color-text-muted)' }}>
             The member who referred this customer

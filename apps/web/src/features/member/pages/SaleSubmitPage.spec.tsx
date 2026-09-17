@@ -145,9 +145,9 @@ describe('member SaleSubmitPage (SCR-MEM-006, FR-SAL-002)', () => {
     renderSubmit();
 
     await screen.findByLabelText('Customer');
-    const referrer = screen.getByRole('combobox', { name: /Referrer name/ });
-    expect(referrer.querySelector('option[value="Maria Santos"]')).not.toBeNull();
-    expect(referrer.querySelector('option[value="Pedro Pendiente"]')).not.toBeNull();
+    const referrer = screen.getByRole('combobox', { name: /Referrer/ });
+    expect(referrer.querySelector('option[value="mem-002"]')).not.toBeNull();
+    expect(referrer.querySelector('option[value="mem-003"]')).not.toBeNull();
   });
 
   it('submits a selected direct referral as the referrer', async () => {
@@ -167,10 +167,7 @@ describe('member SaleSubmitPage (SCR-MEM-006, FR-SAL-002)', () => {
     await screen.findByLabelText('Customer');
     await user.selectOptions(screen.getByLabelText('Customer'), 'cus-001');
     await user.selectOptions(screen.getByLabelText('Catalog property'), 'igp-250-sqm-farm-lot');
-    await user.selectOptions(
-      screen.getByRole('combobox', { name: /Referrer name/ }),
-      'Maria Santos',
-    );
+    await user.selectOptions(screen.getByRole('combobox', { name: /Referrer/ }), 'mem-002');
     await user.click(screen.getByRole('button', { name: 'Submit sale' }));
 
     await screen.findByText('sale detail page');
@@ -181,38 +178,6 @@ describe('member SaleSubmitPage (SCR-MEM-006, FR-SAL-002)', () => {
     );
     expect(createCall).toBeTruthy();
     const body = JSON.parse(String((createCall?.[1] as RequestInit | undefined)?.body));
-    expect(body.referrerName).toBe('Maria Santos');
-  });
-
-  it('adds a new referrer name via free text and submits it', async () => {
-    const fetchMock = vi.fn((input: RequestInfo | URL, init?: RequestInit) => {
-      const url = String(input);
-      const method = (init?.method ?? 'GET').toUpperCase();
-      if (url.endsWith('/customers')) return Promise.resolve(json(CUSTOMERS));
-      if (url.endsWith('/me/direct-referrals')) return Promise.resolve(json(DIRECT_REFERRALS));
-      if (url.endsWith('/sales') && method === 'POST') return Promise.resolve(json(SALE_RESPONSE));
-      return Promise.resolve(json({ data: [], meta: {} }));
-    });
-    vi.stubGlobal('fetch', fetchMock);
-
-    const user = userEvent.setup();
-    renderSubmit();
-
-    await screen.findByLabelText('Customer');
-    await user.selectOptions(screen.getByLabelText('Customer'), 'cus-001');
-    await user.selectOptions(screen.getByLabelText('Catalog property'), 'igp-250-sqm-farm-lot');
-    await user.selectOptions(screen.getByRole('combobox', { name: /Referrer name/ }), '__new__');
-    await user.type(screen.getByLabelText('New referrer name'), 'Ana Anay');
-    await user.click(screen.getByRole('button', { name: 'Submit sale' }));
-
-    await screen.findByText('sale detail page');
-    const createCall = fetchMock.mock.calls.find(
-      (call) =>
-        String(call[0]).endsWith('/sales') &&
-        (call[1] as RequestInit | undefined)?.method === 'POST',
-    );
-    expect(createCall).toBeTruthy();
-    const body = JSON.parse(String((createCall?.[1] as RequestInit | undefined)?.body));
-    expect(body.referrerName).toBe('Ana Anay');
+    expect(body.referrerId).toBe('mem-002');
   });
 });

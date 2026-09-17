@@ -129,8 +129,49 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     'customerName',
     'sellerId',
     'sellerName',
+    'referrerId',
+    'referrerName',
   ] as const) {
     if (input[field] !== undefined) patch[field] = input[field];
+  }
+  // Validate referrerId when provided: must be a direct referral of the
+  // (possibly new) seller. No free-text referrerName commission.
+  if (patch.referrerId !== undefined) {
+    const rId = String(patch.referrerId ?? '').trim();
+    if (rId) {
+      const sellerForRef = String(
+        (patch.sellerId as string | undefined) ?? (current.sellerId as string) ?? '',
+      ).trim();
+      const { data: ref } = await supabase
+        .from('Member')
+        .select('id, sponsorId')
+        .eq('id', rId)
+        .maybeSingle();
+      if (!ref || (ref as { sponsorId?: string | null }).sponsorId !== sellerForRef) {
+        const { error, status } = toErrorEnvelope(
+          'VALIDATION_ERROR',
+          'The selected referrer must be one of the seller’s direct referrals.',
+          400,
+        );
+        res.status(status).json({ error });
+        return;
+      }
+      // Normalize to the canonical id/name; also sync referrerName.
+      const { data: full } = await supabase
+        .from('Member')
+        .select('firstName, lastName, name')
+        .eq('id', rId)
+        .maybeSingle();
+      const fn = (full as { firstName?: string; lastName?: string; name?: string } | null) ?? null;
+      const canonical = fn
+        ? `${(fn.firstName ?? '').trim()} ${(fn.lastName ?? '').trim()}`.trim() ||
+          String(fn.name ?? '').trim()
+        : '';
+      if (canonical) patch.referrerName = canonical;
+    } else {
+      patch.referrerId = null;
+      patch.referrerName = null;
+    }
   }
   if (patch.customerId !== undefined) {
     const { data: customer } = await supabase
@@ -234,7 +275,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       res.status(status).json({ error });
       return;
     }
-    const parsedQual = saleSchema.safeParse(mapSaleRow(outcome.sale as Record<string, unknown>));
+    // Defensive unwrap: older function versions returned {"sale":{"to_jsonb":{...}}}.
+    const rawSale =
+      (outcome.sale as Record<string, unknown> & { to_jsonb?: Record<string, unknown> })
+        ?.to_jsonb ?? outcome.sale;
+    const parsedQual = saleSchema.safeParse(mapSaleRow(rawSale as Record<string, unknown>));
     if (!parsedQual.success) {
       const { error, status } = toErrorEnvelope('INTERNAL', 'Stored sale failed validation', 500);
       res.status(status).json({ error });

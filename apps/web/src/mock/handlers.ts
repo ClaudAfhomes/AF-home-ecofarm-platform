@@ -154,6 +154,7 @@ function toSale(sale: MockSale): Sale {
     approvedAt: sale.approvedAt,
     paymentVerifiedAt: sale.paymentVerifiedAt,
     lockedAt: sale.lockedAt,
+    referrerId: (sale as { referrerId?: string }).referrerId,
     referrerName: sale.referrerName,
   };
 }
@@ -1477,6 +1478,20 @@ export function memberMockHandlers(store: MockStore): MockRoute[] {
         const price = (property as { price?: string }).price ?? property.value;
         if (!price || price === '0.00')
           return validationError('This property is not available in the catalog.');
+        const referrerId = parsed.data.referrerId;
+        let referrerName: string | undefined;
+        if (referrerId !== undefined) {
+          const refMember = store.members.find(
+            (m) => m.id === referrerId && m.sponsorId === member.id,
+          );
+          if (!refMember)
+            return error(
+              'VALIDATION_ERROR',
+              'The selected referrer must be one of your direct referrals.',
+              400,
+            );
+          referrerName = `${refMember.firstName} ${refMember.lastName}`;
+        }
         const sale: MockSale = {
           id: `sal-${String(store.nextSaleId).padStart(3, '0')}`,
           sellerId: member.id,
@@ -1489,9 +1504,8 @@ export function memberMockHandlers(store: MockStore): MockRoute[] {
           customerName: customer.fullName,
           resubmissionCount: 0,
           submittedAt: new Date().toISOString(),
-          ...(parsed.data.referrerName !== undefined
-            ? { referrerName: parsed.data.referrerName }
-            : {}),
+          ...(referrerId !== undefined ? { referrerId } : {}),
+          ...(referrerName !== undefined ? { referrerName } : {}),
         };
         store.nextSaleId += 1;
         store.sales.push(sale);
@@ -1552,6 +1566,22 @@ export function memberMockHandlers(store: MockStore): MockRoute[] {
         sale.propertyId = property.id;
         sale.propertyName = property.name;
         sale.propertyValue = price;
+        if (parsed.data.referrerId !== undefined) {
+          const refM = store.members.find(
+            (m) => m.id === parsed.data.referrerId && m.sponsorId === member.id,
+          );
+          if (!refM)
+            return error(
+              'VALIDATION_ERROR',
+              'The selected referrer must be one of your direct referrals.',
+              400,
+            );
+          sale.referrerId = refM.id;
+          sale.referrerName = `${refM.firstName} ${refM.lastName}`;
+        } else {
+          sale.referrerId = undefined;
+          sale.referrerName = undefined;
+        }
         sale.resubmissionCount += 1;
         sale.status = 'SUBMITTED' as SaleStatus;
         sale.rejectionReason = undefined;

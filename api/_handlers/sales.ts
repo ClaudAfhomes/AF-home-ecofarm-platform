@@ -165,6 +165,38 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     `${memberRow.firstName ?? ''} ${memberRow.lastName ?? ''}`.trim() ||
     String(memberRow.name ?? '');
   const now = new Date().toISOString();
+  let referrerName: string | undefined;
+  let referrerId: string | undefined;
+  if (parsed.data.referrerId !== undefined) {
+    const { data: referrer } = await supabase
+      .from('Member')
+      .select('id, firstName, lastName, name, sponsorId, accountStatus, isQualified')
+      .eq('id', parsed.data.referrerId)
+      .maybeSingle();
+    const r = referrer as {
+      id?: string;
+      firstName?: string;
+      lastName?: string;
+      name?: string;
+      sponsorId?: string | null;
+      accountStatus?: string;
+      isQualified?: boolean;
+    } | null;
+    if (!r || r.sponsorId !== auth.userId) {
+      const { error, status } = toErrorEnvelope(
+        'VALIDATION_ERROR',
+        'The selected referrer must be one of your direct referrals.',
+        400,
+      );
+      res.status(status).json({ error });
+      return;
+    }
+    referrerName =
+      `${(r.firstName ?? '').trim()} ${(r.lastName ?? '').trim()}`.trim() ||
+      String(r.name ?? '').trim() ||
+      undefined;
+    referrerId = r.id;
+  }
   const sale = {
     id: prefixedId('sal'),
     status: 'SUBMITTED',
@@ -177,7 +209,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     sellerName,
     submittedAt: now,
     resubmissionCount: 0,
-    ...(parsed.data.referrerName !== undefined ? { referrerName: parsed.data.referrerName } : {}),
+    ...(referrerId !== undefined ? { referrerId } : {}),
+    ...(referrerName !== undefined ? { referrerName } : {}),
   };
   const { error: insertError } = await supabase.from('Sale').insert(sale);
   if (insertError) {

@@ -135,6 +135,36 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return;
   }
   const now = new Date().toISOString();
+  let patchReferrerName: string | undefined;
+  let patchReferrerId: string | undefined;
+  if (parsed.data.referrerId !== undefined) {
+    const { data: referrer } = await supabase
+      .from('Member')
+      .select('id, firstName, lastName, name, sponsorId')
+      .eq('id', parsed.data.referrerId)
+      .maybeSingle();
+    const rr = referrer as {
+      id?: string;
+      firstName?: string;
+      lastName?: string;
+      name?: string;
+      sponsorId?: string | null;
+    } | null;
+    if (!rr || rr.sponsorId !== auth.userId) {
+      const { error, status } = toErrorEnvelope(
+        'VALIDATION_ERROR',
+        'The selected referrer must be one of your direct referrals.',
+        400,
+      );
+      res.status(status).json({ error });
+      return;
+    }
+    patchReferrerName =
+      `${(rr.firstName ?? '').trim()} ${(rr.lastName ?? '').trim()}`.trim() ||
+      String(rr.name ?? '').trim() ||
+      undefined;
+    patchReferrerId = rr.id;
+  }
   const patch: Record<string, unknown> = {
     customerId: parsed.data.customerId,
     customerName: (customer as { name: string }).name,
@@ -146,7 +176,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     rejectionReason: null,
     submittedAt: now,
     updatedAt: now,
-    ...(parsed.data.referrerName !== undefined ? { referrerName: parsed.data.referrerName } : {}),
+    ...(parsed.data.referrerId !== undefined
+      ? { referrerId: patchReferrerId ?? null, referrerName: patchReferrerName ?? null }
+      : {}),
   };
   if (outcome.status === 'LOCKED') patch.lockedAt = now;
   const { data: updated, error: writeError } = await supabase

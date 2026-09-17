@@ -38,16 +38,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.status(status).json({ error: env });
     return;
   }
-  // Pending commission estimate: own open sales x direct rate + downline open sales x referral rate.
+  // Pending commission estimate: own open sales x direct rate + referred sales x referral rate.
   let pendingCommission = '0.00';
   try {
-    const [rateRows, ownSales, downlineMembers] = await Promise.all([
+    const [rateRows, ownSales, referredSales] = await Promise.all([
       supabase
         .from('SystemConfig')
         .select('key,value')
         .in('key', ['COMMISSION_DIRECT_RATE', 'COMMISSION_REFERRAL_RATE']),
       supabase.from('Sale').select('propertyValue,status').eq('sellerId', auth.userId),
-      supabase.from('Member').select('id').eq('sponsorId', auth.userId),
+      supabase.from('Sale').select('propertyValue,status').eq('referrerId', auth.userId),
     ]);
     const rateByKey: Record<string, string> = {};
     for (const r of ((rateRows as { data?: { key: string; value: string }[] | null })?.data ??
@@ -58,20 +58,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       status: unknown;
       propertyValue: unknown;
     }[];
-    let downlineRows: { status: unknown; propertyValue: unknown }[] = [];
-    const downIds = ((downlineMembers as { data?: { id: string }[] | null })?.data ?? [])
-      .map((m) => m.id)
-      .filter(Boolean);
-    if (downIds.length > 0) {
-      const { data: dlSales } = (await supabase
-        .from('Sale')
-        .select('propertyValue,status')
-        .in('sellerId', downIds)) as { data?: unknown[] | null };
-      downlineRows = (dlSales ?? []) as { status: unknown; propertyValue: unknown }[];
-    }
+    const referredRows = ((referredSales as { data?: unknown[] | null })?.data ?? []) as {
+      status: unknown;
+      propertyValue: unknown;
+    }[];
     pendingCommission = sumPendingCommission({
       ownSales: ownRows,
-      downlineSales: downlineRows,
+      referredSales: referredRows,
       directRate: rateByKey.COMMISSION_DIRECT_RATE,
       referralRate: rateByKey.COMMISSION_REFERRAL_RATE,
     });

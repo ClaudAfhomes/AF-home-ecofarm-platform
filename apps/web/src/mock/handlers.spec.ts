@@ -130,12 +130,13 @@ describe('F1 member mock API', () => {
     expect(sale.resubmissionCount).toBe(0);
   });
 
-  it('stores and returns an optional referrer name snapshot (SCR-MEM-006)', async () => {
+  it('stores and returns an optional referrer (members only, SCR-MEM-006)', async () => {
     setMockSessionUser(MOCK_MEMBER);
     const sale = await submitSale(
-      { customerId: 'cus-001', propertyId: 'igp-250-sqm-farm-lot', referrerName: 'Maria Santos' },
+      { customerId: 'cus-001', propertyId: 'igp-250-sqm-farm-lot', referrerId: 'mem-002' },
       'idem-wdr-referrer',
     );
+    expect(sale.referrerId).toBe('mem-002');
     expect(sale.referrerName).toBe('Maria Santos');
     const fetched = await getSale(sale.id);
     expect(fetched.referrerName).toBe('Maria Santos');

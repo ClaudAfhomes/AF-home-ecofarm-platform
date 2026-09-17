@@ -4,7 +4,8 @@ import { addMoney, multiplyMoney } from '@jad/shared';
  * Estimate pending commission for a member from open sales.
  * A sale is "pending" when its status is SUBMITTED, ADMIN_APPROVED, or
  * PAYMENT_VERIFIED. Direct commission = own sales x direct rate; referral =
- * direct-downline sales x referral rate. Exact-decimal BigInt math, never floats.
+ * sales where the member is the selected referrer x referral rate.
+ * Exact-decimal BigInt math, never floats.
  */
 const PENDING_SALE_STATUSES = new Set(['SUBMITTED', 'ADMIN_APPROVED', 'PAYMENT_VERIFIED']);
 
@@ -22,12 +23,12 @@ function isValidRate(value: unknown): boolean {
 
 export function sumPendingCommission(params: {
   ownSales: { status: unknown; propertyValue: unknown }[];
-  downlineSales: { status: unknown; propertyValue: unknown }[];
+  referredSales: { status: unknown; propertyValue: unknown }[];
   directRate: string | null | undefined;
   referralRate: string | null | undefined;
 }): string {
   let total = '0.00';
-  const { ownSales, downlineSales, directRate, referralRate } = params;
+  const { ownSales, referredSales, directRate, referralRate } = params;
 
   if (directRate && isValidRate(directRate)) {
     for (const s of ownSales) {
@@ -37,7 +38,7 @@ export function sumPendingCommission(params: {
     }
   }
   if (referralRate && isValidRate(referralRate)) {
-    for (const s of downlineSales) {
+    for (const s of referredSales) {
       if (!isPendingSale(s.status)) continue;
       if (!isValidAmount(s.propertyValue)) continue;
       total = addMoney(total, multiplyMoney(s.propertyValue as string, referralRate));

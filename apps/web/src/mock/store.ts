@@ -108,7 +108,8 @@ export interface MockSale {
   approvedAt?: string;
   paymentVerifiedAt?: string;
   lockedAt?: string;
-  /** Optional referrer name snapshot (direct referral pick or free text). */
+  referrerId?: string;
+  /** Snapshot of the member who referred this customer (members only). */
   referrerName?: string;
 }
 

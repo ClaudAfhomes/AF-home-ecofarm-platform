@@ -6,29 +6,40 @@ import handler from './sales.js';
 
 /**
  * GET own sales / POST submit (Idempotency-Key, qualified-only). These specs
- * pin the referrer-name snapshot (chosen from direct referrals or typed
- * free-form): the POST persists it when supplied, omits it otherwise, and the
- * GET round-trips it. Supabase is fully mocked.
+ * pin the referrerId (members only): the POST persists it when the referrer
+ * is a direct referral, rejects otherwise, and the GET round-trips it.
+ * Supabase is fully mocked.
  */
 const mocks = vi.hoisted(() => {
   const calls: { table: string; op: string; arg?: unknown }[] = [];
   const script = {
     member: null as unknown,
+    referrer: null as unknown,
     customer: null as unknown,
     catalog: null as unknown,
     replay: null as unknown,
     sales: [] as Record<string, unknown>[],
   };
   const chainFor = (table: string) => {
+    const lastEq: Record<string, unknown> = {};
     const chain: Record<string, (...a: never[]) => unknown> = {};
     chain.select = () => chain;
-    chain.eq = () => chain;
+    chain.eq = (col: string, val: unknown) => {
+      lastEq[col] = val;
+      return chain;
+    };
     chain.order = async () => {
       if (table === 'Sale') return { data: script.sales, error: null };
       return { data: [], error: null };
     };
     chain.maybeSingle = async () => {
-      if (table === 'Member') return { data: script.member, error: null };
+      if (table === 'Member') {
+        // Referrer lookup (id = referrerId) vs seller lookup (id = sellerId).
+        if (lastEq.id && script.referrer && (script.referrer as { id?: string }).id === lastEq.id) {
+          return { data: script.referrer, error: null };
+        }
+        return { data: script.member, error: null };
+      }
       if (table === 'Customer') return { data: script.customer, error: null };
       if (table === 'cms_contents') return { data: { content: script.catalog }, error: null };
       if (table === 'IdempotencyKey') return { data: script.replay, error: null };
@@ -113,6 +124,7 @@ describe('POST /sales referrer snapshot', () => {
     vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'service');
     mocks.calls.length = 0;
     mocks.script.member = QUALIFIED_MEMBER;
+    mocks.script.referrer = null;
     mocks.script.customer = CUSTOMER;
     mocks.script.catalog = CATALOG;
     mocks.script.replay = null;
@@ -138,28 +150,52 @@ describe('POST /sales referrer snapshot', () => {
     expect(seen.status).toBe(400);
   });
 
-  it('persists an optional referrer name snapshot on submit', async () => {
+  it('persists an optional referrerId snapshot on submit', async () => {
+    mocks.script.referrer = {
+      id: 'mem-ref-1',
+      firstName: 'Maria',
+      lastName: 'Santos',
+      name: 'Maria Santos',
+      sponsorId: 'mem-uuid-1',
+    };
     const { res, seen } = capture();
     await handler(
-      postReq({ customerId: 'cus-1', propertyId: 'prop-1', referrerName: 'Maria Santos' }, 'k2'),
+      postReq({ customerId: 'cus-1', propertyId: 'prop-1', referrerId: 'mem-ref-1' }, 'k2'),
       res,
     );
     expect(seen.status).toBe(201);
-    expect(seen.body).toMatchObject({ referrerName: 'Maria Santos' });
+    expect(seen.body).toMatchObject({ referrerId: 'mem-ref-1', referrerName: 'Maria Santos' });
     const insert = mocks.calls.find((c) => c.table === 'Sale')?.arg as Record<string, unknown>;
+    expect(insert.referrerId).toBe('mem-ref-1');
     expect(insert.referrerName).toBe('Maria Santos');
   });
 
-  it('omits referrerName when not supplied', async () => {
+  it('rejects a non-direct referrer', async () => {
+    mocks.script.referrer = {
+      id: 'mem-ref-1',
+      firstName: 'Maria',
+      lastName: 'Santos',
+      sponsorId: 'someone-else',
+    };
+    const { res, seen } = capture();
+    await handler(
+      postReq({ customerId: 'cus-1', propertyId: 'prop-1', referrerId: 'mem-ref-1' }, 'k2b'),
+      res,
+    );
+    expect(seen.status).toBe(400);
+  });
+
+  it('omits referrer when not supplied', async () => {
     const { res, seen } = capture();
     await handler(postReq({ customerId: 'cus-1', propertyId: 'prop-1' }, 'k3'), res);
     expect(seen.status).toBe(201);
     const insert = mocks.calls.find((c) => c.table === 'Sale')?.arg as Record<string, unknown>;
+    expect(insert).not.toHaveProperty('referrerId');
     expect(insert).not.toHaveProperty('referrerName');
-    expect(seen.body).not.toHaveProperty('referrerName');
+    expect(seen.body).not.toHaveProperty('referrerId');
   });
 
-  it('GET round-trips the referrer name snapshot', async () => {
+  it('GET round-trips the referrer snapshot', async () => {
     mocks.script.sales = [
       {
         id: 'sal-1',
@@ -173,6 +209,7 @@ describe('POST /sales referrer snapshot', () => {
         sellerName: 'Juan Dela Cruz',
         submittedAt: '2026-08-18T09:00:00.000Z',
         resubmissionCount: 0,
+        referrerId: 'mem-ref-1',
         referrerName: 'Maria Santos',
       },
     ];
@@ -180,6 +217,6 @@ describe('POST /sales referrer snapshot', () => {
     await handler(getReq(), res);
     expect(seen.status).toBe(200);
     const data = (seen.body as { data: Record<string, unknown>[] }).data;
-    expect(data[0]).toMatchObject({ referrerName: 'Maria Santos' });
+    expect(data[0]).toMatchObject({ referrerId: 'mem-ref-1', referrerName: 'Maria Santos' });
   });
 });
