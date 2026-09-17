@@ -742,14 +742,15 @@ export function memberMockHandlers(store: MockStore): MockRoute[] {
       handler: () => {
         const member = currentMember(store);
         if (!member) return unauthorized();
-        return ok(
-          store.wallets[member.id] ?? {
-            availableBalance: '0.00',
-            pendingAmount: '0.00',
-            totalWithdrawals: '0.00',
-            totalEarned: '0.00',
-          },
-        );
+        const wallet = store.wallets[member.id];
+        if (wallet) return ok(wallet);
+        return ok({
+          availableBalance: '0.00',
+          pendingAmount: '0.00',
+          pendingCommission: '0.00',
+          totalWithdrawals: '0.00',
+          totalEarned: '0.00',
+        });
       },
     },
     {

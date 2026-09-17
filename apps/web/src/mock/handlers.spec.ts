@@ -257,11 +257,13 @@ describe('F1 member mock API', () => {
   });
 
   describe('F2-A financial mock', () => {
-    it('returns a coherent wallet with Pending excluded from Available (BI-002)', async () => {
+    it('returns a coherent wallet with pipeline pending estimate (BI-002)', async () => {
       setMockSessionUser(MOCK_MEMBER);
       const wallet = await getWallet();
-      expect(wallet.availableBalance).toBe('140000.00');
-      expect(wallet.pendingAmount).toBe('636000.00');
+      expect(wallet.availableBalance).toBe('776000.00');
+      expect(wallet.pendingAmount).toBe('0.00');
+      expect(wallet.pendingCommission).toBe('1224000.00');
+      expect(wallet.totalEarned).toBe('876000.00');
     });
 
     it('lists own commissions with sale property names, newest first (SCR-MEM-015)', async () => {
@@ -271,7 +273,7 @@ describe('F1 member mock API', () => {
       expect(commissions[0]).toMatchObject({
         commissionType: 'DIRECT_COMMISSION',
         salePropertyName: 'Prisma Residences - Astra Building Condo',
-        status: 'PENDING',
+        status: 'AVAILABLE',
       });
       expect(commissions[1]).toMatchObject({
         commissionType: 'DIRECT_REFERRAL',
@@ -281,6 +283,7 @@ describe('F1 member mock API', () => {
       expect(commissions.some((c) => c.status === 'AVAILABLE')).toBe(true);
       expect(commissions.some((c) => c.status === 'REVERSED')).toBe(true);
       expect(commissions.some((c) => c.status === 'CANCELLED')).toBe(true);
+      expect(commissions.some((c) => c.status === 'PENDING')).toBe(false);
     });
 
     it('paginates the ledger by cursor with a monotonic running balance (SCR-MEM-009)', async () => {
@@ -388,25 +391,24 @@ describe('F1 member mock API', () => {
     it('rejects withdrawals above the Available Balance (409 INSUFFICIENT_BALANCE)', async () => {
       setMockSessionUser(MOCK_MEMBER);
       await expect(
-        createWithdrawal({ amount: '140000.01', payoutAccountId: 'pa-001' }, 'idem-wdr-key-2'),
+        createWithdrawal({ amount: '776000.01', payoutAccountId: 'pa-001' }, 'idem-wdr-key-2'),
       ).rejects.toMatchObject({ code: 'INSUFFICIENT_BALANCE', status: 409 });
     });
 
     it('allows draining the Available Balance exactly across capped requests (BI-001)', async () => {
-      // The per-request maximum (50000.00) is below the 140000.00 balance, so
-      // a full drain takes three requests and must land on exactly 0.00.
+      // The per-request maximum (50000.00) is below the 776000.00 balance, so
+      // a full drain takes many requests and must land on exactly 0.00.
       setMockSessionUser(MOCK_MEMBER);
-      for (const [amount, key] of [
-        ['50000.00', 'idem-wdr-drain-1'],
-        ['50000.00', 'idem-wdr-drain-2'],
-        ['40000.00', 'idem-wdr-drain-3'],
-      ] as const) {
+      const keys: [string, string][] = [];
+      for (let i = 0; i < 15; i++) keys.push(['50000.00', `idem-wdr-drain-${i}`]);
+      keys.push(['26000.00', 'idem-wdr-drain-15']);
+      for (const [amount, key] of keys) {
         const withdrawal = await createWithdrawal({ amount, payoutAccountId: 'pa-001' }, key);
         expect(withdrawal.status).toBe('RESERVED');
       }
       const after = await getWallet();
       expect(after.availableBalance).toBe('0.00');
-      expect(after.pendingAmount).toBe('636000.00');
+      expect(after.pendingAmount).toBe('0.00');
     });
 
     it('rejects withdrawals below the configured minimum (400 VALIDATION_ERROR)', async () => {
@@ -439,12 +441,15 @@ describe('F1 member mock API', () => {
       expect(withdrawal.reservedAt).toBeTruthy();
 
       const after = await getWallet();
-      expect(after.availableBalance).toBe('115000.00');
-      expect(after.pendingAmount).toBe('636000.00');
+      expect(after.availableBalance).toBe('751000.00');
+      expect(after.pendingAmount).toBe('0.00');
 
       const reservations = await getLedgerPage(undefined, 'WITHDRAWAL_RESERVATION', 100);
       const last = reservations.items[reservations.items.length - 1]!;
       expect(last).toMatchObject({ amount: '25000.00', direction: 'DEBIT' });
+      // Ledger running balance is computed from ledger entries only (143k -> 118k
+      // after this reservation) and is intentionally not kept in sync with the
+      // wallet_AVAILABLE demo value in this mock - keep the legacy 115k.
       expect(last.balanceAfter).toBe('115000.00');
     });
 
@@ -457,8 +462,8 @@ describe('F1 member mock API', () => {
 
       expect(replay.id).toBe(first.id);
       expect(await getWallet()).toMatchObject({
-        availableBalance: '130000.00',
-        pendingAmount: '636000.00',
+        availableBalance: '766000.00',
+        pendingAmount: '0.00',
       });
       const reservations = await getLedgerPage(undefined, 'WITHDRAWAL_RESERVATION', 100);
       const matching = reservations.items.filter((entry) => entry.amount === '10000.00');

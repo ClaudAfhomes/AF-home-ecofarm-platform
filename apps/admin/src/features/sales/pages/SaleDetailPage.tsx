@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -73,6 +73,7 @@ export function SaleDetailPage() {
   const [copied, setCopied] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const inFlight = useRef(false);
 
   const currentStatus =
     (localStatus as typeof data extends { status: infer S } ? S : string) ?? data?.status;
@@ -94,6 +95,8 @@ export function SaleDetailPage() {
     rejectionReason?: string,
   ): Promise<boolean> => {
     if (!data) return false;
+    if (inFlight.current) return false;
+    inFlight.current = true;
     setActionPending(true);
     setActionError(null);
     try {
@@ -108,22 +111,23 @@ export function SaleDetailPage() {
       return false;
     } finally {
       setActionPending(false);
+      inFlight.current = false;
     }
   };
 
   const handleApprove = async () => {
-    await runTransition('ADMIN_APPROVED');
-    setShowApproveConfirm(false);
+    const ok = await runTransition('ADMIN_APPROVED');
+    if (ok) setShowApproveConfirm(false);
   };
 
   const handleVerifyPayment = async () => {
-    await runTransition('PAYMENT_VERIFIED');
-    setShowVerifyConfirm(false);
+    const ok = await runTransition('PAYMENT_VERIFIED');
+    if (ok) setShowVerifyConfirm(false);
   };
 
   const handleQualify = async () => {
-    await runTransition('QUALIFYING_SALE');
-    setShowQualifyConfirm(false);
+    const ok = await runTransition('QUALIFYING_SALE');
+    if (ok) setShowQualifyConfirm(false);
   };
 
   const handleReject = async () => {
@@ -534,6 +538,8 @@ export function SaleDetailPage() {
                   message="This sale will move to Admin Approved and await payment verification."
                   confirmLabel="Approve"
                   cancelLabel="Cancel"
+                  confirmDisabled={actionPending}
+                  confirmLoading={actionPending}
                 />
                 <ConfirmDialog
                   open={showVerifyConfirm}
@@ -543,6 +549,8 @@ export function SaleDetailPage() {
                   message="Payment will be marked verified. Next step is to confirm as Qualifying Sale."
                   confirmLabel="Verify"
                   cancelLabel="Cancel"
+                  confirmDisabled={actionPending}
+                  confirmLoading={actionPending}
                 />
                 <ConfirmDialog
                   open={showQualifyConfirm}
@@ -552,6 +560,8 @@ export function SaleDetailPage() {
                   message="This sale will become a Qualifying Sale and generate commissions."
                   confirmLabel="Confirm"
                   cancelLabel="Cancel"
+                  confirmDisabled={actionPending}
+                  confirmLoading={actionPending}
                 />
               </div>
             )}

@@ -87,7 +87,10 @@ export function LoginPage() {
   const brandMark = globalCms?.brandMark ?? null;
   const { loginAs } = useSession();
   const navigate = useNavigate();
-  const location = useLocation();
+  // `from` is intentionally ignored for member login - always land on the
+  // member dashboard to prevent cross-account path leaks via history state.
+  // Admin logins still honor a saved /admin/* return path (cross-origin).
+  const locationForAdmin = useLocation() as { state?: { from?: string } | null };
   const [values, setValues] = useState<LoginValues>({ identifier: '', password: '' });
   const [errors, setErrors] = useState<LoginErrors>({});
   const [serverError, setServerError] = useState<string | undefined>();
@@ -95,7 +98,7 @@ export function LoginPage() {
   const identifierRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
 
-  const from = (location.state as { from?: string } | null)?.from ?? '/member';
+  const adminFrom = (locationForAdmin.state as { from?: string } | null)?.from ?? '';
 
   const setValue = (field: keyof LoginValues, value: string) => {
     setValues((current) => ({ ...current, [field]: value }));
@@ -292,16 +295,16 @@ export function LoginPage() {
           'http://localhost:5174/admin';
         const base = rawAdminUrl.replace(/\/$/, '');
         const adminBase = base.endsWith('/admin') ? base : `${base}/admin`;
-        const target = from.startsWith('/admin')
-          ? `${adminBase}${from.replace(/^\/admin/, '')}`
+        const target = adminFrom.startsWith('/admin')
+          ? `${adminBase}${adminFrom.replace(/^\/admin/, '')}`
           : adminBase;
         window.location.href = target;
         return;
       }
-      // user → Member App canonical entry is /member (keep /member/* legacy routes per Q3)
-      navigate(from.startsWith('/member') || from.startsWith('/user') ? from : '/member', {
-        replace: true,
-      });
+      // user → Member App always lands on the dashboard to prevent a
+      // previous member's history state (location.state.from) from leaking
+      // into the next login in the same tab.
+      navigate('/member', { replace: true });
     } catch (error) {
       setServerError(apiErrorMessage(error, 'Sign-in failed. Please try again shortly.'));
       setSubmitting(false);

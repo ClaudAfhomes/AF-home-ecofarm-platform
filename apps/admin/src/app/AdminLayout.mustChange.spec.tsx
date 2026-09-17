@@ -35,7 +35,13 @@ describe('AdminLayout mustChangePassword', () => {
       if (url.includes('/admin/')) requested.push(url);
       if (url.includes('/admin/roles')) return Response.json({ data: [], meta: {} });
       if (url.includes('/admin/queues'))
-        return Response.json({ registrations: 0, sales: 0, members: 0, withdrawals: 0 });
+        return Response.json({
+          registrations: 0,
+          sales: 0,
+          salesReadyToQualify: 0,
+          members: 0,
+          withdrawals: 0,
+        });
       return Response.json({ error: { code: 'NOT_FOUND' } }, { status: 404 });
     });
   });

@@ -124,6 +124,7 @@ export interface MockLedgerEntry {
 export interface MockWallet {
   availableBalance: string;
   pendingAmount: string;
+  pendingCommission?: string;
   totalWithdrawals?: string;
   totalEarned?: string;
 }
@@ -736,9 +737,11 @@ export function createMockStore(): MockStore {
     pendingAmount: string,
     totalWithdrawals?: string,
     totalEarned?: string,
+    pendingCommission?: string,
   ): MockWallet => ({
     availableBalance,
     pendingAmount,
+    pendingCommission,
     totalWithdrawals,
     totalEarned,
   });
@@ -898,8 +901,9 @@ export function createMockStore(): MockStore {
     },
   ];
 
-  // Commissions (mem-001) - created PENDING on qualification (BR-COM-005),
-  // become AVAILABLE after clearing, or CANCELLED/REVERSED per BR-CAN-001/002.
+  // Commissions (mem-001) - credited immediately on qualification (sale_qualify
+  // now clears inline); no PENDING state is produced. CANCELLED/REVERSED per
+  // BR-CAN-001/002 are still possible for reversals.
   const commissions: MockCommission[] = [
     {
       id: 'com-001',
@@ -933,7 +937,8 @@ export function createMockStore(): MockStore {
       baseValue: '5300000.00',
       rate: '0.0800',
       amount: '424000.00',
-      status: 'PENDING',
+      status: 'AVAILABLE',
+      clearedAt: iso(0),
       createdAt: iso(0),
     },
     {
@@ -944,7 +949,8 @@ export function createMockStore(): MockStore {
       baseValue: '5300000.00',
       rate: '0.0400',
       amount: '212000.00',
-      status: 'PENDING',
+      status: 'AVAILABLE',
+      clearedAt: iso(0),
       createdAt: iso(0),
     },
     {
@@ -1448,14 +1454,14 @@ export function createMockStore(): MockStore {
     customers,
     sales,
     wallets: {
-      'mem-001': wallet('140000.00', '636000.00', '125000.00', '240000.00'),
-      'mem-002': wallet('0.00', '0.00', '0.00', '0.00'),
-      'mem-003': wallet('0.00', '0.00', '0.00', '0.00'),
-      'mem-004': wallet('0.00', '0.00', '0.00', '0.00'),
-      'mem-005': wallet('0.00', '0.00', '0.00', '0.00'),
-      'mem-006': wallet('0.00', '0.00', '0.00', '0.00'),
-      'mem-007': wallet('0.00', '0.00', '0.00', '0.00'),
-      'mem-008': wallet('0.00', '0.00', '0.00', '0.00'),
+      'mem-001': wallet('776000.00', '0.00', '125000.00', '876000.00', '1224000.00'),
+      'mem-002': wallet('0.00', '0.00', '0.00', '0.00', '0.00'),
+      'mem-003': wallet('0.00', '0.00', '0.00', '0.00', '0.00'),
+      'mem-004': wallet('0.00', '0.00', '0.00', '0.00', '0.00'),
+      'mem-005': wallet('0.00', '0.00', '0.00', '0.00', '0.00'),
+      'mem-006': wallet('0.00', '0.00', '0.00', '0.00', '0.00'),
+      'mem-007': wallet('0.00', '0.00', '0.00', '0.00', '0.00'),
+      'mem-008': wallet('0.00', '0.00', '0.00', '0.00', '0.00'),
     },
     ledger,
     commissions,

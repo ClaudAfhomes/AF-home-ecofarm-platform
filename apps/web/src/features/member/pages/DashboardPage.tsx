@@ -33,7 +33,6 @@ import {
   formatDate,
   memberStatusLabel,
   saleStatusLabel,
-  sumPendingCommissions,
 } from '../lib/presentation';
 import styles from './DashboardPage.module.css';
 
@@ -95,12 +94,9 @@ export function DashboardPage() {
     () => (salesQuery.data ?? []).slice(0, RECENT_SALES_LIMIT),
     [salesQuery.data],
   );
-  // Pending Commissions = PENDING-status commissions in clearing - NOT the
-  // wallet's pendingAmount (reserved withdrawal funds). Exact-decimal sum.
-  const pendingCommissions = useMemo(
-    () => sumPendingCommissions(commissionsQuery.data),
-    [commissionsQuery.data],
-  );
+  // Pending is the server-computed pipeline estimate (open sales x rates),
+  // not the sum of PENDING commissions (commissions now credit instantly).
+  const pendingCommissions = wallet?.pendingCommission ?? '0.00';
   const genealogyRows = useMemo(() => {
     const root = genealogyQuery.data?.root;
     if (!root) return [];
@@ -200,7 +196,7 @@ export function DashboardPage() {
               </div>
               <span className={styles.financialValue}>{formatMoney(pendingCommissions)}</span>
               <span className={styles.financialHint}>
-                Clears to Available after 7-day clearing period (BI-002, BR-COM-007)
+                Awaiting admin approval of submitted sales
               </span>
             </div>
 

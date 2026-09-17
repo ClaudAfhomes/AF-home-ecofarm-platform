@@ -25,6 +25,7 @@ export function zeroWallet() {
   return {
     availableBalance: '0.00',
     pendingAmount: '0.00',
+    pendingCommission: '0.00',
     totalWithdrawals: '0.00',
     totalEarned: '0.00',
   };

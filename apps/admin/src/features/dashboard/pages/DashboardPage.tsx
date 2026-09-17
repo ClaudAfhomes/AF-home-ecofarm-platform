@@ -23,10 +23,10 @@ const QUEUE_LINKS: {
   },
   {
     to: '/admin/sales',
-    label: 'Sales',
-    key: 'sales',
+    label: 'Sales ready to qualify',
+    key: 'salesReadyToQualify',
     icon: 'check',
-    description: 'Sales submissions and approvals',
+    description: 'Payment-verified sales awaiting qualification',
   },
   {
     to: '/admin/withdrawals',

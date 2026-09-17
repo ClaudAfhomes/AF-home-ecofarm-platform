@@ -6,7 +6,11 @@ import { EWalletPage } from './EWalletPage';
 import { renderMember } from '../test/utils';
 import { mockFetchNetworkError, mockFetchRoutes } from '../../../test/utils';
 
-const WALLET = { availableBalance: '140000.00', pendingAmount: '636000.00' };
+const WALLET = {
+  availableBalance: '140000.00',
+  pendingAmount: '636000.00',
+  pendingCommission: '424000.00',
+};
 const PAYOUT_ACCOUNTS = {
   data: [
     {
@@ -35,17 +39,6 @@ const COMMISSIONS = {
       status: 'AVAILABLE',
       createdAt: '2026-08-16T00:00:00.000Z',
     },
-    {
-      id: 'com-003',
-      commissionType: 'DIRECT_COMMISSION',
-      saleId: 'sal-007',
-      salePropertyName: 'Farm Lot',
-      baseValue: '5300000.00',
-      rate: '0.0800',
-      amount: '424000.00',
-      status: 'PENDING',
-      createdAt: '2026-08-20T00:00:00.000Z',
-    },
   ],
   meta: {},
 };
@@ -60,8 +53,7 @@ describe('member EWalletPage', () => {
     renderMember(<EWalletPage />, { user: MOCK_MEMBER });
 
     expect(await screen.findByText('₱140,000.00')).toBeInTheDocument();
-    // Pending card = PENDING commissions (424000.00), not the wallet's
-    // pendingAmount (636000.00, reserved withdrawals) - must match dashboard.
+    // Pending card = wallet.pendingCommission (pipeline), not commissions.
     expect(screen.getByText('₱424,000.00')).toBeInTheDocument();
     expect(screen.queryByText('₱636,000.00')).not.toBeInTheDocument();
     expect(screen.getByText('Pending')).toBeInTheDocument();

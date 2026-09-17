@@ -429,8 +429,7 @@ export function SaleDetailPage() {
           ) : null}
           {sale.status === 'QUALIFYING_SALE' ? (
             <Alert variant="success" title="Qualifying sale">
-              This sale is qualifying - commission was created as Pending and will become Available
-              after the 7-day clearing period.{' '}
+              This sale is qualifying - commission has been credited to your Available Balance.{' '}
               <Link className={styles.inlineLink} to="/member/commissions">
                 View commissions
               </Link>

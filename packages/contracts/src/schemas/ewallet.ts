@@ -11,8 +11,10 @@ import { exactDecimalStringSchema } from './money.js';
 export const walletSchema = z.object({
   /** Available Balance - never negative (BI-001). */
   availableBalance: exactDecimalStringSchema,
-  /** Sum of PENDING commissions - excluded from Available (BI-002, BR-WAL-003). */
+  /** Sum of PENDING commissions - legacy field (reserved/withdrawal). */
   pendingAmount: exactDecimalStringSchema,
+  /** Estimated commission awaiting qualification (SUBMITTED/ADMIN_APPROVED/PAYMENT_VERIFIED). */
+  pendingCommission: exactDecimalStringSchema.optional(),
   /** Total amount of completed/reserved withdrawals - server-computed aggregate. */
   totalWithdrawals: exactDecimalStringSchema.optional(),
   /** Ledger-defined total earned - server-computed aggregate (BR-RPT-003). */

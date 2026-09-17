@@ -35,6 +35,10 @@ export function validateSaleTransition(
   patch: { status?: string; rejectionReason?: string },
 ): string | null {
   if (patch.status === undefined) return null;
+  // Same-status is an idempotent no-op (e.g. re-PATCH QUALIFYING_SALE to
+  // trigger a missing referral, or a field-edit that resends the current
+  // status). Never error on it - the handler/DB function decide what to do.
+  if (patch.status === currentStatus) return null;
   const allowed = SALE_TRANSITIONS[currentStatus] ?? [];
   if (!allowed.includes(patch.status)) {
     return `Cannot transition sale from ${currentStatus} to ${patch.status}.`;

@@ -228,10 +228,9 @@ export function contentKindLabel(kind: ContentKind): string {
 }
 
 /**
- * Pending-commissions total shared by the dashboard card and the eWallet
- * card: PENDING-status commissions in clearing. NOT the wallet's
- * pendingAmount (reserved withdrawal funds) - the two must never be mixed.
- * Exact-decimal sum; unknown shapes fall back to '0.00' via the caller.
+ * Legacy helper: sums PENDING commissions in clearing. Kept for the commissions
+ * list detail; the dashboard/eWallet pending card now uses the server-computed
+ * `wallet.pendingCommission` pipeline estimate (open sales x rates), not this.
  */
 export function sumPendingCommissions(commissions: readonly Commission[] | undefined): string {
   return (commissions ?? [])

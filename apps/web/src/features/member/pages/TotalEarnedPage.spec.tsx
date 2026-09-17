@@ -25,12 +25,12 @@ describe('member TotalEarnedPage', () => {
 
     // Final static figure - no dev preview markers
     expect(await screen.findByRole('status', { name: 'Total earned' })).toBeInTheDocument();
-    expect(screen.getByText('₱240,000.00')).toBeInTheDocument();
+    expect(screen.getByText('₱876,000.00')).toBeInTheDocument();
     expect(screen.getByText('Lifetime earnings')).toBeInTheDocument();
     expect(
-      screen.getByText(/Ledger-defined total based on cleared commissions/),
+      screen.getByText(/Ledger-defined total based on credited commissions/),
     ).toBeInTheDocument();
-    expect(screen.getByText(/Pending amounts are excluded/)).toBeInTheDocument();
+    expect(screen.getByText(/Pending estimates are excluded/)).toBeInTheDocument();
     expect(screen.queryByText(/Illustrative/)).not.toBeInTheDocument();
     expect(screen.queryByText(/Requires approval/)).not.toBeInTheDocument();
     expect(screen.queryByText(/BR-RPT-003/)).not.toBeInTheDocument();

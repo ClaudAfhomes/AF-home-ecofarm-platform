@@ -64,8 +64,8 @@ export function TotalEarnedPage() {
           </p>
           <p className={styles.figureLabel}>Lifetime earnings</p>
           <p className={styles.figureHint}>
-            Ledger-defined total based on cleared commissions and referral earnings. Pending amounts
-            are excluded.
+            Ledger-defined total based on credited commissions and referral earnings. Pending
+            estimates are excluded.
           </p>
         </div>
       ) : (
@@ -76,7 +76,8 @@ export function TotalEarnedPage() {
           </p>
           <p className={styles.figureLabel}>No earnings yet</p>
           <p className={styles.figureHint}>
-            Earnings appear here once commissions clear. Pending amounts are not included.
+            Earnings appear here once sales are approved and commissions credited. Pending estimates
+            are not included.
           </p>
         </div>
       )}

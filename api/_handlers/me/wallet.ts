@@ -3,6 +3,7 @@ import { walletSchema } from '@jad/contracts';
 import { verifyUser } from '../../_lib/auth.js';
 import type { VercelRequest, VercelResponse } from '../../_lib/http.js';
 import { isValidWalletRow, zeroWallet } from '../../_lib/money.js';
+import { sumPendingCommission } from '../../_lib/pending-commission.js';
 import { methodNotAllowed, requireService } from '../../_lib/rest.js';
 import { toErrorEnvelope } from '../../_lib/envelope.js';
 
@@ -37,9 +38,52 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.status(status).json({ error: env });
     return;
   }
-  const wallet = data ?? zeroWallet();
-  const parsed = walletSchema.safeParse(wallet);
-  if (!parsed.success || !isValidWalletRow(wallet as Record<string, unknown>)) {
+  // Pending commission estimate: own open sales x direct rate + downline open sales x referral rate.
+  let pendingCommission = '0.00';
+  try {
+    const [rateRows, ownSales, downlineMembers] = await Promise.all([
+      supabase
+        .from('SystemConfig')
+        .select('key,value')
+        .in('key', ['COMMISSION_DIRECT_RATE', 'COMMISSION_REFERRAL_RATE']),
+      supabase.from('Sale').select('propertyValue,status').eq('sellerId', auth.userId),
+      supabase.from('Member').select('id').eq('sponsorId', auth.userId),
+    ]);
+    const rateByKey: Record<string, string> = {};
+    for (const r of ((rateRows as { data?: { key: string; value: string }[] | null })?.data ??
+      []) as { key: string; value: string }[]) {
+      rateByKey[r.key] = r.value;
+    }
+    const ownRows = ((ownSales as { data?: unknown[] | null })?.data ?? []) as {
+      status: unknown;
+      propertyValue: unknown;
+    }[];
+    let downlineRows: { status: unknown; propertyValue: unknown }[] = [];
+    const downIds = ((downlineMembers as { data?: { id: string }[] | null })?.data ?? [])
+      .map((m) => m.id)
+      .filter(Boolean);
+    if (downIds.length > 0) {
+      const { data: dlSales } = (await supabase
+        .from('Sale')
+        .select('propertyValue,status')
+        .in('sellerId', downIds)) as { data?: unknown[] | null };
+      downlineRows = (dlSales ?? []) as { status: unknown; propertyValue: unknown }[];
+    }
+    pendingCommission = sumPendingCommission({
+      ownSales: ownRows,
+      downlineSales: downlineRows,
+      directRate: rateByKey.COMMISSION_DIRECT_RATE,
+      referralRate: rateByKey.COMMISSION_REFERRAL_RATE,
+    });
+  } catch {
+    pendingCommission = '0.00';
+  }
+
+  const withPending = { ...(data ?? zeroWallet()), pendingCommission };
+  // Attach pendingCommission after stored-row validation; walletSchema allows it optional.
+  const rawWallet = data ?? zeroWallet();
+  const parsed = walletSchema.safeParse(withPending);
+  if (!parsed.success || !isValidWalletRow(rawWallet as Record<string, unknown>)) {
     const { error: env, status } = toErrorEnvelope(
       'INTERNAL',
       'Stored wallet failed validation',

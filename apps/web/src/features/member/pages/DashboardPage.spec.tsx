@@ -6,7 +6,11 @@ import { DashboardPage } from './DashboardPage';
 import { renderMember } from '../test/utils';
 import { mockFetchRoutes } from '../../../test/utils';
 
-const WALLET = { availableBalance: '1280000.00', pendingAmount: '960000.00' };
+const WALLET = {
+  availableBalance: '1280000.00',
+  pendingAmount: '960000.00',
+  pendingCommission: '424000.00',
+};
 
 const QUALIFIED = {
   status: 'APPROVED_ACTIVE',
@@ -142,44 +146,20 @@ describe('member DashboardPage', () => {
     expect(screen.queryByText('Submit sale')).not.toBeInTheDocument();
   });
 
-  it('sums PENDING commissions on the card, not the wallet pending amount', async () => {
+  it('shows the server-computed pipeline pending estimate, not PENDING commissions', async () => {
     mockFetchRoutes({
-      '/me/wallet': WALLET,
+      '/me/wallet': {
+        availableBalance: '1280000.00',
+        pendingAmount: '960000.00',
+        pendingCommission: '1224000.00',
+      },
       '/me/qualification': QUALIFIED,
       '/sales': { data: [], meta: {} },
-      '/me/commissions': {
-        data: [
-          {
-            id: 'com-001',
-            commissionType: 'DIRECT_COMMISSION',
-            saleId: 'sal-004',
-            salePropertyName: 'Titled Hotspring Lots',
-            baseValue: '2000000.00',
-            rate: '0.0800',
-            amount: '160000.00',
-            status: 'AVAILABLE',
-            createdAt: '2026-08-16T00:00:00.000Z',
-          },
-          {
-            id: 'com-003',
-            commissionType: 'DIRECT_COMMISSION',
-            saleId: 'sal-007',
-            salePropertyName: 'Farm Lot',
-            baseValue: '5300000.00',
-            rate: '0.0800',
-            amount: '424000.00',
-            status: 'PENDING',
-            createdAt: '2026-08-20T00:00:00.000Z',
-          },
-        ],
-        meta: {},
-      },
     });
     renderMember(<DashboardPage />, { user: MOCK_MEMBER });
 
-    // PENDING 424000.00 only: AVAILABLE 160000.00 excluded, and the wallet's
-    // pendingAmount (960000.00, reserved withdrawals) must not leak in.
-    await screen.findByText('₱424,000.00');
+    // Pending is the wallet.pendingCommission (pipeline), not commissions.
+    await screen.findByText('₱1,224,000.00');
     expect(screen.queryByText('₱960,000.00')).not.toBeInTheDocument();
   });
 });

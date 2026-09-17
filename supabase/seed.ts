@@ -820,7 +820,7 @@ async function seed() {
       );
     } else {
       const walletSeeds: Record<string, { a: string; p: string; w: string; e: string }> = {
-        [mem001]: { a: '140000.00', p: '636000.00', w: '125000.00', e: '240000.00' },
+        [mem001]: { a: '776000.00', p: '0.00', w: '125000.00', e: '876000.00' },
       };
       for (const [memberId, b] of Object.entries(walletSeeds)) {
         const { error } = await supabase.from('Wallet').upsert(

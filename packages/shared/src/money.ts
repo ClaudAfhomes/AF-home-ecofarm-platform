@@ -95,3 +95,24 @@ export function subtractMoney(a: string, b: string): string {
   }
   return fromCents(toCents(a) - toCents(b));
 }
+
+/**
+ * Multiply an exact-decimal money string by a rate string (up to 4 decimal
+ * places) and round to 2 decimals (half away from zero), mirroring PG
+ * `round(amount::numeric * rate::numeric, 2)` for non-negative values.
+ * Uses BigInt cents/basis-points - no float math.
+ */
+export function multiplyMoney(amount: string, rate: string): string {
+  if (!isExactDecimal(amount)) {
+    throw new Error(`multiplyMoney: expected exact-decimal amount, got "${amount}"`);
+  }
+  if (typeof rate !== 'string' || !/^\d+(\.\d{1,4})?$/.test(rate)) {
+    throw new Error(`multiplyMoney: expected rate string up to 4dp, got "${rate}"`);
+  }
+  const [aWhole = '0', aFrac = ''] = amount.split('.');
+  const cents = BigInt(aWhole) * 100n + BigInt((aFrac + '00').slice(0, 2));
+  const [rWhole = '0', rFrac = ''] = rate.split('.');
+  const rateBp = BigInt(rWhole) * 10000n + BigInt((rFrac + '0000').slice(0, 4));
+  const estCents = (cents * rateBp + 5000n) / 10000n;
+  return fromCents(estCents);
+}

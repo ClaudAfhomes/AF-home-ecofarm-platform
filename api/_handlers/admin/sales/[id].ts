@@ -172,14 +172,35 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       res.status(status).json({ error });
       return;
     }
-    patch.status = input.status;
-    const now = new Date().toISOString();
-    if (input.status === 'ADMIN_APPROVED') patch.approvedAt = now;
-    if (input.status === 'PAYMENT_VERIFIED') patch.paymentVerifiedAt = now;
-    if (input.status === 'REJECTED')
-      patch.rejectionReason = (input.rejectionReason as string).trim();
+    const isSameStatus = String(input.status) === String(current.status);
+    if (input.status === 'QUALIFYING_SALE') {
+      // Always route through the atomic function (idempotent re-entry emits
+      // any missing referral and credits only new rows).
+      patch.status = input.status;
+    } else if (!isSameStatus) {
+      patch.status = input.status;
+      const now = new Date().toISOString();
+      if (input.status === 'ADMIN_APPROVED') patch.approvedAt = now;
+      if (input.status === 'PAYMENT_VERIFIED') patch.paymentVerifiedAt = now;
+      if (input.status === 'REJECTED')
+        patch.rejectionReason = (input.rejectionReason as string).trim();
+    }
+    // Same-status non-qualify is a field-only edit (or pure no-op) - do not
+    // re-stamp timestamps or include the unchanged status.
   }
   if (Object.keys(patch).length === 0) {
+    // Pure idempotent same-status PATCH with no field edits - return the
+    // current sale as a success rather than a validation error.
+    if (input.status !== undefined && String(input.status) === String(current.status)) {
+      const parsedSame = saleSchema.safeParse(mapSaleRow(current));
+      if (!parsedSame.success) {
+        const { error, status } = toErrorEnvelope('INTERNAL', 'Stored sale failed validation', 500);
+        res.status(status).json({ error });
+        return;
+      }
+      res.status(200).json(parsedSame.data);
+      return;
+    }
     const { error, status } = toErrorEnvelope('VALIDATION_ERROR', 'Nothing to update.', 400);
     res.status(status).json({ error });
     return;

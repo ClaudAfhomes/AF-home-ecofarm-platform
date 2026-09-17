@@ -14,6 +14,10 @@ export interface ConfirmDialogProps {
   cancelLabel?: string;
   /** Danger tone for destructive/irreversible actions (UI-UX §9.6). */
   danger?: boolean;
+  /** Disable the confirm button (e.g. while an async action is pending). */
+  confirmDisabled?: boolean;
+  /** Show a loading state on the confirm button. */
+  confirmLoading?: boolean;
 }
 
 /** Confirmation dialog for destructive/irreversible actions (UI-UX §9.6). */
@@ -26,6 +30,8 @@ export function ConfirmDialog({
   confirmLabel = 'Confirm',
   cancelLabel = 'Cancel',
   danger = false,
+  confirmDisabled = false,
+  confirmLoading = false,
 }: ConfirmDialogProps) {
   return (
     <Dialog
@@ -34,10 +40,15 @@ export function ConfirmDialog({
       title={title}
       footer={
         <>
-          <Button variant="secondary" onClick={onCancel}>
+          <Button variant="secondary" onClick={onCancel} disabled={confirmLoading}>
             {cancelLabel}
           </Button>
-          <Button variant={danger ? 'danger' : 'primary'} onClick={onConfirm}>
+          <Button
+            variant={danger ? 'danger' : 'primary'}
+            onClick={onConfirm}
+            disabled={confirmDisabled}
+            loading={confirmLoading}
+          >
             {confirmLabel}
           </Button>
         </>

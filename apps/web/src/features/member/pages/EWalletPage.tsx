@@ -6,24 +6,22 @@ import { ErrorState, Icon, PageHeader, Skeleton } from '@jad/ui';
 import { Alert } from '../../../components/Alert';
 import { Button } from '../../../components/Button';
 import { ButtonLink } from '../../../components/ButtonLink';
-import { usePayoutAccounts, useCommissions, useWallet } from '../hooks/useMember';
-import { sumPendingCommissions } from '../lib/presentation';
+import { usePayoutAccounts, useWallet } from '../hooks/useMember';
 import styles from './EWalletPage.module.css';
 
 /**
  * eWallet summary (SCR-MEM-001, FR-WAL-003/004). Available Balance is the
- * only amount that can be withdrawn; Pending commissions are excluded until
- * they clear (BI-002, BR-WAL-003). Balances are server-computed - the client
- * never derives them.
+ * only amount that can be withdrawn; Pending is the server-computed pipeline
+ * estimate (open sales awaiting approval). Balances are server-computed - the
+ * client never derives them.
  */
 export function EWalletPage() {
   const walletQuery = useWallet();
   const payoutsQuery = usePayoutAccounts();
-  const commissionsQuery = useCommissions();
 
-  // Pending card = PENDING commissions in clearing (same source as the
-  // dashboard card) - never wallet.pendingAmount (reserved withdrawals).
-  const pendingCommissions = sumPendingCommissions(commissionsQuery.data);
+  // Pending is the server-computed estimate (open sales x rates), not the
+  // sum of PENDING commissions (commissions now credit instantly on approval).
+  const pendingCommissions = walletQuery.data?.pendingCommission ?? '0.00';
 
   const available = walletQuery.data?.availableBalance ?? '0.00';
   const hasAvailable = (() => {
@@ -86,11 +84,9 @@ export function EWalletPage() {
               </span>
             </div>
             <span className={styles.cardValue}>
-              {commissionsQuery.isLoading ? '-' : formatMoney(pendingCommissions)}
+              {walletQuery.isLoading ? '-' : formatMoney(pendingCommissions)}
             </span>
-            <span className={styles.cardHint}>
-              Clears to Available after the clearing period (BI-002, BR-WAL-003).
-            </span>
+            <span className={styles.cardHint}>Awaiting admin approval of submitted sales.</span>
           </div>
           <div className={styles.card}>
             <div className={styles.cardTop}>
@@ -125,8 +121,8 @@ export function EWalletPage() {
       <div className={styles.alertStack}>
         {!isCheckingEligibility && !walletQuery.isError && !hasAvailable ? (
           <Alert variant="info" title="No available balance">
-            You have no available balance to withdraw. Pending commissions clear to Available after
-            the 7-day clearing period. <Link to="/member/commissions">View commissions</Link>.
+            You have no available balance to withdraw. Commissions are credited when an admin
+            approves your sale. <Link to="/member/commissions">View commissions</Link>.
           </Alert>
         ) : null}
 

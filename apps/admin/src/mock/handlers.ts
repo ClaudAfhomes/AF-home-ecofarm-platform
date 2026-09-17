@@ -95,6 +95,7 @@ export const adminMockHandlers: MockRoute[] = [
       registrations: registrationStore.registrations.filter((row) => row.status === 'PENDING')
         .length,
       sales: MOCK_SALES.length,
+      salesReadyToQualify: MOCK_SALES.filter((s) => s.status === 'PAYMENT_VERIFIED').length,
       members: MOCK_MEMBERS.length,
       withdrawals: MOCK_WITHDRAWALS.length,
     }),

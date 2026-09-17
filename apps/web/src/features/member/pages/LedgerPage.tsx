@@ -126,7 +126,7 @@ export function LedgerPage() {
           <p className={styles.emptyBody}>
             {type === 'GROUP_INCENTIVE'
               ? 'Group Incentive is gated - no entries yet until Owner decision OD-006 (FEAT-041 BLOCKED).'
-              : 'Transactions appear here once commissions clear or withdrawals are requested.'}
+              : 'Transactions appear here once commissions are credited or withdrawals are requested.'}
           </p>
           {type ? (
             <button
