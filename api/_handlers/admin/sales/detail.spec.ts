@@ -10,10 +10,12 @@ import saleById from './[id].js';
  * hard-coded. Supabase is fully mocked.
  */
 const mocks = vi.hoisted(() => {
+  const rpcCalls: { fn: string; arg?: unknown }[] = [];
   const script = {
     roleSlug: 'super_admin',
     saleRow: null as unknown,
     configRows: [] as { key: string; value: string }[],
+    rpcResult: null as unknown,
   };
   const chainFor = (table: string) => {
     const chain: Record<string, (...a: never[]) => unknown> = {};
@@ -39,7 +41,14 @@ const mocks = vi.hoisted(() => {
   };
   return {
     script,
-    service: { from: (table: string) => chainFor(table) },
+    rpcCalls,
+    service: {
+      from: (table: string) => chainFor(table),
+      rpc: async (fn: string, arg: unknown) => {
+        rpcCalls.push({ fn, arg });
+        return { data: script.rpcResult, error: null };
+      },
+    },
     anon: {
       auth: {
         getUser: async () => ({
@@ -121,5 +130,49 @@ describe('GET /admin/sales/:id commission rates', () => {
     expect(seen.status).toBe(200);
     expect(seen.body).toMatchObject({ id: 'sal-003' });
     expect(seen.body).not.toHaveProperty('commissionRates');
+  });
+});
+
+describe('DELETE /admin/sales/:id sale_delete guard', () => {
+  const deleteReq = (): VercelRequest =>
+    ({ method: 'DELETE', query: { id: 'sal-003' }, headers: authed }) as VercelRequest;
+
+  beforeEach(() => {
+    vi.stubEnv('SUPABASE_URL', 'https://money.test.supabase.co');
+    vi.stubEnv('VITE_SUPABASE_ANON_KEY', 'anon');
+    vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'service');
+    mocks.rpcCalls.length = 0;
+    mocks.script.roleSlug = 'super_admin';
+    mocks.script.saleRow = SALE_ROW;
+  });
+
+  it('delegates deletion to the atomic sale_delete function', async () => {
+    mocks.script.rpcResult = { deleted: true, id: 'sal-003', commissionsRemoved: 0 };
+    const { res, seen } = capture();
+    await saleById(deleteReq(), res);
+    expect(seen.status).toBe(200);
+    expect(seen.body).toMatchObject({ id: 'sal-003', deleted: true });
+    expect(mocks.rpcCalls).toHaveLength(1);
+    expect(mocks.rpcCalls[0]?.fn).toBe('sale_delete');
+    expect(mocks.rpcCalls[0]?.arg).toMatchObject({ p_id: 'sal-003' });
+  });
+
+  it('surfaces the credited-commission block as 409', async () => {
+    mocks.script.rpcResult = {
+      error: {
+        code: 'CONFLICT',
+        message: 'This sale has credited commissions and cannot be deleted.',
+        status: 409,
+      },
+    };
+    const { res, seen } = capture();
+    await saleById(deleteReq(), res);
+    expect(seen.status).toBe(409);
+    expect(seen.body).toMatchObject({
+      error: {
+        code: 'CONFLICT',
+        message: 'This sale has credited commissions and cannot be deleted.',
+      },
+    });
   });
 });

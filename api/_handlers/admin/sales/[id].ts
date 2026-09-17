@@ -93,21 +93,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   if (req.method === 'DELETE') {
-    const { error } = await supabase.from('Sale').delete().eq('id', id);
-    if (error) {
-      const { error: env, status } = toErrorEnvelope('INTERNAL', error.message, 500);
-      res.status(status).json({ error: env });
+    // Guarded by the atomic sale_delete function: blocked while any AVAILABLE
+    // (credited) commission exists; non-credited commissions are removed with
+    // the sale so no orphans are left.
+    const { data: result, error: rpcError } = await supabase.rpc('sale_delete', {
+      p_id: id,
+      p_actor: auth.userId,
+      p_role: auth.slugs[0] ?? 'admin',
+    });
+    if (rpcError) {
+      const { error, status } = toErrorEnvelope('INTERNAL', rpcError.message, 500);
+      res.status(status).json({ error });
       return;
     }
-    await appendAudit(supabase, {
-      action: 'SALE_DELETED',
-      actorId: auth.userId,
-      actorRole: auth.slugs[0] ?? 'admin',
-      targetType: 'Sale',
-      targetId: id,
-      targetName: String(current.propertyName ?? id),
-      detail: `Deleted sale ${id}`,
-    });
+    const outcome = (result ?? {}) as {
+      error?: { code: string; message: string; status?: number };
+      deleted?: boolean;
+    };
+    if (outcome.error) {
+      const { error, status } = toErrorEnvelope(
+        outcome.error.code as never,
+        outcome.error.message,
+        outcome.error.status ?? 500,
+      );
+      res.status(status).json({ error });
+      return;
+    }
     res.status(200).json({ id, deleted: true });
     return;
   }

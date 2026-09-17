@@ -46,9 +46,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       names.set(s.id, s.propertyName || s.id);
     }
   }
-  const mapped = rows.map((row) =>
-    mapCommissionRow(row, typeof row.saleId === 'string' ? names.get(row.saleId) : undefined),
-  );
+  // Defensive: never hand the UI a commission whose sale no longer exists
+  // (that would render a dead property link). Orphans should not exist since
+  // sale_delete removes non-credited commissions with the sale.
+  const orphaned = rows.filter((row) => typeof row.saleId === 'string' && !names.has(row.saleId));
+  if (orphaned.length > 0) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      `[commissions] dropping ${orphaned.length} orphan commission(s) for member ${auth.userId}:`,
+      orphaned.map((r) => r.id),
+    );
+  }
+  const mapped = rows
+    .filter((row) => typeof row.saleId !== 'string' || names.has(row.saleId))
+    .map((row) =>
+      mapCommissionRow(row, typeof row.saleId === 'string' ? names.get(row.saleId) : undefined),
+    );
   okList(
     res,
     mapped.filter((row) => isValidCommissionRow(row)),

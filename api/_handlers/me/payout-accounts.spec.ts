@@ -131,7 +131,11 @@ describe('payout unification', () => {
     expect(seen.status).toBe(201);
     const insert = mocks.calls.find((c) => c.op === 'insert');
     expect(insert?.table).toBe('PayoutAccount');
-    expect(insert?.arg).toMatchObject({ memberId: 'mem-uuid-1', accountIdentifier: '09175550199' });
+    expect(insert?.arg).toMatchObject({
+      memberId: 'mem-uuid-1',
+      accountIdentifier: '09175550199',
+      accountIdentifierMasked: '•••• 0199',
+    });
     expect(seen.body).toMatchObject({
       accountIdentifierMasked: '•••• 0199',
       accountIdentifier: '09175550199',

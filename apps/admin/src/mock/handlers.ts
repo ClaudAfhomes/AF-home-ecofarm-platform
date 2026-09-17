@@ -170,6 +170,24 @@ export const adminMockHandlers: MockRoute[] = [
       if (!id) return notFound('Sale');
       const sale = MOCK_SALES.find((s) => s.id === id);
       if (!sale) return notFound('Sale');
+      // Mirror the sale_delete guard: qualifying (credited) sales cannot be
+      // deleted; other sales are removed with their mock commissions.
+      if (ctx.method === 'DELETE') {
+        if (sale.status === 'QUALIFYING_SALE') {
+          return {
+            status: 409,
+            body: {
+              error: {
+                code: 'CONFLICT',
+                message: 'This sale has credited commissions and cannot be deleted.',
+              },
+            },
+          };
+        }
+        const index = MOCK_SALES.findIndex((s) => s.id === id);
+        if (index !== -1) MOCK_SALES.splice(index, 1);
+        return { id, deleted: true };
+      }
       // Configured rates for the estimate preview (mirrors GET /admin/sales/:id).
       const rateOf = (key: string) => configStore.entries.find((e) => e.key === key)?.value;
       const direct = rateOf('COMMISSION_DIRECT_RATE');

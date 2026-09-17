@@ -610,7 +610,7 @@ export function SaleDetailPage() {
         onCancel={() => setShowDeleteConfirm(false)}
         onConfirm={handleDelete}
         title={data ? `Delete ${data.propertyName}?` : 'Delete sale?'}
-        message="This sale will be permanently removed. This action cannot be undone."
+        message="This sale will be permanently removed along with any uncredited commissions. Sales with credited commissions cannot be deleted."
         confirmLabel="Delete"
         cancelLabel="Cancel"
         danger

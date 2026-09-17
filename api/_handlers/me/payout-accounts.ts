@@ -2,6 +2,7 @@ import { createPayoutAccountRequestSchema } from '@jad/contracts';
 
 import { verifyUser } from '../../_lib/auth.js';
 import type { VercelRequest, VercelResponse } from '../../_lib/http.js';
+import { maskIdentifier } from '../../_lib/money.js';
 import { isValidPayoutAccountRow, mapPayoutAccountRow, prefixedId } from '../../_lib/pipeline.js';
 import { methodNotAllowed, okList, readJsonBody, requireService } from '../../_lib/rest.js';
 import { toErrorEnvelope } from '../../_lib/envelope.js';
@@ -61,6 +62,7 @@ export async function createPayoutAccount(req: VercelRequest, res: VercelRespons
     method: parsed.data.method,
     accountName: parsed.data.accountName,
     accountIdentifier: parsed.data.accountIdentifier,
+    accountIdentifierMasked: maskIdentifier(parsed.data.accountIdentifier),
     status: 'PENDING',
     isPrimary: false,
     createdAt: new Date().toISOString(),
