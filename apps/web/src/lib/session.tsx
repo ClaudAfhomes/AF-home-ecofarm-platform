@@ -13,6 +13,7 @@ import type { MemberStatus, Role } from '@jad/contracts';
 import { MockSessionProvider, setMockSessionUser, useMockSession } from '@jad/mock';
 
 import { getSupabaseClient, isSupabaseConfigured, tryRefreshSession } from './supabase';
+import { getMemberAccessBlock } from './api/orphan';
 
 /**
  * App-owned session context - Supabase Auth (JWT + RLS) is the SSOT when
@@ -183,6 +184,8 @@ export function SupabaseSessionProvider({ children }: { children: ReactNode }) {
         lastName: string;
         isQualified: boolean;
         status: string;
+        archivedAt: string | null;
+        accountStatus: string;
       } | null = null;
       let memberFound = false;
       try {
@@ -208,7 +211,14 @@ export function SupabaseSessionProvider({ children }: { children: ReactNode }) {
           const isQualified =
             (d['isQualified'] as boolean) ?? (d['is_qualified'] as boolean) ?? false;
           const status = (d['status'] as string) ?? 'PENDING';
-          member = { firstName, lastName, isQualified, status };
+          member = {
+            firstName,
+            lastName,
+            isQualified,
+            status,
+            archivedAt: (d['archivedAt'] as string | null) ?? null,
+            accountStatus: (d['accountStatus'] as string) ?? 'ACTIVE',
+          };
         }
       } catch {
         member = null;
@@ -221,6 +231,17 @@ export function SupabaseSessionProvider({ children }: { children: ReactNode }) {
       // instead of a broken panel of 404s. Staff-only identities (no Member
       // row by design) keep their admin session.
       if (!memberFound && role !== 'admin') {
+        try {
+          await client.auth.signOut();
+        } catch {
+          // best effort - local sign-out below still clears the session
+        }
+        return { user: null, verified: true };
+      }
+      // Archived or deactivated members keep their Member row but must not
+      // hold a member session - sign out so RequireRole lands them on login.
+      // Staff-only identities are unaffected (no Member row by design).
+      if (memberFound && role !== 'admin' && getMemberAccessBlock(member)) {
         try {
           await client.auth.signOut();
         } catch {

@@ -3,6 +3,7 @@ import { archivedMemberSchema } from '@jad/contracts';
 import { ADMIN_STAFF } from '../../../_lib/access.js';
 import { verifyStaffModule } from '../../../_lib/auth.js';
 import type { VercelRequest, VercelResponse } from '../../../_lib/http.js';
+import { mapMemberRow } from '../../../_lib/pipeline.js';
 import { methodNotAllowed, okList, requireService } from '../../../_lib/rest.js';
 import { toErrorEnvelope } from '../../../_lib/envelope.js';
 
@@ -37,47 +38,53 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.status(status).json({ error: env });
     return;
   }
+  // Build originalData with the same mapMemberRow mapper the active members
+  // list uses, so an archived record always satisfies memberProfileSchema.
+  // Member name/phone/referralCode columns are nullable while the schema
+  // requires them - fall back to explicit placeholders instead of silently
+  // dropping the archived row (a dropped row is what made archived members
+  // "disappear" from the Archives tab).
   const rows = (((data as unknown[]) ?? []) as Record<string, unknown>[]).map((row) => {
     const snap =
       typeof row.archiveSnapshot === 'object' && row.archiveSnapshot !== null
         ? (row.archiveSnapshot as Record<string, unknown>)
-        : row;
-    const programId =
-      typeof snap.programId === 'string' && snap.programId ? snap.programId : 'prg-domestic';
+        : {};
+    const source: Record<string, unknown> = { ...row, ...snap, id: String(row.id) };
+    const nameParts = String((source.name as string | undefined) ?? '').split(' ');
+    if (typeof source.firstName !== 'string' || !source.firstName.trim()) {
+      source.firstName = nameParts[0] || '?';
+    }
+    if (typeof source.lastName !== 'string' || !source.lastName.trim()) {
+      source.lastName = nameParts.slice(1).join(' ') || '?';
+    }
+    if (typeof source.phone !== 'string' || !source.phone.trim()) {
+      source.phone = '?';
+    }
+    if (typeof source.referralCode !== 'string' || !source.referralCode) {
+      source.referralCode = '?';
+    }
+    const profile = mapMemberRow(source);
+    const prevAccount = (snap.accountStatus ?? row.accountStatus) as unknown;
     return {
       id: `arch-${row.id}`,
-      memberId: row.id,
-      originalData: {
-        ...snap,
-        id: String(row.id),
-        status: snap.status ?? 'APPROVED_ACTIVE',
-        firstName: snap.firstName ?? '?',
-        lastName: snap.lastName ?? '?',
-        phone: snap.phone ?? '?',
-        dateOfBirth: snap.dateOfBirth ?? '1990-01-01',
-        gender: snap.gender ?? '?',
-        countryCode: snap.countryCode ?? 'PH',
-        countryName: snap.countryName ?? '?',
-        programId,
-        programCode: snap.programCode ?? (programId === 'prg-abroad' ? 'ABROAD' : 'DOMESTIC'),
-        qualificationAnswers: snap.qualificationAnswers ?? [],
-        governmentId: snap.governmentId ?? {
-          fileName: 'archived',
-          mimeType: 'application/pdf',
-          sizeBytes: 1,
-        },
-        submittedAt: snap.submittedAt ?? snap.createdAt ?? row.archivedAt,
-        createdAt: snap.createdAt ?? row.archivedAt,
-        updatedAt: snap.updatedAt ?? row.archivedAt,
-      },
+      memberId: String(row.id),
+      originalData: profile,
       archivedAt: row.archivedAt,
-      archivedBy: row.archivedBy ?? 'unknown',
-      previousStatus: String(snap.status ?? 'APPROVED_ACTIVE'),
-      previousAccountStatus: snap.accountStatus ?? undefined,
+      archivedBy: (row.archivedBy as string | undefined) ?? 'unknown',
+      previousStatus: String(snap.status ?? row.status ?? 'APPROVED_ACTIVE'),
+      ...(prevAccount === 'ACTIVE' || prevAccount === 'INACTIVE'
+        ? { previousAccountStatus: prevAccount }
+        : {}),
     };
   });
-  okList(
-    res,
-    rows.filter((row) => archivedMemberSchema.safeParse(row).success),
-  );
+  const valid: Record<string, unknown>[] = [];
+  for (const row of rows) {
+    if (archivedMemberSchema.safeParse(row).success) {
+      valid.push(row);
+    } else {
+      // eslint-disable-next-line no-console
+      console.warn('[archived] dropping invalid archived row:', row.memberId);
+    }
+  }
+  okList(res, valid);
 }

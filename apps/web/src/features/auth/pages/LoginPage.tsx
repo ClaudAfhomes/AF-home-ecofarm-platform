@@ -11,7 +11,12 @@ import { Alert } from '../../../components/Alert';
 import { Button } from '../../../components/Button';
 import { ApiError } from '../../../lib/api/errors';
 import { apiErrorMessage } from '../../../lib/api/errorMessage';
-import { ORPHAN_ACCOUNT_MESSAGE } from '../../../lib/api/orphan';
+import {
+  ARCHIVED_ACCOUNT_MESSAGE,
+  INACTIVE_ACCOUNT_MESSAGE,
+  ORPHAN_ACCOUNT_MESSAGE,
+  getMemberAccessBlock,
+} from '../../../lib/api/orphan';
 import { useQuery } from '@tanstack/react-query';
 import { getGlobalCmsPublic, getLoginCmsPublic } from '@/lib/cms';
 import { AUTH } from '../content';
@@ -179,6 +184,8 @@ export function LoginPage() {
         lastName: string;
         isQualified: boolean;
         status: string;
+        archivedAt: string | null;
+        accountStatus: string;
       } | null = null;
       try {
         const res = (await (
@@ -207,6 +214,8 @@ export function LoginPage() {
             lastName: (d['lastName'] as string) ?? name.split(' ').slice(1).join(' ') ?? '',
             isQualified: (d['isQualified'] as boolean) ?? (d['is_qualified'] as boolean) ?? false,
             status: (d['status'] as string) ?? 'PENDING',
+            archivedAt: (d['archivedAt'] as string | null) ?? null,
+            accountStatus: (d['accountStatus'] as string) ?? 'ACTIVE',
           };
         }
       } catch {
@@ -236,6 +245,21 @@ export function LoginPage() {
         throw new ApiError({
           code: 'ACCOUNT_DELETED',
           message: ORPHAN_ACCOUNT_MESSAGE,
+          status: 403,
+        });
+      }
+      // Archived or deactivated members keep their Member row but must not
+      // enter the portal.
+      const accessBlock = getMemberAccessBlock(member);
+      if (accessBlock && authoritativeRole !== 'admin') {
+        try {
+          await supaClient.auth.signOut();
+        } catch {
+          // best effort - the ApiError below still blocks entry
+        }
+        throw new ApiError({
+          code: accessBlock === 'ARCHIVED' ? 'ACCOUNT_ARCHIVED' : 'ACCOUNT_INACTIVE',
+          message: accessBlock === 'ARCHIVED' ? ARCHIVED_ACCOUNT_MESSAGE : INACTIVE_ACCOUNT_MESSAGE,
           status: 403,
         });
       }

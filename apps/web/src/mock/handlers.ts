@@ -26,6 +26,8 @@ import type {
 import { MOCK_SUPER_ADMIN, mockSessionRef } from '@jad/mock';
 import type { MockRequestContext, MockRoute } from '@jad/mock';
 
+import { ARCHIVED_ACCOUNT_MESSAGE, INACTIVE_ACCOUNT_MESSAGE } from '../lib/api/orphan';
+
 import {
   ageFromDateOfBirth,
   hashPassword,
@@ -377,7 +379,15 @@ export function memberMockHandlers(store: MockStore): MockRoute[] {
           const aliasMember = store.members.find(
             (candidate) => candidate.email.toLowerCase() === 'juan.delacruz@example.com',
           );
-          if (aliasMember) return ok({ user: toSessionUser(aliasMember) });
+          if (aliasMember) {
+            if (aliasMember.archivedAt) {
+              return error('ACCOUNT_ARCHIVED', ARCHIVED_ACCOUNT_MESSAGE, 403);
+            }
+            if (aliasMember.accountStatus === 'INACTIVE') {
+              return error('ACCOUNT_INACTIVE', INACTIVE_ACCOUNT_MESSAGE, 403);
+            }
+            return ok({ user: toSessionUser(aliasMember) });
+          }
         }
         // Single SUPER_ADMIN seed: superadmin@gmail.com / P@ssword (single admin type).
         if (trimmed === 'superadmin@gmail.com' && password === 'P@ssword') {
@@ -398,6 +408,13 @@ export function memberMockHandlers(store: MockStore): MockRoute[] {
         );
         if (!member || member.passwordHash !== hashPassword(password)) {
           return error('UNAUTHORIZED', 'Email or password is incorrect.', 401);
+        }
+        // Mirror the live login gates: archived/inactive members cannot sign in.
+        if (member.archivedAt) {
+          return error('ACCOUNT_ARCHIVED', ARCHIVED_ACCOUNT_MESSAGE, 403);
+        }
+        if (member.accountStatus === 'INACTIVE') {
+          return error('ACCOUNT_INACTIVE', INACTIVE_ACCOUNT_MESSAGE, 403);
         }
         return ok({ user: toSessionUser(member) });
       },

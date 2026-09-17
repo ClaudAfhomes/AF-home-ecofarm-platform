@@ -6,7 +6,12 @@ import { mapSaleRow } from '../../_lib/pipeline.js';
 import { methodNotAllowed, requireService } from '../../_lib/rest.js';
 import { toErrorEnvelope } from '../../_lib/envelope.js';
 
-/** GET /sales/:id - own sale only (404 otherwise, hides existence). */
+/**
+ * GET /sales/:id - seller or selected referrer only (404 otherwise, hides
+ * existence). Referrer access is read-only: a DIRECT_REFERRAL commission
+ * points at the seller's sale, so the referrer must be able to open the link
+ * from the commissions list. All mutations stay seller-scoped.
+ */
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS');
@@ -38,7 +43,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     .from('Sale')
     .select('*')
     .eq('id', id)
-    .eq('sellerId', auth.userId)
+    .or(`sellerId.eq.${auth.userId},referrerId.eq.${auth.userId}`)
     .maybeSingle();
   if (error) {
     const { error: env, status } = toErrorEnvelope('INTERNAL', error.message, 500);

@@ -15,10 +15,15 @@ const mocks = vi.hoisted(() => {
     saleRow: null as unknown,
     configRows: [] as { key: string; value: string }[],
   };
+  const seenOr: string[] = [];
   const chainFor = (table: string) => {
     const chain: Record<string, (...a: never[]) => unknown> = {};
     chain.select = () => chain;
     chain.eq = () => chain;
+    chain.or = (clause: string) => {
+      seenOr.push(clause);
+      return chain;
+    };
     chain.in = async () => {
       if (table === 'SystemConfig') return { data: script.configRows, error: null };
       return { data: [], error: null };
@@ -31,6 +36,7 @@ const mocks = vi.hoisted(() => {
   };
   return {
     script,
+    seenOr,
     service: { from: (table: string) => chainFor(table) },
     anon: {
       auth: {
@@ -86,6 +92,7 @@ describe('GET /sales/:id commission rates', () => {
     vi.stubEnv('SUPABASE_URL', 'https://money.test.supabase.co');
     vi.stubEnv('VITE_SUPABASE_ANON_KEY', 'anon');
     vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'service');
+    mocks.seenOr.length = 0;
     mocks.script.saleRow = SALE_ROW;
     mocks.script.configRows = [
       { key: 'COMMISSION_DIRECT_RATE', value: '0.0800' },
@@ -110,5 +117,40 @@ describe('GET /sales/:id commission rates', () => {
     expect(seen.status).toBe(200);
     expect(seen.body).toMatchObject({ id: 'sal-001' });
     expect(seen.body).not.toHaveProperty('commissionRates');
+  });
+});
+
+describe('GET /sales/:id seller-or-referrer scope', () => {
+  beforeEach(() => {
+    vi.stubEnv('SUPABASE_URL', 'https://money.test.supabase.co');
+    vi.stubEnv('VITE_SUPABASE_ANON_KEY', 'anon');
+    vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'service');
+    mocks.seenOr.length = 0;
+    mocks.script.saleRow = { ...SALE_ROW, referrerId: 'mem-uuid-9' };
+    mocks.script.configRows = [];
+  });
+
+  it('scopes the read to seller or selected referrer', async () => {
+    const { res, seen } = capture();
+    await saleById(getReq(), res);
+    expect(seen.status).toBe(200);
+    expect(mocks.seenOr).toHaveLength(1);
+    expect(mocks.seenOr[0]).toContain('sellerId.eq.mem-uuid-1');
+    expect(mocks.seenOr[0]).toContain('referrerId.eq.mem-uuid-1');
+  });
+
+  it('returns the sale to the selected referrer', async () => {
+    const { res, seen } = capture();
+    await saleById(getReq(), res);
+    expect(seen.status).toBe(200);
+    expect(seen.body).toMatchObject({ id: 'sal-001', referrerId: 'mem-uuid-9' });
+  });
+
+  it('still 404s when the viewer is neither seller nor referrer', async () => {
+    mocks.script.saleRow = null;
+    const { res, seen } = capture();
+    await saleById(getReq(), res);
+    expect(seen.status).toBe(404);
+    expect(seen.body).toMatchObject({ error: { code: 'NOT_FOUND' } });
   });
 });

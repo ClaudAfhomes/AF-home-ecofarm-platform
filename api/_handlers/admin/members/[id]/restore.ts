@@ -58,12 +58,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
   const { error: writeError } = await supabase
     .from('Member')
-    .update({ archivedAt: null, archiveSnapshot: null })
+    .update({ archivedAt: null, archivedBy: null, archiveSnapshot: null })
     .eq('id', id);
   if (writeError) {
     const { error, status } = toErrorEnvelope('INTERNAL', writeError.message, 500);
     res.status(status).json({ error });
     return;
+  }
+  // Best-effort: lift the archive-time ban so the restored member can sign
+  // in again. A failed unban must not fail the restore.
+  try {
+    await supabase.auth.admin.updateUserById(id, { ban_duration: 'none' });
+  } catch {
+    // best effort - restore still succeeds
   }
   const displayName =
     `${row.firstName ?? ''} ${row.lastName ?? ''}`.trim() || String(row.name ?? id);

@@ -64,6 +64,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.status(status).json({ error });
     return;
   }
+  // Best-effort credential revocation: ban the auth user so the archived
+  // member cannot sign in again. A failed ban must not fail the archive -
+  // the app-layer login/session gates are the enforcement point.
+  try {
+    await supabase.auth.admin.updateUserById(id, { ban_duration: '876000h' });
+  } catch {
+    // best effort - archive still succeeds
+  }
   const displayName =
     `${row.firstName ?? ''} ${row.lastName ?? ''}`.trim() || String(row.name ?? id);
   await appendAudit(supabase, {

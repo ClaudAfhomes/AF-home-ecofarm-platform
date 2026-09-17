@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Route, Routes } from 'react-router';
-import { MOCK_MEMBER } from '@jad/mock';
+import { MOCK_MEMBER, MOCK_MEMBER_NOT_QUALIFIED } from '@jad/mock';
 
 import { SaleDetailPage } from './SaleDetailPage';
 import { renderMember } from '../test/utils';
@@ -131,5 +131,32 @@ describe('member SaleDetailPage (SCR-MEM-007)', () => {
     renderSale('sal-001');
 
     expect(await screen.findByText('Could not load this sale')).toBeInTheDocument();
+  });
+
+  it('renders read-only for the selected referrer (no seller actions)', async () => {
+    const referredRejected = {
+      ...SALE,
+      id: 'sal-010',
+      status: 'REJECTED',
+      resubmissionCount: 1,
+      referrerId: 'mem-002',
+      referrerName: 'Maria Santos',
+      rejectionReason: 'Phone number could not be verified.',
+    };
+    mockFetchRoutes({
+      '/sales/sal-010': referredRejected,
+      '/customers': CUSTOMERS,
+    });
+    renderMember(
+      <Routes>
+        <Route path="/member/sales/:saleId" element={<SaleDetailPage />} />
+      </Routes>,
+      { route: '/member/sales/sal-010', user: MOCK_MEMBER_NOT_QUALIFIED },
+    );
+
+    expect(await screen.findByText('Referred sale')).toBeInTheDocument();
+    expect(screen.getByText(/viewing this sale as its selected referrer/)).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Resubmit sale' })).not.toBeInTheDocument();
+    expect(screen.queryByText('Resubmit sale', { selector: 'h2' })).not.toBeInTheDocument();
   });
 });

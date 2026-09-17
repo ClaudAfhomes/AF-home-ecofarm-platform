@@ -369,3 +369,10 @@ export const registrationStore: {
   members: initialMembers.map((m) => ({ ...m })),
   archived: initialArchived.map((a) => ({ ...a })),
 };
+
+/** Restore seed state (specs call this to isolate mutation tests). */
+export function resetRegistrationStore(): void {
+  registrationStore.registrations = initialRegistrations.map((r) => ({ ...r }));
+  registrationStore.members = initialMembers.map((m) => ({ ...m }));
+  registrationStore.archived = initialArchived.map((a) => ({ ...a }));
+}

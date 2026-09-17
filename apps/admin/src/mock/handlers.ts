@@ -35,7 +35,7 @@ import {
   updateStaffMember,
 } from './staffMockStore';
 import { guardRolePermissions } from '../features/roles/guards';
-import { registrationStore } from './registrationMockStore';
+import { registrationStore, type AdminMember } from './registrationMockStore';
 import { messagesMockStore, staffUnreadFor } from './messagesMockStore';
 import {
   assignMockVoucher,
@@ -49,6 +49,14 @@ import {
 
 function idFromPath(url: string, pattern: RegExp): string | undefined {
   return pattern.exec(new URL(url, 'http://mock.local').pathname)?.[1];
+}
+
+/** Stash of archived AdminMember rows so mock restore is lossless. */
+const archivedMemberStash = new Map<string, AdminMember>();
+
+/** Clear mock-only archive/restore state (specs call this alongside store resets). */
+export function resetMockMemberLifecycle(): void {
+  archivedMemberStash.clear();
 }
 
 function notFound(entity: string) {
@@ -141,11 +149,88 @@ export const adminMockHandlers: MockRoute[] = [
     },
   },
   {
+    path: '/admin/members/archived',
+    response: () => {
+      const data = registrationStore.archived;
+      return {
+        data,
+        meta: {
+          page: 1,
+          pageSize: 10,
+          total: data.length,
+        },
+      };
+    },
+  },
+  {
     path: '/admin/members/',
     match: 'prefix',
     handler: (ctx: MockRequestContext) => {
+      const pathname = new URL(ctx.url, 'http://mock.local').pathname;
+      // POST .../:id/archive - move to the archived roster (mirrors the API).
+      const archiveMatch = /\/admin\/members\/([^/?#]+)\/archive$/.exec(pathname);
+      if (archiveMatch) {
+        const id = archiveMatch[1]!;
+        const index = registrationStore.members.findIndex((m) => m.id === id);
+        if (index === -1) return notFound('Member');
+        const member = registrationStore.members[index]!;
+        if (registrationStore.archived.some((a) => a.memberId === id)) {
+          return fail('Member is already archived.');
+        }
+        archivedMemberStash.set(id, member);
+        registrationStore.members.splice(index, 1);
+        registrationStore.archived.push({
+          id: `arch-${member.id}`,
+          memberId: member.id,
+          originalData: {
+            id: member.id,
+            firstName: member.firstName,
+            lastName: member.lastName,
+            dateOfBirth: member.dateOfBirth,
+            age: member.age,
+            gender: member.gender,
+            address: member.address,
+            countryCode: member.countryCode,
+            countryName: member.countryName,
+            phone: member.phone,
+            email: member.email,
+            referralCode: member.referralCode,
+            status: member.status,
+            isQualified: member.isQualified,
+            program: member.program,
+          },
+          archivedAt: new Date().toISOString(),
+          archivedBy: 'mock-admin',
+          previousStatus: member.status,
+          previousAccountStatus: member.accountStatus,
+        });
+        return { archivedId: id };
+      }
+      // POST .../:id/restore - return to the active roster.
+      const restoreMatch = /\/admin\/members\/([^/?#]+)\/restore$/.exec(pathname);
+      if (restoreMatch) {
+        const raw = restoreMatch[1]!;
+        const memberId = raw.startsWith('arch-') ? raw.slice('arch-'.length) : raw;
+        const index = registrationStore.archived.findIndex((a) => a.memberId === memberId);
+        if (index === -1) return notFound('Archived member');
+        const record = registrationStore.archived[index]!;
+        registrationStore.archived.splice(index, 1);
+        const stashed = archivedMemberStash.get(memberId);
+        if (stashed && !registrationStore.members.some((m) => m.id === memberId)) {
+          registrationStore.members.push(stashed);
+        }
+        archivedMemberStash.delete(memberId);
+        return { id: record.memberId, restored: true };
+      }
       const id = idFromPath(ctx.url, /\/admin\/members\/([^/?#]+)/);
       if (!id) return notFound('Member');
+      // DELETE .../:id - purge from the mock roster (mirrors the API shape).
+      if (ctx.method === 'DELETE') {
+        const index = registrationStore.members.findIndex((m) => m.id === id);
+        if (index === -1) return notFound('Member');
+        registrationStore.members.splice(index, 1);
+        return { purgedId: id, authRemoved: true };
+      }
       const member = registrationStore.members.find((m) => m.id === id);
       if (!member) return notFound('Member');
       return member;

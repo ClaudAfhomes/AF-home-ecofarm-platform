@@ -60,6 +60,8 @@ export interface MockMember {
   referralCode: string;
   sponsorId?: string;
   status: MemberStatus;
+  accountStatus?: 'ACTIVE' | 'INACTIVE';
+  archivedAt?: string | null;
   isQualified: boolean;
   isEmailVerified: boolean;
   isIdVerified: boolean;

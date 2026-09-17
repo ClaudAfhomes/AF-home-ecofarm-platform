@@ -1,7 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { MOCK_MEMBER, MOCK_MEMBER_NOT_QUALIFIED, setMockSessionUser } from '@jad/mock';
+import { createMockServer } from '@jad/mock';
 
 import { createMemberMockServer } from './index';
+import { memberMockHandlers } from './handlers';
+import { createMockStore } from './store';
 import {
   login,
   registerApplication,
@@ -658,5 +661,55 @@ describe('F1 member mock API', () => {
         status: 404,
       });
     });
+  });
+});
+
+/**
+ * Mock login lifecycle gates (mirrors the live Supabase gates): archived and
+ * inactive members cannot sign in. Each test builds its own store so the
+ * flags never leak into other suites.
+ */
+describe('mock login lifecycle gates', () => {
+  let server: ReturnType<typeof createMockServer>;
+
+  afterEach(() => {
+    server.restore();
+    setMockSessionUser(null);
+  });
+
+  function installWithMemberFlags(
+    memberId: string,
+    flags: { archivedAt?: string; accountStatus?: 'ACTIVE' | 'INACTIVE' },
+  ) {
+    const store = createMockStore();
+    const member = store.members.find((m) => m.id === memberId);
+    if (!member) throw new Error(`mock member ${memberId} missing`);
+    if (flags.archivedAt !== undefined) member.archivedAt = flags.archivedAt;
+    if (flags.accountStatus !== undefined) member.accountStatus = flags.accountStatus;
+    server = createMockServer(memberMockHandlers(store));
+    server.install();
+  }
+
+  it('rejects archived members with ACCOUNT_ARCHIVED', async () => {
+    installWithMemberFlags('mem-001', { archivedAt: new Date().toISOString() });
+    await expect(
+      login({ identifier: 'juan.delacruz@example.com', password: 'password123' }),
+    ).rejects.toMatchObject({ code: 'ACCOUNT_ARCHIVED', status: 403 });
+  });
+
+  it('rejects inactive members with ACCOUNT_INACTIVE', async () => {
+    installWithMemberFlags('mem-001', { accountStatus: 'INACTIVE' });
+    await expect(
+      login({ identifier: 'juan.delacruz@example.com', password: 'password123' }),
+    ).rejects.toMatchObject({ code: 'ACCOUNT_INACTIVE', status: 403 });
+  });
+
+  it('still signs in active members', async () => {
+    installWithMemberFlags('mem-001', {});
+    const result = await login({
+      identifier: 'juan.delacruz@example.com',
+      password: 'password123',
+    });
+    expect(result.user).toMatchObject({ id: 'mem-001' });
   });
 });

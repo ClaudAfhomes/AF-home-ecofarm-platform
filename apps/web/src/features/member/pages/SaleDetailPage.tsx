@@ -10,6 +10,7 @@ import type { SaleStatus } from '@jad/contracts';
 import { Alert } from '../../../components/Alert';
 import { Button } from '../../../components/Button';
 import { apiErrorMessage } from '../../../lib/api/errorMessage';
+import { useSession } from '../../../lib/session';
 import { PROPERTY_RECORDS } from '../../public/content/properties';
 import { useCustomers, useSale } from '../hooks/useMember';
 import { requestReopenSale, resubmitSale } from '../services/member';
@@ -65,6 +66,7 @@ function rateLabel(rate: string): string {
  */
 export function SaleDetailPage() {
   const { saleId = '' } = useParams<{ saleId: string }>();
+  const { user } = useSession();
   const queryClient = useQueryClient();
   const saleQuery = useSale(saleId);
   const customersQuery = useCustomers();
@@ -204,6 +206,10 @@ export function SaleDetailPage() {
   }
 
   const sale = saleQuery.data;
+
+  // Referrers can open a sale that earned them a referral commission, but all
+  // mutations (resubmit, reopen) stay seller-only - server and UI enforced.
+  const isSeller = sale.sellerId === user?.id;
 
   const onResubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -435,6 +441,12 @@ export function SaleDetailPage() {
               </Link>
             </Alert>
           ) : null}
+          {!isSeller ? (
+            <Alert variant="info" title="Referred sale">
+              You are viewing this sale as its selected referrer. It earned your referral commission
+              - sale actions are unavailable.
+            </Alert>
+          ) : null}
 
           {maxedOut ? (
             <Alert variant="warning" title="This sale is locked">
@@ -443,7 +455,7 @@ export function SaleDetailPage() {
             </Alert>
           ) : null}
 
-          {sale.status === 'LOCKED' ? (
+          {sale.status === 'LOCKED' && isSeller ? (
             <div className={styles.actions}>
               <Button
                 variant="secondary"
@@ -462,7 +474,7 @@ export function SaleDetailPage() {
           ) : null}
         </div>
 
-        {canResubmit ? (
+        {canResubmit && isSeller ? (
           <div className={styles.resubmit}>
             <h2 className={styles.subtitle}>Resubmit sale</h2>
             <p className={styles.lead}>

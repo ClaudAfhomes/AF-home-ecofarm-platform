@@ -1,7 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
 import { ApiError } from './errors';
-import { isOrphanMemberError, ORPHAN_ACCOUNT_MESSAGE } from './orphan';
+import {
+  ARCHIVED_ACCOUNT_MESSAGE,
+  getMemberAccessBlock,
+  INACTIVE_ACCOUNT_MESSAGE,
+  isOrphanMemberError,
+  ORPHAN_ACCOUNT_MESSAGE,
+} from './orphan';
 
 describe('isOrphanMemberError', () => {
   it('detects the raw PostgREST PGRST116 single-row coercion failure', () => {
@@ -32,5 +38,35 @@ describe('isOrphanMemberError', () => {
   it('exposes a friendly, non-technical account message', () => {
     expect(ORPHAN_ACCOUNT_MESSAGE).toMatch(/no longer exists/i);
     expect(ORPHAN_ACCOUNT_MESSAGE).not.toMatch(/PGRST116|coerce/i);
+  });
+});
+
+describe('getMemberAccessBlock', () => {
+  it('allows active, unarchived members', () => {
+    expect(getMemberAccessBlock({ archivedAt: null, accountStatus: 'ACTIVE' })).toBeNull();
+    // Missing flags default to active (legacy rows predate the columns).
+    expect(getMemberAccessBlock({})).toBeNull();
+    expect(getMemberAccessBlock(null)).toBeNull();
+  });
+
+  it('blocks archived members even when active', () => {
+    expect(
+      getMemberAccessBlock({ archivedAt: '2026-09-01T00:00:00.000Z', accountStatus: 'ACTIVE' }),
+    ).toBe('ARCHIVED');
+  });
+
+  it('blocks inactive members', () => {
+    expect(getMemberAccessBlock({ archivedAt: null, accountStatus: 'INACTIVE' })).toBe('INACTIVE');
+  });
+
+  it('prefers the archived reason when both apply', () => {
+    expect(
+      getMemberAccessBlock({ archivedAt: '2026-09-01T00:00:00.000Z', accountStatus: 'INACTIVE' }),
+    ).toBe('ARCHIVED');
+  });
+
+  it('exposes friendly, non-technical messages', () => {
+    expect(ARCHIVED_ACCOUNT_MESSAGE).toMatch(/archived/i);
+    expect(INACTIVE_ACCOUNT_MESSAGE).toMatch(/inactive/i);
   });
 });
