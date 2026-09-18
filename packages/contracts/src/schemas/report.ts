@@ -125,3 +125,28 @@ export const operationalSummaryReportSchema = z.object({
 });
 
 export type OperationalSummaryReport = z.infer<typeof operationalSummaryReportSchema>;
+
+/** One bucket in the sales trend series (`2026-09` for months, `2026` for years). */
+export const salesTrendPeriodSchema = z.object({
+  /** `YYYY-MM` (month granularity) or `YYYY` (year granularity); month 01-12. */
+  key: z.string().regex(/^\d{4}(?:-(?:0[1-9]|1[0-2]))?$/),
+  count: z.number().int().nonnegative(),
+  /** Exact-decimal sum of `property_value` for the period. */
+  total: exactDecimalStringSchema,
+});
+
+export type SalesTrendPeriod = z.infer<typeof salesTrendPeriodSchema>;
+
+/**
+ * Sales trend for the dashboard overview chart - monthly (last 12 months,
+ * zero-filled for a gapless line) or yearly (all calendar years in which any
+ * sale exists, zero-filled between first and latest sale year). Counts and
+ * money totals are server facts; the chart only renders them.
+ */
+export const salesTrendReportSchema = z.object({
+  granularity: z.enum(['month', 'year']),
+  generatedAt: z.string(),
+  periods: z.array(salesTrendPeriodSchema),
+});
+
+export type SalesTrendReport = z.infer<typeof salesTrendReportSchema>;

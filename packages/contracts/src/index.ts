@@ -137,6 +137,8 @@ export {
   reportBreakdownSchema,
   salesCommissionsReportSchema,
   operationalSummaryReportSchema,
+  salesTrendPeriodSchema,
+  salesTrendReportSchema,
 } from './schemas/report.js';
 export type {
   SalesReportRow,
@@ -144,6 +146,8 @@ export type {
   ReportBreakdown,
   SalesCommissionsReport,
   OperationalSummaryReport,
+  SalesTrendPeriod,
+  SalesTrendReport,
 } from './schemas/report.js';
 export {
   sessionUserSchema,

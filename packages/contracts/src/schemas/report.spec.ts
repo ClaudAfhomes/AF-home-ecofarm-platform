@@ -5,6 +5,8 @@ import {
   operationalSummaryReportSchema,
   salesCommissionsReportSchema,
   salesReportRowSchema,
+  salesTrendPeriodSchema,
+  salesTrendReportSchema,
 } from './report';
 
 const SALE_ROW = {
@@ -186,6 +188,60 @@ describe('operationalSummaryReportSchema', () => {
         },
         inquiries: { new: 0 },
       }).success,
+    ).toBe(false);
+  });
+});
+
+describe('salesTrendPeriodSchema', () => {
+  it('accepts YYYY and YYYY-MM keys with exact-decimal totals', () => {
+    expect(
+      salesTrendPeriodSchema.safeParse({ key: '2026-09', count: 3, total: '1200000.00' }).success,
+    ).toBe(true);
+    expect(salesTrendPeriodSchema.safeParse({ key: '2026', count: 0, total: '0.00' }).success).toBe(
+      true,
+    );
+  });
+
+  it('rejects malformed keys and money', () => {
+    expect(
+      salesTrendPeriodSchema.safeParse({ key: '2026-9', count: 1, total: '10.00' }).success,
+    ).toBe(false);
+    expect(
+      salesTrendPeriodSchema.safeParse({ key: '2026-13', count: 1, total: '10.00' }).success,
+    ).toBe(false);
+    expect(
+      salesTrendPeriodSchema.safeParse({ key: '2026-09', count: 1, total: '1,0.00' }).success,
+    ).toBe(false);
+    expect(
+      salesTrendPeriodSchema.safeParse({ key: '2026-09', count: 1.5, total: '10.00' }).success,
+    ).toBe(false);
+  });
+});
+
+describe('salesTrendReportSchema', () => {
+  const TREND = {
+    granularity: 'month',
+    generatedAt: '2026-09-18T00:00:00.000Z',
+    periods: [
+      { key: '2025-10', count: 0, total: '0.00' },
+      { key: '2025-11', count: 2, total: '960000.00' },
+    ],
+  };
+
+  it('accepts month and year granularity reports', () => {
+    expect(salesTrendReportSchema.safeParse(TREND).success).toBe(true);
+    expect(
+      salesTrendReportSchema.safeParse({ ...TREND, granularity: 'year' }).success,
+    ).toBe(true);
+  });
+
+  it('rejects unknown granularity or empty period keys', () => {
+    expect(
+      salesTrendReportSchema.safeParse({ ...TREND, granularity: 'week' }).success,
+    ).toBe(false);
+    expect(
+      salesTrendReportSchema.safeParse({ ...TREND, periods: [{ key: '2026-Q1', count: 1, total: '0.00' }] })
+        .success,
     ).toBe(false);
   });
 });

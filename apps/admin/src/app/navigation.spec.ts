@@ -162,6 +162,7 @@ describe('navItemsForRole with staff role', () => {
       'Sales',
       'Payouts',
       'Withdrawals',
+      'Reports',
     ]);
   });
 

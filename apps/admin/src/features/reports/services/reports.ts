@@ -1,8 +1,10 @@
 import {
   operationalSummaryReportSchema,
   salesCommissionsReportSchema,
+  salesTrendReportSchema,
   type OperationalSummaryReport,
   type SalesCommissionsReport,
+  type SalesTrendReport,
 } from '@jad/contracts';
 
 import { request } from '../../../lib/api/client';
@@ -27,4 +29,12 @@ export function getSalesCommissionsReport(
 /** `GET /admin/reports/summary` - whole-org operational snapshot. */
 export function getOperationalSummaryReport(): Promise<OperationalSummaryReport> {
   return request('/admin/reports/summary', operationalSummaryReportSchema);
+}
+
+/**
+ * `GET /admin/reports/sales-trend` - continuous monthly (last 12 months) or
+ * yearly series for the dashboard overview chart.
+ */
+export function getSalesTrend(granularity: 'month' | 'year'): Promise<SalesTrendReport> {
+  return request(`/admin/reports/sales-trend?granularity=${granularity}`, salesTrendReportSchema);
 }

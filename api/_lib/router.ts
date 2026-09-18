@@ -410,6 +410,15 @@ export function selectHandler(
     };
   }
   if (
+    pathname === '/api/v1/admin/reports/sales-trend' ||
+    pathname === '/api/admin/reports/sales-trend'
+  ) {
+    return {
+      handler: lazy(() => import('../_handlers/admin/reports/sales-trend.js')),
+      routeKey: 'admin/reports/sales-trend',
+    };
+  }
+  if (
     pathname === '/api/v1/crons/commission-clearing' ||
     pathname === '/crons/commission-clearing'
   ) {

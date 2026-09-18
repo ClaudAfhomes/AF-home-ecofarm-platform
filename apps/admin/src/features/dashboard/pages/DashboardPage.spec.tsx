@@ -26,6 +26,8 @@ describe('DashboardPage', () => {
     expect(screen.getByText('Withdrawals')).toBeInTheDocument();
     expect(await screen.findByText(/Welcome back, Admin - \d+ pending/)).toBeInTheDocument();
     expect(screen.getByText('As of today')).toBeInTheDocument();
+    // Sales Overview chart section (sales module: mock admin session passes).
+    expect(screen.getByText('Sales Overview')).toBeInTheDocument();
   });
 
   it('shows no admin queues for MEMBER', async () => {

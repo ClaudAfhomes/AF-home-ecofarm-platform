@@ -5,6 +5,7 @@ import type {
   OperationalSummaryReport,
   SalesCommissionsReport,
   SalesReportRow,
+  SalesTrendReport,
 } from '@jad/contracts';
 import { CMS_PROPERTIES_SEED, STAFF_MODULE_LABEL, roleNameFor } from '@jad/contracts';
 import { multiplyMoney, addMoney } from '@jad/shared';
@@ -282,6 +283,50 @@ export const adminMockHandlers: MockRoute[] = [
           new: inquiryStore.items.filter((item) => item.status === 'NEW').length,
         },
       };
+    },
+  },
+  {
+    path: '/admin/reports/sales-trend',
+    response: (ctx: MockRequestContext) => {
+      const query = new URL(ctx.url, 'http://mock.local').searchParams;
+      const granularity = query.get('granularity') === 'year' ? ('year' as const) : ('month' as const);
+      const zero = { count: 0, total: '0.00' };
+      const aggregated = (keys: string[], keyOf: (d: Date) => string) => {
+        const buckets = new Map(keys.map((key) => [key, { ...zero }]));
+        for (const sale of MOCK_SALES) {
+          const date = new Date(sale.submittedAt);
+          if (Number.isNaN(date.getTime())) continue;
+          const bucket = buckets.get(keyOf(date));
+          if (!bucket) continue;
+          bucket.count += 1;
+          bucket.total = addMoney(bucket.total, sale.propertyValue);
+        }
+        return keys.map((key) => ({ key, ...(buckets.get(key) ?? zero) }));
+      };
+      let periods: { key: string; count: number; total: string }[];
+      if (granularity === 'month') {
+        const keys: string[] = [];
+        for (let i = 11; i >= 0; i -= 1) {
+          const d = new Date();
+          d.setUTCDate(1);
+          d.setUTCMonth(d.getUTCMonth() - i);
+          keys.push(`${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`);
+        }
+        periods = aggregated(keys, (d) => `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`);
+      } else {
+        const years = new Set(MOCK_SALES.map((sale) => new Date(sale.submittedAt).getUTCFullYear()));
+        const current = new Date().getUTCFullYear();
+        const start = Math.min(...years, current);
+        const yearKeys: string[] = [];
+        for (let year = start; year <= current; year += 1) yearKeys.push(String(year));
+        periods = aggregated(yearKeys, (d) => String(d.getUTCFullYear()));
+      }
+      const trend: SalesTrendReport = {
+        granularity,
+        generatedAt: new Date().toISOString(),
+        periods,
+      };
+      return trend;
     },
   },
   {
