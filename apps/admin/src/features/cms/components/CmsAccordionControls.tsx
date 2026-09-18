@@ -1,6 +1,6 @@
 import { Button, Icon } from '@jad/ui';
 
-import styles from './CmsSectionCard.module.css';
+import styles from '../pages/CmsHomepagePage.module.css';
 
 export function CmsAccordionControls({
   sectionCount,

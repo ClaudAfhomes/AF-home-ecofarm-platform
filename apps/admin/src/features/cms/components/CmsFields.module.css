@@ -22,6 +22,8 @@
   font-size: var(--text-body);
   background: var(--color-bg-surface);
   color: var(--color-text-default);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .input:focus,

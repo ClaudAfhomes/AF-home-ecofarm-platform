@@ -1499,12 +1499,14 @@ export function memberMockHandlers(store: MockStore): MockRoute[] {
         let referrerName: string | undefined;
         if (referrerId !== undefined) {
           const refMember = store.members.find(
-            (m) => m.id === referrerId && m.sponsorId === member.id,
+            (m) =>
+              m.id === referrerId &&
+              (m.sponsorId === member.id || m.id === member.sponsorId),
           );
           if (!refMember)
             return error(
               'VALIDATION_ERROR',
-              'The selected referrer must be one of your direct referrals.',
+              'The selected referrer must be your sponsor or one of your direct referrals.',
               400,
             );
           referrerName = `${refMember.firstName} ${refMember.lastName}`;
@@ -1585,12 +1587,14 @@ export function memberMockHandlers(store: MockStore): MockRoute[] {
         sale.propertyValue = price;
         if (parsed.data.referrerId !== undefined) {
           const refM = store.members.find(
-            (m) => m.id === parsed.data.referrerId && m.sponsorId === member.id,
+            (m) =>
+              m.id === parsed.data.referrerId &&
+              (m.sponsorId === member.id || m.id === member.sponsorId),
           );
           if (!refM)
             return error(
               'VALIDATION_ERROR',
-              'The selected referrer must be one of your direct referrals.',
+              'The selected referrer must be your sponsor or one of your direct referrals.',
               400,
             );
           sale.referrerId = refM.id;

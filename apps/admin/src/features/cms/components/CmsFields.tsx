@@ -147,19 +147,30 @@ export function CmsToggleField({
   return (
     <label
       className={styles.field}
-      style={{ flexDirection: 'row', alignItems: 'center', gap: 'var(--space-2)' }}
+      style={{
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        alignItems: 'flex-start',
+        gap: 'var(--space-2)',
+      }}
     >
       <input
         id={fieldId}
         type="checkbox"
         checked={value}
         onChange={(e) => onChange(e.target.checked)}
-        style={{ width: 18, height: 18 }}
+        style={{ width: 18, height: 18, flexShrink: 0, marginTop: 2 }}
         aria-describedby={describedBy}
       />
-      <span className={styles.label}>{label}</span>
+      <span className={styles.label} style={{ flex: '1 1 0', minWidth: 0, overflowWrap: 'anywhere' }}>
+        {label}
+      </span>
       {hint ? (
-        <span id={hintId} className={styles.hint}>
+        <span
+          id={hintId}
+          className={styles.hint}
+          style={{ flexBasis: '100%', overflowWrap: 'anywhere' }}
+        >
           {hint}
         </span>
       ) : null}

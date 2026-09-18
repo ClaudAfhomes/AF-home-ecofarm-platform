@@ -72,7 +72,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const { data: member } = await supabase
     .from('Member')
-    .select('isQualified, accountStatus, firstName, lastName, name')
+    .select('isQualified, accountStatus, firstName, lastName, name, sponsorId')
     .eq('id', auth.userId)
     .maybeSingle();
   const memberRow = member as {
@@ -81,6 +81,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     firstName?: string;
     lastName?: string;
     name?: string;
+    sponsorId?: string | null;
   } | null;
   if (!memberRow) {
     const { error, status } = toErrorEnvelope('NOT_FOUND', 'Not found', 404);
@@ -182,10 +183,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       accountStatus?: string;
       isQualified?: boolean;
     } | null;
-    if (!r || r.sponsorId !== auth.userId) {
+    const isDirectReferral = r?.sponsorId === auth.userId;
+    const isSponsor = r?.id === memberRow.sponsorId;
+    if (!r || (!isDirectReferral && !isSponsor)) {
       const { error, status } = toErrorEnvelope(
         'VALIDATION_ERROR',
-        'The selected referrer must be one of your direct referrals.',
+        'The selected referrer must be your sponsor or one of your direct referrals.',
         400,
       );
       res.status(status).json({ error });

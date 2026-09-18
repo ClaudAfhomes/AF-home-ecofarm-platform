@@ -4,6 +4,12 @@
   gap: var(--space-5);
 }
 
+@media (max-width: 639px) {
+  .stack {
+    gap: var(--space-4);
+  }
+}
+
 .banner {
   margin-bottom: var(--space-4);
 }
@@ -105,11 +111,12 @@
 
 .anchorActions {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--space-2);
   margin-top: var(--space-3);
 }
 
-@media (max-width: 640px) {
+@media (max-width: 639px) {
   .anchorNav {
     padding: var(--space-2) var(--space-3);
   }
@@ -133,6 +140,15 @@
     white-space: nowrap;
     scroll-snap-align: start;
     flex-shrink: 0;
+  }
+
+  .anchorActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .anchorActions > * {
+    width: 100%;
   }
 }
 
@@ -223,6 +239,12 @@
   align-items: start;
 }
 
+@media (max-width: 639px) {
+  .ctaPair {
+    grid-template-columns: 1fr;
+  }
+}
+
 .ctaSecondaryWrap {
   display: flex;
   flex-direction: column;
@@ -232,6 +254,7 @@
 .ssotChip {
   display: inline-flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: var(--space-2);
   padding: var(--space-2) var(--space-3);
   background: var(--color-bg-surface-raised);
@@ -240,6 +263,8 @@
   font-size: var(--text-body-s);
   color: var(--color-text-muted);
   margin-bottom: var(--space-3);
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .ssotDivider {
@@ -261,6 +286,12 @@
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: var(--space-3);
   margin-bottom: var(--space-4);
+}
+
+@media (max-width: 400px) {
+  .entryCards {
+    grid-template-columns: 1fr;
+  }
 }
 
 .entryCard {
@@ -295,6 +326,7 @@
 
 .cardHeader {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-2);
@@ -320,12 +352,14 @@
   border: 1px solid var(--color-border-default);
   border-radius: var(--radius-sm);
   background: var(--color-bg-surface);
+  flex-wrap: wrap;
 }
 
 .listRowActions {
   display: flex;
   gap: var(--space-1);
   flex-shrink: 0;
+  flex-wrap: wrap;
 }
 
 .listRowContent {
@@ -339,6 +373,8 @@
 .listRowTitle {
   font-weight: 600;
   font-size: var(--text-body);
+  overflow-wrap: anywhere;
+  min-width: 0;
 }
 
 .listRowMeta {
@@ -347,6 +383,27 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+@media (max-width: 639px) {
+  .listRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .listRowContent {
+    width: 100%;
+  }
+
+  .listRowActions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .listRowMeta {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
 }
 
 .formLabel {
@@ -380,6 +437,13 @@
   gap: var(--space-3);
   padding: var(--space-2) 0;
   border-bottom: 1px solid var(--color-border-subtle, #e5e1d8);
+}
+
+@media (max-width: 639px) {
+  .readonlyList > div {
+    grid-template-columns: 1fr;
+    gap: var(--space-1);
+  }
 }
 
 .readonlyList dt {
@@ -513,4 +577,24 @@
   border: 1px solid var(--color-brand-primary, #2c6aa7);
   background: var(--color-bg-surface, #f4f2ec);
   color: var(--color-brand-primary, #2c6aa7);
+}
+
+@media (max-width: 639px) {
+  .fieldGroup,
+  .qualTrack {
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .confirmDialog {
+    padding: var(--space-4);
+  }
+
+  .confirmActions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .confirmActions > * {
+    width: 100%;
+  }
 }

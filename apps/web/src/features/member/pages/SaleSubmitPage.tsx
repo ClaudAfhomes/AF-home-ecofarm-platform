@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { useNavigate } from 'react-router';
 
@@ -10,7 +10,7 @@ import { Alert } from '../../../components/Alert';
 import { Button } from '../../../components/Button';
 import { apiErrorMessage } from '../../../lib/api/errorMessage';
 import { PROPERTY_RECORDS } from '../../public/content/properties';
-import { useCustomers, useDirectReferrals } from '../hooks/useMember';
+import { useCustomers, useDirectReferrals, useGenealogy } from '../hooks/useMember';
 import { createCustomer, submitSale } from '../services/member';
 import { SelectField } from '../../auth/components/SelectField';
 import { TextField } from '../../auth/components/TextField';
@@ -35,12 +35,14 @@ export function SaleSubmitPage() {
   const queryClient = useQueryClient();
   const customersQuery = useCustomers();
   const referralsQuery = useDirectReferrals();
+  const genealogyQuery = useGenealogy();
   const [customerId, setCustomerId] = useState('');
   const [addingCustomer, setAddingCustomer] = useState(false);
   const [newCustomer, setNewCustomer] = useState({ fullName: '', phone: '', email: '' });
   const [propertyId, setPropertyId] = useState('');
-  // Referrer: members only (a direct referral who referred the customer).
+  // Referrer: sponsor (default when linked) or a direct referral; None is explicit opt-out.
   const [referrerId, setReferrerId] = useState('');
+  const hasAutoSelectedSponsor = useRef(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [serverError, setServerError] = useState<string | undefined>();
   const [idempotencyKey] = useState(() =>
@@ -52,6 +54,30 @@ export function SaleSubmitPage() {
     () => properties.find((property) => property.id === propertyId),
     [properties, propertyId],
   );
+
+  const sponsor = genealogyQuery.data?.sponsor ?? null;
+
+  const referrerOptions = useMemo(() => {
+    const opts: { value: string; label: string }[] = [{ value: '', label: 'None' }];
+    if (sponsor) {
+      opts.push({ value: sponsor.id, label: `${sponsor.name} — Sponsor` });
+    }
+    for (const referral of referralsQuery.data ?? []) {
+      if (sponsor && referral.id === sponsor.id) continue;
+      opts.push({ value: referral.id, label: referral.name });
+    }
+    return opts;
+  }, [sponsor, referralsQuery.data]);
+
+  // Auto-select sponsor when the member has one and the field is still pristine.
+  useEffect(() => {
+    if (hasAutoSelectedSponsor.current) return;
+    if (referrerId !== '') return;
+    if (!sponsor) return;
+    if (genealogyQuery.isLoading) return;
+    hasAutoSelectedSponsor.current = true;
+    setReferrerId(sponsor.id);
+  }, [sponsor, referrerId, genealogyQuery.isLoading]);
 
   const createCustomerMutation = useMutation({ mutationFn: createCustomer });
   const submitSaleMutation = useMutation({
@@ -94,6 +120,7 @@ export function SaleSubmitPage() {
   };
 
   const onReferrerChange = (value: string) => {
+    hasAutoSelectedSponsor.current = true;
     setReferrerId(value);
     setErrors((current) => {
       const next = { ...current };
@@ -279,21 +306,22 @@ export function SaleSubmitPage() {
             optional
             value={referrerId}
             onChange={onReferrerChange}
-            options={[
-              { value: '', label: 'None' },
-              ...(referralsQuery.data ?? []).map((referral) => ({
-                value: referral.id,
-                label: referral.name,
-              })),
-            ]}
+            options={referrerOptions}
             error={errors.referrerId}
             hint={
-              'The member who referred this customer - pick from your direct referrals (members only). Leave empty and your sponsor automatically receives the referral share.'
+              sponsor
+                ? 'Your sponsor is pre-selected. You can keep it, choose one of your direct referrals, or select None.'
+                : 'Pick the member who referred this customer - your direct referrals are listed. Leave as None for no referral share.'
             }
           />
           {referralsQuery.isError ? (
             <p className={styles.referrerHint} role="status">
               Could not load your direct referrals.
+            </p>
+          ) : null}
+          {genealogyQuery.isError ? (
+            <p className={styles.referrerHint} role="status">
+              Could not load your sponsor.
             </p>
           ) : null}
         </fieldset>
