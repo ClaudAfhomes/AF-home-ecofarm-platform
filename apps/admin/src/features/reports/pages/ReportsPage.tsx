@@ -4,6 +4,7 @@ import {
   Button,
   EmptyState,
   ErrorState,
+  Icon,
   PageHeader,
   Skeleton,
   StatusChip,
@@ -16,7 +17,7 @@ import {
   Tabs,
   notifyError,
 } from '@jad/ui';
-import type { StatusTone } from '@jad/ui';
+import type { IconName, StatusTone } from '@jad/ui';
 import { formatMoney } from '@jad/shared';
 import type {
   CommissionReportRow,
@@ -124,10 +125,27 @@ function csvFileStamp(generatedAt: string): string {
   return generatedAt.slice(0, 10).replace(/-/g, '');
 }
 
-/** Metric tile in the summary grids. */
-function MetricTile({ label, value }: { label: string; value: string }) {
+/** Metric card in the summary grids (dashboard queue-card visual language). */
+function MetricTile({
+  label,
+  value,
+  icon,
+  tone = 'brand',
+}: {
+  label: string;
+  value: string;
+  icon: IconName;
+  tone?: 'brand' | 'success' | 'warning' | 'danger' | 'neutral';
+}) {
+  const toneClass =
+    tone === 'brand'
+      ? ''
+      : ` ${styles[`tile${tone[0]!.toUpperCase()}${tone.slice(1)}`] ?? ''}`;
   return (
-    <div className={styles.tile}>
+    <div className={`${styles.tile}${toneClass}`}>
+      <span className={styles.tileIcon} aria-hidden="true">
+        <Icon name={icon} size={18} />
+      </span>
       <span className={styles.tileValue}>{value}</span>
       <span className={styles.tileLabel}>{label}</span>
     </div>
@@ -203,15 +221,17 @@ export function ReportsPage() {
       />
 
       <div className={styles.controls}>
-        <Tabs
-          ariaLabel="Report type"
-          value={tab}
-          onChange={(value) => setTab(value as ReportTab)}
-          items={[
-            { value: 'sales', label: 'Sales & Commissions' },
-            { value: 'summary', label: 'Operational Summary' },
-          ]}
-        />
+        <div className={styles.controlsTop}>
+          <Tabs
+            ariaLabel="Report type"
+            value={tab}
+            onChange={(value) => setTab(value as ReportTab)}
+            items={[
+              { value: 'sales', label: 'Sales & Commissions' },
+              { value: 'summary', label: 'Operational Summary' },
+            ]}
+          />
+        </div>
 
         {tab === 'sales' ? (
           <div className={styles.toolbar}>
@@ -240,6 +260,9 @@ export function ReportsPage() {
             >
               Generate
             </Button>
+            <p className={styles.toolbarHint}>
+              Optional: leave From or To empty to report on all time.
+            </p>
           </div>
         ) : (
           <div className={styles.toolbar}>
@@ -272,16 +295,36 @@ export function ReportsPage() {
               </div>
               <div className={styles.tiles}>
                 <MetricTile
+                  icon="list"
                   label="Sales in range"
                   value={String(report.summary.salesCount)}
                 />
                 <MetricTile
+                  icon="wallet"
                   label="Sales value total"
                   value={formatMoney(report.summary.salesValueTotal)}
                 />
                 {Object.entries(report.summary.commissionsByStatus).map(([status, breakdown]) => (
                   <MetricTile
                     key={status}
+                    icon={
+                      status === 'AVAILABLE'
+                        ? 'check'
+                        : status === 'PENDING'
+                          ? 'clock'
+                          : status === 'REVERSED'
+                            ? 'alert'
+                            : 'close'
+                    }
+                    tone={
+                      status === 'AVAILABLE'
+                        ? 'success'
+                        : status === 'PENDING'
+                          ? 'warning'
+                          : status === 'REVERSED'
+                            ? 'danger'
+                            : 'neutral'
+                    }
                     label={`${COMMISSION_STATUS_LABEL[status as CommissionReportRow['status']]} commissions`}
                     value={`${breakdown.count} · ${formatMoney(breakdown.total)}`}
                   />
@@ -291,7 +334,8 @@ export function ReportsPage() {
               <div className={styles.sectionHead}>
                 <h2 className={styles.sectionTitle}>Sales</h2>
                 <Button variant="secondary" onClick={downloadSalesCsv}>
-                  Download CSV (sales + commissions)
+                  <Icon name="download" size={16} aria-hidden="true" /> Download CSV (sales +
+                  commissions)
                 </Button>
               </div>
               {report.sales.length === 0 ? (
@@ -403,33 +447,55 @@ export function ReportsPage() {
                   Snapshot as of {formatDate(summary.data.generatedAt)}
                 </h2>
                 <Button variant="secondary" onClick={downloadSummaryCsv}>
-                  Download CSV
+                  <Icon name="download" size={16} aria-hidden="true" /> Download CSV
                 </Button>
               </div>
               <div className={styles.tiles}>
-                <MetricTile label="Active members" value={String(summary.data.members.active)} />
                 <MetricTile
+                  icon="users"
+                  label="Active members"
+                  value={String(summary.data.members.active)}
+                />
+                <MetricTile
+                  icon="user-plus"
+                  tone="warning"
                   label="Pending registrations"
                   value={String(summary.data.registrations.pending)}
                 />
-                <MetricTile label="Total sales" value={String(summary.data.sales.total)} />
                 <MetricTile
+                  icon="list"
+                  label="Total sales"
+                  value={String(summary.data.sales.total)}
+                />
+                <MetricTile
+                  icon="clock"
+                  tone="warning"
                   label="Pending withdrawals"
                   value={String(summary.data.withdrawals.pendingCount)}
                 />
                 <MetricTile
+                  icon="wallet"
+                  tone="warning"
                   label="Pending withdrawal money"
                   value={formatMoney(summary.data.withdrawals.pendingTotal)}
                 />
                 <MetricTile
+                  icon="check"
+                  tone="success"
                   label="Cleared commissions"
                   value={formatMoney(summary.data.commissions.availableTotal)}
                 />
                 <MetricTile
+                  icon="clock"
+                  tone="warning"
                   label="Pending commissions"
                   value={formatMoney(summary.data.commissions.pendingTotal)}
                 />
-                <MetricTile label="New inquiries" value={String(summary.data.inquiries.new)} />
+                <MetricTile
+                  icon="message"
+                  label="New inquiries"
+                  value={String(summary.data.inquiries.new)}
+                />
               </div>
 
               <div className="table-scroll">
