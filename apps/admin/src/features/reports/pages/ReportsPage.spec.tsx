@@ -59,6 +59,15 @@ describe('ReportsPage', () => {
     expect(revokeObjectURL).toHaveBeenCalledWith('blob:mock-url');
   });
 
+  it('summary tab shows the empty state while nothing has been generated (no idle-query skeleton)', () => {
+    renderWithProviders(<ReportsPage />, { user: MOCK_ADMIN, route: '/admin/reports' });
+    fireEvent.click(screen.getByRole('tab', { name: 'Operational Summary' }));
+    // TanStack v5 keeps a disabled query in status 'pending' - the page must
+    // not render the loading skeleton until the user presses Generate.
+    expect(screen.getByText('No report yet')).toBeInTheDocument();
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
+  });
+
   it('generates and downloads the operational summary report', async () => {
     renderWithProviders(<ReportsPage />, { user: MOCK_ADMIN, route: '/admin/reports' });
     fireEvent.click(screen.getByRole('tab', { name: 'Operational Summary' }));

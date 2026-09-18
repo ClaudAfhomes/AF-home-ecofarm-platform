@@ -436,7 +436,15 @@ export function ReportsPage() {
         </>
       ) : (
         <>
-          {summary.isPending ? (
+          {!summaryRequested ? (
+            /* Disabled TanStack queries sit in status 'pending' (fetchStatus
+             * 'idle') - gate the skeleton on whether the user asked for a run
+             * or it shows forever before Generate. */
+            <EmptyState
+              title="No report yet"
+              description="Press Generate to build the operational snapshot."
+            />
+          ) : summary.isPending ? (
             <Skeleton style={{ height: 320 }} />
           ) : summary.isError ? (
             <ErrorState error={summary.error} onRetry={() => void summary.refetch()} />
