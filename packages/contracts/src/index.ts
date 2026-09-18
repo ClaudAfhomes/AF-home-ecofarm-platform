@@ -132,6 +132,20 @@ export type {
 export { adminQueuesSchema, adminMemberSchema } from './schemas/admin.js';
 export type { AdminQueues, AdminMember } from './schemas/admin.js';
 export {
+  salesReportRowSchema,
+  commissionReportRowSchema,
+  reportBreakdownSchema,
+  salesCommissionsReportSchema,
+  operationalSummaryReportSchema,
+} from './schemas/report.js';
+export type {
+  SalesReportRow,
+  CommissionReportRow,
+  ReportBreakdown,
+  SalesCommissionsReport,
+  OperationalSummaryReport,
+} from './schemas/report.js';
+export {
   sessionUserSchema,
   loginRequestSchema,
   loginResponseSchema,

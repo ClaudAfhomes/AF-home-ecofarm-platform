@@ -10,6 +10,7 @@ import { SalesPage } from '../features/sales/pages/SalesPage';
 import { SaleDetailPage } from '../features/sales/pages/SaleDetailPage';
 import { PayoutsPage } from '../features/payouts/pages/PayoutsPage';
 import { WithdrawalsPage } from '../features/withdrawals/pages/WithdrawalsPage';
+import { ReportsPage } from '../features/reports/pages/ReportsPage';
 import { VouchersPage } from '../features/vouchers/pages/VouchersPage';
 import { VoucherDetailPage } from '../features/vouchers/pages/VoucherDetailPage';
 import { ScanVoucherPage } from '../features/vouchers/pages/ScanVoucherPage';
@@ -117,6 +118,14 @@ export default function App() {
             element={
               <RequireRole>
                 <WithdrawalsPage />
+              </RequireRole>
+            }
+          />
+          <Route
+            path="/admin/reports"
+            element={
+              <RequireRole>
+                <ReportsPage />
               </RequireRole>
             }
           />

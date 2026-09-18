@@ -1,5 +1,13 @@
-import type { AdminQueues, ContentKind } from '@jad/contracts';
+import type {
+  AdminQueues,
+  CommissionReportRow,
+  ContentKind,
+  OperationalSummaryReport,
+  SalesCommissionsReport,
+  SalesReportRow,
+} from '@jad/contracts';
 import { CMS_PROPERTIES_SEED, STAFF_MODULE_LABEL, roleNameFor } from '@jad/contracts';
+import { multiplyMoney, addMoney } from '@jad/shared';
 import type { MockRequestContext, MockRoute } from '@jad/mock';
 import { contentStore, createStoreContent, deleteStoreContent } from './contentMockStore';
 import { configStore, updateStoreConfig } from './configMockStore';
@@ -72,6 +80,44 @@ function notFound(entity: string) {
   };
 }
 
+/** Report range from the request URL (`?from=YYYY-MM-DD&to=YYYY-MM-DD`). */
+function reportRangeFromUrl(url: string): { from: string | null; to: string | null } {
+  const query = new URL(url, 'http://mock.local').searchParams;
+  const from = query.get('from');
+  const to = query.get('to');
+  return { from: from ?? null, to: to ?? null };
+}
+
+function inMockRange(submittedAt: string, range: { from: string | null; to: string | null }) {
+  if (range.from && submittedAt < `${range.from}T00:00:00.000Z`) return false;
+  if (range.to && submittedAt >= `${range.to}T23:59:59.999Z`) return false;
+  return true;
+}
+
+const EARNING_SALE_STATUSES = ['PAYMENT_VERIFIED', 'QUALIFYING_SALE', 'LOCKED'] as const;
+
+/** Mock commissions derived from the sales store (8% direct-rate snapshot). */
+function mockCommissionsFor(sales: typeof MOCK_SALES): CommissionReportRow[] {
+  return sales
+    .filter((sale) => (EARNING_SALE_STATUSES as readonly string[]).includes(sale.status))
+    .map((sale) => ({
+      id: `com-rpt-${sale.id}`,
+      saleId: sale.id,
+      memberName: sale.sellerName,
+      commissionType: 'DIRECT_COMMISSION' as const,
+      amount: multiplyMoney(sale.propertyValue, '0.0800'),
+      status: (sale.status === 'PAYMENT_VERIFIED' ? 'PENDING' : 'AVAILABLE') as
+        | 'PENDING'
+        | 'AVAILABLE',
+      createdAt: sale.submittedAt,
+      ...(sale.status === 'QUALIFYING_SALE' || sale.status === 'LOCKED'
+        ? { clearedAt: sale.submittedAt }
+        : {}),
+    }));
+}
+
+
+
 function fail(message: string) {
   const status = /not found|does not exist/i.test(message)
     ? 404
@@ -107,6 +153,136 @@ export const adminMockHandlers: MockRoute[] = [
       members: MOCK_MEMBERS.length,
       withdrawals: MOCK_WITHDRAWALS.length,
     }),
+  },
+  {
+    path: '/admin/reports/sales-commissions',
+    response: (ctx: MockRequestContext) => {
+      const range = reportRangeFromUrl(ctx.url);
+      const sales: SalesReportRow[] = MOCK_SALES.filter((sale) =>
+        inMockRange(sale.submittedAt, range),
+      ).map((sale) => ({
+        id: sale.id,
+        propertyName: sale.propertyName,
+        sellerName: sale.sellerName,
+        status: sale.status,
+        propertyValue: sale.propertyValue,
+        ...(typeof sale.referrerName === 'string' && sale.referrerName.length > 0
+          ? { referrerName: sale.referrerName }
+          : {}),
+        submittedAt: sale.submittedAt,
+      }));
+      const commissions = mockCommissionsFor(MOCK_SALES)
+        .filter((row) => sales.some((sale) => sale.id === row.saleId))
+        .sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+      const salesByStatus: SalesCommissionsReport['summary']['salesByStatus'] = {
+        SUBMITTED: { count: 0, total: '0.00' },
+        ADMIN_APPROVED: { count: 0, total: '0.00' },
+        PAYMENT_VERIFIED: { count: 0, total: '0.00' },
+        QUALIFYING_SALE: { count: 0, total: '0.00' },
+        REJECTED: { count: 0, total: '0.00' },
+        LOCKED: { count: 0, total: '0.00' },
+      };
+      let salesValueTotal = '0.00';
+      for (const sale of sales) {
+        const slot = salesByStatus[sale.status];
+        slot.count += 1;
+        slot.total = addMoney(slot.total, sale.propertyValue);
+        salesValueTotal = addMoney(salesValueTotal, sale.propertyValue);
+      }
+      const commissionsByStatus: SalesCommissionsReport['summary']['commissionsByStatus'] = {
+        PENDING: { count: 0, total: '0.00' },
+        AVAILABLE: { count: 0, total: '0.00' },
+        CANCELLED: { count: 0, total: '0.00' },
+        REVERSED: { count: 0, total: '0.00' },
+      };
+      for (const row of commissions) {
+        const slot = commissionsByStatus[row.status];
+        slot.count += 1;
+        slot.total = addMoney(slot.total, row.amount);
+      }
+      const report: SalesCommissionsReport = {
+        range,
+        generatedAt: new Date().toISOString(),
+        sales,
+        commissions,
+        summary: {
+          salesCount: sales.length,
+          salesValueTotal,
+          salesByStatus,
+          commissionsByStatus,
+        },
+      };
+      return report;
+    },
+  },
+  {
+    path: '/admin/reports/summary',
+    response: (): OperationalSummaryReport => {
+      const members = registrationStore.members;
+      const withdrawalRows: { amount: string; status: string }[] = MOCK_WITHDRAWALS.map((w) => ({
+        amount: w.amount,
+        status: w.status,
+      }));
+      const commissionRows: { amount: string; status: string }[] = mockCommissionsFor(
+        MOCK_SALES,
+      ).map((c) => ({ amount: c.amount, status: c.status }));
+      const pendingWithdrawals = withdrawalRows.filter(
+        (row) => row.status === 'REQUESTED' || row.status === 'RESERVED',
+      );
+      const saleStatuses = MOCK_SALES.map((s) => s.status);
+      const count = (rows: { status: string }[], status: string) =>
+        rows.filter((row) => row.status === status).length;
+      const sum = (rows: { amount: string; status: string }[], status?: string): string => {
+        let total = '0.00';
+        for (const row of rows) {
+          if (status !== undefined && row.status !== status) continue;
+          total = addMoney(total, row.amount);
+        }
+        return total;
+      };
+      return {
+        generatedAt: new Date().toISOString(),
+        members: {
+          active: members.filter((m) => m.accountStatus === 'ACTIVE').length,
+          inactive: members.filter((m) => m.accountStatus === 'INACTIVE').length,
+          archived: 0,
+        },
+        registrations: {
+          total: registrationStore.registrations.length,
+          pending: registrationStore.registrations.filter((row) => row.status === 'PENDING')
+            .length,
+          rejected: registrationStore.registrations.filter((row) => row.status === 'REJECTED')
+            .length,
+        },
+        sales: {
+          total: saleStatuses.length,
+          byStatus: {
+            SUBMITTED: saleStatuses.filter((s) => s === 'SUBMITTED').length,
+            ADMIN_APPROVED: saleStatuses.filter((s) => s === 'ADMIN_APPROVED').length,
+            PAYMENT_VERIFIED: saleStatuses.filter((s) => s === 'PAYMENT_VERIFIED').length,
+            QUALIFYING_SALE: saleStatuses.filter((s) => s === 'QUALIFYING_SALE').length,
+            REJECTED: saleStatuses.filter((s) => s === 'REJECTED').length,
+            LOCKED: saleStatuses.filter((s) => s === 'LOCKED').length,
+          },
+        },
+        withdrawals: {
+          pendingCount: pendingWithdrawals.length,
+          pendingTotal: sum(pendingWithdrawals),
+          completedCount: count(withdrawalRows, 'COMPLETED'),
+          completedTotal: sum(withdrawalRows, 'COMPLETED'),
+          rejectedCount: count(withdrawalRows, 'REJECTED'),
+        },
+        commissions: {
+          pendingCount: count(commissionRows, 'PENDING'),
+          pendingTotal: sum(commissionRows, 'PENDING'),
+          availableCount: count(commissionRows, 'AVAILABLE'),
+          availableTotal: sum(commissionRows, 'AVAILABLE'),
+        },
+        inquiries: {
+          new: inquiryStore.items.filter((item) => item.status === 'NEW').length,
+        },
+      };
+    },
   },
   {
     path: '/admin/registrations',

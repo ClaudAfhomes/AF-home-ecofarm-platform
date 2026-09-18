@@ -392,6 +392,24 @@ export function selectHandler(
     };
   }
   if (
+    pathname === '/api/v1/admin/reports/sales-commissions' ||
+    pathname === '/api/admin/reports/sales-commissions'
+  ) {
+    return {
+      handler: lazy(() => import('../_handlers/admin/reports/sales-commissions.js')),
+      routeKey: 'admin/reports/sales-commissions',
+    };
+  }
+  if (
+    pathname === '/api/v1/admin/reports/summary' ||
+    pathname === '/api/admin/reports/summary'
+  ) {
+    return {
+      handler: lazy(() => import('../_handlers/admin/reports/summary.js')),
+      routeKey: 'admin/reports/summary',
+    };
+  }
+  if (
     pathname === '/api/v1/crons/commission-clearing' ||
     pathname === '/crons/commission-clearing'
   ) {

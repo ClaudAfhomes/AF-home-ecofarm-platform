@@ -77,6 +77,7 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
       { to: '/admin/sales', label: 'Sales', module: 'sales' },
       { to: '/admin/payouts', label: 'Payouts', module: 'payouts' },
       { to: '/admin/withdrawals', label: 'Withdrawals', module: 'withdrawals' },
+      { to: '/admin/reports', label: 'Reports', module: 'sales' },
       { to: '/admin/vouchers', label: 'Vouchers', module: 'vouchers' },
     ],
   },
