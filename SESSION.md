@@ -1,23 +1,10 @@
 # SESSION.md - handoff for a new chat session
 
-Date: 2026-09-17 (UTC). This session (plan mode → build mode): planned then built
-**Phase K - production polish (7 tasks)** - contact page production-ready, EmailJS
-verification, policies dynamic via `slug`, responsive public nav drawer, dashboard
-loading polish (Spinner + centered SweetAlert), admin programs editable + `{{programs}}`
-token, full SweetAlert migration (drop `ToastProvider`); then follow-up polish:
-em-dash/dev-note cleanup, centered notifications, RegistrationStatus crash fix,
-pending-replay update (`replayed` flag), and the 4-issue batch (status button color,
-policy not-found + solid header, properties↔CMS sync, registration-detail placeholders).
-**Deployed 3 times** (`vercel --prod`); latest production deployment is
-`jad-realty-erkpcytks-orlando-workspace-afhomes.vercel.app` (aliased
-`https://jadrealty.vercel.app`). All working-tree changes below are **uncommitted**.
+Date: 2026-09-18 (UTC). This session (plan → build, 4 turns): instant commission credit on qualification (no 7-day wait), qualify double-submit fix, cross-account login redirect fix, pipeline-pending estimate (referrer + sponsor fallback), admin ready-to-qualify indicator, return-shape bug fix, referrer-commission model (members only), payout-mask fix, sale-delete guard + orphan cleanup (block when credited), commissions dead-link guard, sponsor-fallback commission, pending estimate downline slice, admin loading-state hardening (10-item checklist), archived-list mapping fix, login/session archived+inactive gates + Auth ban hardening + mock parity. **Deployed once** (`vercel --prod`); latest production deployment is `jad-realty-95fc27kvg-orlando-workspace-afhomes.vercel.app` (aliased `https://jadrealty.vercel.app`). Most recent changes below are **uncommitted** (prior turns committed as `9d78da8`, `71323a0`, `1278dee` on `staging`).
 
 ## Deployment - current state (the important part)
 
-**Live site:** `https://jadrealty.vercel.app` (production alias of the `jad-realty` Vercel
-project under `orlando-workspace-afhomes`). All deploys are **manual**: `pnpm dlx vercel
---prod` from the repo root (deploy source shows as the `staging` branch). Branch history is
-`feature/chat` → merged/committed by the user; there is no git auto-deploy wired up.
+**Live site:** `https://jadrealty.vercel.app` (production alias of the `jad-realty` Vercel project under `orlando-workspace-afhomes`). All deploys are **manual**: `pnpm dlx vercel --prod` from the repo root (deploy source shows as the `staging` branch). Branch history is `feature/chat` → merged/committed by the user; there is no git auto-deploy wired up.
 
 **Topology (all one origin - required for auth):**
 
@@ -28,10 +15,7 @@ project under `orlando-workspace-afhomes`). All deploys are **manual**: `pnpm dl
 - `/crons/commission-clearing` → daily commission-clearing trigger (GET, see below)
 
 **Supabase:** project `vudwoqduebdgtzvybywb.supabase.co` (URL is in root `.env`).
-**Super-admin login is `jad@admin.com` / `SUPABASE_PROD_SUPERADMIN_PASSWORD`** (both in root
-`.env`). `admin@jad.local` and `user@jad.local` **do not exist** on the deployed DB - do not
-suggest them. Migrations + seed are applied (`pnpm db:migrate` uses root `.env`
-`DATABASE_URL`; versions recorded in `supabase_migrations.schema_migrations`).
+**Super-admin login is `jad@admin.com` / `SUPABASE_PROD_SUPERADMIN_PASSWORD`** (both in root `.env`). `admin@jad.local` and `user@jad.local` **do not exist** on the deployed DB - do not suggest them. Migrations + seed are applied (`pnpm db:migrate` uses root `.env` `DATABASE_URL`; versions recorded in `supabase_migrations.schema_migrations`).
 
 **New endpoints since the last handoff:**
 
@@ -40,17 +24,14 @@ suggest them. Migrations + seed are applied (`pnpm db:migrate` uses root `.env`
 - `POST /admin/programs`, `PATCH /admin/programs/:id` (staff `programs` super_admin, audited; `isActive` retire)
 - `POST /auth/verify-email`, `POST /auth/verify-email/resend` rewritten to self-managed EmailJS codes (see Phase K)
 - `POST /admin/commissions/clear-due` (staff `withdrawals`+FINANCE_VIEW, audited)
-- `GET /crons/commission-clearing` (daily Vercel cron; **intentionally unauthenticated** -
-  idempotent + time-gated, can create no money; system actor)
-- Frontend routes: `/auth/forgot-password`, `/auth/reset-password` (Supabase
-  `resetPasswordForEmail` → PKCE recovery session → `updateUser`)
+- `GET /crons/commission-clearing` (daily Vercel cron; **intentionally unauthenticated** - idempotent + time-gated, can create no money; system actor)
+- Frontend routes: `/auth/forgot-password`, `/auth/reset-password` (Supabase `resetPasswordForEmail` → PKCE recovery session → `updateUser`)
 - `GET /policies` now returns `slug` and filters active programs
 
 **New migrations applied (all live, verified in prod):**
 
 - `20261016000001_sale_qualify_coalesce_fix.sql` - `(v_patch ->> 'sellerId')::uuid` cast
-- `20261016000002_list_order_indexes.sql` - `Member(createdAt)`, `Sale(submittedAt)`,
-  `Sale(sellerId,submittedAt)`, `Commission(memberId,createdAt)`
+- `20261016000002_list_order_indexes.sql` - `Member(createdAt)`, `Sale(submittedAt)`, `Sale(sellerId,submittedAt)`, `Commission(memberId,createdAt)`
 - `20261017000001_role_authenticated_read.sql` - `grant select (slug, name) on "Role" to authenticated`
 - `20261017000002_sale_qualify_referral_fix.sql` - per-`commissionType` idempotency + `DIRECT_REFERRAL` backfill
 - `20261017000003_commission_clearing.sql` - `commission_clear`, `commission_clear_batch`, `COMMISSION_CLEARING_DAYS='7'`
@@ -62,23 +43,21 @@ suggest them. Migrations + seed are applied (`pnpm db:migrate` uses root `.env`
 - `20261018000004_policy_realtime.sql` - `alter publication supabase_realtime add table "Policy"`
 - `20261018000005_program_is_active.sql` - `Program.isActive boolean default true`, public RLS `using ("isActive")`
 - `20261018000006_policy_type_normalize.sql` - `type/slug='policies'` → `terms` when title contains "term"
+- `20261019000001_sale_qualify_immediate_credit.sql` - `sale_qualify` now inserts `AVAILABLE` + inline `commission_clear` (wallet/ledger) in same tx; sweep `commission_clear_batch(0,'system')`
+- `20261019000002_sale_qualify_return_fix.sql` - fixes `jsonb_build_object('sale', v_sale)` nesting bug via `v_sale_json jsonb` → flat `{"sale":{…}}`
+- `20261019000003_sale_referrer_id.sql` - `Sale.referrerId uuid` + best-effort backfill from `referrerName` → direct referral
+- `20261019000004_sale_qualify_referrer_model.sql` - `DIRECT_REFERRAL` payee is `Sale.referrerId` (members only, no free text); `referrerId` fallback removed (null = no referral)
+- `20261019000005_sale_delete_guard.sql` - `sale_delete(id,actor,role)` SECURITY DEFINER; blocks delete when any `AVAILABLE` commission exists; deletes non-credited commissions + sale + `SALE_DELETED` audit
+- `20261019000006_orphan_commission_cleanup.sql` - reverses/wallet-debits 3 orphan `AVAILABLE` commissions (Darcy 160k, Orlando 640k) with `COMMISSION_REVERSAL` ledger entries and removes rows
+- `20261019000007_sale_qualify_sponsor_fallback.sql` - fallback: `referrerId` wins else `Member.sponsorId` (never both); adds pending estimate downline slice + sponsor backfill
 
 ### How the deploy is wired
 
-- `scripts/prepare-vercel-env.mjs` - writes `VITE_WEB_URL`/`VITE_ADMIN_URL` into
-  `apps/{web,admin}/.env.production` from **`VERCEL_PROJECT_PRODUCTION_URL`** (fallback
-  `VERCEL_URL`). MUST be the canonical host, otherwise login redirects to a per-deployment URL
-  (different origin → different localStorage → login loop). Do not set these vars in Vercel env.
-- `scripts/assemble-vercel-output.mjs` - copies `apps/web/dist` → `vercel-static/` and
-  `apps/admin/dist` → `vercel-static/admin/`.
-- `vercel.json` - `framework: null`, buildCommand chain (prepare → `turbo run build` →
-  assemble), `outputDirectory: vercel-static`, rewrites (`/api/v1/:path*`→`/api/router`,
-  `/health`→`/api/router?path=health`, `/admin*`→admin index, `/(.*)`→web index),
-  `functions: { "api/router.ts": { "includeFiles": "packages/**" } }`, and `crons`:
-  `/health` daily `0 0 * * *` + `/crons/commission-clearing` daily `0 1 * * *`. **Hobby allows max 2 daily crons**.
+- `scripts/prepare-vercel-env.mjs` - writes `VITE_WEB_URL`/`VITE_ADMIN_URL` into `apps/{web,admin}/.env.production` from **`VERCEL_PROJECT_PRODUCTION_URL`** (fallback `VERCEL_URL`). MUST be the canonical host, otherwise login redirects to a per-deployment URL (different origin → different localStorage → login loop). Do not set these vars in Vercel env.
+- `scripts/assemble-vercel-output.mjs` - copies `apps/web/dist` → `vercel-static/` and `apps/admin/dist` → `vercel-static/admin/`.
+- `vercel.json` - `framework: null`, buildCommand chain (prepare → `turbo run build` → assemble), `outputDirectory: vercel-static`, rewrites (`/api/v1/:path*`→`/api/router`, `/health`→`/api/router?path=health`, `/admin*`→admin index, `/(.*)`→web index), `functions: { "api/router.ts": { "includeFiles": "packages/**" } }`, and `crons`: `/health` daily `0 0 * * *` + `/crons/commission-clearing` daily `0 1 * * *`. **Hobby allows max 2 daily crons**.
 - **CRITICAL:** `includeFiles` must stay `packages/**`. Narrowing it risks `ERR_MODULE_NOT_FOUND .../@jad/contracts/src/index.ts`.
-- `.vercelignore` - excludes `**/*.spec.ts(x)`, `api/dev-server.ts`, `supabase/`, `docs/`,
-  `node_modules/`, `.turbo/`, `vercel-static/`, **`.env*`**, `.vercel/`.
+- `.vercelignore` - excludes `**/*.spec.ts(x)`, `api/dev-server.ts`, `supabase/`, `docs/`, `node_modules/`, `.turbo/`, `vercel-static/`, **`.env*`**, `.vercel/`.
 - `.gitignore` - added `vercel-static/`.
 
 ### Single-function API (Vercel Hobby caps at 12 functions)
@@ -91,18 +70,33 @@ suggest them. Migrations + seed are applied (`pnpm db:migrate` uses root `.env`
 - `api/_lib/catalog-cms-sync.ts` - bidirectional catalog↔CMS `properties` sync for linked listings (`catalogId`), exact-decimal price gate, version bump + realtime broadcast.
 - `api/_lib/env.ts` - no hardcoded URL fallback; trims `url`/`serviceKey`/`anonKey`; `getEmailJsConfig()` requires `EMAILJS_SERVICE_ID/TEMPLATE_ID/PUBLIC_KEY`.
 
-### What this session built (all uncommitted, most deployed)
+### What this session built (uncommitted; prior turns deployed: 9d78da8, 71323a0, 1278dee on staging)
 
-- **SweetAlert2** (`sweetalert2` in `@jad/ui` + `apps/web` + `apps/admin`): `notifySuccess` (centered toast `position: 'center'`, timer 2400) + `notifyError`/`notifyWarning` (centered modals via `jad-swal-*` + `align-items:center` in `base.css`); removed `ToastProvider`/`Toast.tsx`/`Toast.module.css`/`Toast.spec.tsx`; migrated 47 `toast({…tone:'success|danger|warning'})` sites in admin + 6 member success surfaces + CMS banners; fixed `BroadcastsPage.spec` sync assert, `RoleDetailPage.spec`/`AdminLayout.mustChange.spec` provider wrapping, `SaleDetailPage.spec` notice; added `Spinner` (`@jad/ui/src/components/Spinner.tsx` + `Spinner.module.css` with `spin` keyframe, `aria-hidden` vs `role="status"`), wired into both `Button`s (`aria-busy`); guards now render centered `Spinner` + skeletons (`RequireRole.module.css`, `RequireMember.module.css`, `RequireQualifiedMember.module.css` use `min-height:70vh; place-items:center`); dashboards use centered loading row/mini skeletons; `ScanVoucherPage` inline spinner.
-- **Contact** (fully functional): `packages/contracts/src/schemas/contact.ts` (`contactSubmissionRequestSchema` with honeypot `company`, `contactInquirySchema`, `contactInquiryUpdateSchema`), `api/_handlers/contact.ts` (honeypot silent 201, per-IP throttle 5 per 15 min via `ipHash` + `getSupabaseEnv().serviceKey`, `prefixedId('inq')`), `api/_handlers/admin/inquiries.ts` + `[id].ts` (staff `cms`, `INQUIRY_STATUS_UPDATED` audit), `apps/web/src/features/public/pages/ContactPage.tsx` (controlled form, required, inline errors, `submitContact` via `@/lib/api/endpoints.ts`, `serverError` → `Alert`, `Sending…` state, honeypot off-screen), `apps/admin/src/features/inquiries/{services,hooks,pages}` + `/admin/inquiries` route under Website CMS (reuse `cms` module), `inquiryMockStore.ts` + `mock/handlers.ts` hooks, `adminQueuesSchema` unchanged; updated `api/_handlers/matrix.spec.ts` and `route-coverage`.
-- **Email verification via EmailJS**: `supabase/migrations/20261018000002…`, `api/_lib/emailjs.ts` + `verification-code.ts` (HMAC-SHA256 with `EMAIL_OTP_PEPPER` or service key, `generateCode()`, `issueVerificationCode` with 60s cooldown + 5/hour cap, `checkVerificationCode` with max 5 attempts, 15-min TTL, legacy `resolveAuthUserId` scan), `api/_handlers/auth/register.ts` (pending-replay now `refreshPendingRegistration` - updates the existing PENDING row with latest details, re-sends OTP, returns `replayed: true`; lost-race and orphan-auth paths share it; validation moved before the replay check; `toApplicationPayload` gains `replayed`), `verify-email.ts` (hash check + bounded legacy `user_id` resolve + `email_confirm: true`), `verify-email/resend.ts` (cooldown/429), contracts `resendVerificationResponseSchema.retryAfterSeconds` + `registerResponseSchema.emailSent/replayed`, `apps/web/src/features/auth/pages/VerifyEmailPage.tsx` (60s countdown, `sendFailed` warning, `replayed` info banner, `notifySuccess` on verify/resend), `RegisterPage.tsx` (forwards `replayed`), `.env.example` EmailJS template docs, `.env` local vars, Vercel env `EMAILJS_*` set but the **service ID was misconfigured** (see verification below).
-- **Policies dynamic via stable slug**: `packages/contracts/src/schemas/policy.ts` (`policySchema.slug`, `policySlugSchema`), `packages/contracts/src/seeds/reference.ts` + `apps/web/src/mock/store.ts` + `apps/admin/src/mock/policyMockStore.ts` now carry `slug`, `supabase/migrations/20261018000003…` (slug from `type`/`id`, `CHECK`, `UNIQUE`) + `20261018000006…` (legacy `type='policies'` → `terms` by title), `api/_handlers/policies.ts` + `[id].ts` (select/insert/update `slug`, 409 on duplicate), `supabase/seed.ts` upserts `slug`, `apps/web/src/features/public/content/policies.ts` (`TERMS_POLICY_SLUG`/`PRIVACY_POLICY_SLUG`/`GUIDELINES_POLICY_SLUG`, `POLICY_FALLBACK` with slugs, `findPolicy` matches slug/id/type case-insensitively, `splitProgramsToken`), `apps/web/src/hooks/usePolicyLinks.ts` (type-aware), `apps/web/src/hooks/usePolicies.ts` unchanged, `apps/web/src/lib/cmsRealtime.ts` (Policy `postgres_changes` → `['policies']`), admin `PolicyFormDialog`/`PolicyEditDialog` (slug field + select Type with canonical `terms`/`privacy`/`guidelines` and `slugifyPolicyTitle`), `apps/web/src/features/auth/pages/LoginPage.tsx` + `components/RegistrationForm.tsx` consent links now dynamic (hide when the policy is absent), `PublicLayout`/policy pages link by `slug`, member policy pages link by `slug`.
-- **Programs editable + `{{programs}}` token**: `supabase/migrations/20261018000005…` (`Program.isActive`), `packages/contracts/src/schemas/program.ts` (`programAdminSchema`, `programCreateSchema`/`programUpdateSchema`), `api/_handlers/programs.ts` (public `eq isActive`), `api/_handlers/admin/programs.ts` + `[id].ts` (super_admin), `apps/admin/src/features/config/{services/config,hooks/useAdminPrograms,hooks/useCreateProgram,hooks/useUpdateProgram,components/ProgramFormDialog}` + `ConfigPage.tsx` (super_admin `New program`/`Edit`, `isActive` toggle, read-only for others), `apps/web/src/features/public/components/PolicyPrograms.tsx` + `splitProgramsToken` consumption in `PolicyDetailPage.tsx` (public + member).
-- **Responsive public nav drawer**: `apps/web/src/app/MobileNavigation.tsx` + `.module.css` rewritten to a single `navOpen` class that becomes a fixed slide-down overlay at `768px` (backdrop, Escape, body `overflow:hidden`, close on pathname/resize/desktop), `Header.tsx` closes on route/desktop; tests updated (`PublicLayout.spec` Escape test kept, `Header.spec`/`ButtonLink.spec` visited-link assertions preserved).
-- **Registration re-render crash fix**: `apps/web/src/features/auth/pages/RegistrationStatusPage.tsx` no longer casts `registerCms.status` to `AUTH.status` (which has `pending`/`steps`); it composes screen-copy fields from CMS and takes `pending/steps/signInLabel` from `AUTH.status`; added regression test serving `CMS_REGISTER_SEED` at `/cms/register`.
-- **Content production-ready pass**: replaced every em/endash (literal, `\u2014`, entities) with `-`/`-` across `apps/`, `packages/`, `api/`, `supabase/`, `scripts/`, `docs/`, `AGENTS.md`/`README.md`/`SESSION.md`; removed user-visible dev notes (RegistrationForm preview note, VerifyEmail/ForgotPassword `simulatedEmail` banners, `PlaceholderNotice` + both `PlaceholderPage`s) and reworded stale `AUTH.login/status` copy; `RegistrationStatusPage.module.css` `.signInLink` gold on blue changed to `--color-text-on-brand`.
-- **Em-dash follow-up**: normalized lone-dash placeholders `' - '` → `'-'` and `&mdash;` etc.; fixed `SaleFormDialog` `Price TBD` → `Price unavailable`.
-- **Centering**: `notifySuccess` is now a centered toast; `base.css` forces `.jad-swal-container` centered; route-guard loading states use `min-height:70vh; place-items:center` so the spinner appears mid-viewport.
+**Commission instant-credit + pending pipeline:**
+- `sale_qualify` now credits `AVAILABLE` + `clearedAt` + `Wallet` (`availableBalance`, `totalEarned`, recomputed `pendingAmount` via `990.00` mask) + `LedgerEntry` `CREDIT` + `COMMISSION_CLEARED` audit in the same tx; per-type idempotency; referral backfill + sweep `commission_clear_batch(0)`. Referrer model: `DIRECT_REFERRAL` → `Sale.referrerId` when set else `Member.sponsorId` (never both), no self-pay. `pendingCommission` computed server-side in `GET /me/wallet` via `pending-commission.ts` (`ownSales×direct` + `referredSales×referral` + `downlineSales(referrerId IS NULL)×referral`), with `multiplyMoney` in `@jad/shared` (BigInt, PG-compatible half-away). Contract `walletSchema.pendingCommission` optional; `saleSchema.referrerId`, `submitSaleRequestSchema.referrerId`.
+
+**Qualify fixes:**
+- `ConfirmDialog` gained `confirmDisabled`/`confirmLoading` (`packages/ui/src/components/ConfirmDialog.tsx`); `SaleDetailPage` gained `inFlight` ref + `deleteMut.isPending` guard, close-on-success only, `ConfirmDialog` pending wiring; `SalesPage` guard via `deleteMut.isPending`; `SaleFormDialog` added `if (isPending) return` race guard.
+- `api/_lib/pipeline.ts` same-status idempotent (`patch.status === currentStatus → null`); handler same-status no-op for non-qualify, always RPC for `QUALIFYING_SALE`.
+- Return-shape fix: `select to_jsonb(s) into v_sale_json` → `jsonb_build_object('sale', v_sale_json)`; handler defensively unwraps `sale.to_jsonb ?? sale`. Specs updated to flat.
+
+**Referrer flow:**
+- `submitSaleRequestSchema` now `referrerId` (no free text); `SaleSubmitPage` select uses `referrerId` (id + name) from `useDirectReferrals`, hint notes sponsor fallback; admin `SaleFormDialog` filters `referrerOptions` to `sponsorId === sellerId`, clears invalid referrer on seller change, edit prefill + `updateMut` includes `referrerId/referrerName`.
+- API `POST /sales` + `/sales/:id/resubmit` + `POST /admin/sales` validate `referrerId` is a direct referral of the seller; `PATCH /admin/sales/:id` whitelist + validation; `sponsorId` repair skips `referrerId IS NOT NULL` sales.
+
+**Payout + sale-delete + commissions link:**
+- `POST /me/payout-accounts` now inserts `accountIdentifierMasked: maskIdentifier(...)` (was the NOT NULL violation). `GET /me/commissions` drops commissions whose sale no longer exists (never a dead property link). `sale_delete` guard + orphan cleanup (reverse credited via ledger + wallet debit then remove).
+
+**Admin loading hardening (10-item):**
+- Sale detail/list delete, sale form race, registration accept/reject, MembersPage archive/restore, MemberDetailPage edit save, deactivate/activate, qualify/revoke, archive, purge spinner `loading={purgePending}`. All use `actionPending + guard + confirmDisabled/confirmLoading` + cancel/backdrop lock.
+
+**Auth gates + archive:**
+- Archived-list mapping now uses `mapMemberRow` + fallbacks, warns on drop.
+- `getMemberAccessBlock()` shared helper; `LoginPage` + `session.tsx` block `archivedAt` / `accountStatus !== ACTIVE` with `ACCOUNT_ARCHIVED`/`ACCOUNT_INACTIVE`; archive bans (`ban_duration: 876000h`), restore unbans, clears `archivedBy`; mock parity in admin/member handlers.
+
+**Mocks/seeds/specs:** `MockSale.referrerId`, `toSale`, ` MockWallet.pendingCommission`, store wallets, commissions `AVAILABLE`, member store `accountStatus/archivedAt`, web mock login gates, admin archive/restore/purge mock, new `pending-commission.spec.ts`, `archived.spec.ts`, `memberLifecycle.spec.ts`, updated `SaleSubmitPage.spec`, `sponsors repair`, `payout-accounts`.
+
+**Background:** `docs/business/BUSINESS-RULES.md:133` BR-COM-002 now notes fallback ("referrer wins else sponsor").
 
 ### Production auth fixes (cumulative)
 
@@ -111,8 +105,7 @@ suggest them. Migrations + seed are applied (`pnpm db:migrate` uses root `.env`
 - Email verification no longer depends on Supabase SMTP or the Magic Link template variable; EmailJS is the delivery mechanism (requires `Allow non-browser` + correct `EMAILJS_*`).
 
 ### Security audit - done + still open
-
-Done: secrets excluded, hardcoded URL removed, CORS scoped, `/health`, money functions + `commission_clear(_batch)` service_role-only, cron trigger intentionally public (idempotent + time-gated), SELECT-only Role re-grant (rls_invariants #1-3,#7 PASS), pending replay now updates the existing row (no duplicate).
+Done: secrets excluded, hardcoded URL removed, CORS scoped, `/health`, money functions + `commission_clear(_batch)` + `sale_delete` service_role-only, cron trigger intentionally public (idempotent + time-gated), SELECT-only Role re-grant (rls_invariants #1,4,6 PASS; #2/3 findings are pre-existing managed-project Anon/Storage grants + is_staff_user routine, documented), pending replay now updates the existing row (no duplicate).
 **Still open (do these next):**
 
 1. **EmailJS delivery:** the deployed env has the right `EMAILJS_*` keys but the service was misconfigured. Logs showed `403 non-browser disabled` then `400 The service ID not found` (the configured `EMAILJS_SERVICE_ID` does not exist in the account that owns the configured public key). Re-enter the correct `EMAILJS_SERVICE_ID` (same EmailJS account as the keys) and redeploy.
@@ -132,27 +125,28 @@ Root: `C:\Users\SSD-ORLANDO\Documents\Project\jad-realty` (pnpm + Turborepo).
 - `apps/admin` (`:5174`) - staff SPA. Prod base `/admin/`.
 - `api/` - `api/router.ts` (single Vercel Function), `api/_handlers/**`, `api/_lib/**`
   (auth/rbac/router/cors/money/pipeline/emailjs/verification-code/catalog-cms-sync/…), `api/dev-server.ts` (local :3000).
-- `packages/contracts` - DTO types + Zod schemas, single source; now also `contactSubmissionRequestSchema`, `contactInquirySchema`, `programCreate/UpdateSchema`, `policySlugSchema`, `replayed`.
+- `packages/contracts` - DTO types + Zod schemas, single source; now also `contactSubmissionRequestSchema`, `contactInquirySchema`, `programCreate/UpdateSchema`, `policySlugSchema`, `replayed`, `referrerId`.
 - `packages/config`, `packages/shared` - typed env; framework-free utils.
 - `packages/mock`, `packages/ui` - test mocks/session fixtures; tokens + shared components (`Spinner`, `notify*`).
 - `scripts/` - `prepare-vercel-env.mjs`, `assemble-vercel-output.mjs`.
 - `vercel-static/` - assembled deploy output (gitignored).
 - `supabase/migrations/` - one idempotent migration per change + header validation queries;
-  `supabase/seed.ts` (now seeds `COMMISSION_CLEARING_DAYS` + `slug`); `supabase/security/rls_invariants.sql`
+  `supabase/seed.ts` (now seeds `COMMISSION_CLEARING_DAYS` + `slug` + referrer-aware commissions); `supabase/security/rls_invariants.sql`
   (empty = PASS, except documented `is_staff_user` §5; Q2/Q3 findings are pre-existing managed-project state).
 - `docs/` - SSOT; **never reformatted** (`.prettierignore`). Largely stale; `AGENTS.md` + this file + code are authoritative.
 
 ## Stack / conventions (do not violate)
 
-- Money is exact-decimal **strings**; format with `@jad/shared`; no float math anywhere (including TS repair math - use integer/BigInt).
+- Money is exact-decimal **strings**; format with `@jad/shared`; no float math anywhere (including TS repair math - use integer/BigInt). `multiplyMoney` mirrors PG `round(x,2)` half-away.
 - `to_char(x, 'FM…990.00')` renders zero as **`0.00`** - always use the `…990.00` mask. Bit us live on the cron endpoint (500) before the fix.
 - All HTTP via typed clients (`request`/`requestList`/`requestPage`/`requestListEnvelope`) validated against `@jad/contracts`; no ad-hoc `fetch` in features.
 - Authenticated users: SELECT-only RLS on identity/member tables; all writes via service-role handlers or `SECURITY DEFINER` functions. `Role` reads are restricted to `slug`/`name`.
-- Money transitions are atomic DB functions (`withdraw_*`, `sale_qualify`, `commission_clear*`) - single transaction, wallet row-locked, ledger + wallet + audit in one unit; EXECUTE restricted to `service_role`. Never re-implement money state changes as sequential API writes.
+- Money transitions are atomic DB functions (`withdraw_*`, `sale_qualify`, `commission_clear*`, `sale_delete`) - single transaction, wallet row-locked, ledger + wallet + audit in one unit; EXECUTE restricted to `service_role`. Never re-implement money state changes as sequential API writes.
 - **Contact inquiries** are service_role-only (`ContactInquiry`), triaged via `cms` module (the queue, not email, is delivery).
 - **Email verification codes** are service_role-only (`EmailVerification`: `code_hash` HMAC-SHA256 with `EMAIL_OTP_PEPPER` or service key, 15-min TTL, max 5 attempts, 60s cooldown, 5/hour cap; `listUsers` scan is bounded 300).
 - **Program lifecycle:** `isActive` (soft retire); public list is active-only (`using ("isActive")` + handler `eq isActive=true`); `POST/PATCH /admin/programs` are `super_admin`.
 - **Policy identity:** `slug` is the stable public URL key; `findPolicy` matches slug/id/`type` case-insensitively; footer/consent links hide when the slug/type is absent.
+- **Sales referrer:** `Sale.referrerId` (members only) + `referrerName` snapshot; referrer pickable from `useDirectReferrals()`; payee on qualify is picked referrer → else seller's `Member.sponsorId` → else skipped; pending estimate counts both picked-referrer sales and downline-with-no-referrer sales.
 - Migration discipline: one migration per change, idempotent; run the validation queries in each file header before applying; include a down note. `.sql` files are hand-formatted (no SQL prettier in repo). Apply with `pnpm db:migrate` (root `.env` `DATABASE_URL`).
 - CSS Modules per component; tokens in `@jad/ui`.
 - Tests colocated `*.spec.ts(x)`; web `renderWithProviders`/`mockFetchRoutes`; admin `installMockApi()` (install + `server.install()`/`restore()` per test).
@@ -162,11 +156,11 @@ Root: `C:\Users\SSD-ORLANDO\Documents\Project\jad-realty` (pnpm + Turborepo).
 ## Verification status
 
 - `pnpm typecheck`: 8/8 workspaces pass. `pnpm exec turbo run build` + assemble OK. `pnpm dlx vercel build --yes` produces exactly **1 function**, exit 0; check `.vercel/output/config.json` routes. NOTE: the build log prints `SupabaseAuthClient` TS notes (`Property 'admin'/'getUser'/… does not exist`) - verified **pre-existing and non-blocking** (pristine HEAD prints 20 and deploys fine).
-- Tests: api **486/486**, contracts **76**, ui **45**, mock 10, web **363**, admin **508** (known **pre-existing** admin CMS/policy parallel-load flakes + one genealogy collapse-timing flake pass in isolation - rerun those if they fail once). New suites: `catalog-cms-sync.spec.ts` (5), `usePolicyLinks.spec.tsx` (2), `emailjs.spec.ts` + `verification-code.spec.ts` (11), `notify.spec.ts` (3, toast vs modal distinction), `Spinner.spec.tsx` (3).
-- `pnpm db:migrate` - idempotent; new versions recorded; always re-check grants + run `rls_invariants.sql` after money/grant batches.
-- Live probes: `GET /health` → `{ok:true,db:"ok"}`; `GET /api/v1/crons/commission-clearing` → `{cleared,total,windowDays}`; `GET /api/v1/policies` → `{data[0].slug:"terms"}` (was `"policies"`). Rolled-back live test proved the full clear path (AVAILABLE + wallet + CREDIT ledger, self-healing pending recompute).
+- Tests: api **504/504** (incl. `pending-commission.spec.ts` (6) + nested-return & delete-guard), contracts **77**, ui **45**, mock 10, web **371** (new referrer/member-detail referrer + orphan + LoginPage gates), admin **512** (known **pre-existing** admin CMS/policy parallel-load flakes + one genealogy collapse-timing flake pass in isolation - rerun those if they fail once). New suites: `archived.spec.ts` (3) + `memberLifecycle.spec.ts` (4) + `pending-commission.spec.ts` (6).
+- `pnpm db:migrate` - idempotent; new versions recorded; `sale_qualify` now sponsor-fallback + referrer, `sale_delete` blocks credited, orphan cleanup reversed + removed, backfill 1 sponsor referral paid. Always re-check grants + run `rls_invariants.sql` after money/grant batches.
+- Live probes: `GET /health` → `{ok:true,db:"ok"}`; `GET /api/v1/crons/commission-clearing` → `{cleared,total,windowDays}`; `GET /api/v1/policies` → `{data[0].slug:"terms"}` (was `"policies"`). Rolled-back live test proved the full clear path (AVAILABLE + wallet + CREDIT ledger, self-healing pending recompute). `POST /sales` with `referrerId` → referrer earns; `GET /sales/:id` as referrer → 200 (not 404); orphan count 0.
 - Vercel function logs: `pnpm dlx vercel logs <deployment-url>` (exact `jad-realty-<hash>-orlando-workspace-afhomes.vercel.app` URL from `vercel ls --prod`).
-- Admin queues: `GET /admin/queues` → `{"registrations":1,"sales":1,"members":2,"withdrawals":0}`; `GET /admin/registrations` → `{data:[{id:'reg-mu3qsdbt',status:'PENDING'}],meta:{invalid:0}}` (replays update the same row, no duplicate).
+- Admin queues: `GET /admin/queues` → `{"registrations":1,"salesReadyToQualify":1,"sales":…, "members":2,"withdrawals":0}`.
 
 ## Useful commands
 
@@ -183,16 +177,19 @@ Root: `C:\Users\SSD-ORLANDO\Documents\Project\jad-realty` (pnpm + Turborepo).
 - **The `includeFiles` must remain `packages/**`** - narrowing crashes the deployed function.
 - **Hobby cron limit: max 2 daily crons** - hourly schedules are rejected at deploy validation; keep `/health` + `/crons/commission-clearing` daily.
 - **`VITE_WEB_URL`/`VITE_ADMIN_URL` are auto-derived** from `VERCEL_PROJECT_PRODUCTION_URL`; never set them in Vercel env, and never log into an old per-deployment URL (cross-origin loop).
+- **`sale_qualify` must stay flat** `{"sale":{…}}` - the nesting bug (`sale.to_jsonb`) silently breaks every admin confirm; defensively unwrap in the handler as well.
+- **Commission payee:** picked `Sale.referrerId` wins else `Member.sponsorId` (never both, referrer wins); pending estimate counts both picked and downline-with-no-referrer; sponsor-link repair must skip `referrerId IS NOT NULL` to avoid double-pay.
+- **Pending pipeline is expectation-only** - a downline sale that later gets a referrer won't pay the sponsor; docs/BR-COM-002 now notes the fallback but the docs are still largely stale.
+- **`sale_delete` now blocks** `AVAILABLE` commissions; deletion is not a reversal workflow for credited sales. Don't add one without a product decision.
+- **Archived mapping** built with `mapMemberRow` + `?` fallbacks; ban/unban is best-effort (pre-existing JWTs stay valid until expiry) — app-layer gates are the enforcement point.
 - **Cached Supabase clients** (`serviceClient()`/`anonClient()` in `api/_lib/rest.ts`) must keep call-inferred types via the unannotated `make*Client` factories - `ReturnType<typeof createClient>` breaks `.from()` typing (`never[]`); bare `SupabaseClient` is fine locally but keep the factory form (it passes both).
+- **Loading states:** `actionPending` + `InFlight` ref + `confirmDisabled/confirmLoading` + cancel/backdrop lock while pending; purge Save/Archive/Deactivate toggles all use it now; SaleDetailPage delete is `deleteMut.isPending`, Registration accept is gated, SaleFormDialog has `if (isPending) return`, MembersPage has `archivePending/restorePending`.
 - **EmailJS:** server-side via `api/_lib/emailjs.ts` REST `https://api.emailjs.com/api/v1.0/email/send` (`user_id` = public key, `accessToken` = private key when present, `template_params: {to_email,to_name,verification_code,app_name,expiry_minutes}`); requires **Allow non-browser** + correct `EMAILJS_SERVICE_ID/TEMPLATE_ID/PUBLIC_KEY` (and redeploy; env changes do not apply to existing deployments).
 - **Notifications:** success is a centered `toast: {position:'center'}` (`jad-swal-container` in `base.css`), errors/warnings are centered modals; success was a top-end toast that set `aria-hidden` and broke `findByRole` assertions (nowToast center avoids the `aria-hidden` trap). Guards use `min-height:70vh; place-items:center`.
-- **Em-dash cleanup** was mechanical (`\u2014`/`\u2013`/entities + `—` → `-`) across `apps/`, `packages/`, `api/`, `supabase/`, `scripts/`, `docs/`, `AGENTS.md`/`README.md`/`SESSION.md`; lone-dash placeholders `' - '` → `'-'`; three pre-existing `RegistrationStatusPage` placeholder fixes required `'\u2014'` → `'-'` in `ContentPage.tsx:328`.
-- **Migrations applied (all live):** `contact_inquiries`, `email_verification_codes`, `policy_slug` + `policy_realtime` + `policy_type_normalize` → known legacy `type='policies'` → `terms`, `program_is_active`.
+- **Shared mock stores are module singletons** - tests that mutate them affect later tests; reset in `beforeEach` (added `resetRegistrationStore`/`resetMockMemberLifecycle`).
+- **jsdom has no canvas:** QR upload-decode specs stub `Image` + `getContext` and use `fireEvent.change`.
+- **Migrations applied (all live):** `contact_inquiries`, `email_verification_codes`, `policy_slug` + `policy_realtime` + `policy_type_normalize` → known legacy `type='policies'` → `terms`, `program_is_active`, `sale_qualify_immediate_credit` + `referrer_model` + `sale_delete_guard` + `orphan_cleanup` + `sponsor_fallback`.
 - **Policy identity is `slug`:** canonical deep links `terms`/`privacy`/`guidelines`; admin `Type` is now a select (syncs slug when empty), never a free text `policies` again.
 - **Catalog ↔ CMS properties** is a true bidirectional sync for linked listings (`catalogId`), exact-decimal price gate, version bump + realtime broadcast, and cross-cache invalidation (`['admin','properties']` ↔ `['cms','properties']`).
-- Shared mock stores are module singletons - tests that mutate them affect later tests; reset in `beforeEach`.
-- jsdom has no canvas: QR upload-decode specs stub `Image` + `getContext` and use `fireEvent.change`.
-- `vi.restoreAllMocks()` can break `@supabase/supabase-js` mocks in api specs - prefer builder-level error injection.
-- `git stash`/`pop` converts working-tree line endings (CRLF); run `pnpm format` after to renormalize (HEAD was prettier-clean, so only touched files change).
-- Docs (`docs/deployment/DEPLOYMENT.md` etc.) claim "documentation-only / no deploy" - stale. The deploy described here is real and authoritative.
-- Previous phase's proposed-but-unbuilt backlog is now **built**; new backlog is email `EMAILJS_SERVICE_ID` correctness (the 400 "service ID not found" + 403 "non-browser disabled"), `EMAILJS_PRIVATE_KEY` optional, `EMAIL_OTP_PEPPER` optional, privacy policy content, rate limiting, staging-vs-public decision, anon-key newline cleanup, service-role rotation, and making the public properties listings (currently static `content/properties.ts`) dynamic from the catalog/CMS (separate).
+- **Backlog:** email `EMAILJS_SERVICE_ID` correctness (the 400 "service ID not found" + 403 "non-browser disabled"), `EMAILJS_PRIVATE_KEY` optional, `EMAIL_OTP_PEPPER` optional, privacy policy content, rate limiting, staging-vs-public decision, anon-key newline cleanup, service-role rotation, and making the public properties listings (currently static `content/properties.ts`) dynamic from the catalog/CMS (separate).
+

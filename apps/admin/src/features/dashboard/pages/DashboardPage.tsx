@@ -23,7 +23,7 @@ const QUEUE_LINKS: {
   },
   {
     to: '/admin/sales',
-    label: 'Sales ready to qualify',
+    label: 'Sales Request',
     key: 'salesReadyToQualify',
     icon: 'check',
     description: 'Payment-verified sales awaiting qualification',

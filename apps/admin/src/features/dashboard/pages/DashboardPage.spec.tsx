@@ -21,7 +21,7 @@ describe('DashboardPage', () => {
     renderWithProviders(<DashboardPage />, { user: MOCK_SUPER_ADMIN });
 
     expect(await screen.findByText('Registrations')).toBeInTheDocument();
-    expect(screen.getByText('Sales ready to qualify')).toBeInTheDocument();
+    expect(screen.getByText('Sales Request')).toBeInTheDocument();
     expect(screen.getByText('Members')).toBeInTheDocument();
     expect(screen.getByText('Withdrawals')).toBeInTheDocument();
     expect(await screen.findByText(/Welcome back, Admin - \d+ pending/)).toBeInTheDocument();
