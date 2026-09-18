@@ -6,7 +6,6 @@
   scroll-margin-top: calc(var(--header-height, 64px) + var(--space-4));
   min-width: 0;
   max-width: 100%;
-  overflow: hidden;
   box-sizing: border-box;
 }
 

@@ -4,6 +4,18 @@
   gap: var(--space-5);
   min-width: 0;
   max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.stack,
+.stack * {
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.stack > * {
+  max-width: 100%;
 }
 
 @media (max-width: 639px) {
@@ -43,7 +55,7 @@
   margin-bottom: var(--space-4);
   min-width: 0;
   max-width: 100%;
-  overflow: hidden;
+  box-sizing: border-box;
 }
 
 .anchorTitle {
@@ -239,7 +251,6 @@
   background: var(--color-bg-surface);
   min-width: 0;
   max-width: 100%;
-  overflow: hidden;
   box-sizing: border-box;
 }
 
@@ -566,7 +577,6 @@
   margin-bottom: var(--space-3);
   min-width: 0;
   max-width: 100%;
-  overflow: hidden;
   box-sizing: border-box;
 }
 
@@ -578,7 +588,6 @@
   min-width: 0;
   min-inline-size: 0;
   max-width: 100%;
-  overflow: hidden;
   box-sizing: border-box;
 }
 
@@ -598,7 +607,6 @@
   margin-bottom: var(--space-3);
   min-width: 0;
   max-width: 100%;
-  overflow: hidden;
   box-sizing: border-box;
 }
 
