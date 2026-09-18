@@ -27,20 +27,34 @@
   overflow-wrap: anywhere;
 }
 
+/* Wraps the Save button so the disabled-reason title tooltip works; CSS
+ * controls its display so the mobile layout can stretch it (an inline style
+ * here would win over any media-query rule). */
+.saveWrap {
+  display: inline-flex;
+}
+
 @media (max-width: 639px) {
   .actions {
-    flex-direction: column;
-    align-items: stretch;
+    flex-wrap: wrap;
+    gap: var(--space-2);
     padding: var(--space-3);
+  }
+
+  /* Compact row: Cancel natural width, Save fills the rest; status wraps
+   * underneath full-width. No stacked full-width column, nothing overflows. */
+  .saveWrap {
+    flex: 1 1 auto;
+  }
+
+  .saveWrap > button {
+    width: 100%;
   }
 
   .status {
     margin-left: 0;
+    flex-basis: 100%;
     width: 100%;
     justify-content: space-between;
-  }
-
-  .actions > button {
-    width: 100%;
   }
 }

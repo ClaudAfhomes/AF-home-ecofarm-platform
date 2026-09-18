@@ -32,7 +32,7 @@ export function CmsFormActions({
       <Button variant="secondary" onClick={onCancel} disabled={!dirty || saving}>
         Cancel
       </Button>
-      <span title={saveDisabledReason} style={{ display: 'inline-flex' }}>
+      <span title={saveDisabledReason} className={styles.saveWrap}>
         <Button
           onClick={onSave}
           disabled={!dirty || !valid}
