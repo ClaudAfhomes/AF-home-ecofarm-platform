@@ -11,6 +11,13 @@
   box-sizing: border-box;
 }
 
+/* Containment reset: fieldset/grid/flex children must be allowed to shrink (prevents cms 200px grids + fieldsets from pushing page scroll) */
+fieldset {
+  min-width: 0;
+  min-inline-size: 0;
+  max-width: 100%;
+}
+
 html {
   -webkit-text-size-adjust: 100%;
 }
@@ -80,12 +87,6 @@ svg {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   box-sizing: border-box;
-}
-
-@media (max-width: 639px) {
-  .table-scroll {
-    overflow-x: visible;
-  }
 }
 
 /* SweetAlert2 theme bridge - notify.ts passes these classes to every popup

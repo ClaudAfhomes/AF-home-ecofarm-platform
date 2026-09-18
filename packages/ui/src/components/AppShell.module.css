@@ -35,6 +35,9 @@
   max-width: 1440px;
   width: 100%;
   margin: 0 auto;
+  min-width: 0;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 @media (min-width: 1024px) {

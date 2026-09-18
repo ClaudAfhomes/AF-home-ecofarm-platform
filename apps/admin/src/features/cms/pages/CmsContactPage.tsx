@@ -657,7 +657,16 @@ export function CmsContactPage() {
             </>
           }
         >
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 'var(--space-3)',
+              minWidth: 0,
+              maxWidth: '100%',
+              boxSizing: 'border-box',
+            }}
+          >
             <CmsSelectField
               label="Icon"
               value={draft.methods[editingMethod]!.icon}

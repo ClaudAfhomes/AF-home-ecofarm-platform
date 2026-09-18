@@ -628,7 +628,15 @@ export function CmsPropertiesPage() {
               <div key={`note-${idx}`} className={styles.pillarCard}>
                 <div className={styles.cardHeader}>
                   <span className={styles.cardIndex}>Step {idx + 1}</span>
-                  <div style={{ display: 'flex', gap: 'var(--space-2)' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: 'var(--space-2)',
+                      minWidth: 0,
+                      maxWidth: '100%',
+                    }}
+                  >
                     <Button
                       variant="secondary"
                       onClick={() => {
@@ -1104,7 +1112,16 @@ export function CmsPropertiesPage() {
             </>
           }
         >
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 'var(--space-3)',
+              minWidth: 0,
+              maxWidth: '100%',
+              boxSizing: 'border-box',
+            }}
+          >
             <CmsTextField
               label="Slug"
               hint={
@@ -1276,7 +1293,16 @@ export function CmsPropertiesPage() {
                 </>
               }
             >
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: 'var(--space-3)',
+                  minWidth: 0,
+                  maxWidth: '100%',
+                  boxSizing: 'border-box',
+                }}
+              >
                 <CmsTextField
                   label="ID (slug)"
                   value={prop!.id}

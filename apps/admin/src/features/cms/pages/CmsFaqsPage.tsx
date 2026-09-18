@@ -609,7 +609,16 @@ export function CmsFaqsPage() {
             </>
           }
         >
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 'var(--space-3)',
+              minWidth: 0,
+              maxWidth: '100%',
+              boxSizing: 'border-box',
+            }}
+          >
             <CmsTextareaField
               label="Question"
               value={draft.items[editingFaq]!.question}
