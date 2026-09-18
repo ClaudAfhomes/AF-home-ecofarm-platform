@@ -70,7 +70,7 @@ export const ADMIN_NAV_ITEMS: AdminNavItem[] = [
   {
     to: '/admin/sales',
     label: 'Operations',
-    icon: 'check',
+    icon: 'wallet',
     roles: ALL_STAFF,
     module: 'sales',
     dropdown: [
