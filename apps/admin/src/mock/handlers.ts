@@ -171,7 +171,11 @@ export const adminMockHandlers: MockRoute[] = [
       salesSubmitted: MOCK_SALES.filter((s) => s.status === 'SUBMITTED').length,
       salesReadyToQualify: MOCK_SALES.filter((s) => s.status === 'PAYMENT_VERIFIED').length,
       members: MOCK_MEMBERS.length,
-      withdrawals: MOCK_WITHDRAWALS.length,
+      // Mirror the real endpoint: withdrawals tile counts only pending-action
+      // rows (REQUESTED/RESERVED) - completed/rejected history excluded.
+      withdrawals: MOCK_WITHDRAWALS.filter(
+        (w) => w.status === 'REQUESTED' || w.status === 'RESERVED',
+      ).length,
     }),
   },
   {

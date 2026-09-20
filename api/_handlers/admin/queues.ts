@@ -11,7 +11,9 @@ import { QUALIFYING_SALE_STATUS } from '../../_lib/pipeline.js';
  * GET /admin/queues - dashboard queue counts (super_admin, admin).
  * Server facts, never derived client-side. The `sales` tile counts only
  * QUALIFYING_SALE rows - submitted/approved-but-unqualified sales are
- * working-pipeline items, not recognized sales.
+ * working-pipeline items, not recognized sales. The `withdrawals` tile
+ * counts only pending-action rows (REQUESTED/RESERVED) - completed/rejected
+ * history must not keep a processed item on the dashboard.
  */
 export async function getQueues(req: VercelRequest, res: VercelResponse) {
   const auth = await verifyStaffModule(req, 'dashboard', ADMIN_STAFF);
@@ -32,16 +34,16 @@ export async function getQueues(req: VercelRequest, res: VercelResponse) {
         .from('Sale')
         .select('id', { count: 'exact', head: true })
         .eq('status', QUALIFYING_SALE_STATUS),
-      supabase
-        .from('Sale')
-        .select('id', { count: 'exact', head: true })
-        .eq('status', 'SUBMITTED'),
+      supabase.from('Sale').select('id', { count: 'exact', head: true }).eq('status', 'SUBMITTED'),
       supabase
         .from('Sale')
         .select('id', { count: 'exact', head: true })
         .eq('status', 'PAYMENT_VERIFIED'),
       supabase.from('Member').select('id', { count: 'exact', head: true }).is('archivedAt', null),
-      supabase.from('Withdrawal').select('id', { count: 'exact', head: true }),
+      supabase
+        .from('Withdrawal')
+        .select('id', { count: 'exact', head: true })
+        .in('status', ['REQUESTED', 'RESERVED']),
     ]);
   for (const [label, result] of [
     ['Registration', registrations],
