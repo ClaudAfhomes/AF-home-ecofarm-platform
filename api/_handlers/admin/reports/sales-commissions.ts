@@ -14,6 +14,7 @@ import { verifyStaffModule } from '../../../_lib/auth.js';
 import { toErrorEnvelope } from '../../../_lib/envelope.js';
 import type { VercelRequest, VercelResponse } from '../../../_lib/http.js';
 import { methodNotAllowed, requireService } from '../../../_lib/rest.js';
+import { QUALIFYING_SALE_STATUS } from '../../../_lib/pipeline.js';
 
 /**
  * GET /admin/reports/sales-commissions?from=YYYY-MM-DD&to=YYYY-MM-DD
@@ -196,9 +197,13 @@ export async function getSalesCommissionsReport(req: VercelRequest, res: VercelR
     });
     if (!candidate.success) continue;
     sales.push(candidate.data);
-    salesCount += 1;
+    // Headline number counts only recognized (qualifying) sales; the full
+    // per-status breakdown keeps the pipeline visible.
+    if (candidate.data.status === QUALIFYING_SALE_STATUS) {
+      salesCount += 1;
+      salesValueTotal = addMoney(salesValueTotal, candidate.data.propertyValue);
+    }
     bump(salesByStatus[candidate.data.status], candidate.data.propertyValue);
-    salesValueTotal = addMoney(salesValueTotal, candidate.data.propertyValue);
   }
 
   const commissions: CommissionReportRow[] = [];

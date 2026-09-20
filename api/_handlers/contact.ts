@@ -7,20 +7,11 @@ import type { VercelRequest, VercelResponse } from '../_lib/http.js';
 import { prefixedId } from '../_lib/pipeline.js';
 import { methodNotAllowed, readJsonBody, requireService } from '../_lib/rest.js';
 import { getSupabaseEnv } from '../_lib/env.js';
+import { clientIp } from '../_lib/rate-limit.js';
 
 /** Anti-spam: max submissions per client IP inside the window. */
 const THROTTLE_WINDOW_MINUTES = 15;
 const THROTTLE_MAX_PER_WINDOW = 5;
-
-function clientIp(req: VercelRequest): string {
-  const forwarded = req.headers['x-forwarded-for'];
-  const first = Array.isArray(forwarded) ? forwarded[0] : forwarded;
-  const ip = (first ?? '').split(',')[0]?.trim();
-  if (ip) return ip;
-  const realIp = req.headers['x-real-ip'];
-  const real = Array.isArray(realIp) ? realIp[0] : realIp;
-  return (real ?? '').trim() || 'unknown';
-}
 
 /**
  * POST /contact - public Contact page submission. Validates the payload,

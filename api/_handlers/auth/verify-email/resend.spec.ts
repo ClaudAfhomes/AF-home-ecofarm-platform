@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { VercelRequest, VercelResponse } from '../../../_lib/http.js';
+import { resetRateLimits } from '../../../_lib/rate-limit.js';
 
 import resendHandler from './resend.js';
 
@@ -60,6 +61,7 @@ const postReq = (body: unknown): VercelRequest =>
 
 describe('POST /api/v1/auth/verify-email/resend', () => {
   beforeEach(() => {
+    resetRateLimits();
     vi.stubEnv('SUPABASE_URL', 'https://verify.test.supabase.co');
     vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'service');
     vi.stubEnv('EMAIL_OTP_PEPPER', 'test-pepper');

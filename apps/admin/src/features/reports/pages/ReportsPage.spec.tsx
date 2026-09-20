@@ -38,7 +38,7 @@ describe('ReportsPage', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Generate' }));
 
     await screen.findByText('Summary (all time – today)');
-    expect(screen.getByText('Sales value total')).toBeInTheDocument();
+    expect(screen.getByText('Qualifying sales value')).toBeInTheDocument();
     expect(
       (await screen.findAllByText('250 SQM Farm Lot with Hotspring')).length,
     ).toBeGreaterThanOrEqual(1);

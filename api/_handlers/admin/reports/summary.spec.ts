@@ -108,7 +108,7 @@ function seedDefault() {
       data: [
         { status: 'SUBMITTED' },
         { status: 'PAYMENT_VERIFIED' },
-        { status: 'PAYMENT_VERIFIED' },
+        { status: 'QUALIFYING_SALE' },
       ],
       error: null,
     },
@@ -175,13 +175,14 @@ describe('GET /admin/reports/summary', () => {
     };
     expect(body.members).toEqual({ active: 4, inactive: 1, archived: 2 });
     expect(body.registrations).toEqual({ total: 6, pending: 1, rejected: 1 });
+    // Headline total is the QUALIFYING_SALE count only; byStatus stays full.
     expect(body.sales).toEqual({
-      total: 3,
+      total: 1,
       byStatus: {
         SUBMITTED: 1,
         ADMIN_APPROVED: 0,
-        PAYMENT_VERIFIED: 2,
-        QUALIFYING_SALE: 0,
+        PAYMENT_VERIFIED: 1,
+        QUALIFYING_SALE: 1,
         REJECTED: 0,
         LOCKED: 0,
       },

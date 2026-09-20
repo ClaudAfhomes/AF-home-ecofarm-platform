@@ -17,6 +17,9 @@ const script = {
 
 const tableResults = new Map<string, unknown[]>();
 
+/** Filter calls recorded so the spec can assert server-side status filters. */
+const seenFilters: { table: string; method: string; args: unknown[] }[] = [];
+
 function chainFor(table: string) {
   const next = () => {
     const queue = tableResults.get(table) ?? [];
@@ -31,7 +34,10 @@ function chainFor(table: string) {
   };
   const chain: Record<string, unknown> = {};
   for (const method of ['select', 'is', 'not', 'neq', 'eq', 'order', 'range', 'limit', 'in']) {
-    chain[method] = () => chain;
+    chain[method] = (...args: unknown[]) => {
+      seenFilters.push({ table, method, args });
+      return chain;
+    };
   }
   chain.maybeSingle = async () => ({ data: null, error: null });
   chain.insert = async () => ({ error: null });
@@ -100,6 +106,7 @@ describe('GET /admin/reports/sales-trend', () => {
     script.roleSlug = 'super_admin';
     script.saleError = null;
     tableResults.clear();
+    seenFilters.length = 0;
     seedDefault();
   });
 
@@ -127,6 +134,12 @@ describe('GET /admin/reports/sales-trend', () => {
     const { res, seen } = capture();
     await salesTrendHandler(authedGet, res);
     expect(seen.status).toBe(200);
+    // Only recognized (qualifying) sales feed the chart.
+    expect(seenFilters).toContainEqual({
+      table: 'Sale',
+      method: 'eq',
+      args: ['status', 'QUALIFYING_SALE'],
+    });
     const body = seen.body as {
       granularity: string;
       periods: { key: string; count: number; total: string }[];

@@ -162,9 +162,10 @@ describe('GET /admin/reports/sales-commissions', () => {
       commissions: { memberName: string }[];
       range: { from: string | null; to: string | null };
     };
-    expect(body.summary.salesCount).toBe(2);
+    // Headline counts only QUALIFYING_SALE rows (SALE_B is SUBMITTED pipeline).
+    expect(body.summary.salesCount).toBe(1);
     expect(body.range).toEqual({ from: null, to: null });
-    expect(body.summary.salesValueTotal).toBe('1700000.00');
+    expect(body.summary.salesValueTotal).toBe('1200000.00');
     expect(body.summary.salesByStatus.QUALIFYING_SALE).toEqual({
       count: 1,
       total: '1200000.00',

@@ -4,6 +4,7 @@ import { toErrorEnvelope } from '../../_lib/envelope.js';
 import type { VercelRequest, VercelResponse } from '../../_lib/http.js';
 import { methodNotAllowed, readJsonBody, requireService } from '../../_lib/rest.js';
 import { checkVerificationCode, resolveAuthUserId } from '../../_lib/verification-code.js';
+import { enforceRateLimit } from '../../_lib/rate-limit.js';
 
 /**
  * POST /api/v1/auth/verify-email - confirm an email address (BR-AUTH-001,
@@ -22,6 +23,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
   if (req.method !== 'POST') {
     methodNotAllowed(res, req.method);
+    return;
+  }
+  // Per-IP brake against brute-forcing one-time codes (each code already
+  // locks after 5 wrong attempts; this bounds guessing across many emails).
+  if (
+    !enforceRateLimit(req, res, {
+      scope: 'auth/verify-email',
+      max: process.env.VERIFY_EMAIL_RATE_LIMIT
+        ? Number(process.env.VERIFY_EMAIL_RATE_LIMIT)
+        : 20,
+    })
+  ) {
     return;
   }
   const parsedBody = readJsonBody(req);

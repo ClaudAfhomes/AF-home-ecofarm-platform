@@ -4,6 +4,7 @@ import { addMoney } from '@jad/shared';
 import { FINANCE_VIEW } from '../../../_lib/access.js';
 import { verifyStaffModule } from '../../../_lib/auth.js';
 import { toErrorEnvelope } from '../../../_lib/envelope.js';
+import { QUALIFYING_SALE_STATUS } from '../../../_lib/pipeline.js';
 import type { VercelRequest, VercelResponse } from '../../../_lib/http.js';
 import { methodNotAllowed, requireService } from '../../../_lib/rest.js';
 
@@ -82,7 +83,12 @@ export async function getSalesTrendReport(req: VercelRequest, res: VercelRespons
   const supabase = requireService(res);
   if (!supabase) return;
 
-  const result = await supabase.from('Sale').select('submittedAt, propertyValue');
+  // Only QUALIFYING_SALE rows feed the chart - submitted/approved sales are
+  // pipeline, rejected sales are not real sales.
+  const result = await supabase
+    .from('Sale')
+    .select('submittedAt, propertyValue')
+    .eq('status', QUALIFYING_SALE_STATUS);
   if (result.error) {
     const { error, status } = toErrorEnvelope(
       'INTERNAL',

@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { VercelRequest, VercelResponse } from '../../_lib/http.js';
+import { resetRateLimits } from '../../_lib/rate-limit.js';
 
 import registerHandler from './register.js';
 
@@ -156,6 +157,7 @@ const postReq = (body: unknown): VercelRequest =>
 
 describe('POST /api/v1/auth/register', () => {
   beforeEach(() => {
+    resetRateLimits();
     vi.stubEnv('SUPABASE_URL', 'https://reg.test.supabase.co');
     vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'service');
     vi.stubEnv('VITE_SUPABASE_ANON_KEY', 'anon');

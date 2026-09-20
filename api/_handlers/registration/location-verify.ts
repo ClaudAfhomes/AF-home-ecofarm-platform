@@ -7,6 +7,7 @@ import { toErrorEnvelope } from '../../_lib/envelope.js';
 import { setCors } from '../../_lib/cors.js';
 import type { VercelRequest, VercelResponse } from '../../_lib/http.js';
 import { serviceClient } from '../../_lib/rest.js';
+import { enforceRateLimit } from '../../_lib/rate-limit.js';
 
 function headerValue(
   headers: Record<string, string | string[] | undefined>,
@@ -111,6 +112,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     const { error, status } = toErrorEnvelope('NOT_FOUND', `Method ${req.method} not allowed`, 405);
     res.status(status).json({ error });
+    return;
+  }
+
+  // Per-IP brake (API-SPEC 5.2): each call hits the reverse-geocoding
+  // provider and persists a verification row.
+  if (
+    !enforceRateLimit(req, res, {
+      scope: 'registration/location-verify',
+      max: process.env.LOCATION_VERIFY_RATE_LIMIT
+        ? Number(process.env.LOCATION_VERIFY_RATE_LIMIT)
+        : 20,
+    })
+  ) {
     return;
   }
 

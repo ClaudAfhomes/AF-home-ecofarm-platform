@@ -8,6 +8,7 @@ import { issueVerificationCode } from '../../_lib/verification-code.js';
 import { calculateAge, prefixedId } from '../../_lib/pipeline.js';
 import { methodNotAllowed, readJsonBody, requireService } from '../../_lib/rest.js';
 import { toErrorEnvelope } from '../../_lib/envelope.js';
+import { enforceRateLimit } from '../../_lib/rate-limit.js';
 
 type Service = NonNullable<ReturnType<typeof requireService>>;
 type RegistrationRow = Record<string, unknown> & { id: string; status: string };
@@ -174,6 +175,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
   if (req.method !== 'POST') {
     methodNotAllowed(res, req.method);
+    return;
+  }
+  // Per-IP flood brake (API-SPEC 5.2): registration writes rows, creates an
+  // auth user, and triggers an email send.
+  if (
+    !enforceRateLimit(req, res, {
+      scope: 'auth/register',
+      max: process.env.REGISTER_RATE_LIMIT
+        ? Number(process.env.REGISTER_RATE_LIMIT)
+        : 5,
+    })
+  ) {
     return;
   }
   const parsedBody = readJsonBody(req);

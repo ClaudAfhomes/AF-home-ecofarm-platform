@@ -29,6 +29,14 @@ export const SALE_TRANSITIONS: Record<string, string[]> = {
   QUALIFYING_SALE: [],
 };
 
+/**
+ * A sale only counts as "real" in dashboards, trend charts, and report
+ * headline numbers once it reaches this status (commissions credited).
+ * Submitted/approved/payment-pending sales are working-pipeline items, not
+ * recognized sales; REJECTED/LOCKED never count.
+ */
+export const QUALIFYING_SALE_STATUS = 'QUALIFYING_SALE';
+
 /** Validate an admin PATCH transition. Returns an error message or null. */
 export function validateSaleTransition(
   currentStatus: string,

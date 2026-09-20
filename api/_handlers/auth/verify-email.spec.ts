@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { createHash } from 'node:crypto';
 
 import type { VercelRequest, VercelResponse } from '../../_lib/http.js';
+import { resetRateLimits } from '../../_lib/rate-limit.js';
 
 import verifyEmailHandler from './verify-email.js';
 
@@ -79,6 +80,7 @@ function hashFor(email: string, code: string): string {
 
 describe('POST /api/v1/auth/verify-email', () => {
   beforeEach(() => {
+    resetRateLimits();
     vi.stubEnv('SUPABASE_URL', 'https://verify.test.supabase.co');
     vi.stubEnv('SUPABASE_SERVICE_ROLE_KEY', 'service');
     vi.stubEnv('EMAIL_OTP_PEPPER', 'test-pepper');

@@ -296,12 +296,12 @@ export function ReportsPage() {
               <div className={styles.tiles}>
                 <MetricTile
                   icon="list"
-                  label="Sales in range"
+                  label="Qualifying sales in range"
                   value={String(report.summary.salesCount)}
                 />
                 <MetricTile
                   icon="wallet"
-                  label="Sales value total"
+                  label="Qualifying sales value"
                   value={formatMoney(report.summary.salesValueTotal)}
                 />
                 {Object.entries(report.summary.commissionsByStatus).map(([status, breakdown]) => (
@@ -472,7 +472,7 @@ export function ReportsPage() {
                 />
                 <MetricTile
                   icon="list"
-                  label="Total sales"
+                  label="Qualifying sales"
                   value={String(summary.data.sales.total)}
                 />
                 <MetricTile

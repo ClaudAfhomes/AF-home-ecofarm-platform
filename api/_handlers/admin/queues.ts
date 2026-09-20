@@ -5,10 +5,13 @@ import { verifyStaffModule } from '../../_lib/auth.js';
 import type { VercelRequest, VercelResponse } from '../../_lib/http.js';
 import { methodNotAllowed, requireService } from '../../_lib/rest.js';
 import { toErrorEnvelope } from '../../_lib/envelope.js';
+import { QUALIFYING_SALE_STATUS } from '../../_lib/pipeline.js';
 
 /**
  * GET /admin/queues - dashboard queue counts (super_admin, admin).
- * Server facts, never derived client-side.
+ * Server facts, never derived client-side. The `sales` tile counts only
+ * QUALIFYING_SALE rows - submitted/approved-but-unqualified sales are
+ * working-pipeline items, not recognized sales.
  */
 export async function getQueues(req: VercelRequest, res: VercelResponse) {
   const auth = await verifyStaffModule(req, 'dashboard', ADMIN_STAFF);
@@ -24,7 +27,10 @@ export async function getQueues(req: VercelRequest, res: VercelResponse) {
       .from('Registration')
       .select('id', { count: 'exact', head: true })
       .eq('status', 'PENDING'),
-    supabase.from('Sale').select('id', { count: 'exact', head: true }),
+    supabase
+      .from('Sale')
+      .select('id', { count: 'exact', head: true })
+      .eq('status', QUALIFYING_SALE_STATUS),
     supabase
       .from('Sale')
       .select('id', { count: 'exact', head: true })

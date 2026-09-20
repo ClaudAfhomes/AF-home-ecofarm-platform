@@ -6,6 +6,7 @@ import { verifyStaffModule } from '../../../_lib/auth.js';
 import { toErrorEnvelope } from '../../../_lib/envelope.js';
 import type { VercelRequest, VercelResponse } from '../../../_lib/http.js';
 import { methodNotAllowed, requireService } from '../../../_lib/rest.js';
+import { QUALIFYING_SALE_STATUS } from '../../../_lib/pipeline.js';
 
 /**
  * GET /admin/reports/summary (super_admin, admin, finance). Whole-org
@@ -166,7 +167,10 @@ export async function getOperationalSummaryReport(req: VercelRequest, res: Verce
       pending: registrationsPending.count ?? 0,
       rejected: registrationsRejected.count ?? 0,
     },
-    sales: { total: saleRows.length, byStatus: salesByStatus },
+    sales: {
+      total: salesByStatus[QUALIFYING_SALE_STATUS] ?? 0,
+      byStatus: salesByStatus,
+    },
     withdrawals: {
       pendingCount: pendingWithdrawals.length,
       pendingTotal: sumAmounts(pendingWithdrawals),

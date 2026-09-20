@@ -55,9 +55,11 @@ interface Kpi {
 }
 
 /**
- * Dashboard Sales Overview: line chart of sale value or count per month/year
- * with KPI strip. Figures come from the server trend series; the
- * exact-decimal totals are only converted to Number for SVG geometry.
+ * Dashboard Sales Overview: line chart of qualifying-sale value or count per
+ * month/year with KPI strip. Only QUALIFYING_SALE rows feed the server trend
+ * series - submitted/approved-but-unqualified sales are working-pipeline
+ * items, not recognized sales. The exact-decimal totals are only converted
+ * to Number for SVG geometry.
  */
 export function SalesTrendChart() {
   const [granularity, setGranularity] = useState<'month' | 'year'>('month');
@@ -91,7 +93,7 @@ export function SalesTrendChart() {
       value: previous ? formatMoney(previous.total) : formatMoney('0.00'),
     },
     {
-      label: 'Sales this year',
+      label: 'Qualifying sales this year',
       value: `${countThisYear} · ${formatMoney(totalThisYear)}`,
     },
   ];

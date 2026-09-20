@@ -4,6 +4,7 @@ import { toErrorEnvelope } from '../../../_lib/envelope.js';
 import type { VercelRequest, VercelResponse } from '../../../_lib/http.js';
 import { methodNotAllowed, readJsonBody, requireService } from '../../../_lib/rest.js';
 import { issueVerificationCode } from '../../../_lib/verification-code.js';
+import { enforceRateLimit } from '../../../_lib/rate-limit.js';
 
 /**
  * POST /api/v1/auth/verify-email/resend - re-issue the email-verification
@@ -21,6 +22,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
   if (req.method !== 'POST') {
     methodNotAllowed(res, req.method);
+    return;
+  }
+  // Per-IP flood brake on top of the per-email cooldown + hourly cap.
+  if (
+    !enforceRateLimit(req, res, {
+      scope: 'auth/verify-email/resend',
+      max: process.env.VERIFY_RESEND_RATE_LIMIT
+        ? Number(process.env.VERIFY_RESEND_RATE_LIMIT)
+        : 10,
+    })
+  ) {
     return;
   }
   const parsedBody = readJsonBody(req);
