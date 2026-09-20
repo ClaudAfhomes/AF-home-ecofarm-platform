@@ -38,6 +38,7 @@ describe('AdminLayout mustChangePassword', () => {
         return Response.json({
           registrations: 0,
           sales: 0,
+          salesSubmitted: 0,
           salesReadyToQualify: 0,
           members: 0,
           withdrawals: 0,

@@ -13,6 +13,7 @@ import { accountStatusSchema } from './registration.js';
 export const adminQueuesSchema = z.object({
   registrations: z.number().int().nonnegative(),
   sales: z.number().int().nonnegative(),
+  salesSubmitted: z.number().int().nonnegative(),
   salesReadyToQualify: z.number().int().nonnegative(),
   members: z.number().int().nonnegative(),
   withdrawals: z.number().int().nonnegative(),

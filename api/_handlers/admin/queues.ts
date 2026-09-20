@@ -22,25 +22,31 @@ export async function getQueues(req: VercelRequest, res: VercelResponse) {
   }
   const supabase = requireService(res);
   if (!supabase) return;
-  const [registrations, sales, salesReadyToQualify, members, withdrawals] = await Promise.all([
-    supabase
-      .from('Registration')
-      .select('id', { count: 'exact', head: true })
-      .eq('status', 'PENDING'),
-    supabase
-      .from('Sale')
-      .select('id', { count: 'exact', head: true })
-      .eq('status', QUALIFYING_SALE_STATUS),
-    supabase
-      .from('Sale')
-      .select('id', { count: 'exact', head: true })
-      .eq('status', 'PAYMENT_VERIFIED'),
-    supabase.from('Member').select('id', { count: 'exact', head: true }).is('archivedAt', null),
-    supabase.from('Withdrawal').select('id', { count: 'exact', head: true }),
-  ]);
+  const [registrations, sales, salesSubmitted, salesReadyToQualify, members, withdrawals] =
+    await Promise.all([
+      supabase
+        .from('Registration')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'PENDING'),
+      supabase
+        .from('Sale')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', QUALIFYING_SALE_STATUS),
+      supabase
+        .from('Sale')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'SUBMITTED'),
+      supabase
+        .from('Sale')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'PAYMENT_VERIFIED'),
+      supabase.from('Member').select('id', { count: 'exact', head: true }).is('archivedAt', null),
+      supabase.from('Withdrawal').select('id', { count: 'exact', head: true }),
+    ]);
   for (const [label, result] of [
     ['Registration', registrations],
     ['Sale', sales],
+    ['SalesSubmitted', salesSubmitted],
     ['SalesReadyToQualify', salesReadyToQualify],
     ['Member', members],
     ['Withdrawal', withdrawals],
@@ -58,6 +64,7 @@ export async function getQueues(req: VercelRequest, res: VercelResponse) {
   const parsed = adminQueuesSchema.safeParse({
     registrations: registrations.count ?? 0,
     sales: sales.count ?? 0,
+    salesSubmitted: salesSubmitted.count ?? 0,
     salesReadyToQualify: salesReadyToQualify.count ?? 0,
     members: members.count ?? 0,
     withdrawals: withdrawals.count ?? 0,

@@ -149,7 +149,10 @@ export const adminMockHandlers: MockRoute[] = [
     response: (): AdminQueues => ({
       registrations: registrationStore.registrations.filter((row) => row.status === 'PENDING')
         .length,
-      sales: MOCK_SALES.length,
+      // Mirror the real endpoint: headline sales figure counts only
+      // recognized (qualifying) sales; submitted pipeline is its own queue.
+      sales: MOCK_SALES.filter((s) => s.status === 'QUALIFYING_SALE').length,
+      salesSubmitted: MOCK_SALES.filter((s) => s.status === 'SUBMITTED').length,
       salesReadyToQualify: MOCK_SALES.filter((s) => s.status === 'PAYMENT_VERIFIED').length,
       members: MOCK_MEMBERS.length,
       withdrawals: MOCK_WITHDRAWALS.length,

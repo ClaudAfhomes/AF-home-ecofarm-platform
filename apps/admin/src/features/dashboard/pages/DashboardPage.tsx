@@ -12,7 +12,7 @@ const QUEUE_LINKS: {
   to: string;
   label: string;
   key: keyof AdminQueues;
-  icon: 'user' | 'check' | 'wallet' | 'list';
+  icon: 'user' | 'check' | 'wallet' | 'list' | 'dollar-sign';
   description: string;
 }[] = [
   {
@@ -25,9 +25,9 @@ const QUEUE_LINKS: {
   {
     to: '/admin/sales',
     label: 'Sales Request',
-    key: 'salesReadyToQualify',
-    icon: 'check',
-    description: 'Payment-verified sales awaiting qualification',
+    key: 'salesSubmitted',
+    icon: 'dollar-sign',
+    description: 'Submitted sales awaiting review',
   },
   {
     to: '/admin/withdrawals',
@@ -43,7 +43,7 @@ const MEMBER_STAT: {
   to: string;
   label: string;
   key: keyof AdminQueues;
-  icon: 'user' | 'check' | 'wallet' | 'list';
+  icon: 'user' | 'check' | 'wallet' | 'list' | 'dollar-sign';
   description: string;
 } = {
   to: '/admin/members',
@@ -64,7 +64,7 @@ function QueueCard({
 }: {
   to: string;
   label: string;
-  icon: 'user' | 'check' | 'wallet' | 'list';
+  icon: 'user' | 'check' | 'wallet' | 'list' | 'dollar-sign';
   description: string;
   data: number | undefined;
   stat?: boolean;
