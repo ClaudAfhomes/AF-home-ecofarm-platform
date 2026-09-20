@@ -9,7 +9,7 @@ import { MemberBottomNav } from '../components/MemberBottomNav';
 import { MessageFab } from '../components/MessageFab';
 import { useMessagesRealtime } from '../hooks/useMessagesRealtime';
 import { useNotificationsRealtime } from '../hooks/useNotificationsRealtime';
-import { findMemberNavItem, memberSidebarItems } from '../navigation';
+import { memberBreadcrumbItems, memberSidebarItems } from '../navigation';
 import styles from './MemberLayout.module.css';
 
 /**
@@ -21,16 +21,14 @@ export function MemberLayout() {
   const { user, logout } = useSession();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const location = useLocation();
-  const current = findMemberNavItem(location.pathname);
   // Single live subscription for the notification feed (bell + page).
   useNotificationsRealtime(user?.id);
   // Single live subscription for the admin thread (page + floating button).
   useMessagesRealtime(user?.id);
 
-  const crumbs = useMemo(() => {
-    if (!current || current.to === '/member') return [];
-    return [{ label: 'Dashboard', to: '/member' }, { label: current.label }];
-  }, [current]);
+  // Single breadcrumb source - page components must not render their own
+  // trail (memberBreadcrumbItems returns null to suppress unmatched routes).
+  const crumbs = useMemo(() => memberBreadcrumbItems(location.pathname), [location.pathname]);
 
   const topbarBrand = (
     <div className={styles.topbarBrand} aria-hidden="true">
@@ -77,7 +75,7 @@ export function MemberLayout() {
         topbarLeading={topbarBrand}
       >
         <div className={styles.content}>
-          {crumbs.length > 0 ? <Breadcrumbs items={crumbs} /> : null}
+          {crumbs ? <Breadcrumbs items={crumbs} /> : null}
           <Outlet />
         </div>
       </AppShell>

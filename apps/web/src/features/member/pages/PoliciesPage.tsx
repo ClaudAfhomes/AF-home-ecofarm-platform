@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router';
 
-import { Breadcrumbs, EmptyState, ErrorState, Icon, PageHeader, Skeleton } from '@jad/ui';
+import { EmptyState, ErrorState, Icon, PageHeader, Skeleton } from '@jad/ui';
 
 import { usePolicies } from '../../../hooks/usePolicies';
 import { formatDate } from '../lib/presentation';
@@ -36,13 +36,7 @@ export function PoliciesPage() {
   return (
     <section>
       <PageHeader title="Policies" description="JA&D policies, program guidelines, and terms." />
-      <Breadcrumbs
-        items={[
-          { label: 'Dashboard', to: '/member' },
-          { label: 'Resources' },
-          { label: 'Policies' },
-        ]}
-      />
+
       {latest ? (
         <p className={styles.timeframe}>Official · Updated {formatDate(latest)}</p>
       ) : (

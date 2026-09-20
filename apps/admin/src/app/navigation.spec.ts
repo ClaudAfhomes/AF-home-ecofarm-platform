@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { RoleRecord } from '@jad/contracts';
 
 import {
+  breadcrumbItems,
   canAccess,
   canAccessModule,
   canAccessSubModule,
@@ -11,6 +12,50 @@ import {
   navItemsForRole,
   ADMIN_NAV_ITEMS,
 } from './navigation';
+
+describe('breadcrumbItems', () => {
+  it('renders the dashboard crumb alone for /admin', () => {
+    expect(breadcrumbItems('/admin')).toEqual([{ label: 'Dashboard' }]);
+  });
+
+  it('shows category > list for sub pages (list crumb kept distinct)', () => {
+    expect(breadcrumbItems('/admin/payouts')).toEqual([
+      { label: 'Dashboard', to: '/admin' },
+      { label: 'Operations' },
+      { label: 'Payouts' },
+    ]);
+    // Category and sub share the label: collapse to a single crumb.
+    expect(breadcrumbItems('/admin/members')).toEqual([
+      { label: 'Dashboard', to: '/admin' },
+      { label: 'Members' },
+    ]);
+  });
+
+  it('puts a clickable list link before Details on detail routes', () => {
+    expect(breadcrumbItems('/admin/sales/sal-1')).toEqual([
+      { label: 'Dashboard', to: '/admin' },
+      { label: 'Sales', to: '/admin/sales' },
+      { label: 'Details' },
+    ]);
+    expect(breadcrumbItems('/admin/staff/stf-1')).toEqual([
+      { label: 'Dashboard', to: '/admin' },
+      { label: 'Staff', to: '/admin/staff' },
+      { label: 'Details' },
+    ]);
+  });
+
+  it('covers plain sections and the account route, suppressing unknown', () => {
+    expect(breadcrumbItems('/admin/messages')).toEqual([
+      { label: 'Dashboard', to: '/admin' },
+      { label: 'Messages' },
+    ]);
+    expect(breadcrumbItems('/admin/profile')).toEqual([
+      { label: 'Dashboard', to: '/admin' },
+      { label: 'My Account' },
+    ]);
+    expect(breadcrumbItems('/admin/unknown')).toBeNull();
+  });
+});
 
 describe('admin navigation registry', () => {
   it('returns no items for an unauthenticated session', () => {

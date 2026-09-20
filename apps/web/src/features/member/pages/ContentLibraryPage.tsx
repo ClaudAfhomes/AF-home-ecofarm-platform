@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 
-import { Breadcrumbs, Dialog, EmptyState, ErrorState, Icon, PageHeader, Skeleton } from '@jad/ui';
+import { Dialog, EmptyState, ErrorState, Icon, PageHeader, Skeleton } from '@jad/ui';
 import type { ContentKind, ForwardableContent } from '@jad/contracts';
 
 import { ButtonLink } from '@/components/ButtonLink';
@@ -115,13 +115,7 @@ export function ContentLibraryPage() {
           </div>
         }
       />
-      <Breadcrumbs
-        items={[
-          { label: 'Dashboard', to: '/member' },
-          { label: 'Resources' },
-          { label: 'Marketing Tools' },
-        ]}
-      />
+
       <p className={styles.timeframe}>Featured · Download-ready</p>
 
       <div className={styles.filters} role="group" aria-label="Filter by category">

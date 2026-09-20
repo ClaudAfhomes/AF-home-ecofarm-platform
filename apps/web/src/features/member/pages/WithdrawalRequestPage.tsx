@@ -4,7 +4,14 @@ import type { FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router';
 
 import { compareMoney, formatMoney, isExactDecimal, subtractMoney } from '@jad/shared';
-import { Breadcrumbs, ConfirmDialog, EmptyState, ErrorState, PageHeader, Skeleton } from '@jad/ui';
+import {
+  ConfirmDialog,
+  EmptyState,
+  ErrorState,
+  PageHeader,
+  Skeleton,
+  notifySuccess,
+} from '@jad/ui';
 
 import { Alert } from '../../../components/Alert';
 import { Button } from '../../../components/Button';
@@ -95,9 +102,19 @@ export function WithdrawalRequestPage() {
         // ignore
       }
       regenerateKey();
-      void queryClient.invalidateQueries({ queryKey: ['member', 'wallet'] });
-      void queryClient.invalidateQueries({ queryKey: ['member', 'withdrawals'] });
-      void queryClient.invalidateQueries({ queryKey: ['member', 'ledger', 'page'] });
+      // Await the refetches so the destination page (detail + eWallet) shows
+      // the server truth (deducted Available, raised Pending reservation).
+      void (async () => {
+        await Promise.allSettled([
+          queryClient.invalidateQueries({ queryKey: ['member', 'wallet'] }),
+          queryClient.invalidateQueries({ queryKey: ['member', 'withdrawals'] }),
+          queryClient.invalidateQueries({ queryKey: ['member', 'ledger', 'page'] }),
+        ]);
+        notifySuccess({
+          title: 'Withdrawal reserved',
+          message: `${formatMoney(withdrawal.amount)} moved from Available to your reserved withdrawals.`,
+        });
+      })();
       navigate(`/member/withdrawals/${withdrawal.id}`, { replace: true });
     },
   });
@@ -183,13 +200,7 @@ export function WithdrawalRequestPage() {
             </Link>
           }
         />
-        <Breadcrumbs
-          items={[
-            { label: 'Dashboard', to: '/member' },
-            { label: 'Withdrawals', to: '/member/withdrawals' },
-            { label: 'Request a withdrawal' },
-          ]}
-        />
+
         <div className={styles.loading} role="status">
           <Skeleton />
           <Skeleton />
@@ -214,13 +225,7 @@ export function WithdrawalRequestPage() {
             </Link>
           }
         />
-        <Breadcrumbs
-          items={[
-            { label: 'Dashboard', to: '/member' },
-            { label: 'Withdrawals', to: '/member/withdrawals' },
-            { label: 'Request a withdrawal' },
-          ]}
-        />
+
         <ErrorState
           error={walletQuery.error}
           title="Could not load your wallet"
@@ -245,13 +250,7 @@ export function WithdrawalRequestPage() {
             </Link>
           }
         />
-        <Breadcrumbs
-          items={[
-            { label: 'Dashboard', to: '/member' },
-            { label: 'Withdrawals', to: '/member/withdrawals' },
-            { label: 'Request a withdrawal' },
-          ]}
-        />
+
         <ErrorState
           error={accountsQuery.error}
           title="Could not load your payout accounts"
@@ -276,13 +275,7 @@ export function WithdrawalRequestPage() {
             </Link>
           }
         />
-        <Breadcrumbs
-          items={[
-            { label: 'Dashboard', to: '/member' },
-            { label: 'Withdrawals', to: '/member/withdrawals' },
-            { label: 'Request a withdrawal' },
-          ]}
-        />
+
         <EmptyState
           title="No verified payout account"
           description="Add and confirm a payout account before requesting a withdrawal. Verification typically takes 24-48h (BR-PAY-003/004)."
@@ -316,13 +309,6 @@ export function WithdrawalRequestPage() {
             ← Back to withdrawals
           </Link>
         }
-      />
-      <Breadcrumbs
-        items={[
-          { label: 'Dashboard', to: '/member' },
-          { label: 'Withdrawals', to: '/member/withdrawals' },
-          { label: 'Request a withdrawal' },
-        ]}
       />
 
       <p className={styles.balance}>

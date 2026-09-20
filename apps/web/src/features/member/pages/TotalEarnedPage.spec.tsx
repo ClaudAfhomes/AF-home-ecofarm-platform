@@ -45,10 +45,8 @@ describe('member TotalEarnedPage', () => {
       '/member/commissions',
     );
 
-    // Breadcrumbs, timeframe, header actions - referrals family ring
-    expect(screen.getByText('Dashboard')).toBeInTheDocument();
-    expect(screen.getByText('Referrals')).toBeInTheDocument();
-    expect(screen.getAllByText('Total Earned')).toHaveLength(2);
+    // Timeframe + header actions - referrals family ring (trail owned by MemberLayout)
+    expect(screen.getAllByText('Total Earned').length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText('All time · Reporting only')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'View Commissions' })).toHaveAttribute(
       'href',

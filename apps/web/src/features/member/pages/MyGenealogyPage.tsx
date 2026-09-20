@@ -1,15 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router';
 
-import {
-  Breadcrumbs,
-  EmptyState,
-  ErrorState,
-  Icon,
-  PageHeader,
-  Skeleton,
-  StatusChip,
-} from '@jad/ui';
+import { EmptyState, ErrorState, Icon, PageHeader, Skeleton, StatusChip } from '@jad/ui';
 import type { GenealogyNode, MemberStatus } from '@jad/contracts';
 
 import { ButtonLink } from '@/components/ButtonLink';
@@ -182,13 +174,6 @@ export function MyGenealogyPage() {
             </ButtonLink>
           </div>
         }
-      />
-      <Breadcrumbs
-        items={[
-          { label: 'Dashboard', to: '/member' },
-          { label: 'Referrals', to: '/member/referrals' },
-          { label: 'My Genealogy' },
-        ]}
       />
 
       {genealogyQuery.data ? (

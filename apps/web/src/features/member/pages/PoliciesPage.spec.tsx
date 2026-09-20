@@ -42,10 +42,8 @@ describe('member PoliciesPage', () => {
       '/member/policies/terms',
     );
 
-    // Beautiful list - breadcrumbs, timeframe, search, count, raised cards
-    expect(screen.getByText('Dashboard')).toBeInTheDocument();
-    expect(screen.getByText('Resources')).toBeInTheDocument();
-    expect(screen.getAllByText('Policies')).toHaveLength(2);
+    // Beautiful list - timeframe, search, count, raised cards (trail owned by MemberLayout)
+    expect(screen.getAllByText('Policies').length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText(/Official · Updated/)).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Search policies')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'All' })).toHaveAttribute('aria-pressed', 'true');

@@ -86,7 +86,9 @@ describe('RoleDetailPage', () => {
   it('renders role, permissions, and members', async () => {
     renderDetail();
     expect(await screen.findByText('Role Detail')).toBeInTheDocument();
-    expect(screen.getAllByText('Finance Reviewer').length).toBeGreaterThanOrEqual(1);
+    // Role name renders in the editable name field (breadcrumb removed - the
+    // layout owns the trail now).
+    expect((screen.getByLabelText('Role name') as HTMLInputElement).value).toBe('Finance Reviewer');
     expect(screen.getByText('role-finance-reviewer')).toBeInTheDocument();
     expect(screen.getByText('Rita Reviewer')).toBeInTheDocument();
     expect(screen.getByText('Back to roles')).toBeInTheDocument();

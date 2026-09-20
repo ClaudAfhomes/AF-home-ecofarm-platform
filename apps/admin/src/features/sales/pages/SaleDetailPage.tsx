@@ -3,7 +3,6 @@ import { useParams, Link, useNavigate } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 
 import {
-  Breadcrumbs,
   Button,
   ConfirmDialog,
   ErrorState,
@@ -215,14 +214,6 @@ export function SaleDetailPage() {
         <ErrorState title="Sale not found" message="The requested sale does not exist." />
       ) : (
         <>
-          <Breadcrumbs
-            items={[
-              { label: 'Dashboard', to: '/admin' },
-              { label: 'Sales', to: '/admin/sales' },
-              { label: `Sale ${data.id}` },
-            ]}
-          />
-
           <div className={styles.detailGrid}>
             <div className={styles.card}>
               <h2 className={styles.cardTitle}>Sale Information</h2>

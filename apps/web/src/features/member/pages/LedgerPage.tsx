@@ -2,7 +2,7 @@ import { useEffect, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router';
 
 import { formatMoney } from '@jad/shared';
-import { Breadcrumbs, ErrorState, PageHeader, Skeleton } from '@jad/ui';
+import { ErrorState, PageHeader, Skeleton } from '@jad/ui';
 import type { LedgerEntryType } from '@jad/contracts';
 
 import { ApiError } from '../../../lib/api/errors';
@@ -76,13 +76,6 @@ export function LedgerPage() {
             ← Back to eWallet
           </Link>
         }
-      />
-      <Breadcrumbs
-        items={[
-          { label: 'Dashboard', to: '/member' },
-          { label: 'eWallet', to: '/member/ewallet' },
-          { label: 'Ledger' },
-        ]}
       />
 
       <div className={styles.filterWrap}>

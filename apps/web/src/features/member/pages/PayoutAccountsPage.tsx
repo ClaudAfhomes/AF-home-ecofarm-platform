@@ -5,7 +5,6 @@ import { Link, useLocation } from 'react-router';
 import type { PayoutAccountStatus } from '@jad/contracts';
 
 import {
-  Breadcrumbs,
   ConfirmDialog,
   Dialog,
   EmptyState,
@@ -135,7 +134,6 @@ export function PayoutAccountsPage() {
           </ButtonLink>
         }
       />
-      <Breadcrumbs items={[{ label: 'Dashboard', to: '/member' }, { label: 'Payout accounts' }]} />
 
       {mutationError ? (
         <Alert variant="danger" title="We could not update the payout account">

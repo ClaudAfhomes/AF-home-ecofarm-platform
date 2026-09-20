@@ -110,6 +110,40 @@ describe('MemberLayout', () => {
     expect(screen.getByRole('dialog', { name: 'Member navigation' })).toBeInTheDocument();
   });
 
+  it('owns the breadcrumb trail: sub-page label + clickable list link', () => {
+    renderMember(<MemberLayout />, { route: '/member/ewallet/ledger', user: MOCK_MEMBER });
+
+    const trail = screen.getByRole('navigation', { name: 'Breadcrumb' });
+    expect(within(trail).getByText('Dashboard')).toBeInTheDocument();
+    // Sub-page label, not the category label (the old bug).
+    expect(within(trail).getByText('Ledger')).toBeInTheDocument();
+    // Exactly one breadcrumb nav - page components must not render their own.
+    expect(screen.getAllByRole('navigation', { name: 'Breadcrumb' }).length).toBe(1);
+  });
+
+  it('renders a detail trail with a clickable list link and suppresses unmatched routes', () => {
+    renderMember(<MemberLayout />, { route: '/member/payouts/new', user: MOCK_MEMBER });
+
+    const detail = screen.getByRole('navigation', { name: 'Breadcrumb' });
+    expect(within(detail!).getByRole('link', { name: 'Payouts' })).toHaveAttribute(
+      'href',
+      '/member/payouts',
+    );
+    expect(within(detail!).getByText('Details')).toBeInTheDocument();
+  });
+
+  it('suppresses the trail when no nav item matches the route', () => {
+    renderMember(<MemberLayout />, { route: '/member/unknown', user: MOCK_MEMBER });
+    expect(screen.queryByRole('navigation', { name: 'Breadcrumb' })).not.toBeInTheDocument();
+  });
+
+  it('renders Profile as the current page for the profile route', () => {
+    renderMember(<MemberLayout />, { route: '/member/profile', user: MOCK_MEMBER });
+    const trails = screen.getAllByRole('navigation', { name: 'Breadcrumb' });
+    expect(trails.length).toBe(1);
+    expect(within(trails[0]!).getByText('Profile')).toBeInTheDocument();
+  });
+
   it('closes the previous dropdown when opening another', async () => {
     mockMatchMedia(false);
     const user = userEvent.setup();

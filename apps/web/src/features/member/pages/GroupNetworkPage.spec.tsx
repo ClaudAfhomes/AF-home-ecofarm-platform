@@ -53,9 +53,7 @@ describe('member GroupNetworkPage', () => {
     expect(screen.getByText(/network view only/)).toBeInTheDocument();
     expect(screen.getByText(/does not represent or compute multi-level/)).toBeInTheDocument();
 
-    // Breadcrumbs
-    expect(screen.getByText('Dashboard')).toBeInTheDocument();
-    expect(screen.getByText('Referrals')).toBeInTheDocument();
-    expect(screen.getAllByText('Group Network')).toHaveLength(2);
+    // Trail is owned by MemberLayout - no in-page duplicate
+    expect(screen.getAllByText('Group Network').length).toBeGreaterThanOrEqual(1);
   });
 });

@@ -3,7 +3,6 @@ import { useParams } from 'react-router';
 
 import { formatMoney, isExpired } from '@jad/shared';
 import {
-  Breadcrumbs,
   Dialog,
   ErrorState,
   NotFound,
@@ -37,14 +36,7 @@ export function VoucherDetailPage() {
     return (
       <section>
         <PageHeader title="Voucher not found" />
-        <Breadcrumbs
-          items={[
-            { label: 'Dashboard', to: '/member' },
-            { label: 'Resources' },
-            { label: 'Vouchers', to: '/member/vouchers' },
-            { label: 'Not found' },
-          ]}
-        />
+
         <NotFound
           title="Voucher not found"
           action={
@@ -67,14 +59,6 @@ export function VoucherDetailPage() {
             All vouchers
           </ButtonLink>
         }
-      />
-      <Breadcrumbs
-        items={[
-          { label: 'Dashboard', to: '/member' },
-          { label: 'Resources' },
-          { label: 'Vouchers', to: '/member/vouchers' },
-          { label: voucherQuery.data?.title ?? 'Voucher' },
-        ]}
       />
 
       {voucherQuery.isLoading || !voucherQuery.data ? (

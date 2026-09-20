@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 
 import {
@@ -17,6 +18,8 @@ import {
   TableHead,
   TableHeaderCell,
   TableRow,
+  notifyError,
+  notifySuccess,
 } from '@jad/ui';
 import { formatMoney } from '@jad/shared';
 import type { Withdrawal } from '@jad/contracts';
@@ -73,8 +76,9 @@ function TableSkeleton() {
 
 export function WithdrawalsPage() {
   const { data, isPending, isError, error, refetch } = useWithdrawals();
+  const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
-  const [localData, setLocalData] = useState<Withdrawal[] | null>(null);
+  const [actionPending, setActionPending] = useState(false);
   const [completeId, setCompleteId] = useState<string | null>(null);
   const [rejectTarget, setRejectTarget] = useState<Withdrawal | null>(null);
   const [rejectReason, setRejectReason] = useState('');
@@ -82,10 +86,7 @@ export function WithdrawalsPage() {
   const [detailTarget, setDetailTarget] = useState<Withdrawal | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
 
-  const displayData = useMemo(() => {
-    const base = localData ?? (data as Withdrawal[] | undefined) ?? [];
-    return base;
-  }, [localData, data]);
+  const displayData = useMemo(() => (data as Withdrawal[] | undefined) ?? [], [data]);
 
   const filtered = useMemo(() => {
     return displayData.filter((w) => {
@@ -98,48 +99,55 @@ export function WithdrawalsPage() {
   const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const rows = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  const confirmComplete = () => {
-    if (!completeId) return;
+  // Server truth only: the POST routes are awaited, then the list is
+  // refetched. Never mutate local state optimistically - a failed call must
+  // leave the row in its persisted status (with the error surfaced).
+  const confirmComplete = async () => {
+    if (!completeId || actionPending) return;
     const id = completeId;
-    // Persist server-side when the backend is available; local fallback keeps
-    // the workflow usable on mock data.
-    completeWithdrawal(id).catch(() => null);
-    setLocalData((prev) => {
-      const base = prev ?? (data as Withdrawal[] | undefined) ?? [];
-      return base.map((w) =>
-        w.id === id
-          ? { ...w, status: 'COMPLETED' as const, completedAt: new Date().toISOString() }
-          : w,
-      );
-    });
-    setCompleteId(null);
+    setActionPending(true);
+    try {
+      await completeWithdrawal(id);
+      notifySuccess({ title: 'Withdrawal completed', message: `${id} marked Completed.` });
+      await queryClient.invalidateQueries({ queryKey: ['admin', 'withdrawals'] });
+      setCompleteId(null);
+    } catch (e) {
+      notifyError({
+        title: 'Complete failed',
+        message:
+          e instanceof Error
+            ? e.message
+            : 'The withdrawal could not be completed. It stays active.',
+      });
+    } finally {
+      setActionPending(false);
+    }
   };
 
-  const handleReject = () => {
-    if (!rejectTarget) return;
+  const handleReject = async () => {
+    if (!rejectTarget || actionPending) return;
     if (!rejectReason.trim()) {
       setRejectError('Rejection reason is required.');
       return;
     }
     const id = rejectTarget.id;
     const reason = rejectReason.trim();
-    rejectWithdrawal(id, reason).catch(() => null);
-    setLocalData((prev) => {
-      const base = prev ?? (data as Withdrawal[] | undefined) ?? [];
-      return base.map((w) =>
-        w.id === id
-          ? {
-              ...w,
-              status: 'REJECTED' as const,
-              rejectionReason: reason,
-              rejectedAt: new Date().toISOString(),
-            }
-          : w,
-      );
-    });
-    setRejectTarget(null);
-    setRejectReason('');
-    setRejectError(undefined);
+    setActionPending(true);
+    try {
+      await rejectWithdrawal(id, reason);
+      notifySuccess({ title: 'Withdrawal rejected', message: `${id} was rejected.` });
+      await queryClient.invalidateQueries({ queryKey: ['admin', 'withdrawals'] });
+      setRejectTarget(null);
+      setRejectReason('');
+      setRejectError(undefined);
+    } catch (e) {
+      notifyError({
+        title: 'Reject failed',
+        message: e instanceof Error ? e.message : 'The withdrawal could not be rejected.',
+      });
+    } finally {
+      setActionPending(false);
+    }
   };
 
   const hasFilters = statusFilter !== 'ALL';
@@ -273,10 +281,18 @@ export function WithdrawalsPage() {
                               onClick={(e) => e.stopPropagation()}
                               onKeyDown={(e) => e.stopPropagation()}
                             >
-                              <Button variant="primary" onClick={() => setCompleteId(row.id)}>
+                              <Button
+                                variant="primary"
+                                onClick={() => setCompleteId(row.id)}
+                                disabled={actionPending}
+                              >
                                 Complete
                               </Button>
-                              <Button variant="danger" onClick={() => setRejectTarget(row)}>
+                              <Button
+                                variant="danger"
+                                onClick={() => setRejectTarget(row)}
+                                disabled={actionPending}
+                              >
                                 Reject
                               </Button>
                             </div>
@@ -309,26 +325,33 @@ export function WithdrawalsPage() {
 
               <ConfirmDialog
                 open={completeId !== null}
-                onCancel={() => setCompleteId(null)}
+                onCancel={actionPending ? () => undefined : () => setCompleteId(null)}
                 onConfirm={confirmComplete}
                 title="Complete withdrawal?"
                 message="This will mark the withdrawal as Completed and permanently deduct the reserved amount (record-only)."
                 confirmLabel="Complete"
                 cancelLabel="Cancel"
+                confirmDisabled={actionPending}
+                confirmLoading={actionPending}
               />
 
               <Dialog
                 open={rejectTarget !== null}
-                onClose={() => {
-                  setRejectTarget(null);
-                  setRejectReason('');
-                  setRejectError(undefined);
-                }}
+                onClose={
+                  actionPending
+                    ? () => undefined
+                    : () => {
+                        setRejectTarget(null);
+                        setRejectReason('');
+                        setRejectError(undefined);
+                      }
+                }
                 title="Reject withdrawal"
                 footer={
                   <>
                     <Button
                       variant="secondary"
+                      disabled={actionPending}
                       onClick={() => {
                         setRejectTarget(null);
                         setRejectReason('');
@@ -337,7 +360,12 @@ export function WithdrawalsPage() {
                     >
                       Cancel
                     </Button>
-                    <Button variant="danger" onClick={handleReject} disabled={!rejectReason.trim()}>
+                    <Button
+                      variant="danger"
+                      onClick={handleReject}
+                      disabled={!rejectReason.trim() || actionPending}
+                      loading={actionPending}
+                    >
                       Confirm Reject
                     </Button>
                   </>

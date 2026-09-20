@@ -4,7 +4,7 @@ import type { FormEvent } from 'react';
 import { Link, useParams } from 'react-router';
 
 import { formatMoney } from '@jad/shared';
-import { Breadcrumbs, ErrorState, notifySuccess, PageHeader, Skeleton, StatusChip } from '@jad/ui';
+import { ErrorState, notifySuccess, PageHeader, Skeleton, StatusChip } from '@jad/ui';
 import type { SaleStatus } from '@jad/contracts';
 
 import { Alert } from '../../../components/Alert';
@@ -245,13 +245,6 @@ export function SaleDetailPage() {
             ← Back to sales
           </Link>
         }
-      />
-      <Breadcrumbs
-        items={[
-          { label: 'Dashboard', to: '/member' },
-          { label: 'Sales', to: '/member/sales' },
-          { label: `Sale ${sale.id}` },
-        ]}
       />
 
       <div className={styles.pageStack}>

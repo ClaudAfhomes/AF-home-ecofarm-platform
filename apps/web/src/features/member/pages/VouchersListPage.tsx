@@ -2,15 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router';
 
 import { formatMoney, isExpired } from '@jad/shared';
-import {
-  Breadcrumbs,
-  EmptyState,
-  ErrorState,
-  PageHeader,
-  QrCode,
-  Skeleton,
-  StatusChip,
-} from '@jad/ui';
+import { EmptyState, ErrorState, PageHeader, QrCode, Skeleton, StatusChip } from '@jad/ui';
 import type { VoucherStatus } from '@jad/contracts';
 
 import { useVouchers } from '../hooks/useMember';
@@ -50,13 +42,7 @@ export function VouchersListPage() {
         title="Vouchers"
         description="Your JA&D vouchers - each with a code and QR code for redemption."
       />
-      <Breadcrumbs
-        items={[
-          { label: 'Dashboard', to: '/member' },
-          { label: 'Resources' },
-          { label: 'Vouchers' },
-        ]}
-      />
+
       <p className={styles.timeframe}>Available · Remaining value</p>
 
       <div className={styles.filters} role="group" aria-label="Filter by status">

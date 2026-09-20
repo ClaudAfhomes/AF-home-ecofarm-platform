@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 import {
-  Breadcrumbs,
   Button,
   Dialog,
   EmptyState,
@@ -149,13 +148,7 @@ export function NotificationsPage() {
           </div>
         }
       />
-      <Breadcrumbs
-        items={[
-          { label: 'Dashboard', to: '/member' },
-          { label: 'Resources' },
-          { label: 'Notifications' },
-        ]}
-      />
+
       <p className={styles.timeframe}>Latest first · Announcements</p>
 
       {mutationError ? (

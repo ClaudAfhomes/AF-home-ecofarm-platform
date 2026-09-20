@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 
 import {
-  Breadcrumbs,
   Button,
   ConfirmDialog,
   ErrorState,
@@ -140,14 +139,6 @@ export function StaffDetailPage() {
         />
       ) : (
         <>
-          <Breadcrumbs
-            items={[
-              { label: 'Dashboard', to: '/admin' },
-              { label: 'Staff', to: '/admin/staff' },
-              { label: data.name },
-            ]}
-          />
-
           <div className={styles.detailGrid}>
             <div className={styles.card}>
               <h2 className={styles.cardTitle}>Staff Information</h2>

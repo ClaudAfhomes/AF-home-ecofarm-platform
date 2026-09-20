@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { Breadcrumbs, Button, notifySuccess, PageHeader, StatusChip } from '@jad/ui';
+import { Button, notifySuccess, PageHeader, StatusChip } from '@jad/ui';
 import { roleNameFor } from '@jad/contracts';
 
 import { useSession } from '../../../lib/session';
@@ -95,7 +95,6 @@ export function MyAccountPage() {
   return (
     <section>
       <PageHeader title="My Account" description="Your staff identity and sign-in." />
-      <Breadcrumbs items={[{ label: 'Dashboard', to: '/admin' }, { label: 'My Account' }]} />
 
       {mustChangePassword ? (
         <div className={styles.banner} role="alert">

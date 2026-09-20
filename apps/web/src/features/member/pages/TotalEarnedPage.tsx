@@ -1,6 +1,6 @@
 import { Link } from 'react-router';
 
-import { Breadcrumbs, ErrorState, Icon, PageHeader, Skeleton } from '@jad/ui';
+import { ErrorState, Icon, PageHeader, Skeleton } from '@jad/ui';
 import { formatMoney } from '@jad/shared';
 
 import { ButtonLink } from '@/components/ButtonLink';
@@ -36,13 +36,7 @@ export function TotalEarnedPage() {
           </div>
         }
       />
-      <Breadcrumbs
-        items={[
-          { label: 'Dashboard', to: '/member' },
-          { label: 'Referrals' },
-          { label: 'Total Earned' },
-        ]}
-      />
+
       <p className={styles.timeframe}>All time · Reporting only</p>
 
       {walletQuery.isLoading ? (

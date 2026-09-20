@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 
-import { Breadcrumbs, Button, EmptyState, ErrorState, Icon, PageHeader, Skeleton } from '@jad/ui';
+import { Button, EmptyState, ErrorState, Icon, PageHeader, Skeleton } from '@jad/ui';
 import type { Message } from '@jad/contracts';
 
 import { Alert } from '@/components/Alert';
@@ -114,7 +114,6 @@ export function MessagesPage() {
           </ButtonLink>
         }
       />
-      <Breadcrumbs items={[{ label: 'Dashboard', to: '/member' }, { label: 'Messages' }]} />
 
       {sendError ? (
         <Alert variant="danger" title="Something went wrong">

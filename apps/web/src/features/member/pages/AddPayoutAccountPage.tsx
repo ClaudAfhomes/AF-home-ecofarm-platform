@@ -3,7 +3,7 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router';
 
-import { Breadcrumbs, ErrorState, PageHeader, Skeleton } from '@jad/ui';
+import { ErrorState, PageHeader, Skeleton } from '@jad/ui';
 import type { PayoutMethod } from '@jad/contracts';
 
 import { PAYOUT_METHOD_OPTIONS } from '../lib/presentation';
@@ -129,13 +129,7 @@ export function AddPayoutAccountPage() {
     return (
       <section>
         <PageHeader title="Add payout account" />
-        <Breadcrumbs
-          items={[
-            { label: 'Dashboard', to: '/member' },
-            { label: 'Payouts', to: '/member/payouts' },
-            { label: 'Add payout account' },
-          ]}
-        />
+
         <div className={styles.loading} role="status">
           <Skeleton />
           <Skeleton />
@@ -149,13 +143,7 @@ export function AddPayoutAccountPage() {
     return (
       <section>
         <PageHeader title="Add payout account" />
-        <Breadcrumbs
-          items={[
-            { label: 'Dashboard', to: '/member' },
-            { label: 'Payouts', to: '/member/payouts' },
-            { label: 'Add payout account' },
-          ]}
-        />
+
         <ErrorState
           error={accountsQuery.error}
           title="Could not load your payout accounts"
@@ -177,13 +165,6 @@ export function AddPayoutAccountPage() {
             ← Back to payouts
           </Link>
         }
-      />
-      <Breadcrumbs
-        items={[
-          { label: 'Dashboard', to: '/member' },
-          { label: 'Payouts', to: '/member/payouts' },
-          { label: 'Add payout account' },
-        ]}
       />
 
       {serverError ? (

@@ -105,9 +105,7 @@ export function DashboardPage() {
   // Sales Overview is gated by the sales module: server-resolved roleModules
   // are authoritative; mock/dev sessions without them fall back to the shell
   // role (admin - which holds sales in the system matrix).
-  const salesModuleOk = user?.roleModules
-    ? user.roleModules.includes('sales')
-    : role === 'admin';
+  const salesModuleOk = user?.roleModules ? user.roleModules.includes('sales') : role === 'admin';
 
   const baseVisible = QUEUE_LINKS.filter((queue) => {
     const item = findNavItem(queue.to);
@@ -135,8 +133,6 @@ export function DashboardPage() {
   return (
     <section>
       <PageHeader title="Dashboard" description={description} />
-      {salesModuleOk ? <SalesTrendChart /> : null}
-      <p className={styles.timeframe}>As of today</p>
       {isPending ? (
         <>
           <p className={styles.loadingRow} role="status" aria-live="polite" aria-busy="true">
@@ -189,6 +185,8 @@ export function DashboardPage() {
           ) : null}
         </>
       )}
+      {salesModuleOk ? <SalesTrendChart /> : null}
+      <p className={styles.timeframe}>As of today</p>
     </section>
   );
 }

@@ -81,8 +81,9 @@ describe('StaffDetailPage', () => {
   it('renders identity, role, and management cards', async () => {
     renderWithProviders(<StaffDetailPage />, { user: MOCK_SUPER_ADMIN });
     expect(await screen.findByText('Staff Detail')).toBeInTheDocument();
-    // Name appears in both the breadcrumb trail and the info card.
-    expect(screen.getAllByText('Ada Admin').length).toBeGreaterThanOrEqual(2);
+    // Name appears in the info card (breadcrumb removed - the layout owns
+    // the trail now).
+    expect(screen.getAllByText('Ada Admin').length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText('ada.admin@jad.example')).toBeInTheDocument();
     expect(screen.getByText('Back to staff')).toBeInTheDocument();
     expect(screen.getByText('Role Assignment')).toBeInTheDocument();

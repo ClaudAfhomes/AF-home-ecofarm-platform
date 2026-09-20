@@ -11,9 +11,10 @@ import styles from './EWalletPage.module.css';
 
 /**
  * eWallet summary (SCR-MEM-001, FR-WAL-003/004). Available Balance is the
- * only amount that can be withdrawn; Pending is the server-computed pipeline
- * estimate (open sales awaiting approval). Balances are server-computed - the
- * client never derives them.
+ * only amount that can be withdrawn; Pending shows the server-computed
+ * pipeline estimate AND the reserved-withdrawal hold (`Wallet.pendingAmount`
+ * - a withdrawal request moves money here immediately). Balances are
+ * server-computed - the client never derives them.
  */
 export function EWalletPage() {
   const walletQuery = useWallet();
@@ -22,6 +23,14 @@ export function EWalletPage() {
   // Pending is the server-computed estimate (open sales x rates), not the
   // sum of PENDING commissions (commissions now credit instantly on approval).
   const pendingCommissions = walletQuery.data?.pendingCommission ?? '0.00';
+  const pendingWithdrawals = walletQuery.data?.pendingAmount ?? '0.00';
+  const reservedWithdrawals = (() => {
+    try {
+      return compareMoney(pendingWithdrawals, '0.00') > 0;
+    } catch {
+      return false;
+    }
+  })();
 
   const available = walletQuery.data?.availableBalance ?? '0.00';
   const hasAvailable = (() => {
@@ -86,7 +95,12 @@ export function EWalletPage() {
             <span className={styles.cardValue}>
               {walletQuery.isLoading ? '-' : formatMoney(pendingCommissions)}
             </span>
-            <span className={styles.cardHint}>Awaiting admin approval of submitted sales.</span>
+            <span className={styles.cardHint}>
+              Awaiting admin approval of submitted sales.
+              {reservedWithdrawals
+                ? ` Reserved withdrawals (in Pending/Completed payments): ${formatMoney(pendingWithdrawals)}.`
+                : ''}
+            </span>
           </div>
           <div className={styles.card}>
             <div className={styles.cardTop}>
@@ -101,7 +115,7 @@ export function EWalletPage() {
             <span className={styles.cardValue}>
               {formatMoney(walletQuery.data?.totalWithdrawals ?? '0.00')}
             </span>
-            <span className={styles.cardHint}>Completed & reserved • server-computed</span>
+            <span className={styles.cardHint}>Completed withdrawals • server-computed</span>
           </div>
           <div className={styles.card}>
             <div className={styles.cardTop}>

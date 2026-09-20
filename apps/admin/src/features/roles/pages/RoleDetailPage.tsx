@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 
 import {
-  Breadcrumbs,
   Button,
   ConfirmDialog,
   ErrorState,
@@ -163,8 +162,6 @@ export function RoleDetailPage() {
         <ErrorState title="Role not found" message="The requested role does not exist." />
       ) : (
         <>
-          <Breadcrumbs items={[{ label: 'Roles', to: '/admin/roles' }, { label: data.name }]} />
-
           <div className={styles.detailGrid}>
             <div className={styles.card}>
               <h2 className={styles.cardTitle}>Role</h2>

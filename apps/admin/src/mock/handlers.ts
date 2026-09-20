@@ -6,6 +6,7 @@ import type {
   SalesCommissionsReport,
   SalesReportRow,
   SalesTrendReport,
+  Withdrawal,
 } from '@jad/contracts';
 import { CMS_PROPERTIES_SEED, STAFF_MODULE_LABEL, roleNameFor } from '@jad/contracts';
 import { multiplyMoney, addMoney } from '@jad/shared';
@@ -68,6 +69,24 @@ export function resetMockMemberLifecycle(): void {
   archivedMemberStash.clear();
 }
 
+type WithdrawalStatusSnapshot = {
+  status: Withdrawal['status'];
+  completedAt?: string;
+  rejectedAt?: string;
+  rejectionReason?: string;
+};
+
+const withdrawalStatusStash = new Map<string, WithdrawalStatusSnapshot>();
+
+/** Restore any mock-withdrawal mutations made by complete/reject handlers. */
+export function resetMockWithdrawals(): void {
+  for (const [id, snapshot] of withdrawalStatusStash) {
+    const row = MOCK_WITHDRAWALS.find((w) => w.id === id);
+    if (row) Object.assign(row, snapshot);
+  }
+  withdrawalStatusStash.clear();
+}
+
 function notFound(entity: string) {
   return {
     body: {
@@ -108,16 +127,13 @@ function mockCommissionsFor(sales: typeof MOCK_SALES): CommissionReportRow[] {
       commissionType: 'DIRECT_COMMISSION' as const,
       amount: multiplyMoney(sale.propertyValue, '0.0800'),
       status: (sale.status === 'PAYMENT_VERIFIED' ? 'PENDING' : 'AVAILABLE') as
-        | 'PENDING'
-        | 'AVAILABLE',
+        'PENDING' | 'AVAILABLE',
       createdAt: sale.submittedAt,
       ...(sale.status === 'QUALIFYING_SALE' || sale.status === 'LOCKED'
         ? { clearedAt: sale.submittedAt }
         : {}),
     }));
 }
-
-
 
 function fail(message: string) {
   const status = /not found|does not exist/i.test(message)
@@ -253,8 +269,7 @@ export const adminMockHandlers: MockRoute[] = [
         },
         registrations: {
           total: registrationStore.registrations.length,
-          pending: registrationStore.registrations.filter((row) => row.status === 'PENDING')
-            .length,
+          pending: registrationStore.registrations.filter((row) => row.status === 'PENDING').length,
           rejected: registrationStore.registrations.filter((row) => row.status === 'REJECTED')
             .length,
         },
@@ -292,7 +307,8 @@ export const adminMockHandlers: MockRoute[] = [
     path: '/admin/reports/sales-trend',
     response: (ctx: MockRequestContext) => {
       const query = new URL(ctx.url, 'http://mock.local').searchParams;
-      const granularity = query.get('granularity') === 'year' ? ('year' as const) : ('month' as const);
+      const granularity =
+        query.get('granularity') === 'year' ? ('year' as const) : ('month' as const);
       const zero = { count: 0, total: '0.00' };
       const aggregated = (keys: string[], keyOf: (d: Date) => string) => {
         const buckets = new Map(keys.map((key) => [key, { ...zero }]));
@@ -315,9 +331,14 @@ export const adminMockHandlers: MockRoute[] = [
           d.setUTCMonth(d.getUTCMonth() - i);
           keys.push(`${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`);
         }
-        periods = aggregated(keys, (d) => `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`);
+        periods = aggregated(
+          keys,
+          (d) => `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`,
+        );
       } else {
-        const years = new Set(MOCK_SALES.map((sale) => new Date(sale.submittedAt).getUTCFullYear()));
+        const years = new Set(
+          MOCK_SALES.map((sale) => new Date(sale.submittedAt).getUTCFullYear()),
+        );
         const current = new Date().getUTCFullYear();
         const start = Math.min(...years, current);
         const yearKeys: string[] = [];
@@ -564,6 +585,56 @@ export const adminMockHandlers: MockRoute[] = [
         pageSize: 10,
         total: MOCK_WITHDRAWALS.length,
       },
+    },
+  },
+  {
+    // POST /admin/withdrawals/:id/complete|reject - mirrors the real API's
+    // guarded transitions so the queue UI tests exercise the await + refetch
+    // path instead of local optimistic state.
+    path: '/admin/withdrawals/',
+    match: 'prefix',
+    handler: (ctx: MockRequestContext) => {
+      if (ctx.method !== 'POST') return notFound('Withdrawal');
+      const id = idFromPath(ctx.url, /\/admin\/withdrawals\/([^/?#]+)\/(?:complete|reject)$/);
+      if (!id) return notFound('Withdrawal');
+      const row = MOCK_WITHDRAWALS.find((w) => w.id === id);
+      if (!row) return notFound('Withdrawal');
+      if (/\/complete$/.test(ctx.url)) {
+        if (row.status !== 'REQUESTED' && row.status !== 'RESERVED') {
+          return fail(`Only reserved withdrawals can be completed (current: ${row.status}).`);
+        }
+        withdrawalStatusStash.set(id, {
+          status: row.status,
+          completedAt: row.completedAt,
+          rejectedAt: row.rejectedAt,
+          rejectionReason: row.rejectionReason,
+        });
+        (row as { status: Withdrawal['status']; completedAt?: string }).status = 'COMPLETED';
+        row.completedAt = new Date().toISOString();
+        return { body: row, status: 200 };
+      }
+      const reason = ((ctx.body ?? {}) as { rejectionReason?: unknown }).rejectionReason;
+      if (typeof reason !== 'string' || reason.trim().length === 0) {
+        return fail('Rejection reason is required.');
+      }
+      if (row.status !== 'REQUESTED' && row.status !== 'RESERVED') {
+        return fail(`Only reserved withdrawals can be rejected (current: ${row.status}).`);
+      }
+      withdrawalStatusStash.set(id, {
+        status: row.status,
+        completedAt: row.completedAt,
+        rejectedAt: row.rejectedAt,
+        rejectionReason: row.rejectionReason,
+      });
+      const patch = row as {
+        status: Withdrawal['status'];
+        rejectedAt?: string;
+        rejectionReason?: string;
+      };
+      patch.status = 'REJECTED';
+      patch.rejectedAt = new Date().toISOString();
+      patch.rejectionReason = reason.trim();
+      return { body: row, status: 200 };
     },
   },
   {

@@ -56,9 +56,7 @@ describe('member VoucherDetailPage', () => {
       'href',
       '/member/vouchers',
     );
-    // Breadcrumbs
-    expect(screen.getByText('Dashboard')).toBeInTheDocument();
-    expect(screen.getByText('Resources')).toBeInTheDocument();
+    // Trail is owned by MemberLayout
   });
 
   it('renders a not-found state for an unknown voucher (object-level)', async () => {
@@ -73,7 +71,6 @@ describe('member VoucherDetailPage', () => {
     renderAt('/member/vouchers/vch-999');
 
     expect(await screen.findAllByText('Voucher not found')).toHaveLength(2);
-    expect(screen.getByText('Dashboard')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'All vouchers' })).toHaveAttribute(
       'href',
       '/member/vouchers',

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams } from 'react-router';
 
-import { Breadcrumbs, ErrorState, NotFound, PageHeader, Skeleton } from '@jad/ui';
+import { ErrorState, NotFound, PageHeader, Skeleton } from '@jad/ui';
 
 import { ButtonLink } from '@/components/ButtonLink';
 import { usePolicies } from '../../../hooks/usePolicies';
@@ -34,13 +34,7 @@ export function PolicyDetailPage() {
     return (
       <section>
         <PageHeader title="Policy" />
-        <Breadcrumbs
-          items={[
-            { label: 'Dashboard', to: '/member' },
-            { label: 'Resources' },
-            { label: 'Policies' },
-          ]}
-        />
+
         <div className={styles.loading} role="status" aria-live="polite" aria-busy="true">
           <Skeleton />
           <Skeleton />
@@ -54,13 +48,7 @@ export function PolicyDetailPage() {
     return (
       <section>
         <PageHeader title="Policy" />
-        <Breadcrumbs
-          items={[
-            { label: 'Dashboard', to: '/member' },
-            { label: 'Resources' },
-            { label: 'Policies' },
-          ]}
-        />
+
         <ErrorState
           error={policiesQuery.error}
           title="Could not load policy"
@@ -74,14 +62,7 @@ export function PolicyDetailPage() {
     return (
       <section>
         <PageHeader title="Policy not found" />
-        <Breadcrumbs
-          items={[
-            { label: 'Dashboard', to: '/member' },
-            { label: 'Resources' },
-            { label: 'Policies' },
-            { label: 'Not found' },
-          ]}
-        />
+
         <NotFound
           title="Policy not found"
           action={
@@ -105,14 +86,7 @@ export function PolicyDetailPage() {
           </ButtonLink>
         }
       />
-      <Breadcrumbs
-        items={[
-          { label: 'Dashboard', to: '/member' },
-          { label: 'Resources' },
-          { label: 'Policies' },
-          { label: policy.title },
-        ]}
-      />
+
       <div className={styles.bodyCard}>
         <div className={styles.body}>
           {splitProgramsToken(policy.content ?? '').map((block, index) =>

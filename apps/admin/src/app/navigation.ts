@@ -1,6 +1,6 @@
 import type { Role, RoleRecord, StaffModule } from '@jad/contracts';
 import { resolveRoleModules } from '@jad/contracts';
-import type { SidebarItem } from '@jad/ui';
+import type { BreadcrumbItem, SidebarItem } from '@jad/ui';
 
 /**
  * Admin navigation registry (UI-UX §4.2 destinations). Categories group related
@@ -192,6 +192,58 @@ export function findNavSubItem(
     if (sub && !('divider' in sub)) return { parent: item, sub };
   }
   return undefined;
+}
+
+/**
+ * Breadcrumb trail for a pathname - the single source for AdminLayout's bar
+ * so page-level trails never duplicate it (UI-UX §4.3/§4.7). Trail shapes:
+ * - exact sub/list page: Dashboard(link) > Category > Current
+ *   (category span collapses when it would duplicate the page label).
+ * - detail page under a sub or plain item: Dashboard(link) > List(link) >
+ *   Details (current) - the list link stays clickable because it is not the
+ *   last crumb.
+ * - unmatched routes: `null` (suppress the bar) - except /admin/profile
+ *   (My Account, outside the nav registry).
+ */
+export function breadcrumbItems(pathname: string): BreadcrumbItem[] | null {
+  if (pathname === '/admin') return [{ label: 'Dashboard' }];
+  if (pathname === '/admin/profile') {
+    return [{ label: 'Dashboard', to: '/admin' }, { label: 'My Account' }];
+  }
+  const dashboardLink: BreadcrumbItem = { label: 'Dashboard', to: '/admin' };
+  const subs = ADMIN_NAV_ITEMS.flatMap((item) =>
+    (item.dropdown ?? []).filter((s): s is AdminNavSubItem => !('divider' in s)),
+  );
+  // Exact sub matches first so nested sub routes resolve to their own label
+  // instead of a longer parent's detail trail.
+  const exactSub = subs.find((sub) => sub.to === pathname);
+  if (exactSub) {
+    if (exactSub.to === '/admin/members') {
+      // The Members category and its sub share the label/path - single crumb.
+      return [dashboardLink, { label: exactSub.label }];
+    }
+    const parent = ADMIN_NAV_ITEMS.find((item) =>
+      item.dropdown?.some((s) => !('divider' in s) && 'to' in s && s.to === exactSub.to),
+    );
+    if (parent && parent.label !== exactSub.label) {
+      return [dashboardLink, { label: parent.label }, { label: exactSub.label }];
+    }
+    return [dashboardLink, { label: exactSub.label }];
+  }
+  const detailSub = subs.find((sub) => pathname.startsWith(`${sub.to}/`));
+  if (detailSub) {
+    return [dashboardLink, { label: detailSub.label, to: detailSub.to }, { label: 'Details' }];
+  }
+  for (const item of ADMIN_NAV_ITEMS) {
+    if (item.dropdown || item.to === '/admin') continue;
+    if (pathname === item.to) {
+      return [dashboardLink, { label: item.label }];
+    }
+    if (pathname.startsWith(`${item.to}/`)) {
+      return [dashboardLink, { label: item.label, to: item.to }, { label: 'Details' }];
+    }
+  }
+  return null;
 }
 
 /** Check whether a role can access a nav item (includes categories). */

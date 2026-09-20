@@ -4,7 +4,6 @@ import type { FormEvent } from 'react';
 
 import type { UpdateProfileRequest } from '@jad/contracts';
 import {
-  Breadcrumbs,
   ConfirmDialog,
   ErrorState,
   notifySuccess,
@@ -103,7 +102,7 @@ export function ProfilePage() {
     return (
       <section>
         <PageHeader title="Profile" />
-        <Breadcrumbs items={[{ label: 'Dashboard', to: '/member' }, { label: 'Profile' }]} />
+
         <div className={styles.loading} role="status" aria-live="polite" aria-busy="true">
           <Skeleton />
           <Skeleton />
@@ -117,7 +116,7 @@ export function ProfilePage() {
     return (
       <section>
         <PageHeader title="Profile" />
-        <Breadcrumbs items={[{ label: 'Dashboard', to: '/member' }, { label: 'Profile' }]} />
+
         <ErrorState
           error={profileQuery.error}
           title="Could not load your profile"
@@ -163,7 +162,6 @@ export function ProfilePage() {
           ) : null
         }
       />
-      <Breadcrumbs items={[{ label: 'Dashboard', to: '/member' }, { label: 'Profile' }]} />
 
       {error ? (
         <Alert variant="danger" title="We could not save your profile">

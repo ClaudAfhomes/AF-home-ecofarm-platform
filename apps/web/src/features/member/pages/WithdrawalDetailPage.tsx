@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useParams } from 'react-router';
 
 import { formatMoney } from '@jad/shared';
-import { Breadcrumbs, ErrorState, PageHeader, Skeleton, StatusChip } from '@jad/ui';
+import { ErrorState, PageHeader, Skeleton, StatusChip } from '@jad/ui';
 
 import { Alert } from '../../../components/Alert';
 import { ButtonLink } from '../../../components/ButtonLink';
@@ -51,13 +51,7 @@ export function WithdrawalDetailPage() {
             </Link>
           }
         />
-        <Breadcrumbs
-          items={[
-            { label: 'Dashboard', to: '/member' },
-            { label: 'Withdrawals', to: '/member/withdrawals' },
-            { label: 'Withdrawal detail' },
-          ]}
-        />
+
         <div className={styles.loading} role="status">
           <Skeleton />
           <Skeleton />
@@ -82,13 +76,7 @@ export function WithdrawalDetailPage() {
             </Link>
           }
         />
-        <Breadcrumbs
-          items={[
-            { label: 'Dashboard', to: '/member' },
-            { label: 'Withdrawals', to: '/member/withdrawals' },
-            { label: 'Withdrawal detail' },
-          ]}
-        />
+
         <ErrorState
           error={withdrawalQuery.error}
           title="Could not load this withdrawal"
@@ -125,13 +113,6 @@ export function WithdrawalDetailPage() {
             ← Back to withdrawals
           </Link>
         }
-      />
-      <Breadcrumbs
-        items={[
-          { label: 'Dashboard', to: '/member' },
-          { label: 'Withdrawals', to: '/member/withdrawals' },
-          { label: `Withdrawal ${withdrawal.id}` },
-        ]}
       />
 
       <dl className={styles.details}>

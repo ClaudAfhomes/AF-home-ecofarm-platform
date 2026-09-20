@@ -1,6 +1,45 @@
 import { describe, expect, it } from 'vitest';
 
-import { findMemberNavItem, memberBottomNavItems, memberSidebarItems } from './navigation';
+import {
+  findMemberNavItem,
+  memberBreadcrumbItems,
+  memberBottomNavItems,
+  memberSidebarItems,
+} from './navigation';
+
+describe('memberBreadcrumbItems', () => {
+  it('renders no trail on the dashboard', () => {
+    expect(memberBreadcrumbItems('/member')).toEqual([]);
+  });
+
+  it('uses the sub-page label, never the category label', () => {
+    expect(memberBreadcrumbItems('/member/ewallet/ledger')).toEqual([
+      { label: 'Dashboard', to: '/member' },
+      { label: 'Ledger' },
+    ]);
+  });
+
+  it('puts a clickable list link before Details on detail routes', () => {
+    expect(memberBreadcrumbItems('/member/payouts/new')).toEqual([
+      { label: 'Dashboard', to: '/member' },
+      { label: 'Payouts', to: '/member/payouts' },
+      { label: 'Details' },
+    ]);
+    expect(memberBreadcrumbItems('/member/sales/sal-1')).toEqual([
+      { label: 'Dashboard', to: '/member' },
+      { label: 'Sales', to: '/member/sales' },
+      { label: 'Details' },
+    ]);
+  });
+
+  it('covers plain items and suppresses unmatched routes', () => {
+    expect(memberBreadcrumbItems('/member/profile')).toEqual([
+      { label: 'Dashboard', to: '/member' },
+      { label: 'Profile' },
+    ]);
+    expect(memberBreadcrumbItems('/member/unknown')).toBeNull();
+  });
+});
 
 describe('member navigation registry', () => {
   it('lists categorized member destinations in the sidebar', () => {

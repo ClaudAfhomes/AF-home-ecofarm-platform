@@ -44,14 +44,12 @@ describe('member ContentLibraryPage', () => {
     expect(screen.getAllByText('Image').length).toBeGreaterThanOrEqual(2);
     expect(screen.getAllByText('Video').length).toBeGreaterThanOrEqual(3);
 
-    // Header ring + breadcrumbs + timeframe + filters
+    // Header ring + timeframe + filters (breadcrumbs are owned by MemberLayout)
     expect(screen.getByRole('link', { name: 'View Vouchers' })).toHaveAttribute(
       'href',
       '/member/vouchers',
     );
-    expect(screen.getByText('Dashboard')).toBeInTheDocument();
-    expect(screen.getByText('Resources')).toBeInTheDocument();
-    expect(screen.getAllByText('Marketing Tools')).toHaveLength(2);
+    expect(screen.getAllByText('Marketing Tools').length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText('Featured · Download-ready')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'All' })).toHaveAttribute('aria-pressed', 'true');
     expect(screen.getByText(/Showing 12 of 12 items/)).toBeInTheDocument();

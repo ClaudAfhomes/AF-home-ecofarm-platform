@@ -63,11 +63,7 @@ describe('member PolicyDetailPage', () => {
       '/member/policies',
     );
     expect(document.querySelector('[data-testid]')).toBeNull();
-    // Breadcrumbs - Dashboard > Resources > Policies > Title
-    expect(screen.getByText('Dashboard')).toBeInTheDocument();
-    expect(screen.getByText('Resources')).toBeInTheDocument();
-    expect(screen.getAllByText('Policies').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getAllByText('Terms and Conditions').length).toBeGreaterThanOrEqual(2);
+    expect(screen.getAllByText('Terms and Conditions').length).toBeGreaterThanOrEqual(1);
   });
 
   it('renders a not-found state for an unknown policy id', async () => {
@@ -75,7 +71,6 @@ describe('member PolicyDetailPage', () => {
     renderAt('/member/policies/does-not-exist');
 
     expect(await screen.findAllByText('Policy not found')).toHaveLength(2);
-    expect(screen.getByText('Dashboard')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'All policies' })).toHaveAttribute(
       'href',
       '/member/policies',

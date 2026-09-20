@@ -1,4 +1,4 @@
-import type { BottomNavItem, SidebarItem } from '@jad/ui';
+import type { BreadcrumbItem, BottomNavItem, SidebarItem } from '@jad/ui';
 
 /**
  * Member navigation registry (UI-UX §4.1 destinations). Categories group related
@@ -97,4 +97,37 @@ export function findMemberNavItem(pathname: string): MemberNavItem | undefined {
       (pathname.startsWith(`${item.to}/`) ||
         item.dropdown?.some((sub) => pathname === sub.to || pathname.startsWith(`${sub.to}/`))),
   );
+}
+
+/**
+ * Breadcrumb trail for a pathname - the single source for MemberLayout's bar
+ * so page components must not render their own trail (UI-UX §4.3/§4.7).
+ * The page label comes from the dropdown sub-item when one matches (e.g.
+ * Ledger under Sales & Earnings), never the category label. Detail routes
+ * (e.g. /member/payouts/new, /member/sales/:id) end with a `Details` crumb
+ * while the list link stays clickable; unmatched routes return `null` and
+ * the layout suppresses the bar.
+ */
+export function memberBreadcrumbItems(pathname: string): BreadcrumbItem[] | null {
+  if (pathname === '/member') return [];
+  const dashboardLink: BreadcrumbItem = { label: 'Dashboard', to: '/member' };
+  const subs = MEMBER_NAV_ITEMS.flatMap((item) => item.dropdown ?? []);
+  // Exact sub-page match first so nested routes (e.g. Ledger under eWallet)
+  // resolve to their own label instead of their parent's detail trail.
+  const exactSub = subs.find((sub) => sub.to === pathname);
+  if (exactSub) return [dashboardLink, { label: exactSub.label }];
+  const detailSub = subs.find((sub) => pathname.startsWith(`${sub.to}/`));
+  if (detailSub) {
+    return [dashboardLink, { label: detailSub.label, to: detailSub.to }, { label: 'Details' }];
+  }
+  for (const item of MEMBER_NAV_ITEMS) {
+    if (item.dropdown || item.to === '/member') continue;
+    if (pathname === item.to) {
+      return [dashboardLink, { label: item.label }];
+    }
+    if (pathname.startsWith(`${item.to}/`)) {
+      return [dashboardLink, { label: item.label, to: item.to }, { label: 'Details' }];
+    }
+  }
+  return null;
 }

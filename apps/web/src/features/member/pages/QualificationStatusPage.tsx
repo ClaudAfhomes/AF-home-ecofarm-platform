@@ -1,7 +1,7 @@
 import { Link, useSearchParams } from 'react-router';
 import { useEffect } from 'react';
 
-import { Breadcrumbs, EmptyState, ErrorState, PageHeader, Skeleton, StatusChip } from '@jad/ui';
+import { EmptyState, ErrorState, PageHeader, Skeleton, StatusChip } from '@jad/ui';
 
 import { Alert } from '../../../components/Alert';
 import { ButtonLink } from '../../../components/ButtonLink';
@@ -97,7 +97,6 @@ export function QualificationStatusPage() {
         title="Qualification status"
         description={`Membership status: ${memberStatusLabel(summary.status)}`}
       />
-      <Breadcrumbs items={[{ label: 'Dashboard', to: '/member' }, { label: 'Qualification' }]} />
 
       <div className={styles.stack}>
         {summary.status === 'REJECTED' ? (

@@ -4,7 +4,7 @@ import { Outlet, useLocation } from 'react-router';
 import { useSession } from '../lib/session';
 import { AppShell, Breadcrumbs, ConfirmDialog, UserMenu } from '@jad/ui';
 
-import { findNavItem, findNavSubItem, navItemsForRole, ROLE_LABELS } from './navigation';
+import { breadcrumbItems, navItemsForRole, ROLE_LABELS } from './navigation';
 import { resolveRoleModules, roleNameFor } from '@jad/contracts';
 import { useAdminQueues } from '../features/dashboard/hooks/useAdminQueues';
 import { useRoles } from '../features/roles/hooks/useRoles';
@@ -61,31 +61,11 @@ export function AdminLayout() {
     }
     return item;
   });
-  const current = findNavItem(location.pathname);
 
-  const crumbs = useMemo(() => {
-    if (!current || current.to === '/admin') return [{ label: 'Dashboard' }];
-    const subMatch = findNavSubItem(location.pathname);
-    if (subMatch) {
-      // Detail route: parent category > sub-page with link back to list
-      if (location.pathname !== subMatch.sub.to) {
-        return [
-          { label: 'Dashboard', to: '/admin' },
-          { label: current.label },
-          { label: subMatch.sub.label, to: subMatch.sub.to },
-        ];
-      }
-      // List route inside a category: show parent + sub
-      if (subMatch.sub.label !== current.label) {
-        return [
-          { label: 'Dashboard', to: '/admin' },
-          { label: current.label },
-          { label: subMatch.sub.label },
-        ];
-      }
-    }
-    return [{ label: 'Dashboard', to: '/admin' }, { label: current.label }];
-  }, [current, location.pathname]);
+  // Single breadcrumb source - page components must not render their own
+  // trail (breadcrumbItems resolves list, category, detail, and My Account
+  // routes; unmatched routes suppress the bar entirely).
+  const crumbs = useMemo(() => breadcrumbItems(location.pathname), [location.pathname]);
 
   // Fail loud (not silent): a staff session with zero navigation modules
   // means role resolution failed (missing MemberRole link or role lookup
@@ -162,7 +142,7 @@ export function AdminLayout() {
               </button>
             </div>
           )}
-          <Breadcrumbs items={crumbs} />
+          {crumbs ? <Breadcrumbs items={crumbs} /> : null}
           <Outlet />
         </div>
       </AppShell>

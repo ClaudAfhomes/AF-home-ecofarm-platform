@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useParams, Link } from 'react-router';
 
-import { Breadcrumbs, ErrorState, PageHeader, Skeleton, StatusChip } from '@jad/ui';
+import { ErrorState, PageHeader, Skeleton, StatusChip } from '@jad/ui';
 import { formatMoney } from '@jad/shared';
 import type { StatusTone } from '@jad/ui';
 
@@ -75,14 +75,6 @@ export function AuditDetailPage() {
         <ErrorState title="Record not found" message="The requested record does not exist." />
       ) : (
         <>
-          <Breadcrumbs
-            items={[
-              { label: 'Dashboard', to: '/admin' },
-              { label: 'Audit Logs', to: '/admin/audit' },
-              { label: record.kind === 'AUDIT' ? record.data.action : record.data.entryType },
-            ]}
-          />
-
           <div className={styles.detailGrid}>
             {record.kind === 'AUDIT' ? (
               <>

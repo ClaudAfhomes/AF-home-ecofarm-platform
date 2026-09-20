@@ -1,4 +1,4 @@
-import { Breadcrumbs, EmptyState, ErrorState, Icon, PageHeader, Skeleton } from '@jad/ui';
+import { EmptyState, ErrorState, Icon, PageHeader, Skeleton } from '@jad/ui';
 
 import { ButtonLink } from '@/components/ButtonLink';
 import { orphanMessageFor } from '../../../lib/api/orphan';
@@ -33,13 +33,6 @@ export function GroupNetworkPage() {
             </ButtonLink>
           </div>
         }
-      />
-      <Breadcrumbs
-        items={[
-          { label: 'Dashboard', to: '/member' },
-          { label: 'Referrals' },
-          { label: 'Group Network' },
-        ]}
       />
       <p className={styles.timeframe}>All time · Reporting only</p>
       {networkQuery.isLoading ? (

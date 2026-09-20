@@ -2,7 +2,7 @@ import { Link } from 'react-router';
 import { useMemo, useState } from 'react';
 
 import { formatMoney } from '@jad/shared';
-import { Breadcrumbs, EmptyState, ErrorState, PageHeader, Skeleton, StatusChip } from '@jad/ui';
+import { EmptyState, ErrorState, PageHeader, Skeleton, StatusChip } from '@jad/ui';
 import type { WithdrawalStatus } from '@jad/contracts';
 
 import { ButtonLink } from '../../../components/ButtonLink';
@@ -48,7 +48,6 @@ export function WithdrawalsListPage() {
           </ButtonLink>
         }
       />
-      <Breadcrumbs items={[{ label: 'Dashboard', to: '/member' }, { label: 'Withdrawals' }]} />
 
       <div className={styles.filters} role="group" aria-label="Filter withdrawals by status">
         {FILTERS.map((option) => (

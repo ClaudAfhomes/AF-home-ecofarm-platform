@@ -22,17 +22,15 @@ describe('member NotificationsPage', () => {
     setMockSessionUser(null);
   });
 
-  it('renders the notification feed with Breadcrumbs, filters and read state (SCR-MEM-024)', async () => {
+  it('renders the notification feed with filters and read state (SCR-MEM-024)', async () => {
     renderMember(<NotificationsPage />, { user: MOCK_MEMBER });
 
     expect(await screen.findByText('Welcome to JA&D')).toBeInTheDocument();
     expect(screen.getByText('Commission cleared')).toBeInTheDocument();
     expect(screen.getByText('New: Join the JA&D Community')).toBeInTheDocument();
 
-    // Breadcrumbs + timeframe + header ring
-    expect(screen.getByText('Dashboard')).toBeInTheDocument();
-    expect(screen.getByText('Resources')).toBeInTheDocument();
-    expect(screen.getAllByText('Notifications')).toHaveLength(2);
+    // Timeframe + header ring (trail is owned by MemberLayout)
+    expect(screen.getAllByText('Notifications').length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText(/Latest first/)).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'View Marketing Tools' })).toHaveAttribute(
       'href',
