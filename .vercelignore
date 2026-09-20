@@ -16,6 +16,7 @@ api/dev-server.ts
 # Not needed on the server
 supabase/
 docs/
+.opencode/
 node_modules/
 .turbo/
 vercel-static/

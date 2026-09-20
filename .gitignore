@@ -37,4 +37,7 @@ vercel.local.json
 supabase/backfill-staff-domain.map.json
 supabase/backfill-staff-domain.retire.json
 
+# opencode agent skills (local-only, never commit or deploy)
+.opencode/
+
 .env*
