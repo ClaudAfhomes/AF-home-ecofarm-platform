@@ -74,3 +74,4 @@ npm run build
 - Document links are signed for 60 seconds and every document row stores a SHA-256 checksum.
 - Realtime is intentionally limited to payments, notifications, and profile status changes.
 - See [SECURITY.md](SECURITY.md) and [DECISIONS_NEEDED.md](DECISIONS_NEEDED.md) before production rollout.
+- Product requirements, including the customer ID scanning and OCR workflow, are maintained in [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md).

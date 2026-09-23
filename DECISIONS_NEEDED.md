@@ -11,7 +11,7 @@ The following requirements were intentionally implemented as configuration or le
 | Manager-shoulders-payment amount and enforcement | Disabled; status field retained | `business_rules` and `qr_credits` |
 | Vice Director invite code lifetime | Schema requires an explicit expiry; no default duration | Invite creation workflow |
 | Spot-cash grace period after seven days | Zero days | `business_rules` |
-| OCR vendor and accepted ID field map | Disabled; manual entry remains available | `OCR_PROVIDER_*` secrets |
+| OCR/barcode provider and supported Philippine ID formats | Disabled; manual entry remains available. Provider must support the approved QR, barcode, PDF417, and visible-text field map and return source/confidence metadata where available. | `OCR_PROVIDER_*` secrets |
 | PII requiring application-layer encryption | Government ID number only, pending privacy review | Edge Function/KMS design in `SECURITY.md` |
 | Document retention/deletion schedule | No automatic deletion | Compliance policy required |
 | Employee document categories | Free-form secure records | HR policy required |
