@@ -49,6 +49,9 @@ const DepartmentsPage = lazy(() =>
 const PlaceholderPage = lazy(() =>
   import('../pages/PlaceholderPage').then((module) => ({ default: module.PlaceholderPage })),
 );
+const QrCreditsPage = lazy(() =>
+  import('../pages/QrCreditsPage').then((module) => ({ default: module.QrCreditsPage })),
+);
 
 function Protected({ permission, superAdminOnly, children }: { permission?: string; superAdminOnly?: boolean; children: React.ReactNode }) {
   const { session, profile, role, permissions, loading } = useAuth();
@@ -234,21 +237,13 @@ export function App() {
           path="qr-credits"
           element={
             <Protected permission={PERMISSIONS.qrCredits}>
-              <PlaceholderPage
-                title="QR credit tracking"
-                description="Monitor eligible referrals, credit counts, and manager-shoulders-payment status."
-              />
+              <QrCreditsPage />
             </Protected>
           }
         />
         <Route
           path="notifications"
-          element={
-            <PlaceholderPage
-              title="Notifications"
-              description="Role-relevant operational alerts and realtime updates."
-            />
-          }
+          element={<Protected permission={PERMISSIONS.dashboard}><PlaceholderPage title="Notifications" description="Role-relevant operational alerts and realtime updates." /></Protected>}
         />
         <Route
           path="activity"

@@ -11,6 +11,7 @@ export type StaffProfile = Database['public']['Tables']['profiles']['Row'] & {
   roles: { name: string; slug: RoleSlug };
   departments: { name: string } | null;
   staff_invitations: { status: string; invited_at: string; last_sent_at: string; accepted_at: string | null }[];
+  genealogy_parent: { full_name: string } | null;
 };
 export type StaffInput = {
   email: string; fullName: string; roleId: string; departmentId: string | null;
@@ -18,9 +19,80 @@ export type StaffInput = {
   isTestAccount?: boolean; deliveryMode?: 'email' | 'link';
 };
 
+export type AnalyticsGrouping = 'day' | 'week' | 'month' | 'year';
+export type AnalyticsProductType = 'All' | 'Bronze' | 'Silver' | 'Gold';
+export type AnalyticsFilters = {
+  from: string;
+  to: string;
+  grouping: AnalyticsGrouping;
+  productType: AnalyticsProductType;
+  salespersonId?: string | null;
+  viceDirectorId?: string | null;
+};
+
+export type SalesAnalytics = {
+  filters: {
+    from: string;
+    to: string;
+    grouping: AnalyticsGrouping;
+    productType: AnalyticsProductType;
+    salespersonId: string | null;
+    viceDirectorId: string | null;
+  };
+  summary: {
+    totalSalesCreated: number;
+    totalVerifiedSales: number;
+    downPaymentCollection: string;
+    totalCollection: string;
+    averageSalesPerPeriod: string;
+    highestPeriod: { bucket: string | null; verifiedSales: number; amount: string };
+    lowestPeriod: { bucket: string | null; verifiedSales: number; amount: string };
+    pendingPayments: number;
+    pendingAmount: string;
+  };
+  buckets: Array<{
+    bucket: string;
+    salesCreated: number;
+    verifiedSales: number;
+    collectedAmount: string;
+    totalCollectedAmount: string;
+    pendingPayments: number;
+    pendingAmount: string;
+  }>;
+};
+
+export type ViceDirectorAnalytics = SalesAnalytics & {
+  summary: SalesAnalytics['summary'] & {
+    totalMembers: number;
+    activeMembers: number;
+    inactiveMembers: number;
+    newMembers: number;
+    membersWithSalesActivity: number;
+    membersWithNoSalesActivity: number;
+    pendingPaymentCount: number;
+    pendingPaymentAmount: string;
+    overduePaymentCount: number;
+    overduePaymentAmount: string;
+  };
+  members: Array<{
+    memberId: string;
+    memberName: string;
+    role: string;
+    roleSlug: RoleSlug;
+    accountStatus: EmploymentStatus;
+    isActive: boolean;
+    directReferrals: number;
+    verifiedSaleCount: number;
+    totalVerifiedCollection: string;
+    lastSaleDate: string | null;
+    performanceLabel: string;
+    newMember: boolean;
+  }>;
+};
+
 const fail = (error: { message: string } | null) => { if (error) throw new Error(error.message); };
 
-export async function listTable<T>(table: 'products' | 'customers' | 'sales' | 'payments' | 'notifications' | 'audit_logs'): Promise<T[]> {
+export async function listTable<T>(table: 'products' | 'customers' | 'sales' | 'payments' | 'notifications' | 'audit_logs' | 'qr_credits' | 'qr_scan_events'): Promise<T[]> {
   const { data, error } = await supabase.from(table).select('*').order('created_at', { ascending: false }).limit(250);
   fail(error);
   return (data ?? []) as T[];
@@ -69,6 +141,46 @@ export async function verifyPayment(paymentId: string, approved: boolean, notes:
   fail(error);
 }
 
+export async function scanQrCode(token: string, referredMemberId?: string | null) {
+  const { data, error } = await supabase.rpc('scan_qr_code', {
+    p_token: token,
+    p_referred_member_id: referredMemberId ?? null,
+  });
+  fail(error);
+  return data as {
+    status: 'success' | 'invalid' | 'expired' | 'revoked' | 'duplicate' | 'unauthorized' | 'error';
+    message: string;
+    creditId?: string;
+    memberId?: string;
+    creditNumber?: number;
+  };
+}
+
+export async function fetchSalesAnalytics(filters: AnalyticsFilters) {
+  const { data, error } = await supabase.rpc('sales_analytics', {
+    p_from: filters.from,
+    p_to: filters.to,
+    p_grouping: filters.grouping,
+    p_product_type: filters.productType,
+    p_salesperson_id: filters.salespersonId ?? null,
+    p_vice_director_id: filters.viceDirectorId ?? null,
+  });
+  fail(error);
+  return data as unknown as SalesAnalytics;
+}
+
+export async function fetchViceDirectorAnalytics(filters: AnalyticsFilters) {
+  const { data, error } = await supabase.rpc('vice_director_analytics', {
+    p_from: filters.from,
+    p_to: filters.to,
+    p_grouping: filters.grouping,
+    p_product_type: filters.productType,
+    p_vice_director_id: filters.viceDirectorId ?? null,
+  });
+  fail(error);
+  return data as unknown as ViceDirectorAnalytics;
+}
+
 export async function createSignedDocumentUrl(bucket: 'customer-documents' | 'payment-receipts' | 'employee-documents', path: string) {
   const { data, error } = await supabase.storage.from(bucket).createSignedUrl(path, 60);
   fail(error);
@@ -91,7 +203,7 @@ export async function listDepartments(includeInactive = true) {
 
 export async function listStaff(options: { page: number; pageSize: number; search: string; role: string; status: string; department: string; testOnly?: boolean }) {
   const from = options.page * options.pageSize;
-  let query = supabase.from('profiles').select('*,roles!inner(name,slug),departments(name),staff_invitations(status,invited_at,last_sent_at,accepted_at)', { count: 'exact' });
+  let query = supabase.from('profiles').select('*,roles!inner(name,slug),departments(name),staff_invitations(status,invited_at,last_sent_at,accepted_at),genealogy_parent:profiles!profiles_genealogy_parent_id_fkey(full_name)', { count: 'exact' });
   if (options.search) query = query.or(`full_name.ilike.%${options.search}%,email.ilike.%${options.search}%,employee_no.ilike.%${options.search}%`);
   if (options.role) query = query.eq('roles.slug', options.role as RoleSlug);
   if (options.status) query = query.eq('employment_status', options.status as EmploymentStatus);
@@ -113,14 +225,23 @@ export const resendStaffInvitation = (userId: string) => invokeAdminUsers({ acti
 export const updateStaff = (userId: string, input: Omit<StaffInput, 'email'> & { employmentStatus: EmploymentStatus; reason: string }) =>
   invokeAdminUsers({ action: 'update', userId, ...input });
 
-export async function createDepartment(name: string, description: string) {
-  const { data, error } = await supabase.rpc('admin_create_department', { p_name: name, p_description: description || null });
+export async function createDepartment(name: string, description: string, accountableLeaderId: string | null) {
+  const { data, error } = await supabase.rpc('admin_create_department', { p_name: name, p_description: description || null, p_accountable_leader_id: accountableLeaderId });
   fail(error); return data;
 }
 
 export async function updateDepartment(department: Department) {
-  const { data, error } = await supabase.rpc('admin_update_department', { p_department_id: department.id, p_name: department.name, p_description: department.description, p_is_active: department.is_active });
+  const { data, error } = await supabase.rpc('admin_update_department', { p_department_id: department.id, p_name: department.name, p_description: department.description, p_is_active: department.is_active, p_accountable_leader_id: department.accountable_leader_id });
   fail(error); return data;
+}
+
+export async function listDepartmentCounts() {
+  const { data, error } = await supabase.from('profiles').select('department_id');
+  fail(error);
+  return (data ?? []).reduce<Record<string, number>>((counts, row) => {
+    if (row.department_id) counts[row.department_id] = (counts[row.department_id] ?? 0) + 1;
+    return counts;
+  }, {});
 }
 
 export function exportRows(rows: Record<string, unknown>[], filename: string, format: 'csv' | 'xlsx') {

@@ -24,7 +24,7 @@ export function UsersPage() {
   const pages = Math.max(1, Math.ceil((staff.data?.count ?? 0) / pageSize));
   const resetPage = () => setPage(0);
   return <>
-    <header className="page-header"><div><p className="eyebrow">SETTINGS</p><h1>User &amp; Role Management</h1><p>Invite staff, assign one seeded role, manage employment status, and preserve a complete audit trail.</p></div><button className="primary" onClick={() => setDialog('new')}><Plus /> Invite user</button></header>
+    <header className="page-header"><div><p className="eyebrow">SETTINGS</p><h1>User &amp; Role Management</h1><p>Invite staff, assign one seeded role, manage employment status, and preserve a complete audit trail.</p></div><button className="primary" onClick={() => setDialog('new')}><Plus /> Invite member</button></header>
     <section className="panel">
       <div className="filters">
         <label className="search"><Search /><span className="sr-only">Search staff</span><input value={search} onChange={(event) => { setSearch(event.target.value); resetPage(); }} placeholder="Name, email, employee no.…" /></label>
@@ -37,14 +37,17 @@ export function UsersPage() {
           { key: 'full_name', label: 'Staff member', render: (row) => <div><strong>{row.full_name}</strong><small className="table-subtitle">{row.email}</small></div> },
           { key: 'role', label: 'Role', render: (row) => row.roles.name },
           { key: 'department', label: 'Department', render: (row) => row.departments?.name ?? '—' },
+          { key: 'genealogy_parent', label: 'Genealogy parent', render: (row) => row.genealogy_parent?.full_name ?? '—' },
           { key: 'employment_status', label: 'Status', render: (row) => <StatusChip value={row.employment_status} /> },
           { key: 'invitation', label: 'Invitation', render: (row) => { const invite = row.staff_invitations[0]; return invite ? <div><StatusChip value={invite.status} /><small className="table-subtitle">{formatDate(invite.invited_at)}</small></div> : 'Provisioned directly'; } },
+          { key: 'created_at', label: 'Created', render: (row) => formatDate(row.created_at) },
           { key: 'actions', label: 'Actions', render: (row) => <div className="row-actions"><button className="text-button" onClick={() => setDialog(row)}>Edit</button>{row.staff_invitations[0]?.status === 'pending' ? <button className="text-button" disabled={resend.isPending} onClick={() => resend.mutate(row.id)}>Resend invite</button> : null}</div> },
         ]} />
         <div className="pagination"><button className="secondary" disabled={page === 0} onClick={() => setPage((value) => value - 1)}>Previous</button><span>Page {page + 1} of {pages} · {staff.data?.count ?? 0} records</span><button className="secondary" disabled={page + 1 >= pages} onClick={() => setPage((value) => value + 1)}>Next</button></div>
       </>}
       {resend.error ? <p className="inline-error" role="alert">{resend.error.message}</p> : null}
     </section>
+    <p className="muted">Sensitive changes and invitation actions are available in the <a href="/audit">Audit Log</a>.</p>
     {dialog ? <StaffDialog profile={dialog === 'new' ? undefined : dialog} onClose={() => setDialog(null)} /> : null}
   </>;
 }

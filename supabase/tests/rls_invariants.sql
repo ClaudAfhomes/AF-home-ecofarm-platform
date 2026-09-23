@@ -5,13 +5,13 @@ from pg_class c join pg_namespace n on n.oid=c.relnamespace
 where n.nspname='public' and c.relkind='r' and c.relname in (
   'roles','permissions','role_permissions','departments','profiles','employee_documents',
   'product_categories','products','customers','customer_documents','sales','payments',
-  'payment_corrections','qr_credits','invite_codes','staff_invitations','business_rules','notifications','audit_logs'
+  'payment_corrections','qr_credits','invite_codes','staff_invitations','qr_scan_events','business_rules','notifications','audit_logs'
 ) and not c.relrowsecurity
 union all
 select distinct 'ANON_TABLE_PRIVILEGE', table_name from information_schema.role_table_grants
 where grantee='anon' and table_schema='public' and table_name in (
   'profiles','employee_documents','customers','customer_documents','sales','payments',
-  'payment_corrections','qr_credits','invite_codes','staff_invitations','business_rules','audit_logs'
+  'payment_corrections','qr_credits','invite_codes','staff_invitations','qr_scan_events','business_rules','audit_logs'
 )
 union all
 select distinct 'FORBIDDEN_AUTHENTICATED_MUTATION', table_name from information_schema.role_table_grants
