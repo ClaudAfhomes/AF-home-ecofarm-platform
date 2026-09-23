@@ -33,7 +33,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => data.subscription.unsubscribe();
   }, []);
 
-  const value = useMemo(() => ({ session, profile, role, permissions: new Set(permissions), loading, signOut: async () => { await supabase.auth.signOut(); } }), [session, profile, role, permissions, loading]);
+  const value = useMemo(() => ({ session, profile, role, permissions: new Set(permissions), loading, signOut: async () => {
+    if (session) await supabase.rpc('record_auth_event', { p_event: 'logout' });
+    await supabase.auth.signOut();
+  } }), [session, profile, role, permissions, loading]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

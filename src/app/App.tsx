@@ -42,6 +42,7 @@ const SettingsPage = lazy(() =>
 const UsersPage = lazy(() =>
   import('../pages/UsersPage').then((module) => ({ default: module.UsersPage })),
 );
+const TestAccountsPage = lazy(() => import('../pages/TestAccountsPage').then((module) => ({ default: module.TestAccountsPage })));
 const DepartmentsPage = lazy(() =>
   import('../pages/DepartmentsPage').then((module) => ({ default: module.DepartmentsPage })),
 );
@@ -82,6 +83,10 @@ export function App() {
               <UsersPage />
             </Protected>
           }
+        />
+        <Route
+          path="settings/test-accounts"
+          element={<Protected permission={PERMISSIONS.users} superAdminOnly><TestAccountsPage /></Protected>}
         />
         <Route
           path="settings/departments"

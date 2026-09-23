@@ -15,6 +15,7 @@ export type StaffProfile = Database['public']['Tables']['profiles']['Row'] & {
 export type StaffInput = {
   email: string; fullName: string; roleId: string; departmentId: string | null;
   phone: string | null; employeeNo: string | null; parentId: string | null;
+  isTestAccount?: boolean; deliveryMode?: 'email' | 'link';
 };
 
 const fail = (error: { message: string } | null) => { if (error) throw new Error(error.message); };
@@ -88,13 +89,14 @@ export async function listDepartments(includeInactive = true) {
   return (data ?? []) as Department[];
 }
 
-export async function listStaff(options: { page: number; pageSize: number; search: string; role: string; status: string; department: string }) {
+export async function listStaff(options: { page: number; pageSize: number; search: string; role: string; status: string; department: string; testOnly?: boolean }) {
   const from = options.page * options.pageSize;
   let query = supabase.from('profiles').select('*,roles!inner(name,slug),departments(name),staff_invitations(status,invited_at,last_sent_at,accepted_at)', { count: 'exact' });
   if (options.search) query = query.or(`full_name.ilike.%${options.search}%,email.ilike.%${options.search}%,employee_no.ilike.%${options.search}%`);
   if (options.role) query = query.eq('roles.slug', options.role as RoleSlug);
   if (options.status) query = query.eq('employment_status', options.status as EmploymentStatus);
   if (options.department) query = query.eq('department_id', options.department);
+  if (options.testOnly) query = query.eq('is_test_account', true);
   const { data, error, count } = await query.order('created_at', { ascending: false }).range(from, from + options.pageSize - 1);
   fail(error);
   return { rows: (data ?? []) as unknown as StaffProfile[], count: count ?? 0 };
@@ -103,7 +105,7 @@ export async function listStaff(options: { page: number; pageSize: number; searc
 async function invokeAdminUsers(body: Record<string, unknown>) {
   const { data, error } = await supabase.functions.invoke('admin-users', { body });
   if (error) throw new Error(error.message);
-  return data as { id: string };
+  return data as { id: string; actionLink?: string };
 }
 
 export const inviteStaff = (input: StaffInput) => invokeAdminUsers({ action: 'invite', ...input });

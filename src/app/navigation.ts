@@ -1,9 +1,10 @@
-import { Activity, BadgeDollarSign, Bell, Boxes, Building2, ContactRound, CreditCard, FileBarChart, GitBranch, LayoutDashboard, Network, PackageOpen, QrCode, Settings, ShieldCheck, ShoppingCart, UserCog, Users } from 'lucide-react';
+import { Activity, BadgeDollarSign, Bell, Boxes, Building2, ContactRound, CreditCard, FileBarChart, FlaskConical, GitBranch, LayoutDashboard, Network, PackageOpen, QrCode, Settings, ShieldCheck, ShoppingCart, UserCog, Users } from 'lucide-react';
 import { PERMISSIONS } from '../lib/permissions';
 export const navigation = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard, permission: PERMISSIONS.dashboard },
   { group: 'Settings' },
   { to: '/settings/users', label: 'Users & roles', icon: UserCog, permission: PERMISSIONS.users, superAdminOnly: true },
+  { to: '/settings/test-accounts', label: 'Test accounts', icon: FlaskConical, permission: PERMISSIONS.users, superAdminOnly: true },
   { to: '/settings/departments', label: 'Departments', icon: Building2, permission: PERMISSIONS.departments, superAdminOnly: true },
   { group: 'Organization' },
   { to: '/employees', label: 'HR employees', icon: Users, permission: PERMISSIONS.hr },

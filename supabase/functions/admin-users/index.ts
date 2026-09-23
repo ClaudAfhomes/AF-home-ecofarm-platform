@@ -4,6 +4,7 @@ type InviteBody = {
   action: 'invite'; email: string; fullName: string; roleId: string;
   departmentId?: string | null; phone?: string | null; employeeNo?: string | null;
   parentId?: string | null;
+  isTestAccount?: boolean; deliveryMode?: 'email' | 'link';
 };
 type UpdateBody = {
   action: 'update'; userId: string; fullName: string; roleId: string;
@@ -47,20 +48,26 @@ Deno.serve(async (request) => {
   if (body.action === 'invite') {
     if (!body.email || !body.fullName || !body.roleId) return reply(request, 400, { error: 'Email, full name, and role are required' });
     const redirectTo = Deno.env.get('INVITE_REDIRECT_URL');
-    const { data, error } = await admin.auth.admin.inviteUserByEmail(body.email.trim().toLowerCase(), {
-      data: { display_name: body.fullName.trim() }, ...(redirectTo ? { redirectTo } : {}),
-    });
+    const normalizedEmail = body.email.trim().toLowerCase();
+    const options = { data: { display_name: body.fullName.trim() }, ...(redirectTo ? { redirectTo } : {}) };
+    const generated = body.deliveryMode === 'link'
+      ? await admin.auth.admin.generateLink({ type: 'invite', email: normalizedEmail, options })
+      : await admin.auth.admin.inviteUserByEmail(normalizedEmail, options);
+    const data = generated.data;
+    const error = generated.error;
     if (error || !data.user) return reply(request, 400, { error: error?.message ?? 'Invite failed' });
     const { error: profileError } = await auth.rpc('admin_create_profile', {
       p_user_id: data.user.id, p_email: body.email, p_full_name: body.fullName, p_role_id: body.roleId,
       p_department_id: body.departmentId ?? null, p_phone: body.phone ?? null,
       p_employee_no: body.employeeNo ?? null, p_parent_id: body.parentId ?? null,
+      p_is_test_account: body.isTestAccount ?? false,
     });
     if (profileError) {
       await admin.auth.admin.deleteUser(data.user.id);
       return reply(request, 400, { error: profileError.message });
     }
-    return reply(request, 201, { id: data.user.id });
+    const actionLink = body.deliveryMode === 'link' && 'properties' in data ? data.properties?.action_link : undefined;
+    return reply(request, 201, { id: data.user.id, ...(actionLink ? { actionLink } : {}) });
   }
 
   if (body.action === 'resend') {

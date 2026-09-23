@@ -16,8 +16,8 @@ export interface Database {
   public: {
     Tables: {
       profiles: {
-        Row: { id: string; employee_no: string | null; full_name: string; email: string; phone: string | null; department_id: string | null; role_id: string; employment_status: EmploymentStatus; genealogy_parent_id: string | null; vice_director_id: string | null; referral_depth: number; credit_eligibility: boolean; credit_count: number; manager_shoulders_payment: boolean; is_active: boolean; created_at: string; updated_at: string };
-        Insert: { id: string; full_name: string; email: string; role_id: string; employee_no?: string | null; phone?: string | null; department_id?: string | null; employment_status?: string; genealogy_parent_id?: string | null; vice_director_id?: string | null; is_active?: boolean };
+        Row: { id: string; employee_no: string | null; full_name: string; email: string; phone: string | null; department_id: string | null; role_id: string; employment_status: EmploymentStatus; genealogy_parent_id: string | null; vice_director_id: string | null; referral_depth: number; credit_eligibility: boolean; credit_count: number; manager_shoulders_payment: boolean; is_active: boolean; is_test_account: boolean; created_at: string; updated_at: string };
+        Insert: { id: string; full_name: string; email: string; role_id: string; employee_no?: string | null; phone?: string | null; department_id?: string | null; employment_status?: string; genealogy_parent_id?: string | null; vice_director_id?: string | null; is_active?: boolean; is_test_account?: boolean };
         Update: Partial<Database['public']['Tables']['profiles']['Insert']>;
         Relationships: [];
       };
@@ -89,7 +89,8 @@ export interface Database {
       admin_create_department: { Args: { p_name: string; p_description: string | null }; Returns: Database['public']['Tables']['departments']['Row'] };
       admin_update_department: { Args: { p_department_id: string; p_name: string; p_description: string | null; p_is_active: boolean }; Returns: Database['public']['Tables']['departments']['Row'] };
       dashboard_metrics: { Args: never; Returns: Json };
-      genealogy_tree: { Args: never; Returns: { id: string; full_name: string; role_name: string; role_slug: string; employment_status: string; is_active: boolean; depth: number; parent_id: string | null; vice_director_id: string | null; direct_referrals: number; total_descendants: number; sales_total: string }[] };
+      genealogy_tree: { Args: never; Returns: { id: string; full_name: string; role_name: string; role_slug: string; employment_status: string; is_active: boolean; is_test_account: boolean; depth: number; parent_id: string | null; vice_director_id: string | null; direct_referrals: number; total_descendants: number; sales_total: string }[] };
+      record_auth_event: { Args: { p_event: 'login' | 'logout' }; Returns: undefined };
       record_export: { Args: { p_report: string; p_filters: Json; p_row_count: number }; Returns: undefined };
     };
     Enums: Record<string, never>;

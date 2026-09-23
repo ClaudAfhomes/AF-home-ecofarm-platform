@@ -24,10 +24,25 @@ The first Super Admin must be provisioned through a controlled administrator pro
 Once provisioned, Super Admin management is available at:
 
 - `/settings/users` for invitations, role/department assignment, status changes, and profile edits.
+- `/settings/test-accounts` for controlled role-testing accounts and secure password setup.
 - `/settings/departments` for audited department creation and activation changes.
 - `/genealogy/members` for validated sales placement, tree, and table views.
 
 Auth identities are created only by the `admin-users` Edge Function. Direct profile mutations are revoked from browser roles; audited database functions validate Super Admin authority and genealogy rules. Deactivation changes status and Auth access without deleting historical records.
+
+### Role-account test checklist
+
+1. As Super Admin, open **Settings → Test accounts** and create a Vice Director.
+2. Create a Senior Sales Manager under that Vice Director, a Sales Manager under the senior manager, and an OST under the sales manager.
+3. Create Finance, HR, and Admin test accounts. Use email delivery when SMTP is configured.
+4. If email delivery is unavailable, choose **Generate secure setup link**, copy the one-time link, and send it to the intended tester through a trusted channel. The server generates the Supabase invite link; no password or service-role key is stored in the browser or source.
+5. Set each password, then sign in and out at `https://afhomes-ecofarm.vercel.app/login`. Confirm the dashboard and profile menu display the expected role and `Test Account` label.
+6. Confirm each sales role sees only its permitted navigation and genealogy scope. Create a second Vice Director and confirm neither Vice Director can view the other's tree.
+7. Confirm Finance and HR cannot access `/genealogy/members` or `/settings/test-accounts`.
+8. Review **Governance → Audit log** for `AUTH_LOGIN`, `AUTH_LOGOUT`, invitation, profile, and genealogy events.
+9. Deactivate each test account from **Settings → Test accounts**, confirm login is blocked, then reactivate only when another test is needed.
+
+Users never choose their own role. The Super Admin assigns it through the server-authorized `admin-users` Edge Function, and test-account activity is excluded from production dashboard metrics by default.
 
 ## Supabase deployment
 
