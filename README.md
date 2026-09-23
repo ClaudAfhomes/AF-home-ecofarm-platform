@@ -21,6 +21,14 @@ Requires Node.js 22+.
 
 The first Super Admin must be provisioned through a controlled administrator process: create the Auth identity, then insert its `profiles` row with the seeded `super_admin` role using the Supabase SQL editor or a one-time server-side script. Do not add public registration.
 
+Once provisioned, Super Admin management is available at:
+
+- `/settings/users` for invitations, role/department assignment, status changes, and profile edits.
+- `/settings/departments` for audited department creation and activation changes.
+- `/genealogy/members` for validated sales placement, tree, and table views.
+
+Auth identities are created only by the `admin-users` Edge Function. Direct profile mutations are revoked from browser roles; audited database functions validate Super Admin authority and genealogy rules. Deactivation changes status and Auth access without deleting historical records.
+
 ## Supabase deployment
 
 Target project: `rfkfsxiganebzaeioopg`.

@@ -15,6 +15,9 @@ const LoginPage = lazy(() =>
 const RecoveryPage = lazy(() =>
   import('../pages/LoginPage').then((module) => ({ default: module.RecoveryPage })),
 );
+const PasswordUpdatePage = lazy(() =>
+  import('../pages/LoginPage').then((module) => ({ default: module.PasswordUpdatePage })),
+);
 const DashboardPage = lazy(() =>
   import('../pages/DashboardPage').then((module) => ({ default: module.DashboardPage })),
 );
@@ -36,14 +39,22 @@ const AuditPage = lazy(() =>
 const SettingsPage = lazy(() =>
   import('../pages/SettingsPage').then((module) => ({ default: module.SettingsPage })),
 );
+const UsersPage = lazy(() =>
+  import('../pages/UsersPage').then((module) => ({ default: module.UsersPage })),
+);
+const DepartmentsPage = lazy(() =>
+  import('../pages/DepartmentsPage').then((module) => ({ default: module.DepartmentsPage })),
+);
 const PlaceholderPage = lazy(() =>
   import('../pages/PlaceholderPage').then((module) => ({ default: module.PlaceholderPage })),
 );
 
-function Protected({ permission, children }: { permission?: string; children: React.ReactNode }) {
-  const { session, permissions, loading } = useAuth();
+function Protected({ permission, superAdminOnly, children }: { permission?: string; superAdminOnly?: boolean; children: React.ReactNode }) {
+  const { session, profile, role, permissions, loading } = useAuth();
   if (loading) return <LoadingState label="Verifying access…" />;
   if (!session) return <Navigate to="/login" replace />;
+  if (!profile || !profile.is_active || profile.employment_status !== 'active') return <DeniedState />;
+  if (superAdminOnly && role !== 'super_admin') return <DeniedState />;
   if (permission && !permissions.has(permission)) return <DeniedState />;
   return children;
 }
@@ -53,6 +64,8 @@ export function App() {
       <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/recover" element={<RecoveryPage />} />
+      <Route path="/accept-invite" element={<PasswordUpdatePage />} />
+      <Route path="/reset-password" element={<PasswordUpdatePage />} />
       <Route
         path="/"
         element={
@@ -63,24 +76,18 @@ export function App() {
       >
         <Route index element={<DashboardPage />} />
         <Route
-          path="users"
+          path="settings/users"
           element={
-            <Protected permission={PERMISSIONS.users}>
-              <PlaceholderPage
-                title="Users & roles"
-                description="Manage staff identities, role assignment, and least-privilege permissions."
-              />
+            <Protected permission={PERMISSIONS.users} superAdminOnly>
+              <UsersPage />
             </Protected>
           }
         />
         <Route
-          path="departments"
+          path="settings/departments"
           element={
-            <Protected permission={PERMISSIONS.departments}>
-              <PlaceholderPage
-                title="Departments"
-                description="Structure internal teams and assign accountable leadership."
-              />
+            <Protected permission={PERMISSIONS.departments} superAdminOnly>
+              <DepartmentsPage />
             </Protected>
           }
         />
@@ -208,13 +215,16 @@ export function App() {
           }
         />
         <Route
-          path="genealogy"
+          path="genealogy/members"
           element={
             <Protected permission={PERMISSIONS.genealogy}>
               <GenealogyPage />
             </Protected>
           }
         />
+        <Route path="users" element={<Navigate to="/settings/users" replace />} />
+        <Route path="departments" element={<Navigate to="/settings/departments" replace />} />
+        <Route path="genealogy" element={<Navigate to="/genealogy/members" replace />} />
         <Route
           path="qr-credits"
           element={

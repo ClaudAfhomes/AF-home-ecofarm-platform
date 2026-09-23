@@ -1,10 +1,21 @@
 import { supabase } from '../lib/supabase';
-import type { Database } from '../lib/database.types';
+import type { Database, EmploymentStatus, RoleSlug } from '../lib/database.types';
 
 export type Product = Database['public']['Tables']['products']['Row'];
 export type Customer = Database['public']['Tables']['customers']['Row'];
 export type Sale = Database['public']['Tables']['sales']['Row'];
 export type Payment = Database['public']['Tables']['payments']['Row'];
+export type Role = Database['public']['Tables']['roles']['Row'];
+export type Department = Database['public']['Tables']['departments']['Row'];
+export type StaffProfile = Database['public']['Tables']['profiles']['Row'] & {
+  roles: { name: string; slug: RoleSlug };
+  departments: { name: string } | null;
+  staff_invitations: { status: string; invited_at: string; last_sent_at: string; accepted_at: string | null }[];
+};
+export type StaffInput = {
+  email: string; fullName: string; roleId: string; departmentId: string | null;
+  phone: string | null; employeeNo: string | null; parentId: string | null;
+};
 
 const fail = (error: { message: string } | null) => { if (error) throw new Error(error.message); };
 
@@ -61,6 +72,53 @@ export async function createSignedDocumentUrl(bucket: 'customer-documents' | 'pa
   const { data, error } = await supabase.storage.from(bucket).createSignedUrl(path, 60);
   fail(error);
   return data?.signedUrl;
+}
+
+export async function listRoles() {
+  const { data, error } = await supabase.from('roles').select('*').eq('is_system', true).order('name');
+  fail(error);
+  return (data ?? []) as Role[];
+}
+
+export async function listDepartments(includeInactive = true) {
+  let query = supabase.from('departments').select('*').order('name');
+  if (!includeInactive) query = query.eq('is_active', true);
+  const { data, error } = await query;
+  fail(error);
+  return (data ?? []) as Department[];
+}
+
+export async function listStaff(options: { page: number; pageSize: number; search: string; role: string; status: string; department: string }) {
+  const from = options.page * options.pageSize;
+  let query = supabase.from('profiles').select('*,roles!inner(name,slug),departments(name),staff_invitations(status,invited_at,last_sent_at,accepted_at)', { count: 'exact' });
+  if (options.search) query = query.or(`full_name.ilike.%${options.search}%,email.ilike.%${options.search}%,employee_no.ilike.%${options.search}%`);
+  if (options.role) query = query.eq('roles.slug', options.role as RoleSlug);
+  if (options.status) query = query.eq('employment_status', options.status as EmploymentStatus);
+  if (options.department) query = query.eq('department_id', options.department);
+  const { data, error, count } = await query.order('created_at', { ascending: false }).range(from, from + options.pageSize - 1);
+  fail(error);
+  return { rows: (data ?? []) as unknown as StaffProfile[], count: count ?? 0 };
+}
+
+async function invokeAdminUsers(body: Record<string, unknown>) {
+  const { data, error } = await supabase.functions.invoke('admin-users', { body });
+  if (error) throw new Error(error.message);
+  return data as { id: string };
+}
+
+export const inviteStaff = (input: StaffInput) => invokeAdminUsers({ action: 'invite', ...input });
+export const resendStaffInvitation = (userId: string) => invokeAdminUsers({ action: 'resend', userId });
+export const updateStaff = (userId: string, input: Omit<StaffInput, 'email'> & { employmentStatus: EmploymentStatus; reason: string }) =>
+  invokeAdminUsers({ action: 'update', userId, ...input });
+
+export async function createDepartment(name: string, description: string) {
+  const { data, error } = await supabase.rpc('admin_create_department', { p_name: name, p_description: description || null });
+  fail(error); return data;
+}
+
+export async function updateDepartment(department: Department) {
+  const { data, error } = await supabase.rpc('admin_update_department', { p_department_id: department.id, p_name: department.name, p_description: department.description, p_is_active: department.is_active });
+  fail(error); return data;
 }
 
 export function exportRows(rows: Record<string, unknown>[], filename: string, format: 'csv' | 'xlsx') {

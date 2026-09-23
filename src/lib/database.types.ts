@@ -10,11 +10,13 @@ export type RoleSlug =
   | 'sales_manager'
   | 'ost';
 
+export type EmploymentStatus = 'active' | 'inactive' | 'suspended' | 'resigned';
+
 export interface Database {
   public: {
     Tables: {
       profiles: {
-        Row: { id: string; employee_no: string | null; full_name: string; email: string; phone: string | null; department_id: string | null; role_id: string; employment_status: string; genealogy_parent_id: string | null; vice_director_id: string | null; is_active: boolean; created_at: string; updated_at: string };
+        Row: { id: string; employee_no: string | null; full_name: string; email: string; phone: string | null; department_id: string | null; role_id: string; employment_status: EmploymentStatus; genealogy_parent_id: string | null; vice_director_id: string | null; referral_depth: number; credit_eligibility: boolean; credit_count: number; manager_shoulders_payment: boolean; is_active: boolean; created_at: string; updated_at: string };
         Insert: { id: string; full_name: string; email: string; role_id: string; employee_no?: string | null; phone?: string | null; department_id?: string | null; employment_status?: string; genealogy_parent_id?: string | null; vice_director_id?: string | null; is_active?: boolean };
         Update: Partial<Database['public']['Tables']['profiles']['Insert']>;
         Relationships: [];
@@ -23,6 +25,18 @@ export interface Database {
         Row: { id: string; slug: RoleSlug; name: string; description: string | null; is_system: boolean; created_at: string };
         Insert: { slug: RoleSlug; name: string; description?: string | null; is_system?: boolean };
         Update: Partial<Database['public']['Tables']['roles']['Insert']>;
+        Relationships: [];
+      };
+      departments: {
+        Row: { id: string; name: string; description: string | null; is_active: boolean; created_at: string; updated_at: string };
+        Insert: { name: string; description?: string | null; is_active?: boolean };
+        Update: { name?: string; description?: string | null; is_active?: boolean };
+        Relationships: [];
+      };
+      staff_invitations: {
+        Row: { id: string; user_id: string; email: string; status: 'pending' | 'accepted' | 'revoked'; invited_by: string; invited_at: string; last_sent_at: string; accepted_at: string | null; created_at: string; updated_at: string };
+        Insert: never;
+        Update: never;
         Relationships: [];
       };
       products: {
@@ -72,9 +86,10 @@ export interface Database {
     Functions: {
       current_permissions: { Args: never; Returns: string[] };
       verify_payment: { Args: { p_payment_id: string; p_approved: boolean; p_notes: string | null }; Returns: undefined };
-      reparent_genealogy_member: { Args: { p_member_id: string; p_parent_id: string; p_reason: string }; Returns: undefined };
+      admin_create_department: { Args: { p_name: string; p_description: string | null }; Returns: Database['public']['Tables']['departments']['Row'] };
+      admin_update_department: { Args: { p_department_id: string; p_name: string; p_description: string | null; p_is_active: boolean }; Returns: Database['public']['Tables']['departments']['Row'] };
       dashboard_metrics: { Args: never; Returns: Json };
-      genealogy_tree: { Args: never; Returns: { id: string; full_name: string; role_name: string; is_active: boolean; depth: number; parent_id: string | null }[] };
+      genealogy_tree: { Args: never; Returns: { id: string; full_name: string; role_name: string; role_slug: string; employment_status: string; is_active: boolean; depth: number; parent_id: string | null; vice_director_id: string | null; direct_referrals: number; total_descendants: number; sales_total: string }[] };
       record_export: { Args: { p_report: string; p_filters: Json; p_row_count: number }; Returns: undefined };
     };
     Enums: Record<string, never>;

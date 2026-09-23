@@ -2,9 +2,10 @@ import { Activity, BadgeDollarSign, Bell, Boxes, Building2, ContactRound, Credit
 import { PERMISSIONS } from '../lib/permissions';
 export const navigation = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard, permission: PERMISSIONS.dashboard },
+  { group: 'Settings' },
+  { to: '/settings/users', label: 'Users & roles', icon: UserCog, permission: PERMISSIONS.users, superAdminOnly: true },
+  { to: '/settings/departments', label: 'Departments', icon: Building2, permission: PERMISSIONS.departments, superAdminOnly: true },
   { group: 'Organization' },
-  { to: '/users', label: 'Users & roles', icon: UserCog, permission: PERMISSIONS.users },
-  { to: '/departments', label: 'Departments', icon: Building2, permission: PERMISSIONS.departments },
   { to: '/employees', label: 'HR employees', icon: Users, permission: PERMISSIONS.hr },
   { group: 'Commerce' },
   { to: '/products', label: 'Products & cards', icon: Boxes, permission: PERMISSIONS.products },
@@ -14,7 +15,7 @@ export const navigation = [
   { to: '/reports', label: 'Finance reports', icon: FileBarChart, permission: PERMISSIONS.reports },
   { group: 'Network' },
   { to: '/vice-director', label: 'VD analytics', icon: BadgeDollarSign, permission: PERMISSIONS.genealogy },
-  { to: '/genealogy', label: 'Genealogy', icon: Network, permission: PERMISSIONS.genealogy },
+  { to: '/genealogy/members', label: 'Member management', icon: Network, permission: PERMISSIONS.genealogy },
   { to: '/qr-credits', label: 'QR credits', icon: QrCode, permission: PERMISSIONS.qrCredits },
   { group: 'Governance' },
   { to: '/notifications', label: 'Notifications', icon: Bell, permission: PERMISSIONS.dashboard },

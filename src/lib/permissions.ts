@@ -20,6 +20,6 @@ export const PERMISSIONS = {
 
 export const roleHome: Record<RoleSlug, string> = {
   super_admin: '/', admin: '/', finance: '/finance', hr: '/employees',
-  vice_director: '/vice-director', senior_sales_manager: '/genealogy',
+  vice_director: '/vice-director', senior_sales_manager: '/genealogy/members',
   sales_manager: '/sales', ost: '/sales',
 };

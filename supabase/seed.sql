@@ -2,6 +2,12 @@ insert into public.permissions(key,name,module) values
 ('dashboard.view','View dashboard','dashboard'),('users.manage','Manage users','organization'),('roles.manage','Manage roles','organization'),('departments.manage','Manage departments','organization'),('hr.manage','Manage employees','hr'),('products.manage','Manage products','catalog'),('customers.manage','Manage customers','sales'),('sales.manage','Manage sales','sales'),('finance.manage','Manage finance','finance'),('reports.view','View reports','finance'),('genealogy.view','View genealogy','genealogy'),('genealogy.manage','Manage genealogy','genealogy'),('qr_credits.manage','Manage QR credits','genealogy'),('audit.view','View audit log','governance'),('settings.manage','Manage business rules','governance') on conflict(key) do nothing;
 insert into public.roles(slug,name,description,is_system) values
 ('super_admin','Super Admin','Full platform governance',true),('admin','Admin','Operational administration',true),('finance','Finance','Payments and reporting',true),('hr','HR','Employee lifecycle',true),('vice_director','Vice Director','Genealogy owner and analytics',true),('senior_sales_manager','Senior Sales Manager','Sales hierarchy management',true),('sales_manager','Sales Manager','Sales and referrals',true),('ost','OST','Referred sales member',true) on conflict(slug) do nothing;
+insert into public.departments(name,description) values
+('Administration','Platform administration and governance'),
+('Finance','Payments, reconciliation, and reporting'),
+('Human Resources','Employee lifecycle and records'),
+('Sales','Customer acquisition and sales operations')
+on conflict(name) do nothing;
 insert into public.role_permissions(role_id,permission_id)
 select r.id,p.id from public.roles r cross join public.permissions p where
 r.slug='super_admin' or
