@@ -44,6 +44,18 @@ Auth identities are created only by the `admin-users` Edge Function. Direct prof
 
 Users never choose their own role. The Super Admin assigns it through the server-authorized `admin-users` Edge Function, and test-account activity is excluded from production dashboard metrics by default.
 
+### OST registration and approval
+
+- Prospective OST applicants use the separate public route `/ost/register`; no other role can self-register.
+- Sales Managers create hashed, expiring links and scannable QR codes at `/ost/referrals` and see only their branch through RLS.
+- Sales Managers, Admin, and Super Admin review scoped applications at `/ost/applications`. Approval creates the locked `ost` profile and sends the normal Supabase password-setup invitation in one controlled server flow.
+- Pending, rejected, incomplete, and suspended applications have no active internal access. Government IDs are stored in the private `ost-registration-documents` bucket; reviewers receive 60-second signed links and every file has a SHA-256 integrity hash.
+- The endpoint limits public submissions to five attempts per hashed source IP per hour and rejects duplicate email or ID hashes. Public Data API access to the intake tables remains revoked.
+
+Manual acceptance check: create a code as a Sales Manager, open its QR/link in a private browser, test an invalid code, submit a valid application with non-production identity fixtures, confirm another Sales Manager cannot see it, request a correction, approve it as an authorized reviewer, complete the emailed password setup, then confirm the OST appears under the originating Sales Manager and Vice Director. Confirm the audit log records code creation, review, approval, and invitation.
+
+Operational decision still required: choose a document-retention period and a malware-scanning provider. Until a scanner is configured, uploads are MIME/size validated, kept private, integrity-hashed, and never rendered inline by the public application.
+
 ## Supabase deployment
 
 Target project: `rfkfsxiganebzaeioopg`.
@@ -54,6 +66,7 @@ npx supabase link --project-ref rfkfsxiganebzaeioopg
 npx supabase db push
 npx supabase functions deploy admin-users
 npx supabase functions deploy ocr-document
+npx supabase functions deploy ost-registration --no-verify-jwt
 ```
 
 Set Edge Function secrets without committing them:

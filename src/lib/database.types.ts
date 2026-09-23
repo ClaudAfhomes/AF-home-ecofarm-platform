@@ -97,6 +97,18 @@ export interface Database {
         Update: never;
         Relationships: [];
       };
+      ost_referral_codes: {
+        Row: { id: string; code_hash: string; code_hint: string; sales_manager_id: string; vice_director_id: string; status: 'active' | 'inactive'; expires_at: string; max_uses: number; use_count: number; created_at: string; deactivated_at: string | null };
+        Insert: never; Update: never; Relationships: [];
+      };
+      ost_registrations: {
+        Row: { id: string; referral_code_id: string; sales_manager_id: string; vice_director_id: string; email: string; email_hash: string; mobile: string; first_name: string; middle_name: string | null; last_name: string; date_of_birth: string; sex: string | null; address_line: string; barangay: string; city: string; province: string; postal_code: string; id_type: string; id_number_hash: string; id_number_last4: string; id_issue_date: string | null; id_expiration_date: string | null; consented_at: string; certified_at: string; status: 'pending_verification' | 'needs_correction' | 'verified' | 'rejected' | 'invited' | 'active' | 'suspended'; review_reason: string | null; reviewed_by: string | null; reviewed_at: string | null; auth_user_id: string | null; submitted_at: string; updated_at: string };
+        Insert: never; Update: never; Relationships: [];
+      };
+      ost_registration_documents: {
+        Row: { id: string; registration_id: string; side: 'front' | 'back'; storage_path: string; sha256: string; mime_type: string; size_bytes: number; created_at: string };
+        Insert: never; Update: never; Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {

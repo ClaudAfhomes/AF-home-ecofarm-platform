@@ -8,6 +8,7 @@ import { StatusChip } from '../components/StatusChip';
 import { formatMoney } from '../lib/format';
 import { PERMISSIONS } from '../lib/permissions';
 import type { Customer, Product, Sale } from '../services/operations';
+import type { RoleSlug } from '../lib/database.types';
 
 const LoginPage = lazy(() =>
   import('../pages/LoginPage').then((module) => ({ default: module.LoginPage })),
@@ -52,13 +53,17 @@ const PlaceholderPage = lazy(() =>
 const QrCreditsPage = lazy(() =>
   import('../pages/QrCreditsPage').then((module) => ({ default: module.QrCreditsPage })),
 );
+const OstRegistrationPage = lazy(() => import('../pages/OstRegistrationPage').then((module) => ({ default: module.OstRegistrationPage })));
+const OstReferralCodesPage = lazy(() => import('../pages/OstReferralCodesPage').then((module) => ({ default: module.OstReferralCodesPage })));
+const OstApplicationsPage = lazy(() => import('../pages/OstApplicationsPage').then((module) => ({ default: module.OstApplicationsPage })));
 
-function Protected({ permission, superAdminOnly, children }: { permission?: string; superAdminOnly?: boolean; children: React.ReactNode }) {
+function Protected({ permission, superAdminOnly, roles, children }: { permission?: string; superAdminOnly?: boolean; roles?: RoleSlug[]; children: React.ReactNode }) {
   const { session, profile, role, permissions, loading } = useAuth();
   if (loading) return <LoadingState label="Verifying access…" />;
   if (!session) return <Navigate to="/login" replace />;
   if (!profile || !profile.is_active || profile.employment_status !== 'active') return <DeniedState />;
   if (superAdminOnly && role !== 'super_admin') return <DeniedState />;
+  if (roles && (!role || !roles.includes(role))) return <DeniedState />;
   if (permission && !permissions.has(permission)) return <DeniedState />;
   return children;
 }
@@ -70,6 +75,7 @@ export function App() {
       <Route path="/recover" element={<RecoveryPage />} />
       <Route path="/accept-invite" element={<PasswordUpdatePage />} />
       <Route path="/reset-password" element={<PasswordUpdatePage />} />
+      <Route path="/ost/register" element={<OstRegistrationPage />} />
       <Route
         path="/"
         element={
@@ -241,6 +247,8 @@ export function App() {
             </Protected>
           }
         />
+        <Route path="ost/referrals" element={<Protected roles={['sales_manager']}><OstReferralCodesPage /></Protected>} />
+        <Route path="ost/applications" element={<Protected roles={['super_admin','admin','sales_manager']}><OstApplicationsPage /></Protected>} />
         <Route
           path="notifications"
           element={<Protected permission={PERMISSIONS.dashboard}><PlaceholderPage title="Notifications" description="Role-relevant operational alerts and realtime updates." /></Protected>}

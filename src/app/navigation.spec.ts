@@ -9,9 +9,17 @@ describe('sidebar visibility', () => {
       new Set([PERMISSIONS.dashboard, PERMISSIONS.sales, PERMISSIONS.customers]),
       'sales_manager',
     );
-    expect(result.map((group) => group.id)).toEqual(['dashboard', 'sales', 'governance']);
+    expect(result.map((group) => group.id)).toEqual(['dashboard', 'sales', 'network', 'governance']);
     expect(result.find((group) => group.id === 'sales')?.items.map((item) => item.label)).toEqual(['Customers', 'Sales records']);
     expect(result.find((group) => group.id === 'governance')?.items.map((item) => item.label)).toEqual(['Notifications']);
+    expect(result.find((group) => group.id === 'network')?.items.map((item) => item.label)).toEqual(['OST referral codes', 'OST applications']);
+  });
+
+  it('does not expose OST administration to finance or HR', () => {
+    for (const role of ['finance', 'hr'] as const) {
+      const result = visibleNavigation(navigation, new Set(Object.values(PERMISSIONS)), role);
+      expect(result.flatMap((group) => group.items).some((item) => item.to.startsWith('/ost/'))).toBe(false);
+    }
   });
 
   it('keeps governance and organization links for the authorized role only', () => {

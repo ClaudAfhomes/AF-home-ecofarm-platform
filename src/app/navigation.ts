@@ -26,6 +26,7 @@ export type NavigationItem = {
   icon: ComponentType<{ size?: number }>;
   permission: string;
   superAdminOnly?: boolean;
+  roles?: RoleSlug[];
 };
 
 export type NavigationGroup = {
@@ -79,6 +80,8 @@ export const navigation: NavigationGroup[] = [
     items: [
       { to: '/vice-director', label: 'VD analytics', icon: BadgeDollarSign, permission: PERMISSIONS.genealogy },
       { to: '/genealogy/members', label: 'Genealogy', icon: Network, permission: PERMISSIONS.genealogy },
+      { to: '/ost/referrals', label: 'OST referral codes', icon: QrCode, permission: PERMISSIONS.dashboard, roles: ['sales_manager'] },
+      { to: '/ost/applications', label: 'OST applications', icon: ContactRound, permission: PERMISSIONS.dashboard, roles: ['super_admin','admin','sales_manager'] },
     ],
   },
   {
@@ -98,7 +101,7 @@ export function visibleNavigation(groups: NavigationGroup[], permissions: Set<st
   return groups
     .map((group) => ({
       ...group,
-      items: group.items.filter((item) => permissions.has(item.permission) && (!item.superAdminOnly || role === 'super_admin')),
+      items: group.items.filter((item) => permissions.has(item.permission) && (!item.superAdminOnly || role === 'super_admin') && (!item.roles || (role !== null && item.roles.includes(role)))),
     }))
     .filter((group) => group.items.length > 0);
 }
