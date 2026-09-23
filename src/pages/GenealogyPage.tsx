@@ -1,0 +1,8 @@
+import { Network, Search } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '../lib/supabase';
+import { LoadingState, ErrorState, EmptyState } from '../components/States';
+
+type Node = { id: string; full_name: string; role_name: string; is_active: boolean; depth: number; parent_id: string | null };
+export function GenealogyPage() { const query = useQuery({ queryKey: ['genealogy'], queryFn: async () => { const { data, error } = await supabase.rpc('genealogy_tree'); if (error) throw error; return data as unknown as Node[]; } }); return <><header className="page-header"><div><h1>Genealogy</h1><p>Search and explore the authorized sales hierarchy.</p></div><button className="secondary"><Network /> Table view</button></header><section className="panel"><label className="search"><Search /><span className="sr-only">Search genealogy</span><input placeholder="Search members…" /></label>{query.isLoading ? <LoadingState /> : query.error ? <ErrorState message={query.error.message} /> : !query.data?.length ? <EmptyState title="No genealogy members" /> : <div className="tree">{query.data.map((node) => <article className="tree-node" key={node.id} style={{ marginLeft: `${Math.min(node.depth, 6) * 28}px` }}><span className={node.is_active ? 'avatar active' : 'avatar'}>{node.full_name.slice(0, 2).toUpperCase()}</span><div><strong>{node.full_name}</strong><p>{node.role_name}</p></div><Status active={node.is_active} /></article>)}</div>}</section></>; }
+function Status({ active }: { active: boolean }) { return <span className={`status ${active ? 'status-active' : 'status-inactive'}`}>{active ? 'active' : 'inactive'}</span>; }

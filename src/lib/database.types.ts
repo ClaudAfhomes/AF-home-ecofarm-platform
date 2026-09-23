@@ -1,0 +1,83 @@
+export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
+
+export type RoleSlug =
+  | 'super_admin'
+  | 'admin'
+  | 'finance'
+  | 'hr'
+  | 'vice_director'
+  | 'senior_sales_manager'
+  | 'sales_manager'
+  | 'ost';
+
+export interface Database {
+  public: {
+    Tables: {
+      profiles: {
+        Row: { id: string; employee_no: string | null; full_name: string; email: string; phone: string | null; department_id: string | null; role_id: string; employment_status: string; genealogy_parent_id: string | null; vice_director_id: string | null; is_active: boolean; created_at: string; updated_at: string };
+        Insert: { id: string; full_name: string; email: string; role_id: string; employee_no?: string | null; phone?: string | null; department_id?: string | null; employment_status?: string; genealogy_parent_id?: string | null; vice_director_id?: string | null; is_active?: boolean };
+        Update: Partial<Database['public']['Tables']['profiles']['Insert']>;
+        Relationships: [];
+      };
+      roles: {
+        Row: { id: string; slug: RoleSlug; name: string; description: string | null; is_system: boolean; created_at: string };
+        Insert: { slug: RoleSlug; name: string; description?: string | null; is_system?: boolean };
+        Update: Partial<Database['public']['Tables']['roles']['Insert']>;
+        Relationships: [];
+      };
+      products: {
+        Row: { id: string; category_id: string; name: string; description: string | null; price: string; status: string; down_payment_type: string; down_payment_value: string; image_path: string | null; created_at: string; updated_at: string };
+        Insert: { category_id: string; name: string; price: string; description?: string | null; status?: string; down_payment_type?: string; down_payment_value?: string; image_path?: string | null };
+        Update: Partial<Database['public']['Tables']['products']['Insert']>;
+        Relationships: [];
+      };
+      customers: {
+        Row: { id: string; customer_no: string; first_name: string; middle_name: string | null; last_name: string; email: string | null; phone: string; address: string; id_type: string; id_number_encrypted: string | null; created_by: string; assigned_salesperson_id: string | null; created_at: string; updated_at: string };
+        Insert: { first_name: string; last_name: string; phone: string; address: string; id_type: string; middle_name?: string | null; email?: string | null; id_number_encrypted?: string | null; assigned_salesperson_id?: string | null };
+        Update: Partial<Database['public']['Tables']['customers']['Insert']>;
+        Relationships: [];
+      };
+      customer_documents: {
+        Row: { id: string; customer_id: string; kind: string; storage_path: string; sha256: string; mime_type: string; size_bytes: number; uploaded_by: string; ocr_status: string; ocr_result: Json | null; reviewed_by: string | null; reviewed_at: string | null; created_at: string };
+        Insert: { customer_id: string; kind: string; storage_path: string; sha256: string; mime_type: string; size_bytes: number };
+        Update: { ocr_status?: string; ocr_result?: Json | null; reviewed_by?: string | null; reviewed_at?: string | null };
+        Relationships: [];
+      };
+      sales: {
+        Row: { id: string; sale_no: string; customer_id: string; product_id: string; salesperson_id: string; vice_director_id: string | null; transaction_type: string; total_amount: string; status: string; payment_deadline: string | null; created_at: string; updated_at: string };
+        Insert: { customer_id: string; product_id: string; salesperson_id: string; transaction_type: string; total_amount: string; vice_director_id?: string | null; payment_deadline?: string | null };
+        Update: Partial<Database['public']['Tables']['sales']['Insert']>;
+        Relationships: [];
+      };
+      payments: {
+        Row: { id: string; sale_id: string; amount: string; method: string; reference_number: string | null; status: string; receipt_path: string | null; receipt_sha256: string | null; collected_by: string; verified_by: string | null; verified_at: string | null; verification_notes: string | null; created_at: string };
+        Insert: { sale_id: string; amount: string; method: string; reference_number?: string | null; receipt_path?: string | null; receipt_sha256?: string | null };
+        Update: never;
+        Relationships: [];
+      };
+      notifications: {
+        Row: { id: string; recipient_id: string; title: string; body: string; kind: string; read_at: string | null; created_at: string };
+        Insert: { recipient_id: string; title: string; body: string; kind?: string };
+        Update: { read_at?: string | null };
+        Relationships: [];
+      };
+      audit_logs: {
+        Row: { id: number; actor_id: string | null; action: string; entity_type: string; entity_id: string | null; old_values: Json | null; new_values: Json | null; ip_address: string | null; created_at: string };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
+    };
+    Views: Record<string, never>;
+    Functions: {
+      current_permissions: { Args: never; Returns: string[] };
+      verify_payment: { Args: { p_payment_id: string; p_approved: boolean; p_notes: string | null }; Returns: undefined };
+      reparent_genealogy_member: { Args: { p_member_id: string; p_parent_id: string; p_reason: string }; Returns: undefined };
+      dashboard_metrics: { Args: never; Returns: Json };
+      genealogy_tree: { Args: never; Returns: { id: string; full_name: string; role_name: string; is_active: boolean; depth: number; parent_id: string | null }[] };
+      record_export: { Args: { p_report: string; p_filters: Json; p_row_count: number }; Returns: undefined };
+    };
+    Enums: Record<string, never>;
+    CompositeTypes: Record<string, never>;
+  };
+}
