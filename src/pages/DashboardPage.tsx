@@ -167,7 +167,13 @@ function AnalyticsPage({
   const viceDirectors = (staffQuery.data?.rows ?? []).map((staff) => ({ id: staff.id, full_name: staff.full_name }));
   const salespeople = (salespeopleQuery.data?.rows ?? []).map((staff) => ({ id: staff.id, full_name: staff.full_name }));
   const effectiveViceDirectorId = viceDirectorId || viceDirectors[0]?.id || '';
-  const range = getAnalyticsRange(period, customFrom, customTo);
+  // Keep the server range stable for the lifetime of the selected filters. Calling
+  // getAnalyticsRange on every render changes `to` by a few milliseconds, which
+  // changes the React Query key and creates an unbounded RPC request loop.
+  const range = useMemo(
+    () => getAnalyticsRange(period, customFrom, customTo),
+    [customFrom, customTo, period],
+  );
   const filters: AnalyticsFilters = useMemo(() => ({
     from: range.from,
     to: range.to,
