@@ -39,6 +39,24 @@ describe('staff query contract', () => {
     expect(select).toHaveBeenCalledWith(expect.stringContaining('roles!inner(name,slug)'), {
       count: 'exact',
     });
+    expect(selection).not.toContain('staff_invitations(');
+  });
+
+  it('maps invitations to the invited profile by user_id instead of invited_by', async () => {
+    const profiles = [{ id: 'invitee-id', email: 'invitee@example.com', department_id: null, genealogy_parent_id: null }];
+    const profileRange = vi.fn().mockResolvedValue({ data: profiles, error: null, count: 1 });
+    const profileOrder = vi.fn(() => ({ range: profileRange }));
+    const invitationIn = vi.fn().mockResolvedValue({ data: [{ user_id: 'invitee-id', status: 'pending', invited_at: '2026-09-24T00:00:00Z', last_sent_at: '2026-09-24T00:00:00Z', accepted_at: null }], error: null });
+    from
+      .mockReturnValueOnce({ select: vi.fn(() => ({ order: profileOrder })) })
+      .mockReturnValueOnce({ select: vi.fn(() => ({ in: invitationIn })) });
+
+    const { listStaff } = await import('./operations');
+    const result = await listStaff({ page: 0, pageSize: 25, search: '', role: '', status: '', department: '' });
+
+    expect(from).toHaveBeenCalledWith('staff_invitations');
+    expect(invitationIn).toHaveBeenCalledWith('user_id', ['invitee-id']);
+    expect(result.rows[0]?.staff_invitations[0]).toMatchObject({ user_id: 'invitee-id', status: 'pending' });
   });
 });
 

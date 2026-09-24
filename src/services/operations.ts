@@ -207,7 +207,7 @@ export async function listStaff(options: { page: number; pageSize: number; searc
   // schema has reverse department leadership and two profile self-relations, which
   // makes these PostgREST embeds ambiguous/stale-cache-sensitive. Explicit ID
   // lookups preserve the same RLS checks and keep this list query deterministic.
-  let query = supabase.from('profiles').select('*,roles!inner(name,slug),staff_invitations(status,invited_at,last_sent_at,accepted_at)', { count: 'exact' });
+  let query = supabase.from('profiles').select('*,roles!inner(name,slug)', { count: 'exact' });
   if (options.search) query = query.or(`full_name.ilike.%${options.search}%,email.ilike.%${options.search}%,employee_no.ilike.%${options.search}%`);
   if (options.role) query = query.eq('roles.slug', options.role as RoleSlug);
   if (options.status) query = query.eq('employment_status', options.status as EmploymentStatus);
@@ -218,22 +218,29 @@ export async function listStaff(options: { page: number; pageSize: number; searc
   const profiles = data ?? [];
   const departmentIds = [...new Set(profiles.flatMap((profile) => profile.department_id ? [profile.department_id] : []))];
   const parentIds = [...new Set(profiles.flatMap((profile) => profile.genealogy_parent_id ? [profile.genealogy_parent_id] : []))];
-  const [departmentResult, parentResult] = await Promise.all([
+  const profileIds = profiles.map((profile) => profile.id);
+  const [departmentResult, parentResult, invitationResult] = await Promise.all([
     departmentIds.length
       ? supabase.from('departments').select('id,name').in('id', departmentIds)
       : Promise.resolve({ data: [], error: null }),
     parentIds.length
       ? supabase.from('profiles').select('id,full_name').in('id', parentIds)
       : Promise.resolve({ data: [], error: null }),
+    profileIds.length
+      ? supabase.from('staff_invitations').select('user_id,status,invited_at,last_sent_at,accepted_at').in('user_id', profileIds)
+      : Promise.resolve({ data: [], error: null }),
   ]);
   fail(departmentResult.error);
   fail(parentResult.error);
+  fail(invitationResult.error);
   const departmentNames = new Map((departmentResult.data ?? []).map((department) => [department.id, department.name]));
   const parentNames = new Map((parentResult.data ?? []).map((parent) => [parent.id, parent.full_name]));
+  const invitationsByUserId = new Map((invitationResult.data ?? []).map((invitation) => [invitation.user_id, invitation]));
   const rows = profiles.map((profile) => ({
     ...profile,
     departments: profile.department_id ? { name: departmentNames.get(profile.department_id) ?? 'Unknown department' } : null,
     genealogy_parent: profile.genealogy_parent_id ? { full_name: parentNames.get(profile.genealogy_parent_id) ?? 'Unknown member' } : null,
+    staff_invitations: invitationsByUserId.has(profile.id) ? [invitationsByUserId.get(profile.id)] : [],
   })) as unknown as StaffProfile[];
   return { rows, count: count ?? 0 };
 }
