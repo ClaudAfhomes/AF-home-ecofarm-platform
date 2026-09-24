@@ -192,7 +192,8 @@ function AnalyticsPage({
   const defaultRangeLabel = `${formatBucket(range.from, grouping)} – ${formatBucket(range.to, grouping)}`;
 
   if (query.isLoading || (canSelectBranch && staffQuery.isLoading) || (canSelectSalesperson && salespeopleQuery.isLoading)) return <LoadingState label="Loading verified analytics…" />;
-  if (query.error) return <ErrorState message={query.error.message} retry={() => void query.refetch()} />;
+  const queryError = query.error ?? staffQuery.error ?? salespeopleQuery.error;
+  if (queryError) return <ErrorState message={queryError.message} retry={() => void Promise.all([query.refetch(), staffQuery.refetch(), salespeopleQuery.refetch()])} />;
   if (!analytics) return <EmptyState title="No analytics available" body="Choose an authorized genealogy branch or date range." />;
 
   const vdAnalytics = viceDirector ? analytics as ViceDirectorAnalytics : null;

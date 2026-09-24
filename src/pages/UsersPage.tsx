@@ -23,6 +23,7 @@ export function UsersPage() {
   const resend = useMutation({ mutationFn: resendStaffInvitation, onSuccess: () => queryClient.invalidateQueries({ queryKey: ['staff'] }) });
   const pages = Math.max(1, Math.ceil((staff.data?.count ?? 0) / pageSize));
   const resetPage = () => setPage(0);
+  const queryError = staff.error ?? roles.error ?? departments.error;
   return <>
     <header className="page-header"><div><p className="eyebrow">SETTINGS</p><h1>User &amp; Role Management</h1><p>Invite staff, assign one seeded role, manage employment status, and preserve a complete audit trail.</p></div><button className="primary" onClick={() => setDialog('new')}><Plus /> Invite member</button></header>
     <section className="panel">
@@ -32,7 +33,7 @@ export function UsersPage() {
         <label>Status<select value={status} onChange={(event) => { setStatus(event.target.value); resetPage(); }}><option value="">All statuses</option>{['active','inactive','suspended','resigned'].map((item) => <option key={item}>{item}</option>)}</select></label>
         <label>Department<select value={department} onChange={(event) => { setDepartment(event.target.value); resetPage(); }}><option value="">All departments</option>{departments.data?.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
       </div>
-      {staff.isLoading ? <LoadingState /> : staff.error ? <ErrorState message={staff.error.message} retry={() => void staff.refetch()} /> : <>
+      {staff.isLoading || roles.isLoading || departments.isLoading ? <LoadingState /> : queryError ? <ErrorState message={queryError.message} retry={() => void Promise.all([staff.refetch(), roles.refetch(), departments.refetch()])} /> : <>
         <DataTable rows={staff.data?.rows ?? []} caption="Staff and members" columns={[
           { key: 'full_name', label: 'Staff member', render: (row) => <div><strong>{row.full_name}</strong><small className="table-subtitle">{row.email}</small></div> },
           { key: 'role', label: 'Role', render: (row) => row.roles.name },

@@ -1,7 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { useAuth } from '../auth/AuthProvider';
-import { LoadingState, DeniedState } from '../components/States';
+import { LoadingState, DeniedState, ErrorState } from '../components/States';
 import { AppShell } from './AppShell';
 import { ResourcePage } from '../pages/ResourcePage';
 import { StatusChip } from '../components/StatusChip';
@@ -58,8 +58,9 @@ const OstReferralCodesPage = lazy(() => import('../pages/OstReferralCodesPage').
 const OstApplicationsPage = lazy(() => import('../pages/OstApplicationsPage').then((module) => ({ default: module.OstApplicationsPage })));
 
 function Protected({ permission, superAdminOnly, roles, children }: { permission?: string; superAdminOnly?: boolean; roles?: RoleSlug[]; children: React.ReactNode }) {
-  const { session, profile, role, permissions, loading } = useAuth();
+  const { session, profile, role, permissions, loading, error, retry } = useAuth();
   if (loading) return <LoadingState label="Verifying access…" />;
+  if (error) return <ErrorState message={error} retry={retry} />;
   if (!session) return <Navigate to="/login" replace />;
   if (!profile || !profile.is_active || profile.employment_status !== 'active') return <DeniedState />;
   if (superAdminOnly && role !== 'super_admin') return <DeniedState />;
