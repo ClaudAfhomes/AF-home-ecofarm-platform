@@ -8,7 +8,7 @@ export const SALES_ROLES = new Set<RoleSlug>([
 ]);
 
 export function canManageStaff(role: RoleSlug | null) {
-  return role === 'super_admin';
+  return role === 'super_admin' || role === 'admin';
 }
 
 export function allowedParentRoles(role?: RoleSlug) {

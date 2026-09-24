@@ -89,7 +89,7 @@ export function App() {
         <Route
           path="settings/users"
           element={
-            <Protected permission={PERMISSIONS.users} superAdminOnly>
+            <Protected permission={PERMISSIONS.users}>
               <UsersPage />
             </Protected>
           }

@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { allowedParentRoles, canManageStaff, canViewGenealogy, isPlacementAllowed, permittedModules } from './staff-management';
 
-describe('Super Admin staff management rules', () => {
-  it('allows only Super Admin to invite users or change roles', () => {
+describe('staff management rules', () => {
+  it('allows permission-matrix staff managers', () => {
     expect(canManageStaff('super_admin')).toBe(true);
-    expect(canManageStaff('admin')).toBe(false);
+    expect(canManageStaff('admin')).toBe(true);
     expect(canManageStaff('hr')).toBe(false);
   });
 

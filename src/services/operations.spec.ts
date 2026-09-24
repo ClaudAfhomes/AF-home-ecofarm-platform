@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
-const { rpc, from } = vi.hoisted(() => ({ rpc: vi.fn(), from: vi.fn() }));
-vi.mock('../lib/supabase', () => ({ supabase: { rpc, from } }));
+const { rpc, from, invoke } = vi.hoisted(() => ({ rpc: vi.fn(), from: vi.fn(), invoke: vi.fn() }));
+vi.mock('../lib/supabase', () => ({ supabase: { rpc, from, functions: { invoke } } }));
 
 describe('QR verification contract', () => {
   it('preserves duplicate-scan status returned by the secure RPC', async () => {
@@ -16,7 +16,11 @@ describe('staff query contract', () => {
   it('avoids ambiguous department and profile relationship embeds', async () => {
     const range = vi.fn().mockResolvedValue({ data: [], error: null, count: 0 });
     const order = vi.fn(() => ({ range }));
-    const select = vi.fn((_selection: string, _options: { count: string }) => ({ order }));
+    const select = vi.fn((selection: string, options: { count: string }) => {
+      void selection;
+      void options;
+      return { order };
+    });
     from.mockReturnValueOnce({ select });
 
     const { listStaff } = await import('./operations');
@@ -35,5 +39,27 @@ describe('staff query contract', () => {
     expect(select).toHaveBeenCalledWith(expect.stringContaining('roles!inner(name,slug)'), {
       count: 'exact',
     });
+  });
+});
+
+describe('admin-users error contract', () => {
+  it('shows the function JSON error instead of the generic SDK message', async () => {
+    invoke.mockResolvedValueOnce({
+      data: null,
+      error: {
+        message: 'Edge Function returned a non-2xx status code',
+        context: new Response(JSON.stringify({ code: 'EMAIL_EXISTS', error: 'A staff profile already exists for this email address.' }), { status: 409 }),
+      },
+    });
+    const { inviteStaff } = await import('./operations');
+    await expect(inviteStaff({
+      email: 'existing@example.com',
+      fullName: 'Existing User',
+      roleId: 'role-id',
+      departmentId: null,
+      phone: null,
+      employeeNo: null,
+      parentId: null,
+    })).rejects.toThrow('A staff profile already exists for this email address.');
   });
 });

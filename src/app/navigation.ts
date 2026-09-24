@@ -48,7 +48,7 @@ export const navigation: NavigationGroup[] = [
     label: 'Organization',
     icon: Building2,
     items: [
-      { to: '/settings/users', label: 'Users & roles', icon: UserCog, permission: PERMISSIONS.users, superAdminOnly: true },
+      { to: '/settings/users', label: 'Users & roles', icon: UserCog, permission: PERMISSIONS.users },
       { to: '/settings/departments', label: 'Departments', icon: Building2, permission: PERMISSIONS.departments, superAdminOnly: true },
       { to: '/employees', label: 'HR employees', icon: Users, permission: PERMISSIONS.hr },
     ],

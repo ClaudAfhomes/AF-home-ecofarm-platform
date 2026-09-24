@@ -240,7 +240,20 @@ export async function listStaff(options: { page: number; pageSize: number; searc
 
 async function invokeAdminUsers(body: Record<string, unknown>) {
   const { data, error } = await supabase.functions.invoke('admin-users', { body });
-  if (error) throw new Error(error.message);
+  if (error) {
+    let message = error.message;
+    const context = (error as { context?: Response }).context;
+    if (context && typeof context.clone === 'function') {
+      try {
+        const payload = await context.clone().json() as { error?: string };
+        if (payload.error) message = payload.error;
+      } catch {
+        // Preserve the SDK error if the function did not return JSON.
+      }
+    }
+    throw new Error(message);
+  }
+  if (!data || typeof data.id !== 'string') throw new Error('The staff request returned an invalid response.');
   return data as { id: string; actionLink?: string };
 }
 
