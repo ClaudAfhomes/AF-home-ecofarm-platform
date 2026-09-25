@@ -29,6 +29,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{ou
 .sidebar-collapsed .brand-mark{justify-content:center}
 .sidebar-collapsed .sidebar-head{padding-inline:0;justify-content:center}
 .sidebar nav{display:flex;flex-direction:column;gap:4px}
+.nav-list,.nav-items{list-style:none;margin:0;padding:0}.nav-direct{font-weight:700!important}.nav-badge{margin-left:auto;min-width:21px;height:21px;padding:0 6px;display:grid;place-items:center;border-radius:999px;background:var(--gold-400,#e8ae3a);color:#18271d;font-size:.68rem}.sidebar-collapsed .nav-badge{display:none}
 .nav-section{border-radius:12px}
 .nav-group-toggle{width:100%;border:0;background:transparent;color:#c3d6c5;display:flex;align-items:center;gap:11px;padding:11px 10px;border-radius:10px;font-size:.78rem;font-weight:700;letter-spacing:.03em;text-align:left}
 .nav-group-toggle:hover,.nav-section.active>.nav-group-toggle{background:rgb(255 255 255 / .09);color:#fff}
@@ -46,6 +47,7 @@ a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{ou
 .signout:hover{background:rgb(255 255 255 / .09);color:#fff}
 .desktop-sidebar-toggle{color:var(--pine);margin-right:8px}
 .menu-button{display:none}
+.breadcrumbs{max-width:1600px;margin:0 auto;padding:16px 34px 0}.breadcrumbs ol{list-style:none;margin:0;padding:0;display:flex;align-items:center;flex-wrap:wrap;gap:8px;color:var(--muted);font-size:.76rem}.breadcrumbs li{display:flex;align-items:center;gap:8px}.breadcrumbs li:not(:last-child)::after{content:'›';color:#aaa}.breadcrumbs a{color:var(--green-2);text-decoration:none;font-weight:700}.user-menu-wrap{position:relative}.user-dropdown{position:absolute;right:0;top:calc(100% + 10px);width:min(290px,calc(100vw - 30px));background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px;box-shadow:var(--shadow);z-index:30}.user-dropdown>div{padding:8px 10px 12px;border-bottom:1px solid var(--line)}.user-dropdown strong,.user-dropdown span,.user-dropdown small{display:block;overflow-wrap:anywhere}.user-dropdown span,.user-dropdown small{color:var(--muted);font-size:.74rem;margin-top:3px}.user-dropdown button{width:100%;display:flex;align-items:center;gap:9px;border:0;background:transparent;padding:10px;border-radius:8px;color:var(--danger);font-weight:700}.user-dropdown button:hover{background:#fff1f0}.user-dropdown svg{width:17px}.access-notice{max-width:calc(1600px - 68px);margin:16px auto 0;padding:13px 16px;display:flex;align-items:center;gap:12px;border:1px solid #e5b84d;background:#fff8df;border-radius:12px;color:#5f4a13}.access-notice span{font-size:.8rem;flex:1}.access-notice button{border:0;background:var(--green);color:#fff;border-radius:8px;padding:8px 12px;font-weight:700}
 .content{max-width:1600px;padding:34px}
 .panel{border-radius:20px;box-shadow:var(--shadow)}
 .panel-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:14px}
@@ -181,5 +183,5 @@ input:focus,select:focus,textarea:focus{border-color:var(--leaf-600);box-shadow:
 .auth-card{border-radius:var(--radius-panel);padding:clamp(1.5rem,4vw,2.5rem)}.auth-card h2{font-size:2rem;color:var(--navy-900)}
 .state{display:grid;justify-items:center;gap:.45rem}.state .brand-logo{margin-bottom:.25rem}.state .brand-logo img{width:3rem;height:3.4rem}.state>svg{margin-top:.15rem}
 .live-dot::before{animation:brand-pulse 2.4s ease-in-out infinite}@keyframes brand-pulse{50%{opacity:.45;transform:scale(.78)}}
-@media(max-width:800px){.content{padding:clamp(1rem,4vw,1.5rem)}.topbar{height:64px}.auth-panel{background:linear-gradient(180deg,var(--cream-50),var(--cream-100))}}
+@media(max-width:800px){.content{padding:clamp(1rem,4vw,1.5rem)}.breadcrumbs{padding:13px clamp(1rem,4vw,1.5rem) 0}.topbar{height:64px}.auth-panel{background:linear-gradient(180deg,var(--cream-50),var(--cream-100))}.access-notice{margin:12px 15px 0;align-items:flex-start;flex-wrap:wrap}.access-notice span{min-width:70%}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.content{animation:none}.metric:hover{transform:none}}
