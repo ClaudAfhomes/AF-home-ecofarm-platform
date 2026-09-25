@@ -48,8 +48,8 @@ export interface Database {
         Relationships: [];
       };
       products: {
-        Row: { id: string; category_id: string; name: string; description: string | null; price: string; status: string; down_payment_type: string; down_payment_value: string; image_path: string | null; created_at: string; updated_at: string };
-        Insert: { category_id: string; name: string; price: string; description?: string | null; status?: string; down_payment_type?: string; down_payment_value?: string; image_path?: string | null };
+        Row: { id: string; category_id: string; name: string; description: string | null; price: string; status: string; down_payment_type: string; down_payment_value: string; annual_points: number; membership_duration_days: number; image_path: string | null; created_at: string; updated_at: string };
+        Insert: { category_id: string; name: string; price: string; description?: string | null; status?: string; down_payment_type?: string; down_payment_value?: string; annual_points?: number; membership_duration_days?: number; image_path?: string | null };
         Update: Partial<Database['public']['Tables']['products']['Insert']>;
         Relationships: [];
       };
@@ -74,6 +74,18 @@ export interface Database {
       payments: {
         Row: { id: string; sale_id: string; amount: string; method: string; reference_number: string | null; status: string; receipt_path: string | null; receipt_sha256: string | null; collected_by: string; verified_by: string | null; verified_at: string | null; verification_notes: string | null; created_at: string };
         Insert: { sale_id: string; amount: string; method: string; reference_number?: string | null; receipt_path?: string | null; receipt_sha256?: string | null };
+        Update: never;
+        Relationships: [];
+      };
+      memberships: {
+        Row: { id: string; customer_id: string; sale_id: string; product_id: string; member_code: string; status: 'inactive' | 'active' | 'expired' | 'reversed'; activated_at: string | null; expires_at: string | null; activated_by: string | null; created_at: string; updated_at: string };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
+      point_ledger: {
+        Row: { id: string; membership_id: string; entry_type: 'annual_credit' | 'redemption' | 'reversal' | 'adjustment'; points: number; idempotency_key: string; description: string; reversed_entry_id: string | null; created_by: string; created_at: string };
+        Insert: never;
         Update: never;
         Relationships: [];
       };
@@ -124,6 +136,7 @@ export interface Database {
       set_member_permission: { Args: { p_profile_id: string; p_permission_key: string; p_effect: 'allow' | 'deny' | 'inherit'; p_reason: string }; Returns: undefined };
       set_role_permission: { Args: { p_role_slug: string; p_permission_key: string; p_enabled: boolean; p_reason: string }; Returns: undefined };
       verify_payment: { Args: { p_payment_id: string; p_approved: boolean; p_notes: string | null }; Returns: undefined };
+      activate_membership: { Args: { p_sale_id: string }; Returns: Database['public']['Tables']['memberships']['Row'] };
       admin_create_department: { Args: { p_name: string; p_description: string | null; p_accountable_leader_id?: string | null }; Returns: Database['public']['Tables']['departments']['Row'] };
       admin_update_department: { Args: { p_department_id: string; p_name: string; p_description: string | null; p_is_active: boolean; p_accountable_leader_id?: string | null }; Returns: Database['public']['Tables']['departments']['Row'] };
       dashboard_metrics: { Args: never; Returns: Json };

@@ -39,3 +39,13 @@ select public.set_member_permission(
 select public.set_role_permission(
   'admin', 'dashboard.view', false, 'RBAC denial verification'
 );
+
+-- finance: a partial verified payment must not activate a membership or issue points.
+-- Run with a staging sale/payment fixture and replace the UUID placeholders.
+select public.verify_payment('00000000-0000-0000-0000-000000000000', true, 'staging partial payment');
+select public.activate_membership('00000000-0000-0000-0000-000000000000');
+
+-- Activation is idempotent: two successful calls produce one membership and one annual credit.
+select sale_id, count(*) from public.memberships group by sale_id having count(*) > 1;
+select idempotency_key, count(*) from public.point_ledger
+where entry_type='annual_credit' group by idempotency_key having count(*) > 1;

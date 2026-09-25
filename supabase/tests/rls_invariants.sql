@@ -7,7 +7,7 @@ where n.nspname='public' and c.relkind='r' and c.relname in (
   'product_categories','products','customers','customer_documents','sales','payments',
   'payment_corrections','qr_credits','invite_codes','staff_invitations','qr_scan_events','business_rules','notifications','audit_logs',
   'ost_referral_codes','ost_registrations','ost_registration_documents','ost_submission_attempts',
-  'profile_permission_overrides'
+  'profile_permission_overrides','memberships','point_ledger'
 ) and not c.relrowsecurity
 union all
 select distinct 'ANON_TABLE_PRIVILEGE', table_name from information_schema.role_table_grants
@@ -23,7 +23,7 @@ where grantee='authenticated' and table_schema='public'
     or (table_name='employee_documents' and privilege_type='DELETE')
     or (table_name='profiles' and privilege_type in ('INSERT','UPDATE','DELETE'))
     or (table_name='staff_invitations' and privilege_type in ('INSERT','UPDATE','DELETE'))
-    or (table_name in ('ost_referral_codes','ost_registrations','ost_registration_documents','ost_submission_attempts','profile_permission_overrides') and privilege_type in ('INSERT','UPDATE','DELETE')))
+    or (table_name in ('ost_referral_codes','ost_registrations','ost_registration_documents','ost_submission_attempts','profile_permission_overrides','memberships','point_ledger') and privilege_type in ('INSERT','UPDATE','DELETE')))
 union all
 select 'LEGACY_GENEALOGY_RPC_EXECUTABLE', 'reparent_genealogy_member'
 where has_function_privilege('authenticated','public.reparent_genealogy_member(uuid,uuid,text)','execute');
