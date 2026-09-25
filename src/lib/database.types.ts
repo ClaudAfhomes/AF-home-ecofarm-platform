@@ -140,6 +140,7 @@ export interface Database {
       admin_create_department: { Args: { p_name: string; p_description: string | null; p_accountable_leader_id?: string | null }; Returns: Database['public']['Tables']['departments']['Row'] };
       admin_update_department: { Args: { p_department_id: string; p_name: string; p_description: string | null; p_is_active: boolean; p_accountable_leader_id?: string | null }; Returns: Database['public']['Tables']['departments']['Row'] };
       dashboard_metrics: { Args: never; Returns: Json };
+      super_admin_dashboard: { Args: { p_from: string; p_to: string; p_grouping?: string }; Returns: Json };
       genealogy_tree: { Args: never; Returns: { id: string; full_name: string; role_name: string; role_slug: string; employment_status: string; is_active: boolean; is_test_account: boolean; depth: number; parent_id: string | null; vice_director_id: string | null; direct_referrals: number; total_descendants: number; sales_total: string }[] };
       record_auth_event: { Args: { p_event: 'login' | 'logout' }; Returns: undefined };
       record_export: { Args: { p_report: string; p_filters: Json; p_row_count: number }; Returns: undefined };

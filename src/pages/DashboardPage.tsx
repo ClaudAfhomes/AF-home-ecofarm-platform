@@ -19,6 +19,7 @@ import { formatBucket, getAnalyticsRange, performanceLabel, defaultGrouping, typ
 import { chartMetricLabel, type ChartMetric } from '../lib/chart';
 import { formatMoney } from '../lib/format';
 import { subscribeToOperations } from '../lib/realtime';
+import { SuperAdminDashboard } from './SuperAdminDashboard';
 
 const periodLabels: Array<[AnalyticsPeriod, string]> = [
   ['today', 'Today'],
@@ -273,5 +274,7 @@ function MemberPerformanceTable({ analytics }: { analytics: ViceDirectorAnalytic
 }
 
 export function DashboardPage({ viceDirector = false }: { viceDirector?: boolean }) {
+  const { role } = useAuth();
+  if (!viceDirector && role === 'super_admin') return <SuperAdminDashboard />;
   return <AnalyticsPage viceDirector={viceDirector} />;
 }

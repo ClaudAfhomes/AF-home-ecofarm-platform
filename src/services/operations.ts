@@ -91,6 +91,23 @@ export type ViceDirectorAnalytics = SalesAnalytics & {
   }>;
 };
 
+export type SuperAdminDashboard = {
+  range: { from: string; to: string; grouping: AnalyticsGrouping };
+  kpis: {
+    verifiedSales: number; verifiedCollections: string; activeMemberships: number;
+    pendingAccounts: number; downPaymentAccounts: number; overdueAccounts: number;
+    pointsIssued: number; pointsRedeemed: number;
+    pendingFinalQualifications: number | null; earnedUnpaidCommissions: string | null;
+    activeSellers: number; inactiveSellers: number; activeEmployees: number; inactiveEmployees: number;
+  };
+  series: Array<{ bucket: string; cardSales: number; collections: string; cardActivations: number; pointsRedeemed: number }>;
+  extremes: { highest: { bucket: string | null; cardSales: number; collections: string }; lowest: { bucket: string | null; cardSales: number; collections: string } };
+  activity: Array<{ id: number; action: string; entityType: string; entityId: string | null; actorName: string; createdAt: string }>;
+  queues: Record<'paymentVerification' | 'cardActivation' | 'finalQualification' | 'ostApplications' | 'commissionPayout', {
+    available: boolean; count: number | null; items: Array<{ id: string; label: string; detail: string; createdAt: string }>;
+  }>;
+};
+
 const fail = (error: { message: string } | null) => { if (error) throw new Error(error.message); };
 
 export async function listTable<T>(table: 'products' | 'customers' | 'sales' | 'payments' | 'notifications' | 'audit_logs' | 'qr_credits' | 'qr_scan_events'): Promise<T[]> {
@@ -200,6 +217,16 @@ export async function fetchViceDirectorAnalytics(filters: AnalyticsFilters) {
   });
   fail(error);
   return data as unknown as ViceDirectorAnalytics;
+}
+
+export async function fetchSuperAdminDashboard(filters: Pick<AnalyticsFilters, 'from' | 'to' | 'grouping'>) {
+  const { data, error } = await supabase.rpc('super_admin_dashboard', {
+    p_from: filters.from,
+    p_to: filters.to,
+    p_grouping: filters.grouping,
+  });
+  fail(error);
+  return data as unknown as SuperAdminDashboard;
 }
 
 export async function createSignedDocumentUrl(bucket: 'customer-documents' | 'payment-receipts' | 'employee-documents', path: string) {
