@@ -25,8 +25,8 @@ export function UsersPage() {
   const resetPage = () => setPage(0);
   const queryError = staff.error ?? roles.error ?? departments.error;
   return <>
-    <header className="page-header"><div><p className="eyebrow">SETTINGS</p><h1>User &amp; Role Management</h1><p>Invite staff, assign one seeded role, manage employment status, and preserve a complete audit trail.</p></div><button className="primary" onClick={() => setDialog('new')}><Plus /> Invite member</button></header>
-    <section className="panel">
+    <header className="page-header"><div><h1>Users &amp; Accounts</h1><p>Invite staff, assign roles, manage account status, and preserve a complete audit trail.</p></div><button className="primary" onClick={() => setDialog('new')}><Plus /> Invite member</button></header>
+    <section className="panel table-panel">
       <div className="filters">
         <label className="search"><Search /><span className="sr-only">Search staff</span><input value={search} onChange={(event) => { setSearch(event.target.value); resetPage(); }} placeholder="Name, email, employee no.…" /></label>
         <label>Role<select value={role} onChange={(event) => { setRole(event.target.value); resetPage(); }}><option value="">All roles</option>{roles.data?.map((item) => <option key={item.id} value={item.slug}>{item.name}</option>)}</select></label>

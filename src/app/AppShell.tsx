@@ -39,7 +39,7 @@ export function AppShell() {
 
   return <div className={collapsed?'app-shell sidebar-collapsed':'app-shell'}>
     <aside className={drawerOpen?'sidebar open':'sidebar'} aria-label="Primary navigation">
-      <div className="sidebar-head"><NavLink className="brand-mark" to="/" onClick={closeNavigation}><BrandLogo compact={collapsed}/><span className="sr-only">AF Homes dashboard</span></NavLink><button className="icon-button close-menu" onClick={()=>setDrawerOpen(false)} aria-label="Close navigation"><X/></button></div>
+      <div className="sidebar-head"><NavLink className="brand-mark" to="/" onClick={closeNavigation}><BrandLogo compact={collapsed}/>{collapsed?null:<small className="sidebar-brand-subtitle">Admin Panel</small>}<span className="sr-only">AF Homes dashboard</span></NavLink><button className="icon-button close-menu" onClick={()=>setDrawerOpen(false)} aria-label="Close navigation"><X/></button></div>
       <nav><ul className="nav-list">{visibleGroups.map((group)=>{
         const active=group.items.some((item)=>location.pathname===item.to||(item.to!=='/'&&location.pathname.startsWith(`${item.to}/`)));
         if(group.standalone){const item=group.items[0];return item?<li key={group.id}><NavLink className="nav-direct" to={item.to} end onClick={closeNavigation}><item.icon/><span>{item.label}</span></NavLink></li>:null;}
