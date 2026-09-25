@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase';
 import type { Database, EmploymentStatus, RoleSlug } from '../lib/database.types';
+import type { IdentityExtraction } from '../lib/id-extraction';
 
 export type Product = Database['public']['Tables']['products']['Row'];
 export type Customer = Database['public']['Tables']['customers']['Row'];
@@ -98,7 +99,7 @@ export async function listTable<T>(table: 'products' | 'customers' | 'sales' | '
   return (data ?? []) as T[];
 }
 
-export async function createCustomer(input: Database['public']['Tables']['customers']['Insert'], idFile?: File) {
+export async function createCustomer(input: Database['public']['Tables']['customers']['Insert'], idFile?: File, extraction?: IdentityExtraction) {
   const { data, error } = await supabase.from('customers').insert(input).select('*').single();
   fail(error);
   if (idFile && data) {
@@ -108,7 +109,27 @@ export async function createCustomer(input: Database['public']['Tables']['custom
     const path = `${data.id}/${crypto.randomUUID()}-${idFile.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
     const upload = await supabase.storage.from('customer-documents').upload(path, idFile, { contentType: idFile.type, upsert: false });
     fail(upload.error);
-    const documentWrite = await supabase.from('customer_documents').insert({ customer_id: data.id, kind: 'government_id', storage_path: path, sha256: hash, mime_type: idFile.type, size_bytes: idFile.size });
+    const { data: userData, error: userError } = await supabase.auth.getUser();
+    fail(userError);
+    const documentWrite = await supabase.from('customer_documents').insert({
+      customer_id: data.id,
+      kind: 'government_id',
+      storage_path: path,
+      sha256: hash,
+      mime_type: idFile.type,
+      size_bytes: idFile.size,
+      ocr_status: extraction ? 'reviewed' : 'not_configured',
+      ocr_result: extraction ? {
+        source: extraction.source,
+        confidence: extraction.confidence,
+        barcodeFormat: extraction.barcodeFormat ?? null,
+        rawText: extraction.rawText,
+        parsedFields: extraction.fields,
+        reviewRequired: true,
+      } : null,
+      reviewed_by: extraction ? userData.user?.id ?? null : null,
+      reviewed_at: extraction ? new Date().toISOString() : null,
+    });
     fail(documentWrite.error);
   }
   return data;

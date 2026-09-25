@@ -46,14 +46,14 @@ export interface Database {
         Relationships: [];
       };
       customers: {
-        Row: { id: string; customer_no: string; first_name: string; middle_name: string | null; last_name: string; email: string | null; phone: string; address: string; id_type: string; id_number_encrypted: string | null; created_by: string; assigned_salesperson_id: string | null; created_at: string; updated_at: string };
-        Insert: { first_name: string; last_name: string; phone: string; address: string; id_type: string; middle_name?: string | null; email?: string | null; id_number_encrypted?: string | null; assigned_salesperson_id?: string | null };
+        Row: { id: string; customer_no: string; first_name: string; middle_name: string | null; last_name: string; email: string | null; phone: string; address: string; birth_date: string | null; sex: string | null; id_type: string; id_number_encrypted: string | null; id_expiration_date: string | null; created_by: string; assigned_salesperson_id: string | null; created_at: string; updated_at: string };
+        Insert: { first_name: string; last_name: string; phone: string; address: string; id_type: string; middle_name?: string | null; email?: string | null; birth_date?: string | null; sex?: string | null; id_number_encrypted?: string | null; id_expiration_date?: string | null; assigned_salesperson_id?: string | null };
         Update: Partial<Database['public']['Tables']['customers']['Insert']>;
         Relationships: [];
       };
       customer_documents: {
         Row: { id: string; customer_id: string; kind: string; storage_path: string; sha256: string; mime_type: string; size_bytes: number; uploaded_by: string; ocr_status: string; ocr_result: Json | null; reviewed_by: string | null; reviewed_at: string | null; created_at: string };
-        Insert: { customer_id: string; kind: string; storage_path: string; sha256: string; mime_type: string; size_bytes: number };
+        Insert: { customer_id: string; kind: string; storage_path: string; sha256: string; mime_type: string; size_bytes: number; ocr_status?: string; ocr_result?: Json | null; reviewed_by?: string | null; reviewed_at?: string | null };
         Update: { ocr_status?: string; ocr_result?: Json | null; reviewed_by?: string | null; reviewed_at?: string | null };
         Relationships: [];
       };

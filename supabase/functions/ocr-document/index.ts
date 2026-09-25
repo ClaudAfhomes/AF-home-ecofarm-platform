@@ -104,14 +104,6 @@ Deno.serve(async (request) => {
   const token = authorization.startsWith('Bearer ') ? authorization.slice(7) : '';
   if (!token) return reply(request, 401, { error: 'Unauthorized' });
 
-  const credentialsJson = Deno.env.get('GOOGLE_APPLICATION_CREDENTIALS_JSON');
-  const configuredProjectId = Deno.env.get('GOOGLE_CLOUD_PROJECT_ID');
-  const location = Deno.env.get('GOOGLE_DOCUMENT_AI_LOCATION');
-  const processorId = Deno.env.get('GOOGLE_DOCUMENT_AI_PROCESSOR_ID');
-  if (!credentialsJson || !location || !processorId) {
-    return reply(request, 503, { configured: false, error: 'OCR is not configured' });
-  }
-
   const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
   const anonKey = Deno.env.get('SUPABASE_ANON_KEY') ?? '';
   const client = createClient(supabaseUrl, anonKey, {
@@ -122,13 +114,34 @@ Deno.serve(async (request) => {
   if (userError || !userData.user) return reply(request, 401, { error: 'Unauthorized' });
 
   let documentId: string;
+  let provider: string;
   try {
-    const body = await request.json() as { documentId?: unknown };
+    const body = await request.json() as { documentId?: unknown; provider?: unknown };
     documentId = typeof body.documentId === 'string' ? body.documentId.trim() : '';
+    provider = typeof body.provider === 'string' ? body.provider.trim().toLowerCase() : '';
   } catch {
     return reply(request, 400, { error: 'Invalid JSON body' });
   }
   if (!documentId) return reply(request, 400, { error: 'documentId is required' });
+  if (provider !== 'google') {
+    return reply(request, 400, {
+      configured: true,
+      mode: 'local',
+      error: 'Cloud OCR was not selected. Use the free on-device OCR workflow.',
+    });
+  }
+
+  const credentialsJson = Deno.env.get('GOOGLE_APPLICATION_CREDENTIALS_JSON');
+  const configuredProjectId = Deno.env.get('GOOGLE_CLOUD_PROJECT_ID');
+  const location = Deno.env.get('GOOGLE_DOCUMENT_AI_LOCATION');
+  const processorId = Deno.env.get('GOOGLE_DOCUMENT_AI_PROCESSOR_ID');
+  if (!credentialsJson || !location || !processorId) {
+    return reply(request, 503, {
+      configured: false,
+      provider: 'google',
+      error: 'Google Document AI provider is not configured',
+    });
+  }
 
   const { data: document, error: documentError } = await client
     .from('customer_documents')
