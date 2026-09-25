@@ -17,8 +17,13 @@ export type StaffProfile = Database['public']['Tables']['profiles']['Row'] & {
 export type StaffInput = {
   email: string; fullName: string; roleId: string; departmentId: string | null;
   phone: string | null; employeeNo: string | null; parentId: string | null;
-  isTestAccount?: boolean; deliveryMode?: 'email' | 'link';
+  isTestAccount?: boolean; temporaryPassword: string; permissionKeys?: string[];
 };
+export type StaffUpdateInput = Omit<StaffInput, 'email' | 'temporaryPassword' | 'permissionKeys'> & {
+  employmentStatus: EmploymentStatus; reason: string;
+};
+
+export type Permission = Database['public']['Tables']['permissions']['Row'];
 
 export type AnalyticsGrouping = 'day' | 'week' | 'month' | 'year';
 export type AnalyticsProductType = 'All' | 'Bronze' | 'Silver' | 'Gold';
@@ -241,6 +246,39 @@ export async function listRoles() {
   return (data ?? []) as Role[];
 }
 
+export async function listPermissions() {
+  const [{ data: permissions, error }, { data: grants, error: grantsError }] = await Promise.all([
+    supabase.from('permissions').select('*').order('module').order('name'),
+    supabase.from('role_permissions').select('role_id,permission_id,data_scope'),
+  ]);
+  fail(error); fail(grantsError);
+  return {
+    permissions: (permissions ?? []) as Permission[],
+    grants: (grants ?? []) as Array<{ role_id: string; permission_id: string; data_scope: 'own' | 'branch' | 'department' | 'global' }>,
+  };
+}
+
+export async function listRoleRegistry() {
+  const [rolesResult, catalog, profilesResult, auditResult] = await Promise.all([
+    supabase.from('roles').select('*').order('is_system', { ascending: false }).order('name'),
+    listPermissions(),
+    supabase.from('profiles').select('id,full_name,role_id').order('full_name'),
+    supabase.from('audit_logs').select('*').in('action', ['CUSTOM_ROLE_CREATED', 'ROLE_PERMISSION_CHANGED']).order('created_at', { ascending: false }).limit(100),
+  ]);
+  fail(rolesResult.error); fail(profilesResult.error); fail(auditResult.error);
+  return { roles: rolesResult.data ?? [], ...catalog, profiles: profilesResult.data ?? [], audit: auditResult.data ?? [] };
+}
+
+export async function createCustomRole(name: string, description: string) {
+  const { data, error } = await supabase.rpc('create_custom_role', { p_name: name, p_description: description || null });
+  fail(error); return data;
+}
+
+export async function configureRolePermission(input: { roleId: string; permissionKey: string; enabled: boolean; scope: 'own' | 'branch' | 'department' | 'global'; reason: string }) {
+  const { error } = await supabase.rpc('configure_role_permission', { p_role_id: input.roleId, p_permission_key: input.permissionKey, p_enabled: input.enabled, p_scope: input.scope, p_reason: input.reason });
+  fail(error);
+}
+
 export async function listDepartments(includeInactive = true) {
   let query = supabase.from('departments').select('*').order('name');
   if (!includeInactive) query = query.eq('is_active', true);
@@ -312,10 +350,17 @@ async function invokeAdminUsers(body: Record<string, unknown>) {
   return data as { id: string; actionLink?: string };
 }
 
-export const inviteStaff = (input: StaffInput) => invokeAdminUsers({ action: 'invite', ...input });
+export const createStaffAccount = (input: StaffInput) => invokeAdminUsers({ action: 'create', ...input });
+// Compatibility alias for callers/tests while the server accepts only the new
+// create action. This can be removed after all downstream clients migrate.
+export const inviteStaff = createStaffAccount;
 export const resendStaffInvitation = (userId: string) => invokeAdminUsers({ action: 'resend', userId });
-export const updateStaff = (userId: string, input: Omit<StaffInput, 'email'> & { employmentStatus: EmploymentStatus; reason: string }) =>
+export const deleteTestAccount = (userId: string, reason: string) => invokeAdminUsers({ action: 'delete', userId, reason });
+export const updateStaff = (userId: string, input: StaffUpdateInput) =>
   invokeAdminUsers({ action: 'update', userId, ...input });
+
+export const changeTemporaryPassword = (currentPassword: string, newPassword: string) =>
+  invokeAdminUsers({ action: 'change-password', currentPassword, newPassword });
 
 export async function createDepartment(name: string, description: string, accountableLeaderId: string | null) {
   const { data, error } = await supabase.rpc('admin_create_department', { p_name: name, p_description: description || null, p_accountable_leader_id: accountableLeaderId });

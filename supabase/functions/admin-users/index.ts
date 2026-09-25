@@ -1,10 +1,10 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.112.4';
 
-type InviteBody = {
-  action: 'invite'; email: string; fullName: string; roleId: string;
+type CreateBody = {
+  action: 'create'; email: string; fullName: string; roleId: string; temporaryPassword: string;
   departmentId?: string | null; phone?: string | null; employeeNo?: string | null;
   parentId?: string | null;
-  isTestAccount?: boolean; deliveryMode?: 'email' | 'link';
+  isTestAccount?: boolean; permissionKeys?: string[];
 };
 type UpdateBody = {
   action: 'update'; userId: string; fullName: string; roleId: string;
@@ -12,6 +12,8 @@ type UpdateBody = {
   phone?: string | null; employeeNo?: string | null; parentId?: string | null; reason: string;
 };
 type ResendBody = { action: 'resend'; userId: string };
+type ChangePasswordBody = { action: 'change-password'; currentPassword: string; newPassword: string };
+type DeleteBody = { action: 'delete'; userId: string; reason: string };
 
 const allowedOrigins = (Deno.env.get('ALLOWED_ORIGIN') ?? '').split(',').map((value) => value.trim()).filter(Boolean);
 const corsHeaders = (request: Request) => {
@@ -46,9 +48,7 @@ Deno.serve(async (request) => {
   }
   const { data: actor, error: actorError } = await admin.from('profiles').select('id,role_id,is_active,employment_status,roles!inner(slug)').eq('id', actorId).single();
   const actorRole = (actor?.roles as unknown as { slug?: string } | null)?.slug;
-  const { data: managementPermission } = actor?.role_id
-    ? await admin.from('role_permissions').select('permissions!inner(key)').eq('role_id', actor.role_id).eq('permissions.key', 'users.manage').maybeSingle()
-    : { data: null };
+  const { data: effectivePermissions } = await auth.rpc('current_permissions');
   const auditFailure = async (code: string, message: string, email?: string) => {
     console.warn(JSON.stringify({ event: 'admin_users_failed', actorId, code }));
     const { error } = await admin.from('audit_logs').insert({
@@ -60,25 +60,49 @@ Deno.serve(async (request) => {
     });
     if (error) console.error(JSON.stringify({ event: 'admin_users_audit_failed', actorId, code: error.code }));
   };
-  if (actorError || !actor?.is_active || actor.employment_status !== 'active' || !['super_admin', 'admin'].includes(actorRole ?? '') || !managementPermission) {
-    await auditFailure('FORBIDDEN', 'Caller does not have staff management permission');
-    return reply(request, 403, { code: 'FORBIDDEN', error: 'You do not have permission to manage staff users.' });
-  }
-  let body: InviteBody | UpdateBody | ResendBody;
+  let body: CreateBody | UpdateBody | ResendBody | ChangePasswordBody | DeleteBody;
   try { body = await request.json(); } catch {
     await auditFailure('INVALID_JSON', 'Invalid JSON body');
     return reply(request, 400, { code: 'INVALID_JSON', error: 'Invalid request body.' });
   }
 
-  if (body.action === 'invite') {
+  const canManageUsers = Array.isArray(effectivePermissions)
+    && (effectivePermissions.includes('users.create') || effectivePermissions.includes('users.manage'));
+  if (body.action !== 'change-password' && (actorError || !actor?.is_active || actor.employment_status !== 'active' || !['super_admin', 'admin'].includes(actorRole ?? '') || !canManageUsers)) {
+    await auditFailure('FORBIDDEN', 'Caller does not have effective account creation permission');
+    return reply(request, 403, { code: 'FORBIDDEN', error: 'You do not have permission to manage staff users.' });
+  }
+
+  if (body.action === 'change-password') {
+    if (typeof body.currentPassword !== 'string' || typeof body.newPassword !== 'string' || body.newPassword.length < 10) {
+      return reply(request, 400, { code: 'INVALID_PASSWORD', error: 'Enter the temporary password and a new password of at least 10 characters.' });
+    }
+    if (body.currentPassword === body.newPassword) return reply(request, 400, { code: 'PASSWORD_REUSED', error: 'Your new password must differ from the temporary password.' });
+    const { data: target, error: targetError } = await admin.from('profiles').select('email,must_change_password').eq('id', actorId).single();
+    if (targetError || !target?.must_change_password) return reply(request, 409, { code: 'ACTIVATION_NOT_REQUIRED', error: 'This account does not require activation.' });
+    const { error: reauthError } = await auth.auth.signInWithPassword({ email: target.email, password: body.currentPassword });
+    if (reauthError) {
+      await auditFailure('TEMPORARY_PASSWORD_INVALID', 'Temporary password verification failed');
+      return reply(request, 401, { code: 'TEMPORARY_PASSWORD_INVALID', error: 'The temporary password is incorrect.' });
+    }
+    const { error: passwordError } = await admin.auth.admin.updateUserById(actorId, { password: body.newPassword });
+    if (passwordError) return reply(request, 500, { code: 'PASSWORD_CHANGE_FAILED', error: 'The new password could not be saved.' });
+    const { error: flagError } = await admin.from('profiles').update({ must_change_password: false }).eq('id', actorId);
+    if (flagError) return reply(request, 500, { code: 'ACTIVATION_FLAG_FAILED', error: 'Password changed, but account activation needs administrator attention.' });
+    await admin.from('audit_logs').insert({ actor_id: actorId, action: 'ACCOUNT_ACTIVATED', entity_type: 'profiles', entity_id: actorId, new_values: { temporary_password_replaced: true } });
+    return reply(request, 200, { id: actorId });
+  }
+
+  if (body.action === 'create') {
     const normalizedEmail = body.email?.trim().toLowerCase() ?? '';
     const rejectInvite = async (status: number, code: string, message: string) => {
       await auditFailure(code, message, normalizedEmail || undefined);
       return reply(request, status, { code, error: message });
     };
-    if (!normalizedEmail || !body.fullName?.trim() || !body.roleId) return rejectInvite(400, 'REQUIRED_FIELDS', 'Email, full name, and role are required.');
+    if (!normalizedEmail || !body.fullName?.trim() || !body.roleId || !body.temporaryPassword) return rejectInvite(400, 'REQUIRED_FIELDS', 'Email, full name, role, and temporary password are required.');
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) return rejectInvite(400, 'INVALID_EMAIL', 'Enter a valid email address.');
     if (body.fullName.trim().length < 2) return rejectInvite(400, 'INVALID_NAME', 'Full name must contain at least two characters.');
+    if (body.temporaryPassword.length < 10) return rejectInvite(400, 'INVALID_PASSWORD', 'Temporary password must contain at least 10 characters.');
     const { data: existingProfile, error: duplicateCheckError } = await admin.from('profiles').select('id').eq('email', normalizedEmail).maybeSingle();
     if (duplicateCheckError) return rejectInvite(500, 'DUPLICATE_CHECK_FAILED', 'The email could not be validated. Please try again.');
     if (existingProfile) return rejectInvite(409, 'EMAIL_EXISTS', 'A staff profile already exists for this email address.');
@@ -108,14 +132,17 @@ Deno.serve(async (request) => {
     const redirectTo = Deno.env.get('INVITE_REDIRECT_URL');
     if (!redirectTo) return rejectInvite(503, 'INVITE_REDIRECT_MISSING', 'Invitation delivery is not configured.');
     const options = { data: { display_name: body.fullName.trim() }, ...(redirectTo ? { redirectTo } : {}) };
-    const generated = body.deliveryMode === 'link'
-      ? await admin.auth.admin.generateLink({ type: 'invite', email: normalizedEmail, options })
-      : await admin.auth.admin.inviteUserByEmail(normalizedEmail, options);
+    const generated = await admin.auth.admin.inviteUserByEmail(normalizedEmail, options);
     const data = generated.data;
     const error = generated.error;
     if (error || !data.user) {
       const duplicate = error?.message.toLowerCase().includes('already') || error?.status === 422;
       return rejectInvite(duplicate ? 409 : 400, duplicate ? 'EMAIL_EXISTS' : 'INVITE_DELIVERY_FAILED', duplicate ? 'An Auth user already exists for this email address.' : (error?.message ?? 'Invitation delivery failed.'));
+    }
+    const { error: passwordError } = await admin.auth.admin.updateUserById(data.user.id, { password: body.temporaryPassword });
+    if (passwordError) {
+      await admin.auth.admin.deleteUser(data.user.id);
+      return rejectInvite(500, 'TEMPORARY_PASSWORD_FAILED', 'The temporary password could not be assigned. No account was created.');
     }
     const { error: profileError } = await auth.rpc('admin_create_profile', {
       p_user_id: data.user.id, p_email: normalizedEmail, p_full_name: body.fullName, p_role_id: body.roleId,
@@ -128,9 +155,49 @@ Deno.serve(async (request) => {
       if (rollbackError) return rejectInvite(500, 'INVITE_ROLLBACK_FAILED', 'The profile could not be created and the invitation rollback needs administrator attention.');
       return rejectInvite(400, 'PROFILE_CREATE_FAILED', profileError.message);
     }
-    const actionLink = body.deliveryMode === 'link' && 'properties' in data ? data.properties?.action_link : undefined;
-    console.log(JSON.stringify({ event: 'admin_users_invite_succeeded', actorId, userId: data.user.id }));
-    return reply(request, 201, { id: data.user.id, ...(actionLink ? { actionLink } : {}) });
+    const { error: activationFlagError } = await admin.from('profiles').update({ must_change_password: true }).eq('id', data.user.id);
+    if (activationFlagError) {
+      await admin.auth.admin.deleteUser(data.user.id);
+      return rejectInvite(500, 'ACTIVATION_SETUP_FAILED', 'Account activation could not be secured. No account was created.');
+    }
+    if (body.permissionKeys !== undefined) {
+      if (actorRole !== 'super_admin') {
+        await admin.auth.admin.deleteUser(data.user.id);
+        return rejectInvite(403, 'PERMISSION_ASSIGNMENT_FORBIDDEN', 'Only Super Admin can restrict account modules during creation.');
+      }
+      const requested = [...new Set(body.permissionKeys)];
+      const { data: grants, error: grantsError } = await admin.from('role_permissions').select('permission_id,permissions!inner(key)').eq('role_id', body.roleId);
+      if (grantsError) { await admin.auth.admin.deleteUser(data.user.id); return rejectInvite(500, 'PERMISSION_LOAD_FAILED', 'Role permissions could not be validated.'); }
+      const inherited = new Map((grants ?? []).map((grant) => [(grant.permissions as unknown as { key: string }).key, grant.permission_id]));
+      if (requested.some((key) => !inherited.has(key))) { await admin.auth.admin.deleteUser(data.user.id); return rejectInvite(400, 'PERMISSION_ESCALATION', 'Account access cannot exceed the selected role template.'); }
+      const denied = [...inherited.entries()].filter(([key]) => !requested.includes(key)).map(([, permissionId]) => ({ profile_id: data.user.id, permission_id: permissionId, effect: 'deny', reason: 'Restricted during account creation', changed_by: actorId }));
+      if (denied.length) {
+        const { error: restrictionError } = await admin.from('profile_permission_overrides').insert(denied);
+        if (restrictionError) { await admin.auth.admin.deleteUser(data.user.id); return rejectInvite(500, 'PERMISSION_SAVE_FAILED', 'Account restrictions could not be saved. No account was created.'); }
+      }
+    }
+    await admin.from('audit_logs').insert({ actor_id: actorId, action: 'STAFF_ACCOUNT_CREATED', entity_type: 'profiles', entity_id: data.user.id, new_values: { email: normalizedEmail, role_id: body.roleId, activation_email_sent: true } });
+    console.log(JSON.stringify({ event: 'admin_users_create_succeeded', actorId, userId: data.user.id }));
+    return reply(request, 201, { id: data.user.id });
+  }
+
+  if (body.action === 'delete') {
+    if (actorRole !== 'super_admin') return reply(request, 403, { code: 'DELETE_FORBIDDEN', error: 'Only Super Admin can delete test accounts.' });
+    if (!body.userId || body.userId === actorId) return reply(request, 400, { code: 'INVALID_DELETE_TARGET', error: 'You cannot delete your own account.' });
+    if (body.reason?.trim().length < 8) return reply(request, 400, { code: 'DELETE_REASON_REQUIRED', error: 'Enter a deletion reason with at least 8 characters.' });
+    const { data: target, error: targetError } = await admin.from('profiles').select('id,email,full_name,is_test_account,roles!inner(slug)').eq('id', body.userId).single();
+    const targetRole = (target?.roles as unknown as { slug?: string } | null)?.slug;
+    if (targetError || !target) return reply(request, 404, { code: 'ACCOUNT_NOT_FOUND', error: 'Account not found.' });
+    if (!target.is_test_account) return reply(request, 409, { code: 'NOT_TEST_ACCOUNT', error: 'Only accounts marked as test accounts can be permanently deleted.' });
+    if (targetRole === 'super_admin') return reply(request, 403, { code: 'PROTECTED_ACCOUNT', error: 'Super Admin accounts cannot be deleted.' });
+    const { error: deleteError } = await admin.auth.admin.deleteUser(body.userId);
+    if (deleteError) {
+      await auditFailure('TEST_ACCOUNT_DELETE_FAILED', deleteError.message, target.email);
+      return reply(request, 409, { code: 'ACCOUNT_HAS_HISTORY', error: 'This test account has protected operational history and cannot be deleted. Deactivate it instead.' });
+    }
+    await admin.from('audit_logs').insert({ actor_id: actorId, action: 'TEST_ACCOUNT_DELETED', entity_type: 'profiles', entity_id: body.userId, new_values: { email: target.email, name: target.full_name, reason: body.reason.trim() } });
+    console.log(JSON.stringify({ event: 'admin_users_test_account_deleted', actorId, userId: body.userId }));
+    return reply(request, 200, { id: body.userId });
   }
 
   if (body.action === 'resend') {

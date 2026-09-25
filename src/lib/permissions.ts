@@ -5,6 +5,8 @@ export const PERMISSIONS = {
   analytics: 'analytics.view',
   users: 'users.manage',
   roles: 'roles.manage',
+  rolesView: 'roles.view',
+  roleTemplates: 'roles.manage_templates',
   departments: 'departments.manage',
   hr: 'hr.manage',
   products: 'products.manage',

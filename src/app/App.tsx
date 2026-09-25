@@ -19,6 +19,9 @@ const RecoveryPage = lazy(() =>
 const PasswordUpdatePage = lazy(() =>
   import('../pages/LoginPage').then((module) => ({ default: module.PasswordUpdatePage })),
 );
+const AccountActivationPage = lazy(() =>
+  import('../pages/LoginPage').then((module) => ({ default: module.AccountActivationPage })),
+);
 const DashboardPage = lazy(() =>
   import('../pages/DashboardPage').then((module) => ({ default: module.DashboardPage })),
 );
@@ -43,6 +46,7 @@ const SettingsPage = lazy(() =>
 const UsersPage = lazy(() =>
   import('../pages/UsersPage').then((module) => ({ default: module.UsersPage })),
 );
+const RolesPage = lazy(() => import('../pages/RolesPage').then((module) => ({ default: module.RolesPage })));
 const TestAccountsPage = lazy(() => import('../pages/TestAccountsPage').then((module) => ({ default: module.TestAccountsPage })));
 const DepartmentsPage = lazy(() =>
   import('../pages/DepartmentsPage').then((module) => ({ default: module.DepartmentsPage })),
@@ -63,6 +67,7 @@ function Protected({ permission, superAdminOnly, roles, children }: { permission
   if (error) return <ErrorState message={error} retry={retry} />;
   if (!session) return <Navigate to="/login" replace />;
   if (!profile || !profile.is_active || profile.employment_status !== 'active') return <DeniedState />;
+  if (profile.must_change_password) return <Navigate to="/activate-account" replace />;
   if (superAdminOnly && role !== 'super_admin') return <DeniedState />;
   if (roles && (!role || !roles.includes(role))) return <DeniedState />;
   if (permission && !permissions.has(permission)) return <DeniedState />;
@@ -74,7 +79,8 @@ export function App() {
       <Routes>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/recover" element={<RecoveryPage />} />
-      <Route path="/accept-invite" element={<PasswordUpdatePage />} />
+      <Route path="/accept-invite" element={<AccountActivationPage />} />
+      <Route path="/activate-account" element={<AccountActivationPage />} />
       <Route path="/reset-password" element={<PasswordUpdatePage />} />
       <Route path="/ost/register" element={<OstRegistrationPage />} />
       <Route
@@ -98,6 +104,7 @@ export function App() {
           path="settings/test-accounts"
           element={<Protected permission={PERMISSIONS.users} superAdminOnly><TestAccountsPage /></Protected>}
         />
+        <Route path="settings/roles" element={<Protected permission={PERMISSIONS.roleTemplates} superAdminOnly><RolesPage /></Protected>} />
         <Route
           path="settings/departments"
           element={

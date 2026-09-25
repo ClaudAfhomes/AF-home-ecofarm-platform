@@ -69,8 +69,8 @@ describe('admin-users error contract', () => {
         context: new Response(JSON.stringify({ code: 'EMAIL_EXISTS', error: 'A staff profile already exists for this email address.' }), { status: 409 }),
       },
     });
-    const { inviteStaff } = await import('./operations');
-    await expect(inviteStaff({
+    const { createStaffAccount } = await import('./operations');
+    await expect(createStaffAccount({
       email: 'existing@example.com',
       fullName: 'Existing User',
       roleId: 'role-id',
@@ -78,6 +78,7 @@ describe('admin-users error contract', () => {
       phone: null,
       employeeNo: null,
       parentId: null,
+      temporaryPassword: 'Temporary-123',
     })).rejects.toThrow('A staff profile already exists for this email address.');
   });
 });

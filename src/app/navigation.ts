@@ -1,6 +1,6 @@
 import {
   BadgeDollarSign, Boxes, Building2, ContactRound, CreditCard, FileBarChart,
-  LayoutDashboard, Network, QrCode, Settings, ShieldCheck, ShoppingCart, UserCog,
+  LayoutDashboard, Network, QrCode, Settings, ShieldCheck, ShoppingCart, UserCog, KeyRound,
 } from 'lucide-react';
 import type { ComponentType } from 'react';
 import { PERMISSIONS } from '../lib/permissions';
@@ -24,6 +24,7 @@ export const navigation: NavigationGroup[] = [
     items: [{ to: '/', label: 'Dashboard', icon: LayoutDashboard, permission: PERMISSIONS.dashboard }] },
   { id: 'organization', label: 'Organization', icon: Building2, items: [
     { to: '/settings/users', label: 'Users & accounts', icon: UserCog, permission: PERMISSIONS.users },
+    { to: '/settings/roles', label: 'Roles & permissions', icon: KeyRound, permission: PERMISSIONS.roleTemplates, superAdminOnly: true },
     { to: '/settings/departments', label: 'Departments', icon: Building2, permission: PERMISSIONS.departments, superAdminOnly: true },
   ] },
   { id: 'sales', label: 'Sales & Customers', icon: ShoppingCart, items: [

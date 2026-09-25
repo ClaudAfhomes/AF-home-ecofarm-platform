@@ -18,8 +18,8 @@ export interface Database {
   public: {
     Tables: {
       profiles: {
-        Row: { id: string; employee_no: string | null; full_name: string; email: string; phone: string | null; department_id: string | null; role_id: string; employment_status: EmploymentStatus; genealogy_parent_id: string | null; vice_director_id: string | null; referral_depth: number; credit_eligibility: boolean; credit_count: number; manager_shoulders_payment: boolean; is_active: boolean; is_test_account: boolean; created_at: string; updated_at: string };
-        Insert: { id: string; full_name: string; email: string; role_id: string; employee_no?: string | null; phone?: string | null; department_id?: string | null; employment_status?: string; genealogy_parent_id?: string | null; vice_director_id?: string | null; is_active?: boolean; is_test_account?: boolean };
+        Row: { id: string; employee_no: string | null; full_name: string; email: string; phone: string | null; department_id: string | null; role_id: string; employment_status: EmploymentStatus; genealogy_parent_id: string | null; vice_director_id: string | null; referral_depth: number; credit_eligibility: boolean; credit_count: number; manager_shoulders_payment: boolean; is_active: boolean; is_test_account: boolean; must_change_password: boolean; created_at: string; updated_at: string };
+        Insert: { id: string; full_name: string; email: string; role_id: string; employee_no?: string | null; phone?: string | null; department_id?: string | null; employment_status?: string; genealogy_parent_id?: string | null; vice_director_id?: string | null; is_active?: boolean; is_test_account?: boolean; must_change_password?: boolean };
         Update: Partial<Database['public']['Tables']['profiles']['Insert']>;
         Relationships: [];
       };
@@ -28,6 +28,14 @@ export interface Database {
         Insert: { slug: RoleSlug; name: string; description?: string | null; is_system?: boolean; is_protected?: boolean };
         Update: Partial<Database['public']['Tables']['roles']['Insert']>;
         Relationships: [];
+      };
+      permissions: {
+        Row: { id: string; key: string; name: string; module: string; group_key: string | null; module_key: string | null; action_key: string | null; description: string | null; scope_kind: 'none' | 'own' | 'branch' | 'department' | 'global'; created_at: string };
+        Insert: never; Update: never; Relationships: [];
+      };
+      role_permissions: {
+        Row: { role_id: string; permission_id: string; data_scope: 'own' | 'branch' | 'department' | 'global' };
+        Insert: never; Update: never; Relationships: [];
       };
       departments: {
         Row: { id: string; name: string; description: string | null; accountable_leader_id: string | null; is_active: boolean; created_at: string; updated_at: string };
@@ -135,6 +143,9 @@ export interface Database {
       current_permissions: { Args: never; Returns: string[] };
       set_member_permission: { Args: { p_profile_id: string; p_permission_key: string; p_effect: 'allow' | 'deny' | 'inherit'; p_reason: string }; Returns: undefined };
       set_role_permission: { Args: { p_role_slug: string; p_permission_key: string; p_enabled: boolean; p_reason: string }; Returns: undefined };
+      create_custom_role: { Args: { p_name: string; p_description?: string | null }; Returns: Database['public']['Tables']['roles']['Row'] };
+      configure_role_permission: { Args: { p_role_id: string; p_permission_key: string; p_enabled: boolean; p_scope: 'own' | 'branch' | 'department' | 'global'; p_reason: string }; Returns: undefined };
+      restrict_member_permission: { Args: { p_profile_id: string; p_permission_key: string; p_restricted: boolean; p_reason: string }; Returns: undefined };
       verify_payment: { Args: { p_payment_id: string; p_approved: boolean; p_notes: string | null }; Returns: undefined };
       activate_membership: { Args: { p_sale_id: string }; Returns: Database['public']['Tables']['memberships']['Row'] };
       admin_create_department: { Args: { p_name: string; p_description: string | null; p_accountable_leader_id?: string | null }; Returns: Database['public']['Tables']['departments']['Row'] };
