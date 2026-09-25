@@ -13,6 +13,29 @@ select id from public.payments limit 1;
 select id,vice_director_id from public.profiles where id <> auth.uid();
 select id,vice_director_id from public.sales;
 
--- sales_manager / ost: finance queue and other salespeople's customers must not be visible.
+-- sales_manager: finance queue and other salespeople's customers must not be visible.
 select id,status from public.payments;
 select id,created_by,assigned_salesperson_id from public.customers;
+
+-- employee: may process redemption only; no finance, identity documents, or genealogy access.
+select id,status from public.payments;
+select id,storage_path from public.customer_documents;
+select id,vice_director_id from public.profiles where id <> auth.uid();
+
+-- ost: referral-only by default; no staff sales/customer/finance access.
+select id from public.customers;
+select id from public.sales;
+select id from public.payments;
+
+-- customer: may only use customer-portal/self-service policies added with the portal phase.
+select id from public.profiles where id <> auth.uid();
+select id from public.customers;
+select id from public.payments;
+
+-- Admin must be denied by both permission-management RPCs.
+select public.set_member_permission(
+  auth.uid(), 'dashboard.view', 'deny', 'RBAC denial verification'
+);
+select public.set_role_permission(
+  'admin', 'dashboard.view', false, 'RBAC denial verification'
+);

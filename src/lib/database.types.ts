@@ -8,7 +8,9 @@ export type RoleSlug =
   | 'vice_director'
   | 'senior_sales_manager'
   | 'sales_manager'
-  | 'ost';
+  | 'employee'
+  | 'ost'
+  | 'customer';
 
 export type EmploymentStatus = 'active' | 'inactive' | 'suspended' | 'resigned';
 
@@ -22,8 +24,8 @@ export interface Database {
         Relationships: [];
       };
       roles: {
-        Row: { id: string; slug: RoleSlug; name: string; description: string | null; is_system: boolean; created_at: string };
-        Insert: { slug: RoleSlug; name: string; description?: string | null; is_system?: boolean };
+        Row: { id: string; slug: RoleSlug; name: string; description: string | null; is_system: boolean; is_protected: boolean; created_at: string };
+        Insert: { slug: RoleSlug; name: string; description?: string | null; is_system?: boolean; is_protected?: boolean };
         Update: Partial<Database['public']['Tables']['roles']['Insert']>;
         Relationships: [];
       };
@@ -35,6 +37,12 @@ export interface Database {
       };
       staff_invitations: {
         Row: { id: string; user_id: string; email: string; status: 'pending' | 'accepted' | 'revoked'; invited_by: string; invited_at: string; last_sent_at: string; accepted_at: string | null; created_at: string; updated_at: string };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
+      profile_permission_overrides: {
+        Row: { profile_id: string; permission_id: string; effect: 'allow' | 'deny'; reason: string; changed_by: string; created_at: string; updated_at: string };
         Insert: never;
         Update: never;
         Relationships: [];
@@ -113,6 +121,8 @@ export interface Database {
     Views: Record<string, never>;
     Functions: {
       current_permissions: { Args: never; Returns: string[] };
+      set_member_permission: { Args: { p_profile_id: string; p_permission_key: string; p_effect: 'allow' | 'deny' | 'inherit'; p_reason: string }; Returns: undefined };
+      set_role_permission: { Args: { p_role_slug: string; p_permission_key: string; p_enabled: boolean; p_reason: string }; Returns: undefined };
       verify_payment: { Args: { p_payment_id: string; p_approved: boolean; p_notes: string | null }; Returns: undefined };
       admin_create_department: { Args: { p_name: string; p_description: string | null; p_accountable_leader_id?: string | null }; Returns: Database['public']['Tables']['departments']['Row'] };
       admin_update_department: { Args: { p_department_id: string; p_name: string; p_description: string | null; p_is_active: boolean; p_accountable_leader_id?: string | null }; Returns: Database['public']['Tables']['departments']['Row'] };
